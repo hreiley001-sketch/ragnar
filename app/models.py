@@ -150,6 +150,25 @@ class Listing(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=utcnow)
 
 
+class FoundingApplication(SQLModel, table=True):
+    """A prospective seller's application to join the Founding 250.
+
+    Applications are reviewed (not auto-approved) — 'apply, not open signup', per
+    the launch plan. Approving one creates a founding Seller.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(max_length=120)
+    email: str = Field(index=True, max_length=160)
+    handle_wanted: Optional[str] = Field(default=None, max_length=40)
+    categories: Optional[str] = Field(default=None, max_length=300)  # what they sell
+    current_platforms: Optional[str] = Field(default=None, max_length=300)  # eBay/TCGplayer links
+    monthly_volume: Optional[str] = Field(default=None, max_length=80)
+    message: Optional[str] = Field(default=None, max_length=2000)
+    status: str = Field(default="pending", index=True)  # pending | approved | rejected
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
 class Sale(SQLModel, table=True):
     """A completed sale — RAGNAR's own sold-price history (the honest comp set).
 

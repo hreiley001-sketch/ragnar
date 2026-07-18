@@ -113,7 +113,11 @@ class Settings:
     # Scryfall (MTG) needs no key. Pokémon TCG works without a key; a key raises
     # rate limits.
     pokemontcg_key: str = os.getenv("POKEMONTCG_API_KEY", "").strip()
-    catalog_user_agent: str = os.getenv("CATALOG_USER_AGENT", "RagnarCards/0.1 (+https://ragnarcards.com)")
+    catalog_user_agent: str = os.getenv("CATALOG_USER_AGENT", "Ragnar/0.1 (+https://ragnarips.com)")
+
+    # Seed demo data (fake listings/sellers/streams) only when explicitly enabled.
+    # Off by default so production stays clean.
+    seed_demo: bool = _flag("SEED_DEMO", False)
 
     debug: bool = _flag("DEBUG", False)
 

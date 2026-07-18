@@ -23,9 +23,9 @@ services:
       - key: UPLOAD_DIR
         value: /var/data/uploads
       - key: ALLOWED_ORIGINS
-        value: https://ragnarcards.com,https://www.ragnarcards.com
+        value: https://ragnarips.com,https://www.ragnarips.com
       - key: PUBLIC_BASE_URL
-        value: https://ragnarcards.com
+        value: https://ragnarips.com
       # Secrets — set these in the Render dashboard, not in this file:
       - key: STRIPE_SECRET_KEY
         sync: false

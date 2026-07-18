@@ -176,6 +176,31 @@ class SellerApplyResult(SellerState):
     store_edit_token: Optional[str] = None
 
 
+# --------------------------- founding applications --------------------------- #
+
+class FoundingApplicationCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    email: str = Field(min_length=5, max_length=160)
+    handle_wanted: Optional[str] = Field(default=None, max_length=40)
+    categories: Optional[str] = Field(default=None, max_length=300)
+    current_platforms: Optional[str] = Field(default=None, max_length=300)
+    monthly_volume: Optional[str] = Field(default=None, max_length=80)
+    message: Optional[str] = Field(default=None, max_length=2000)
+
+
+class FoundingApplicationRead(BaseModel):
+    id: int
+    name: str
+    email: str
+    handle_wanted: Optional[str]
+    categories: Optional[str]
+    current_platforms: Optional[str]
+    monthly_volume: Optional[str]
+    message: Optional[str]
+    status: str
+    created_at: datetime
+
+
 # --------------------------- live streams --------------------------- #
 
 class LiveStreamCreate(BaseModel):

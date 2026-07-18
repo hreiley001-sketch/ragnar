@@ -115,6 +115,9 @@ def _make_founding(seller: Seller, number: int) -> None:
 
 
 def seed_if_empty() -> None:
+    # Demo data is opt-in (SEED_DEMO=true). Production stays clean by default.
+    if not settings.seed_demo:
+        return
     with Session(engine) as session:
         if session.exec(select(Seller).limit(1)).first():
             return

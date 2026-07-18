@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Become a Founding Seller</title>
+  <meta name="description" content="Apply to be one of RAGNAR's 250 Founding Sellers. Keep more of every sale on a trust-first trading-card marketplace." />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .land { max-width: 960px; margin: 0 auto; padding: 0 clamp(16px,4vw,40px) 60px; }
+    .hero-land { text-align:center; padding: clamp(30px,7vw,70px) 0 20px; }
+    .hero-land h2 { font-size: clamp(32px,6vw,60px); line-height:1.05; margin:14px 0; }
+    .hero-land .sub { color: var(--text-soft); font-size: clamp(16px,2.4vw,20px); max-width:680px; margin:0 auto; }
+    .counter-big { display:inline-flex; align-items:center; gap:10px; margin:18px auto; padding:8px 18px; border-radius:999px; border:1px solid rgba(240,198,116,.5); background:rgba(240,198,116,.1); color:var(--gold); font-weight:600; }
+    .perks { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin:28px 0; }
+    .perk { padding:18px; border-radius:var(--radius); border:1px solid var(--border); background:var(--panel); }
+    .perk .p-num { font-size:26px; font-weight:800; color:var(--ice); text-shadow:0 0 16px rgba(55,189,255,.4); }
+    .perk .p-t { font-weight:700; margin:6px 0 4px; }
+    .perk .p-d { font-size:13px; color:var(--text-soft); }
+    .apply-card { max-width:640px; margin:10px auto 0; padding:26px; }
+    .apply-card h3 { margin-top:0; }
+    .success { text-align:center; padding:30px; }
+    .success .big { font-size:44px; }
+    .foot-links { text-align:center; margin-top:18px; }
+    .foot-links a { margin:0 10px; }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <header class="site-header">
+    <div class="brand">
+      <svg class="crest" viewBox="0 0 120 80" aria-hidden="true"><defs><linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset=".5" stop-color="#6f93b4"/><stop offset="1" stop-color="#2b3d52"/></linearGradient></defs><g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.6"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/></g><g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.8"><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>
+      <div class="brand-word"><h1>RAGNAR</h1><span class="runes">ᚱᚨᚷᚾᚨᚱ · trading-card marketplace</span></div>
+    </div>
+    <div class="header-actions">
+      <a class="btn btn-ghost btn-sm" href="/stores">Explore stores</a>
+      <a class="btn btn-primary btn-sm" href="#apply">Apply</a>
+    </div>
+  </header>
+
+  <main class="land">
+    <section class="hero-land">
+      <div class="counter-big" id="counter">★ Founding Sellers — <span id="claimed">—</span> / <span id="cap">250</span> claimed</div>
+      <h2>Be one of the <span class="accent" style="color:var(--ice)">250 Founding Sellers.</span></h2>
+      <p class="sub">RAGNAR is a trust-first marketplace for trading cards — built so sellers keep more and buyers stop getting burned. The first 250 sellers lock in founding status forever.</p>
+      <div style="margin-top:20px;"><a class="btn btn-primary" href="#apply">Apply to be a Founding Seller</a></div>
+    </section>
+
+    <div class="perks">
+      <div class="perk"><div class="p-num" id="perkIntro">0%</div><div class="p-t">Fees for 90 days</div><div class="p-d">Pay only payment processing during your intro window — keep the rest.</div></div>
+      <div class="perk"><div class="p-num" id="perkRate">4%</div><div class="p-t">Permanent founding rate</div><div class="p-d">A lower rate than everyone else, locked in for good — our thank-you for being early.</div></div>
+      <div class="perk"><div class="p-num">★</div><div class="p-t">Founding badge</div><div class="p-d">A permanent Founding Seller badge on your storefront. Status that never expires.</div></div>
+      <div class="perk"><div class="p-num">⚡</div><div class="p-t">Your own store</div><div class="p-d">A customizable storefront, scan-to-list, real sold-price history, and live selling.</div></div>
+    </div>
+
+    <section class="card apply-card" id="apply">
+      <h3>Apply to be a Founding Seller</h3>
+      <p class="muted" style="margin-top:0;">Spots are limited to 250 and reviewed by hand. Tell us about your cards.</p>
+      <form id="applyForm">
+        <div class="field-row">
+          <label class="field"><span>Name *</span><input name="name" required minlength="2" maxlength="120" /></label>
+          <label class="field"><span>Email *</span><input name="email" type="email" required maxlength="160" /></label>
+        </div>
+        <div class="field-row">
+          <label class="field"><span>Store handle you want</span><input name="handle_wanted" maxlength="40" placeholder="yggdrasil" /></label>
+          <label class="field"><span>Rough monthly sales</span><input name="monthly_volume" maxlength="80" placeholder="$2,000 / mo" /></label>
+        </div>
+        <label class="field"><span>What do you sell?</span><input name="categories" maxlength="300" placeholder="Vintage Pokémon, PSA-graded basketball…" /></label>
+        <label class="field"><span>Where do you sell now? (links welcome)</span><input name="current_platforms" maxlength="300" placeholder="eBay / TCGplayer / Whatnot store URL" /></label>
+        <label class="field"><span>Anything else?</span><textarea name="message" rows="3" maxlength="2000" placeholder="Tell us why you'd be a great Founding Seller."></textarea></label>
+        <button type="submit" class="btn btn-primary">Submit application</button>
+        <span id="formStatus" class="form-status"></span>
+      </form>
+    </section>
+
+    <div id="successBox" class="card apply-card success" hidden>
+      <div class="big">🐺</div>
+      <h3>Application received.</h3>
+      <p class="muted">Thanks — we review Founding applications by hand and will reach out by email. Keep an eye on your inbox.</p>
+      <a class="btn btn-ghost" href="/stores">Explore stores while you wait →</a>
+    </div>
+
+    <div class="foot-links">
+      <a href="/stores">Stores & Live</a> · <a href="/marketplace">Marketplace</a>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/founding.js"></script>
+</body>
+</html>

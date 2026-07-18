@@ -20,6 +20,7 @@ from .routers import (
     admin,
     ai_router,
     catalog,
+    founding,
     health,
     listings,
     meta,
@@ -84,6 +85,7 @@ app.include_router(catalog.router)
 app.include_router(ai_router.router)
 app.include_router(stores.router)
 app.include_router(streams.router)
+app.include_router(founding.router)
 app.include_router(admin.router)
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -94,10 +96,19 @@ if STATIC_DIR.exists():
 
 @app.get("/", include_in_schema=False)
 def home():
+    # Front door = the Founding 250 application landing page.
+    page = STATIC_DIR / "founding.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"name": settings.app_name, "tagline": settings.tagline}
+
+
+@app.get("/marketplace", include_in_schema=False)
+def marketplace():
     index = STATIC_DIR / "index.html"
     if index.exists():
         return FileResponse(str(index))
-    return {"name": settings.app_name, "tagline": settings.tagline}
+    return {"name": settings.app_name}
 
 
 @app.get("/admin", include_in_schema=False)

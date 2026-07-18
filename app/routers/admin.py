@@ -11,13 +11,15 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy import func
 from sqlmodel import Session, select
 
+import secrets
+
 from .. import ai, catalog, comps, payments, pricing
 from ..config import settings
 from ..database import get_session
-from ..models import Listing, ListingStatus, Sale, Seller
+from ..models import FoundingApplication, Listing, ListingStatus, LiveStream, Sale, Seller
 from ..recognition import active_provider
-from ..schemas import ListingRead
-from ..services import founding_status, record_sale
+from ..schemas import FoundingApplicationRead, ListingRead
+from ..services import founding_status, grant_founding_if_available, record_sale
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -170,6 +172,87 @@ def admin_sellers(session: Session = Depends(get_session), _: None = Depends(req
         "stripe_charges_enabled": s.stripe_charges_enabled,
     } for s in rows]
     return {"items": items, "count": len(items)}
+
+
+@router.get("/founding-applications")
+def admin_founding_applications(
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+    status_filter: str | None = Query(None, alias="status"),
+) -> dict:
+    stmt = select(FoundingApplication).order_by(FoundingApplication.created_at.desc())
+    if status_filter:
+        stmt = stmt.where(FoundingApplication.status == status_filter)
+    rows = session.exec(stmt).all()
+    return {
+        "items": [FoundingApplicationRead(**r.model_dump()).model_dump() for r in rows],
+        "count": len(rows),
+    }
+
+
+@router.patch("/founding-applications/{app_id}")
+def admin_review_application(
+    app_id: int,
+    payload: dict,
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+) -> dict:
+    app = session.get(FoundingApplication, app_id)
+    if not app:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application not found")
+    new_status = payload.get("status")
+    if new_status not in {"pending", "approved", "rejected"}:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="status must be pending|approved|rejected")
+
+    result: dict = {"id": app.id, "status": new_status}
+    if new_status == "approved" and app.status != "approved":
+        # Create a founding seller from the application.
+        handle = (app.handle_wanted or app.email.split("@")[0]).strip().lower()
+        handle = "".join(ch for ch in handle if ch.isalnum() or ch in "_.-") or f"seller{app.id}"
+        if session.exec(select(Seller).where(Seller.handle == handle)).first():
+            handle = f"{handle}{app.id}"
+        seller = Seller(
+            handle=handle,
+            display_name=app.name,
+            email=app.email,
+            store_edit_token=secrets.token_urlsafe(16),
+        )
+        grant_founding_if_available(session, seller)
+        session.add(seller)
+        result["seller_handle"] = handle
+        result["store_edit_token"] = seller.store_edit_token
+        result["is_founding"] = seller.is_founding
+    app.status = new_status
+    session.add(app)
+    session.commit()
+    return result
+
+
+@router.post("/reset")
+def admin_reset(
+    confirm: bool = Query(False, description="Must be true to wipe data"),
+    keep_applications: bool = Query(True, description="Keep Founding applications"),
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+) -> dict:
+    """Danger: clears listings, sales, streams, and sellers (e.g. to remove demo
+    data). Keeps Founding applications by default."""
+    if not confirm:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Pass ?confirm=true to wipe data.",
+        )
+    deleted = {}
+    models_to_clear = [("streams", LiveStream), ("sales", Sale), ("listings", Listing), ("sellers", Seller)]
+    if not keep_applications:
+        models_to_clear.append(("applications", FoundingApplication))
+    for name, model in models_to_clear:
+        rows = session.exec(select(model)).all()
+        for r in rows:
+            session.delete(r)
+        deleted[name] = len(rows)
+    session.commit()
+    return {"status": "reset", "deleted": deleted}
 
 
 @router.get("/sales")

@@ -1,11 +1,11 @@
-# Deploying RAGNAR to ragnarcards.com
+# Deploying RAGNAR to ragnarips.com
 
 You do the account/DNS steps (they need your logins + a small hosting payment);
 the app is already configured for them. Recommended host: **Render** (simplest,
 free TLS, the repo includes a `render.yaml` blueprint). ~20 minutes.
 
 ## 0. Prerequisites
-- **Register `ragnarcards.com`** at a domain registrar if you haven't (Cloudflare,
+- **Register `ragnarips.com`** at a domain registrar if you haven't (Cloudflare,
   Namecheap, Porkbun, GoDaddy…). You'll need access to its DNS settings.
 - Put the `ragnar` folder in a **GitHub repo** (Render deploys from GitHub):
   ```bash
@@ -26,12 +26,12 @@ free TLS, the repo includes a `render.yaml` blueprint). ~20 minutes.
    it loads and `/health` returns `{"status":"ok"}`.
 
 ## 2. Point the domain at it (domain is at Network Solutions)
-1. In Render: your service → **Settings → Custom Domains → Add** `ragnarcards.com`,
-   then add `www.ragnarcards.com` too. Render shows the exact records + verification
+1. In Render: your service → **Settings → Custom Domains → Add** `ragnarips.com`,
+   then add `www.ragnarips.com` too. Render shows the exact records + verification
    status. **Use the values Render displays** (they're authoritative) — the ones
    below are the typical Render values.
 2. Log in to **Network Solutions → Account Manager → My Domain Names →
-   ragnarcards.com → Manage → Advanced DNS (Edit DNS)**. Add:
+   ragnarips.com → Manage → Advanced DNS (Edit DNS)**. Add:
    - **A record** — Host: `@` (or blank/root) → Value: `216.24.57.1` (Render's apex IP;
      confirm against what Render shows).
    - **CNAME** — Host: `www` → Value: `ragnar.onrender.com` (your Render hostname).
@@ -48,7 +48,7 @@ free TLS, the repo includes a `render.yaml` blueprint). ~20 minutes.
 - Confirm `ALLOWED_ORIGINS` and `PUBLIC_BASE_URL` = your real domain (already set in
   `render.yaml`). PUBLIC_BASE_URL matters for Stripe redirect/onboarding links.
 - If you wired Stripe, add a webhook in the Stripe dashboard pointing to
-  `https://ragnarcards.com/api/payments/webhook` and set `STRIPE_WEBHOOK_SECRET`.
+  `https://ragnarips.com/api/payments/webhook` and set `STRIPE_WEBHOOK_SECRET`.
 
 ## Alternatives
 - **Railway / Fly.io** — same app; use the `Procfile` (Railway) or `fly launch` with the
