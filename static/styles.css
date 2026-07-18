@@ -404,6 +404,27 @@ select option { background: var(--panel-solid); }
 .int-dot.on { background: #6fe3b0; box-shadow: 0 0 7px rgba(111,227,176,0.7); }
 .int-dot.off { background: #5a6b7d; }
 
+/* ---------- Hamburger nav (shared, injected by nav.js) ---------- */
+.nav-burger { display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:10px; border:1px solid var(--border-strong); background:rgba(255,255,255,0.04); color:var(--text); cursor:pointer; font-size:18px; line-height:1; }
+.nav-burger:hover { background:rgba(55,189,255,0.12); transform:translateY(-1px); }
+.nav-scrim { position:fixed; inset:0; background:rgba(4,7,11,0.6); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:80; }
+.nav-scrim.open { opacity:1; pointer-events:auto; }
+.nav-drawer { position:fixed; top:0; right:0; bottom:0; width:min(330px,88%); background:var(--panel-solid); border-left:1px solid var(--border-strong); z-index:81; transform:translateX(102%); transition:transform .24s ease; display:flex; flex-direction:column; padding:18px; overflow-y:auto; box-shadow:-16px 0 50px rgba(0,0,0,.5); }
+.nav-drawer.open { transform:none; }
+.nav-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.nav-head img { height:42px; border-radius:9px; background:#f6f9fc; padding:4px 8px; }
+.nav-close { background:none; border:none; color:var(--text-soft); font-size:24px; cursor:pointer; line-height:1; }
+.nav-links { display:flex; flex-direction:column; gap:4px; }
+.nav-link { display:flex; align-items:center; gap:13px; padding:12px 12px; border-radius:11px; color:var(--text-soft); text-decoration:none; font-size:15px; border:1px solid transparent; }
+.nav-link:hover { background:rgba(55,189,255,0.08); color:var(--text); text-decoration:none; }
+.nav-link.active { background:linear-gradient(180deg,rgba(23,42,60,0.75),rgba(12,17,26,0.75)); color:#eaf3fb; border-color:var(--border); }
+.nav-link .ico { width:22px; text-align:center; font-size:16px; }
+.nav-div { height:1px; background:var(--border); margin:12px 2px; }
+.nav-user { font-size:12px; color:var(--muted); padding:2px 12px 6px; text-transform:uppercase; letter-spacing:.05em; }
+.nav-hub { border-color:rgba(240,198,116,0.4); color:var(--gold); }
+.nav-hub:hover { background:rgba(240,198,116,0.1); color:var(--gold); }
+.nav-foot { margin-top:auto; padding-top:14px; font-size:11px; color:var(--muted); text-align:center; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
   .layout { grid-template-columns: 1fr; }
