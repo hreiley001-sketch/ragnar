@@ -104,6 +104,17 @@ class Settings:
     public_base_url: str = os.getenv("PUBLIC_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
     payments_live: bool = _flag("PAYMENTS_LIVE", False)
 
+    # --- Admin command hub ---
+    # Admin endpoints require X-Admin-Token == this value. If unset, admin is
+    # disabled (endpoints return 503) — set a strong secret in production.
+    admin_token: str = os.getenv("ADMIN_TOKEN", "").strip()
+
+    # --- Free card catalogs ---
+    # Scryfall (MTG) needs no key. Pokémon TCG works without a key; a key raises
+    # rate limits.
+    pokemontcg_key: str = os.getenv("POKEMONTCG_API_KEY", "").strip()
+    catalog_user_agent: str = os.getenv("CATALOG_USER_AGENT", "RagnarCards/0.1 (+https://ragnarcards.com)")
+
     debug: bool = _flag("DEBUG", False)
 
     @property

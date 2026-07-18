@@ -144,6 +144,69 @@ class FoundingStatus(BaseModel):
     intro_sales_cap: float
 
 
+# --------------------------- stores --------------------------- #
+
+class StoreSummary(BaseModel):
+    handle: str
+    display_name: str
+    tagline: Optional[str] = None
+    avatar_url: Optional[str] = None
+    banner_url: Optional[str] = None
+    accent_color: Optional[str] = None
+    is_founding: bool = False
+    founding_number: Optional[int] = None
+    listing_count: int = 0
+    is_live: bool = False
+
+
+class StoreProfile(StoreSummary):
+    bio: Optional[str] = None
+
+
+class StoreUpdate(BaseModel):
+    tagline: Optional[str] = Field(default=None, max_length=140)
+    bio: Optional[str] = Field(default=None, max_length=1000)
+    banner_url: Optional[str] = Field(default=None, max_length=500)
+    avatar_url: Optional[str] = Field(default=None, max_length=500)
+    accent_color: Optional[str] = Field(default=None, max_length=16)
+    store_public: Optional[bool] = None
+
+
+class SellerApplyResult(SellerState):
+    store_edit_token: Optional[str] = None
+
+
+# --------------------------- live streams --------------------------- #
+
+class LiveStreamCreate(BaseModel):
+    title: str = Field(min_length=2, max_length=140)
+    embed_url: Optional[str] = Field(default=None, max_length=500)
+    thumbnail_url: Optional[str] = Field(default=None, max_length=500)
+    scheduled_at: Optional[datetime] = None
+    status: Optional[str] = Field(default="scheduled")
+
+
+class LiveStreamUpdate(BaseModel):
+    status: Optional[str] = None
+    embed_url: Optional[str] = Field(default=None, max_length=500)
+    viewer_count: Optional[int] = None
+
+
+class LiveStreamRead(BaseModel):
+    id: int
+    seller_handle: str
+    seller_name: str
+    avatar_url: Optional[str] = None
+    accent_color: Optional[str] = None
+    title: str
+    status: str
+    embed_url: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    scheduled_at: Optional[datetime] = None
+    started_at: Optional[datetime] = None
+    viewer_count: int = 0
+
+
 # --------------------------- sales / comps --------------------------- #
 
 class MarkSold(BaseModel):

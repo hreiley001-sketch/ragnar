@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Store</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .store-hero { position:relative; height:200px; border-radius:0 0 var(--radius) var(--radius); overflow:hidden; }
+    .store-hero-inner { position:absolute; inset:0; display:flex; align-items:flex-end; gap:16px; padding:18px clamp(16px,4vw,40px); background:linear-gradient(180deg, transparent, rgba(8,11,16,.85)); }
+    .store-av { width:88px;height:88px;border-radius:20px;border:3px solid var(--bg); display:grid;place-items:center;font-weight:800;font-size:34px;color:#0a0d12; flex:none; }
+    .store-h-meta h1 { margin:0; font-size:clamp(24px,4vw,36px); }
+    .store-h-meta .tg { color:var(--text-soft); }
+    .store-wrap { padding: 18px clamp(16px,4vw,40px) 60px; }
+    .live-strip { display:flex; gap:12px; flex-wrap:wrap; margin:16px 0; }
+    .live-pill { display:flex;align-items:center;gap:8px; padding:8px 14px; border-radius:10px; border:1px solid var(--border-strong); background:rgba(200,30,30,.12); cursor:pointer; }
+    .live-dot { width:9px;height:9px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;animation:pulse 1.4s infinite; } @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .bar { display:flex; align-items:center; justify-content:space-between; margin:18px 0 12px; }
+    .customize { margin-top:14px; padding:16px; }
+    .customize .field-row { grid-template-columns:1fr 1fr; }
+    .embed-wrap { aspect-ratio:16/9; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border-strong); margin:12px 0; background:#000; }
+    .embed-wrap iframe { width:100%; height:100%; border:0; }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <header class="site-header">
+    <div class="brand">
+      <svg class="crest" viewBox="0 0 120 80" aria-hidden="true"><defs><linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset=".5" stop-color="#6f93b4"/><stop offset="1" stop-color="#2b3d52"/></linearGradient></defs><g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.6"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/></g><g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.8"><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>
+      <div class="brand-word"><h1 style="font-size:20px;letter-spacing:.28em;">RAGNAR</h1><span class="runes">ᚱᚨᚷᚾᚨᚱ</span></div>
+    </div>
+    <div class="header-actions">
+      <a class="btn btn-ghost btn-sm" href="/stores">← Stores</a>
+      <a class="btn btn-ghost btn-sm" href="/">Marketplace</a>
+    </div>
+  </header>
+
+  <div class="store-hero" id="storeHero">
+    <div class="store-hero-inner">
+      <div class="store-av" id="storeAv"></div>
+      <div class="store-h-meta">
+        <h1 id="storeName">Store</h1>
+        <div class="tg" id="storeTag"></div>
+      </div>
+    </div>
+  </div>
+
+  <main class="store-wrap">
+    <div id="storeBio" class="muted" style="max-width:720px;"></div>
+    <div id="liveStrip" class="live-strip"></div>
+
+    <div class="bar">
+      <span id="listCount" class="result-count">Listings</span>
+      <button id="customizeBtn" class="btn btn-ghost btn-sm" type="button">✎ Customize this store</button>
+    </div>
+
+    <div id="customizePanel" class="card customize" hidden>
+      <p class="muted" style="margin-top:0;">Paste your <strong>store token</strong> (given when you signed up as a seller) to edit your store.</p>
+      <label class="field"><span>Store token</span><input id="storeToken" type="password" placeholder="X-Store-Token" /></label>
+      <div class="field-row">
+        <label class="field"><span>Tagline</span><input id="c-tagline" maxlength="140" /></label>
+        <label class="field"><span>Accent color</span><input id="c-accent" type="color" value="#6fd6ff" /></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Banner image URL</span><input id="c-banner" type="url" placeholder="https://…" /></label>
+        <label class="field"><span>Avatar image URL</span><input id="c-avatar" type="url" placeholder="https://…" /></label>
+      </div>
+      <label class="field"><span>Bio</span><textarea id="c-bio" rows="2" maxlength="1000"></textarea></label>
+      <button id="saveStoreBtn" class="btn btn-primary btn-sm" type="button">Save store</button>
+      <span id="cStatus" class="form-status"></span>
+    </div>
+
+    <div id="grid" class="grid"></div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/store.js"></script>
+</body>
+</html>

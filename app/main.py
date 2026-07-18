@@ -16,7 +16,21 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .database import init_db
-from .routers import health, listings, meta, payments, pricing, sales, scan, sellers
+from .routers import (
+    admin,
+    ai_router,
+    catalog,
+    health,
+    listings,
+    meta,
+    payments,
+    pricing,
+    sales,
+    scan,
+    sellers,
+    stores,
+    streams,
+)
 from .seed import seed_if_empty
 
 logging.basicConfig(
@@ -66,6 +80,11 @@ app.include_router(sales.router)
 app.include_router(scan.router)
 app.include_router(pricing.router)
 app.include_router(payments.router)
+app.include_router(catalog.router)
+app.include_router(ai_router.router)
+app.include_router(stores.router)
+app.include_router(streams.router)
+app.include_router(admin.router)
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
@@ -79,3 +98,27 @@ def home():
     if index.exists():
         return FileResponse(str(index))
     return {"name": settings.app_name, "tagline": settings.tagline}
+
+
+@app.get("/admin", include_in_schema=False)
+def admin_hub():
+    page = STATIC_DIR / "admin.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "admin UI not found"}
+
+
+@app.get("/stores", include_in_schema=False)
+def stores_page():
+    page = STATIC_DIR / "stores.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "stores UI not found"}
+
+
+@app.get("/store/{handle}", include_in_schema=False)
+def store_page(handle: str):
+    page = STATIC_DIR / "store.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "store UI not found"}

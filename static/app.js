@@ -169,6 +169,42 @@ async function loadListings() {
 }
 function resetAndLoad() { state.page = 1; loadListings(); }
 
+function applyFilters(f) {
+  if (f.q !== undefined) $("f-q").value = f.q || "";
+  if (f.category) $("f-category").value = f.category;
+  if (f.grading_company) $("f-grader").value = f.grading_company;
+  if (f.condition) $("f-condition").value = f.condition;
+  if (f.graded !== undefined && f.graded !== null && f.graded !== "") $("f-graded").value = String(f.graded);
+  if (f.min_grade !== undefined) $("f-mingrade").value = String(f.min_grade);
+  if (f.min_price !== undefined) $("f-minprice").value = f.min_price;
+  if (f.max_price !== undefined) $("f-maxprice").value = f.max_price;
+  if (f.sort) $("f-sort").value = f.sort;
+  if (f.founding_only !== undefined) $("f-founding").checked = String(f.founding_only) === "true";
+  resetAndLoad();
+}
+
+function hydrateFromUrl() {
+  const p = new URLSearchParams(location.search);
+  if (![...p.keys()].length) return false;
+  const f = {};
+  ["q", "category", "grading_company", "condition", "sort"].forEach((k) => { if (p.get(k)) f[k] = p.get(k); });
+  ["min_grade", "min_price", "max_price"].forEach((k) => { if (p.get(k)) f[k] = Number(p.get(k)); });
+  if (p.get("graded")) f.graded = p.get("graded");
+  if (p.get("founding_only")) f.founding_only = p.get("founding_only");
+  applyFilters(f);
+  return true;
+}
+
+async function aiSearch() {
+  const q = $("f-q").value.trim();
+  if (!q) { toast("Type what you want — e.g. 'PSA 10 Charizards under $5k'"); return; }
+  try {
+    const r = await api(`/api/ai/search?q=${encodeURIComponent(q)}`);
+    applyFilters(r.filters || {});
+    toast(`AI search applied (${r.source})`);
+  } catch (e) { toast(e.message); }
+}
+
 /* ---------------- sales history ---------------- */
 function sparkline(series) {
   if (!series || series.length < 2) return "";
@@ -441,6 +477,7 @@ async function init() {
   renderIntegrations();
   refreshFoundingCounter();
 
+  $("aiSearchBtn").addEventListener("click", aiSearch);
   $("f-q").addEventListener("input", debounce(resetAndLoad, 300));
   ["f-category", "f-condition", "f-grader", "f-graded", "f-mingrade", "f-sort"].forEach((id) => $(id).addEventListener("change", resetAndLoad));
   ["f-set", "f-minprice", "f-maxprice"].forEach((id) => $(id).addEventListener("input", debounce(resetAndLoad, 300)));
@@ -477,7 +514,7 @@ async function init() {
   $("listForm").addEventListener("submit", submitListing);
 
   syncGradedFields();
-  await loadListings();
+  if (!hydrateFromUrl()) await loadListings();
 }
 
 document.addEventListener("DOMContentLoaded", init);

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Query
 
+from ..ai import is_configured as ai_configured
 from ..comps import is_configured as comps_configured
 from ..config import settings
 from ..fees import fee_config, quote
@@ -34,6 +35,8 @@ def meta() -> dict:
             "recognition": active_provider(),
             "live_pricing": pricing_configured(),
             "external_comps": comps_configured(),
+            "ai": ai_configured(),
+            "catalog": True,
             "psa": bool(settings.psa_access_token),
         },
     }

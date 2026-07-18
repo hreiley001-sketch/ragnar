@@ -13,15 +13,30 @@ from sqlmodel import Session, select
 
 from .config import settings
 from .database import engine
-from .models import Listing, ListingStatus, Sale, Seller, utcnow
+from .models import Listing, ListingStatus, LiveStream, Sale, Seller, utcnow
 
 logger = logging.getLogger("ragnar.seed")
 
-# handle -> (display_name, founding?)
+# handle -> (display_name, founding?, customization)
 _SELLERS = [
-    ("yggdrasil", "Yggdrasil Cards", True),
-    ("fenrir", "Fenrir Vault", True),
-    ("muninn", "Muninn Collectibles", False),
+    ("yggdrasil", "Yggdrasil Cards", True, {
+        "tagline": "Roots of the hobby.",
+        "accent_color": "#6fd6ff",
+        "bio": "Vintage Pokémon & Lorcana, graded and raw. Founding Seller since day one.",
+        "store_edit_token": "demo-yggdrasil-token",
+    }),
+    ("fenrir", "Fenrir Vault", True, {
+        "tagline": "Unleash the grails.",
+        "accent_color": "#f0a35e",
+        "bio": "High-end vintage and modern grails. Every card slabbed and verified.",
+        "store_edit_token": "demo-fenrir-token",
+    }),
+    ("muninn", "Muninn Collectibles", False, {
+        "tagline": "Memory of every card.",
+        "accent_color": "#9be7c4",
+        "bio": "Sports and TCG singles for every collector. Fair prices, fast shipping.",
+        "store_edit_token": "demo-muninn-token",
+    }),
 ]
 
 # Card catalog. `comps` = (price_offset_pct, days_ago) sold-history points.
@@ -106,8 +121,8 @@ def seed_if_empty() -> None:
 
         sellers: dict[str, Seller] = {}
         founding_n = 0
-        for handle, name, founding in _SELLERS:
-            s = Seller(handle=handle, display_name=name)
+        for handle, name, founding, custom in _SELLERS:
+            s = Seller(handle=handle, display_name=name, **custom)
             if founding:
                 founding_n += 1
                 _make_founding(s, founding_n)
@@ -150,9 +165,24 @@ def seed_if_empty() -> None:
                     )
                 )
 
+        # Demo live streams (video provider plugs into embed_url later).
+        session.add(LiveStream(
+            seller_id=sellers["fenrir"].id,
+            title="Friday Night Grail Rips 🔥",
+            status="live",
+            viewer_count=128,
+            started_at=now,
+        ))
+        session.add(LiveStream(
+            seller_id=sellers["yggdrasil"].id,
+            title="Vintage Pokémon Break — WOTC pulls",
+            status="scheduled",
+            scheduled_at=now + timedelta(days=1),
+        ))
+
         session.commit()
         logger.info(
-            "Seeded %d sellers, %d listings, and sold comps.",
+            "Seeded %d sellers, %d listings, sold comps, and demo streams.",
             len(sellers),
             len(_SAMPLES),
         )

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Command Hub</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .hub-main { padding: 20px clamp(16px, 4vw, 40px) 60px; }
+    .login-wrap { max-width: 420px; margin: 12vh auto; padding: 26px; }
+    .login-wrap h2 { margin-top: 0; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .tab { padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; }
+    .tab.active { background: linear-gradient(180deg,#2a8fc4,#1c6fa3); color: #f2fbff; border-color: rgba(111,214,255,0.6); font-weight: 600; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 14px; margin-bottom: 22px; }
+    .kpi { padding: 16px 18px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
+    .kpi .k-num { font-size: 26px; font-weight: 800; color: #eaf3fb; }
+    .kpi .k-num.hot { color: var(--ice); text-shadow: 0 0 16px rgba(55,189,255,0.4); }
+    .kpi .k-num.gold { color: var(--gold); }
+    .kpi .k-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 3px; }
+    .kpi .k-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    table.hub { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.hub th { text-align: left; color: var(--steel); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    table.hub td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    table.hub tr:hover td { background: rgba(55,189,255,0.05); }
+    .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
+    .pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); }
+    .pill.sold { color: var(--muted); }
+    .pill.active { color: #9be7c4; border-color: rgba(120,230,180,0.4); }
+    .pill.gold { color: var(--gold); border-color: rgba(240,198,116,0.5); }
+    .row-actions { display: flex; gap: 6px; }
+    .ai-panel { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; }
+    .ai-box { padding: 16px; }
+    .ai-out { margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(8,12,18,0.6); border: 1px solid var(--border); font-size: 13px; white-space: pre-wrap; min-height: 24px; }
+    .int-list { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+    .int-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-soft); }
+    @media (max-width: 720px){ .ai-panel { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <header class="site-header">
+    <div class="brand">
+      <svg class="crest" viewBox="0 0 120 80" aria-hidden="true">
+        <defs><linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset=".5" stop-color="#6f93b4"/><stop offset="1" stop-color="#2b3d52"/></linearGradient></defs>
+        <g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.6"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/></g>
+        <g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.8"><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g>
+        <g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g>
+      </svg>
+      <div class="brand-word"><h1>COMMAND HUB</h1><span class="runes">ᚱᚨᚷᚾᚨᚱ · admin</span></div>
+    </div>
+    <div class="header-actions">
+      <a class="btn btn-ghost btn-sm" href="/">← Storefront</a>
+      <button id="logoutBtn" class="btn btn-ghost btn-sm" type="button" hidden>Log out</button>
+    </div>
+  </header>
+
+  <!-- Login gate -->
+  <div id="loginGate" class="card login-wrap">
+    <h2>Command Hub access</h2>
+    <p class="muted">Enter your admin token (the <code>ADMIN_TOKEN</code> you set in the environment).</p>
+    <label class="field"><span>Admin token</span><input id="tokenInput" type="password" placeholder="paste ADMIN_TOKEN" /></label>
+    <button id="loginBtn" class="btn btn-primary" type="button">Enter</button>
+    <p id="loginErr" class="form-status error"></p>
+  </div>
+
+  <main id="hub" class="hub-main" hidden>
+    <div class="tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="listings">Listings</button>
+      <button class="tab" data-tab="sellers">Sellers</button>
+      <button class="tab" data-tab="sales">Sales</button>
+      <button class="tab" data-tab="ai">AI Tools</button>
+    </div>
+
+    <section id="tab-dashboard" class="tab-panel">
+      <div id="kpiGrid" class="kpi-grid"></div>
+      <div class="card" style="padding:16px;">
+        <h3 style="margin-top:0;color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Integrations</h3>
+        <div id="intList" class="int-list"></div>
+      </div>
+    </section>
+
+    <section id="tab-listings" class="tab-panel" hidden>
+      <div class="results-bar">
+        <input id="listSearch" type="search" placeholder="Search listings…" style="max-width:280px;" />
+        <select id="listStatus" style="width:auto;"><option value="">All</option><option value="active">Active</option><option value="sold">Sold</option></select>
+      </div>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>ID</th><th>Title</th><th>Cat</th><th>Grade/Cond</th><th>Price</th><th>Seller</th><th>Status</th><th>Actions</th></tr></thead><tbody id="listBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-sellers" class="tab-panel" hidden>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>Handle</th><th>Name</th><th>Founding</th><th>Intro sales</th><th>Stripe</th></tr></thead><tbody id="sellerBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-sales" class="tab-panel" hidden>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>Date</th><th>Card</th><th>Cat</th><th>Grade</th><th>Price</th><th>Source</th></tr></thead><tbody id="salesBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-ai" class="tab-panel" hidden>
+      <div class="ai-panel">
+        <div class="card ai-box">
+          <h3 style="margin-top:0;">Natural-language search</h3>
+          <p class="muted">e.g. "PSA 10 Charizards under $5k" — see the filters the AI extracts.</p>
+          <input id="nlQuery" type="text" placeholder="Ask in plain English…" />
+          <button id="nlBtn" class="btn btn-primary btn-sm" type="button" style="margin-top:8px;">Parse → search</button>
+          <div id="nlOut" class="ai-out"></div>
+        </div>
+        <div class="card ai-box">
+          <h3 style="margin-top:0;">AI description generator</h3>
+          <p class="muted">Generate a listing description from card details.</p>
+          <input id="descTitle" type="text" placeholder="Title (e.g. Charizard Base Set)" />
+          <input id="descExtra" type="text" placeholder="Set / grade / details" style="margin-top:8px;" />
+          <button id="descBtn" class="btn btn-primary btn-sm" type="button" style="margin-top:8px;">Generate</button>
+          <div id="descOut" class="ai-out"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/admin.js"></script>
+</body>
+</html>

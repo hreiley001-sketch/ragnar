@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Stores & Live</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .hub-main { padding: 20px clamp(16px,4vw,40px) 60px; }
+    .section-title { font-size: 15px; text-transform: uppercase; letter-spacing:.06em; color: var(--steel); margin: 26px 0 12px; display:flex; align-items:center; gap:10px; }
+    .live-dot { width:9px;height:9px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;animation:pulse 1.4s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .live-row { display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+    .live-card { border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); background:var(--panel); cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
+    .live-card:hover { transform:translateY(-3px); box-shadow:0 14px 40px rgba(0,0,0,.5); }
+    .live-thumb { aspect-ratio:16/9; display:grid; place-items:center; position:relative; }
+    .live-badge { position:absolute; top:8px; left:8px; background:#c81e1e; color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; letter-spacing:.05em; }
+    .live-badge.sched { background:rgba(8,12,18,.8); border:1px solid var(--border-strong); color:var(--text-soft); }
+    .live-views { position:absolute; bottom:8px; right:8px; background:rgba(8,12,18,.75); font-size:11px; padding:2px 8px; border-radius:6px; }
+    .live-meta { padding:10px 12px; }
+    .live-meta .lt { font-weight:700; font-size:14px; }
+    .live-meta .ls { font-size:12px; color:var(--muted); }
+    .store-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+    .store-card { border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); background:var(--panel); cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+    .store-card:hover { transform:translateY(-3px); box-shadow:0 14px 40px rgba(0,0,0,.5); border-color:var(--border-strong); }
+    .store-banner { height:84px; position:relative; }
+    .store-avatar { width:52px;height:52px;border-radius:14px; border:2px solid var(--bg); position:absolute; left:14px; bottom:-22px; display:grid; place-items:center; font-weight:800; font-size:20px; color:#0a0d12; }
+    .store-body { padding:30px 14px 14px; }
+    .store-name { font-weight:700; display:flex; align-items:center; gap:8px; }
+    .store-tag { font-size:12px; color:var(--muted); margin-top:2px; }
+    .store-foot { display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:12px; color:var(--text-soft); }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <header class="site-header">
+    <div class="brand">
+      <svg class="crest" viewBox="0 0 120 80" aria-hidden="true"><defs><linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3f5"/><stop offset=".5" stop-color="#6f93b4"/><stop offset="1" stop-color="#2b3d52"/></linearGradient></defs><g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.6"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/></g><g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.8"><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>
+      <div class="brand-word"><h1 style="font-size:24px;letter-spacing:.3em;">STORES & LIVE</h1><span class="runes">ᚱᚨᚷᚾᚨᚱ · the flock</span></div>
+    </div>
+    <div class="header-actions">
+      <a class="btn btn-ghost btn-sm" href="/">← Marketplace</a>
+    </div>
+  </header>
+
+  <main class="hub-main">
+    <div class="section-title" id="liveTitle"><span class="live-dot"></span> Live now</div>
+    <div id="liveRow" class="live-row"></div>
+
+    <div class="section-title" style="justify-content:space-between;">
+      <span>Browse stores</span>
+      <input id="storeSearch" type="search" placeholder="Search stores…" style="max-width:260px;" />
+    </div>
+    <div id="storeGrid" class="store-grid"></div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/stores.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+// RAGNAR — individual store page (branded, listings, live, self-serve customize).
+"use strict";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const HANDLE = decodeURIComponent(location.pathname.split("/store/")[1] || "").replace(/\/$/, "");
+const TOKEN_KEY = `ragnar_store_token_${HANDLE}`;
+
+let toastTimer;
+function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2600); }
+
+async function api(p, o = {}) {
+  const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
+  let d = null; try { d = await r.json(); } catch (_) {}
+  if (!r.ok) throw new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`);
+  return d;
+}
+const accentGrad = (c) => `linear-gradient(135deg, ${c || "#6f93b4"}44, #0a0d12), radial-gradient(circle at 30% 20%, ${c || "#6f93b4"}66, transparent 60%)`;
+const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="#7fa8c9"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
+
+let STORE = null;
+
+function applyStore(s) {
+  STORE = s;
+  if (s.accent_color) document.documentElement.style.setProperty("--ice", s.accent_color);
+  document.title = `${s.display_name} — RAGNAR`;
+  $("storeName").textContent = s.display_name;
+  $("storeTag").textContent = s.tagline || "";
+  $("storeBio").textContent = s.bio || "";
+  $("storeHero").style.background = s.banner_url ? `center/cover url('${s.banner_url}')` : accentGrad(s.accent_color);
+  const av = $("storeAv");
+  if (s.avatar_url) { av.style.background = `center/cover url('${s.avatar_url}')`; av.textContent = ""; }
+  else { av.style.background = s.accent_color || "#6f93b4"; av.textContent = (s.display_name || "?").trim()[0].toUpperCase(); }
+  // prefill customize
+  $("c-tagline").value = s.tagline || "";
+  $("c-bio").value = s.bio || "";
+  $("c-banner").value = s.banner_url || "";
+  $("c-avatar").value = s.avatar_url || "";
+  if (s.accent_color) $("c-accent").value = s.accent_color;
+}
+
+function listingCard(l) {
+  const badges = [`<span class="badge">${esc(l.category)}</span>`];
+  if (l.is_graded && l.grading_company) badges.push(`<span class="badge grade">${esc(l.grading_company)} ${l.grade}</span>`);
+  else if (l.condition) badges.push(`<span class="badge">${esc(l.condition)}</span>`);
+  const sub = [l.set_name, l.card_number].filter(Boolean).map(esc).join(" · ");
+  const img = l.image_url
+    ? `<img src="${esc(l.image_url)}" alt="${esc(l.title)}" loading="lazy" onerror="this.outerHTML='${CREST.replace(/'/g, "&#39;")}'" />`
+    : CREST;
+  const sold = l.status === "sold";
+  return `<article class="listing">
+    <div class="listing-img"><div class="listing-badges">${badges.join("")}${sold ? '<span class="badge">SOLD</span>' : ""}</div>${img}</div>
+    <div class="listing-body">
+      <div class="listing-title">${esc(l.title)}</div>${sub ? `<div class="listing-sub">${sub}</div>` : ""}
+      <div class="listing-spacer"></div>
+      <div class="listing-foot">
+        <span class="listing-price">${money(l.price)}</span>
+        ${sold ? "" : `<button class="btn btn-sm buy-btn" data-buy="${l.id}">Buy</button>`}
+      </div>
+    </div>
+  </article>`;
+}
+
+async function buyListing(id) {
+  try { const r = await api(`/api/payments/checkout/${id}`, { method: "POST" }); if (r.url) { toast("Opening checkout…"); window.open(r.url, "_blank", "noopener"); } }
+  catch (e) { toast(e.message); }
+}
+
+async function loadLive() {
+  try {
+    const streams = (await api("/api/streams")).filter((s) => s.seller_handle === HANDLE);
+    const strip = $("liveStrip");
+    if (!streams.length) { strip.innerHTML = ""; return; }
+    strip.innerHTML = streams.map((s) => `<div class="live-pill">${s.status === "live" ? '<span class="live-dot"></span> LIVE' : "⏱ SCHEDULED"} · ${esc(s.title)} ${s.status === "live" ? `<span class="muted">(${s.viewer_count} watching)</span>` : ""}</div>`).join("");
+    const liveEmbed = streams.find((s) => s.status === "live" && s.embed_url);
+    if (liveEmbed) strip.insertAdjacentHTML("afterend", `<div class="embed-wrap"><iframe src="${esc(liveEmbed.embed_url)}" allowfullscreen></iframe></div>`);
+  } catch (_) {}
+}
+
+async function loadListings() {
+  try {
+    const items = await api(`/api/stores/${encodeURIComponent(HANDLE)}/listings?include_sold=true`);
+    $("listCount").textContent = `${items.filter((i) => i.status === "active").length} listings`;
+    $("grid").innerHTML = items.length ? items.map(listingCard).join("") : `<div class="empty">This store has no listings yet.</div>`;
+    $("grid").querySelectorAll("[data-buy]").forEach((b) => b.addEventListener("click", () => buyListing(b.getAttribute("data-buy"))));
+  } catch (_) { $("grid").innerHTML = `<div class="empty">Could not load listings.</div>`; }
+}
+
+async function saveStore() {
+  const token = $("storeToken").value.trim();
+  if (!token) { toast("Enter your store token."); return; }
+  localStorage.setItem(TOKEN_KEY, token);
+  const body = {
+    tagline: $("c-tagline").value.trim() || null,
+    bio: $("c-bio").value.trim() || null,
+    banner_url: $("c-banner").value.trim() || null,
+    avatar_url: $("c-avatar").value.trim() || null,
+    accent_color: $("c-accent").value || null,
+  };
+  const st = $("cStatus"); st.className = "form-status"; st.textContent = "Saving…";
+  try {
+    const updated = await api(`/api/stores/${encodeURIComponent(HANDLE)}`, { method: "PATCH", headers: { "X-Store-Token": token }, body: JSON.stringify(body) });
+    applyStore(updated);
+    st.className = "form-status ok"; st.textContent = "Saved!";
+    toast("Store updated.");
+  } catch (e) { st.className = "form-status error"; st.textContent = e.message; }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  if (!HANDLE) { document.body.innerHTML = "<p style='padding:40px'>No store specified.</p>"; return; }
+  try { applyStore(await api(`/api/stores/${encodeURIComponent(HANDLE)}`)); }
+  catch (e) { $("storeName").textContent = "Store not found"; toast(e.message); return; }
+  loadListings();
+  loadLive();
+
+  $("customizeBtn").addEventListener("click", () => {
+    const p = $("customizePanel"); p.hidden = !p.hidden;
+    const saved = localStorage.getItem(TOKEN_KEY); if (saved) $("storeToken").value = saved;
+  });
+  $("saveStoreBtn").addEventListener("click", saveStore);
+});

@@ -83,6 +83,35 @@ class Seller(SQLModel, table=True):
     stripe_account_id: Optional[str] = Field(default=None, index=True)
     stripe_charges_enabled: bool = Field(default=False)
 
+    # --- Storefront customization (the seller's "own little store") ---
+    tagline: Optional[str] = Field(default=None, max_length=140)
+    bio: Optional[str] = Field(default=None, max_length=1000)
+    banner_url: Optional[str] = Field(default=None, max_length=500)
+    avatar_url: Optional[str] = Field(default=None, max_length=500)
+    accent_color: Optional[str] = Field(default=None, max_length=16)  # hex, e.g. #6fd6ff
+    store_public: bool = Field(default=True, index=True)
+    # Secret the seller uses to edit their own store (returned once on signup).
+    store_edit_token: Optional[str] = Field(default=None, index=True)
+
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class LiveStream(SQLModel, table=True):
+    """A live (or scheduled) selling stream for a seller's store.
+
+    ``embed_url`` is where a real video provider (Mux/LiveKit/YouTube/etc.) plugs
+    in later; until then a stream can still be listed/scheduled.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    seller_id: int = Field(foreign_key="seller.id", index=True)
+    title: str = Field(max_length=140)
+    status: str = Field(default="scheduled", index=True)  # scheduled | live | ended
+    embed_url: Optional[str] = Field(default=None, max_length=500)
+    thumbnail_url: Optional[str] = Field(default=None, max_length=500)
+    scheduled_at: Optional[datetime] = Field(default=None)
+    started_at: Optional[datetime] = Field(default=None)
+    viewer_count: int = Field(default=0)
     created_at: datetime = Field(default_factory=utcnow, index=True)
 
 
