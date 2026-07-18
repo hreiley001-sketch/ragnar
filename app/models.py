@@ -64,6 +64,31 @@ class ListingStatus(str, Enum):
     draft = "draft"
 
 
+class UserRole(str, Enum):
+    user = "user"
+    admin = "admin"  # staff / Command Hub access
+
+
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    email: str = Field(index=True, unique=True, max_length=160)
+    name: Optional[str] = Field(default=None, max_length=120)
+    password_hash: Optional[str] = Field(default=None, max_length=255)  # null for Google-only
+    google_sub: Optional[str] = Field(default=None, index=True, max_length=64)
+    email_verified: bool = Field(default=False)
+    role: str = Field(default=UserRole.user.value, index=True)
+    seller_handle: Optional[str] = Field(default=None, index=True, max_length=40)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class UserSession(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    token: str = Field(index=True, unique=True, max_length=64)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    expires_at: datetime = Field(index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
 class Seller(SQLModel, table=True):
     """A seller account. Founding Sellers get the 0% intro window and permanent
     4% rate; everyone else is on the standard rate."""

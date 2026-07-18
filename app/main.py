@@ -19,6 +19,7 @@ from .database import init_db
 from .routers import (
     admin,
     ai_router,
+    auth,
     catalog,
     founding,
     health,
@@ -76,6 +77,7 @@ app.add_middleware(
 )
 
 app.include_router(health.router)
+app.include_router(auth.router)
 app.include_router(meta.router)
 app.include_router(sellers.router)
 app.include_router(listings.router)
@@ -138,6 +140,22 @@ def store_page(handle: str):
     if page.exists():
         return FileResponse(str(page))
     return {"error": "store UI not found"}
+
+
+@app.get("/login", include_in_schema=False)
+def login_page():
+    page = STATIC_DIR / "login.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "login UI not found"}
+
+
+@app.get("/account", include_in_schema=False)
+def account_page():
+    page = STATIC_DIR / "account.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "account UI not found"}
 
 
 @app.get("/rides", include_in_schema=False)

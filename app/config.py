@@ -138,9 +138,21 @@ class Settings:
     dataforseo_login: str = os.getenv("DATAFORSEO_LOGIN", "").strip()
     dataforseo_password: str = os.getenv("DATAFORSEO_PASSWORD", "").strip()
 
+    # --- Accounts / auth ---
+    session_cookie: str = os.getenv("SESSION_COOKIE", "ragnar_session")
+    session_ttl_days: int = int(os.getenv("SESSION_TTL_DAYS", "30"))
+    # Verified Google emails on this domain get staff (Command Hub) access.
+    staff_email_domain: str = os.getenv("STAFF_EMAIL_DOMAIN", "ragnarips.com").lower().strip()
+    admin_emails: list[str] = [
+        e.strip().lower() for e in os.getenv("ADMIN_EMAILS", "").split(",") if e.strip()
+    ]
+    # Sign in with Google (OAuth) — key-gated. Create a client in Google Cloud.
+    google_client_id: str = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+    google_client_secret: str = os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
+
     # --- Admin command hub ---
-    # Admin endpoints require X-Admin-Token == this value. If unset, admin is
-    # disabled (endpoints return 503) — set a strong secret in production.
+    # Admin endpoints require X-Admin-Token == this value OR a signed-in staff
+    # user. If neither is set/available, admin is disabled.
     admin_token: str = os.getenv("ADMIN_TOKEN", "").strip()
 
     # --- Free card catalogs ---

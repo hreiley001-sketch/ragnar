@@ -13,7 +13,7 @@ from sqlmodel import Session, select
 
 import secrets
 
-from .. import ai, catalog, comps, payments, pricing, seo_tools
+from .. import ai, auth, catalog, comps, payments, pricing, seo_tools
 from ..config import settings
 from ..database import get_session
 from ..models import FoundingApplication, Listing, ListingStatus, LiveStream, Sale, Seller
@@ -24,14 +24,24 @@ from ..services import founding_status, grant_founding_if_available, record_sale
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 
-def require_admin(x_admin_token: str = Header(default="")) -> None:
+def require_admin(
+    x_admin_token: str = Header(default=""),
+    user=Depends(auth.get_current_user),
+) -> None:
+    # 1) Signed-in staff (verified @ragnarips.com or allow-listed) — preferred.
+    if auth.is_staff(user):
+        return
+    # 2) Break-glass admin token.
+    if settings.admin_token and x_admin_token == settings.admin_token:
+        return
     if not settings.admin_token:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Admin is disabled. Set ADMIN_TOKEN to enable the command hub.",
+            detail="Admin is disabled. Sign in with a staff @ragnarips.com account "
+            "(configure Google sign-in) or set ADMIN_TOKEN.",
         )
-    if x_admin_token != settings.admin_token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Admin access required (staff sign-in or admin token).")
 
 
 def integrations_status() -> dict:

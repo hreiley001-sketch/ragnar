@@ -44,7 +44,16 @@ async function submitApplication(e) {
   }
 }
 
+async function reflectAccount() {
+  try {
+    const me = await api("/api/auth/me");
+    const el = $("acctLink");
+    if (el && me.user) { el.textContent = me.user.is_staff ? "Command Hub" : "My account"; el.href = me.user.is_staff ? "/admin" : "/account"; }
+  } catch (_) {}
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   loadStatus();
+  reflectAccount();
   $("applyForm").addEventListener("submit", submitApplication);
 });
