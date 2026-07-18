@@ -156,6 +156,74 @@ def _clean_filters(d: dict) -> dict:
 # --------------------------------------------------------------------------- #
 
 
+_PALETTES = [
+    (("gold", "lux", "premium", "elite", "high-end", "luxury", "grail"), "#f0c674", "gold"),
+    (("ice", "frost", "cold", "blue", "arctic", "steel", "winter", "chill"), "#6fd6ff", "ice-blue"),
+    (("fire", "red", "aggress", "bold", "hot", "inferno", "blood"), "#ff6b5e", "ember-red"),
+    (("green", "money", "emerald", "nature", "mint"), "#6fe3b0", "emerald"),
+    (("purple", "royal", "mystic", "magic", "cosmic", "galaxy"), "#b18cff", "royal-purple"),
+    (("vintage", "retro", "classic", "old-school", "nostalg", "throwback"), "#e0a45e", "vintage-amber"),
+    (("pink", "cute", "kawaii", "pastel", "soft"), "#ff9ecb", "pastel-pink"),
+]
+_HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+def _rules_design(prompt: str, current: dict) -> dict:
+    low = prompt.lower()
+    color, cname = current.get("accent_color") or "#7fa8c9", "steel"
+    for kws, hex_, name in _PALETTES:
+        if any(k in low for k in kws):
+            color, cname = hex_, name
+            break
+    focus = None
+    for f in ("pokemon", "pokémon", "magic", "mtg", "yugioh", "yu-gi-oh", "one piece",
+              "lorcana", "basketball", "baseball", "football", "soccer", "sports",
+              "vintage", "graded", "psa", "slabs", "singles"):
+        if f in low:
+            focus = f
+            break
+    pretty = cname.replace("-", " ")
+    tagline = (f"{pretty.title()} vibes for {focus} collectors." if focus
+               else f"A {pretty} store, forged on RAGNAR.")
+    bio = ((f"Curated {focus} cards" if focus else "Curated cards")
+           + f" with a {pretty} look — grading-aware listings, real sold-price history, "
+             "and buyer protection on every sale.")
+    return {
+        "accent_color": color, "tagline": tagline[:140], "bio": bio[:1000],
+        "reply": f"Done — I gave your store a {pretty} accent ({color}) with a matching "
+                 "tagline and bio. Try “make it darker”, “more premium”, or name what you sell to refine.",
+        "source": "rules",
+    }
+
+
+def design_store(prompt: str, current: dict | None = None) -> dict:
+    """Turn a plain-English vibe into store customization (accent, tagline, bio)."""
+    current = current or {}
+    content = _chat([
+        {"role": "system", "content": "You are a store-branding designer for a trading-card "
+         "marketplace. Given a seller's description and their current store, return ONLY JSON with keys: "
+         "accent_color (a #RRGGBB hex that pops on a dark UI), tagline (<=80 chars), "
+         "bio (<=240 chars, no emojis), reply (a short friendly sentence describing what you changed). "
+         f"Current store: {json.dumps({k: current.get(k) for k in ('accent_color', 'tagline', 'bio')})}."},
+        {"role": "user", "content": prompt},
+    ], max_tokens=300, temperature=0.7)
+    if content:
+        try:
+            m = re.search(r"\{.*\}", content, re.DOTALL)
+            d = json.loads(m.group(0) if m else content)
+            color = d.get("accent_color") if _HEX_RE.match(str(d.get("accent_color", ""))) else (current.get("accent_color") or "#6fd6ff")
+            return {
+                "accent_color": color,
+                "tagline": (d.get("tagline") or "")[:140] or None,
+                "bio": (d.get("bio") or "")[:1000] or None,
+                "reply": d.get("reply") or "Updated your store design.",
+                "source": "openai",
+            }
+        except Exception:  # noqa: BLE001
+            pass
+    return _rules_design(prompt, current)
+
+
 def generate_description(fields: dict) -> dict:
     """Return {description, source}."""
     name = fields.get("title") or fields.get("player_or_character") or "this card"

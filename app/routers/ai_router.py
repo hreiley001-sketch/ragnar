@@ -23,3 +23,14 @@ class DescribeRequest(ScanFields):
 @router.post("/describe")
 def ai_describe(fields: DescribeRequest) -> dict:
     return ai.generate_description(fields.model_dump())
+
+
+@router.post("/design")
+def ai_design(payload: dict) -> dict:
+    """Store Designer: describe a vibe -> suggested {accent_color, tagline, bio, reply}.
+    Suggestion only (not persisted); applying uses PATCH /api/stores/{handle}."""
+    prompt = (payload.get("prompt") or "").strip()
+    if not prompt:
+        return {"reply": "Tell me the vibe you want — e.g. 'dark and premium for vintage Pokémon'."}
+    current = payload.get("current") or {}
+    return ai.design_store(prompt, current)

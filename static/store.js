@@ -106,6 +106,38 @@ async function saveStore() {
   } catch (e) { st.className = "form-status error"; st.textContent = e.message; }
 }
 
+function addDesignMsg(html, who) {
+  const el = document.createElement("div");
+  el.className = "design-msg " + who;
+  el.innerHTML = html;
+  $("designFeed").appendChild(el);
+  $("designFeed").scrollTop = $("designFeed").scrollHeight;
+  return el;
+}
+
+async function runDesigner() {
+  const prompt = $("designPrompt").value.trim();
+  if (!prompt) return;
+  addDesignMsg(esc(prompt), "me");
+  $("designPrompt").value = "";
+  const thinking = addDesignMsg("Designing…", "ai");
+  try {
+    const current = { accent_color: $("c-accent").value, tagline: $("c-tagline").value, bio: $("c-bio").value };
+    const r = await api("/api/ai/design", { method: "POST", body: JSON.stringify({ prompt, current }) });
+    if (r.accent_color) $("c-accent").value = r.accent_color;
+    if (r.tagline) $("c-tagline").value = r.tagline;
+    if (r.bio) $("c-bio").value = r.bio;
+    // Live preview (not persisted until Save).
+    applyStore({ ...STORE, accent_color: r.accent_color || STORE.accent_color, tagline: r.tagline || STORE.tagline, bio: r.bio || STORE.bio });
+    thinking.remove();
+    const sw = r.accent_color ? `<span class="design-swatch" style="background:${esc(r.accent_color)}"></span>` : "";
+    addDesignMsg(sw + esc(r.reply || "Updated the preview.") + (r.source ? ` <span class="muted" style="font-size:11px">(${esc(r.source)})</span>` : ""), "ai");
+  } catch (e) {
+    thinking.remove();
+    addDesignMsg("Design failed: " + esc(e.message), "ai");
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   if (!HANDLE) { document.body.innerHTML = "<p style='padding:40px'>No store specified.</p>"; return; }
   try { applyStore(await api(`/api/stores/${encodeURIComponent(HANDLE)}`)); }
@@ -116,6 +148,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("customizeBtn").addEventListener("click", () => {
     const p = $("customizePanel"); p.hidden = !p.hidden;
     const saved = localStorage.getItem(TOKEN_KEY); if (saved) $("storeToken").value = saved;
+    if (!p.hidden && !$("designFeed").children.length) {
+      addDesignMsg("Hi! Describe the vibe you want and I'll design your store — colors, tagline, and bio. Try “dark and premium for vintage Pokémon” or “bright, fun, sports cards”.", "ai");
+    }
   });
   $("saveStoreBtn").addEventListener("click", saveStore);
+  $("designSend").addEventListener("click", runDesigner);
+  $("designPrompt").addEventListener("keydown", (e) => { if (e.key === "Enter") runDesigner(); });
 });

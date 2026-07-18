@@ -21,6 +21,14 @@
     .customize .field-row { grid-template-columns:1fr 1fr; }
     .embed-wrap { aspect-ratio:16/9; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border-strong); margin:12px 0; background:#000; }
     .embed-wrap iframe { width:100%; height:100%; border:0; }
+    .designer { margin-bottom:14px; }
+    .designer-title { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--steel); margin-bottom:6px; }
+    .design-feed { display:flex; flex-direction:column; gap:6px; margin:8px 0; max-height:180px; overflow:auto; }
+    .design-msg { font-size:13px; padding:8px 11px; border-radius:10px; max-width:92%; }
+    .design-msg.me { background:rgba(55,189,255,.14); align-self:flex-end; color:#eaf3fb; }
+    .design-msg.ai { background:rgba(8,12,18,.5); border:1px solid var(--border); color:var(--text-soft); align-self:flex-start; }
+    .design-swatch { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px; border:1px solid rgba(255,255,255,.3); }
+    .design-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }
   </style>
 </head>
 <body>
@@ -55,6 +63,16 @@
     </div>
 
     <div id="customizePanel" class="card customize" hidden>
+      <div class="designer">
+        <div class="designer-title">✨ Store Designer — describe your vibe</div>
+        <div id="designFeed" class="design-feed"></div>
+        <div class="design-row">
+          <input id="designPrompt" placeholder="e.g. dark & premium for vintage Pokémon" />
+          <button id="designSend" class="btn btn-primary btn-sm" type="button">Design</button>
+        </div>
+        <p class="muted" style="font-size:12px;margin:8px 0 0;">The designer updates the live preview above. Enter your token below and hit <strong>Save store</strong> to keep it.</p>
+      </div>
+      <div class="nav-div" style="margin:14px 0;"></div>
       <p class="muted" style="margin-top:0;">Paste your <strong>store token</strong> (given when you signed up as a seller) to edit your store.</p>
       <label class="field"><span>Store token</span><input id="storeToken" type="password" placeholder="X-Store-Token" /></label>
       <div class="field-row">
