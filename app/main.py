@@ -29,6 +29,7 @@ from .routers import (
     sales,
     scan,
     sellers,
+    seo,
     stores,
     streams,
 )
@@ -86,6 +87,7 @@ app.include_router(ai_router.router)
 app.include_router(stores.router)
 app.include_router(streams.router)
 app.include_router(founding.router)
+app.include_router(seo.router)
 app.include_router(admin.router)
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)

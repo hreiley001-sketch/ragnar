@@ -104,6 +104,28 @@ class Settings:
     public_base_url: str = os.getenv("PUBLIC_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
     payments_live: bool = _flag("PAYMENTS_LIVE", False)
 
+    # --- SEO ---
+    # Canonical site URL for sitemap/canonical/OG tags (falls back to base URL).
+    site_url: str = os.getenv("SITE_URL", "").strip()
+    seo_title: str = os.getenv("SEO_TITLE", "RAGNAR — Trading Card Marketplace")
+    seo_description: str = os.getenv(
+        "SEO_DESCRIPTION",
+        "RAGNAR is a trust-first trading-card marketplace. Keep more of every sale, "
+        "scan cards to list in seconds, and see real sold-price history. "
+        "Apply to be one of 250 Founding Sellers.",
+    )
+    seo_keywords: str = os.getenv(
+        "SEO_KEYWORDS",
+        "trading card marketplace, sell trading cards, Pokemon cards, PSA graded cards, "
+        "sports cards, buy sell trading cards, TCG marketplace, card sold prices, "
+        "founding sellers, Magic the Gathering, Yu-Gi-Oh, One Piece cards",
+    )
+
+    # Keyword/SEO research providers (admin tools) — key-gated.
+    serper_api_key: str = os.getenv("SERPER_API_KEY", "").strip()
+    dataforseo_login: str = os.getenv("DATAFORSEO_LOGIN", "").strip()
+    dataforseo_password: str = os.getenv("DATAFORSEO_PASSWORD", "").strip()
+
     # --- Admin command hub ---
     # Admin endpoints require X-Admin-Token == this value. If unset, admin is
     # disabled (endpoints return 503) — set a strong secret in production.

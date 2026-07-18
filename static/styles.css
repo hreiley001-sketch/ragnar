@@ -60,6 +60,11 @@ code { background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 6px;
 }
 
 .brand { display: flex; align-items: center; gap: 14px; }
+/* Real logo lockup (wolf+raven crest). White chip keeps a white-bg PNG clean on
+   the dark theme; a transparent PNG also looks right here. */
+.logo-img { height: 48px; width: auto; display: block; border-radius: 10px; background: #f6f9fc; padding: 4px 8px; box-shadow: 0 0 14px rgba(55,189,255,0.25); }
+.logo-link { display: inline-flex; }
+.hero-logo { display: block; width: min(440px, 82%); margin: 0 auto 14px; border-radius: 16px; background: #f6f9fc; padding: 14px 22px; box-shadow: var(--shadow); }
 .crest { width: 62px; height: 42px; filter: drop-shadow(0 0 10px rgba(55,189,255,0.35)); }
 .brand-word h1 {
   margin: 0;

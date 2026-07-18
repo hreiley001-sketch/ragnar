@@ -13,7 +13,7 @@ from sqlmodel import Session, select
 
 import secrets
 
-from .. import ai, catalog, comps, payments, pricing
+from .. import ai, catalog, comps, payments, pricing, seo_tools
 from ..config import settings
 from ..database import get_session
 from ..models import FoundingApplication, Listing, ListingStatus, LiveStream, Sale, Seller
@@ -43,7 +43,18 @@ def integrations_status() -> dict:
         "catalog": True,  # Scryfall/Pokémon TCG are free/no-key
         "payments": payments.status(),
         "psa": bool(settings.psa_access_token),
+        "seo": seo_tools.providers_status(),
     }
+
+
+@router.get("/keywords")
+def admin_keywords(
+    q: str = Query(..., min_length=1, description="Seed keyword/topic"),
+    _: None = Depends(require_admin),
+) -> dict:
+    """Keyword research (Serper/DataForSEO). Returns related keywords, People-Also-Ask,
+    and search volumes when providers are configured."""
+    return seo_tools.keyword_research(q)
 
 
 @router.get("/check")
