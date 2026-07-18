@@ -90,6 +90,18 @@ class Settings:
     comps_auth_header: str = os.getenv("COMPS_AUTH_HEADER", "X-API-Key").strip()
     comps_lookback_days: int = int(os.getenv("COMPS_LOOKBACK_DAYS", "365"))
 
+    # --- BirdmanOS rides (auction rollercoaster engine) ---
+    ride_min_increment_cents: int = int(os.getenv("RIDE_MIN_INCREMENT_CENTS", "100"))
+    ride_anti_snipe_seconds: int = int(os.getenv("RIDE_ANTI_SNIPE_SECONDS", "15"))
+    ride_anti_snipe_extend_seconds: int = int(os.getenv("RIDE_ANTI_SNIPE_EXTEND_SECONDS", "20"))
+    # Analytics observatory (PostHog) — event bus mirrors here when configured.
+    posthog_api_key: str = os.getenv("POSTHOG_API_KEY", "").strip()
+    posthog_host: str = os.getenv("POSTHOG_HOST", "https://us.i.posthog.com").rstrip("/")
+    # Live-stream tunnel (LiveKit) — slot for real low-latency video later.
+    livekit_url: str = os.getenv("LIVEKIT_URL", "").strip()
+    livekit_api_key: str = os.getenv("LIVEKIT_API_KEY", "").strip()
+    livekit_api_secret: str = os.getenv("LIVEKIT_API_SECRET", "").strip()
+
     # --- PSA population/authentication (OAuth2; docs gated behind login) ---
     # Stub seam only — supply a pre-obtained access token to enable later.
     psa_access_token: str = os.getenv("PSA_ACCESS_TOKEN", "").strip()

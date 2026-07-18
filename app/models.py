@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
+from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
 
 
@@ -166,6 +167,68 @@ class FoundingApplication(SQLModel, table=True):
     monthly_volume: Optional[str] = Field(default=None, max_length=80)
     message: Optional[str] = Field(default=None, max_length=2000)
     status: str = Field(default="pending", index=True)  # pending | approved | rejected
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class RideStatus(str, Enum):
+    idle = "idle"
+    lobby = "lobby"
+    showcase = "showcase"
+    bidding = "bidding"
+    cooldown = "cooldown"
+    archived = "archived"
+
+
+class Ride(SQLModel, table=True):
+    """A BirdmanOS 'rollercoaster' — a structured live experience (auction).
+
+    The state machine runs idle → lobby → showcase → bidding → cooldown → archived.
+    ``phases`` and ``apis`` are stored as JSON so a ride is fully data-defined.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    type: str = Field(default="auction", index=True)
+    title: str = Field(max_length=160)
+    seller_id: Optional[int] = Field(default=None, foreign_key="seller.id", index=True)
+    listing_id: Optional[int] = Field(default=None, foreign_key="listing.id")
+
+    status: str = Field(default=RideStatus.idle.value, index=True)
+    phases: list = Field(default_factory=list, sa_column=Column(JSON))  # [{name,duration_sec}]
+    apis: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    phase_index: int = Field(default=-1)
+    current_phase: Optional[str] = Field(default=None)
+    phase_started_at: Optional[datetime] = Field(default=None)
+    phase_ends_at: Optional[datetime] = Field(default=None)
+
+    # Auction economics (cents)
+    starting_bid_cents: int = Field(default=0)
+    reserve_cents: int = Field(default=0)
+    current_bid_cents: int = Field(default=0)
+    current_bidder: Optional[str] = Field(default=None)
+    winner: Optional[str] = Field(default=None)
+    market_price_cents: Optional[int] = Field(default=None)  # from showcase pricing fetch
+
+    viewer_count: int = Field(default=0)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+
+class Bid(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    ride_id: int = Field(foreign_key="ride.id", index=True)
+    bidder: str = Field(max_length=80)
+    amount_cents: int = Field(index=True)
+    status: str = Field(default="placed")  # placed | outbid | won
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class RideEvent(SQLModel, table=True):
+    """The BirdmanOS event bus, persisted. Command Hub + analytics read from here."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    ride_id: Optional[int] = Field(default=None, foreign_key="ride.id", index=True)
+    type: str = Field(index=True)
+    data: dict = Field(default_factory=dict, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=utcnow, index=True)
 
 

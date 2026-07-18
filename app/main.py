@@ -26,6 +26,7 @@ from .routers import (
     meta,
     payments,
     pricing,
+    rides,
     sales,
     scan,
     sellers,
@@ -88,6 +89,8 @@ app.include_router(stores.router)
 app.include_router(streams.router)
 app.include_router(founding.router)
 app.include_router(seo.router)
+app.include_router(rides.router)
+app.include_router(rides.hub)
 app.include_router(admin.router)
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -135,3 +138,19 @@ def store_page(handle: str):
     if page.exists():
         return FileResponse(str(page))
     return {"error": "store UI not found"}
+
+
+@app.get("/rides", include_in_schema=False)
+def rides_page():
+    page = STATIC_DIR / "rides.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "rides UI not found"}
+
+
+@app.get("/ride/{ride_id}", include_in_schema=False)
+def ride_page(ride_id: int):
+    page = STATIC_DIR / "ride.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "ride UI not found"}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Live Ride</title>
+  <link rel="icon" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>
+    .ride-wrap { padding: 18px clamp(16px,4vw,40px) 60px; max-width: 1100px; margin: 0 auto; }
+    .track { display:flex; gap:8px; margin: 16px 0 22px; }
+    .stop { flex:1; text-align:center; padding:10px 6px; border-radius:10px; border:1px solid var(--border); background:var(--panel); position:relative; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+    .stop.done { color:var(--text-soft); }
+    .stop.active { border-color:var(--ice); color:#eaf3fb; box-shadow:0 0 18px rgba(55,189,255,.35); background:linear-gradient(180deg,rgba(23,42,60,.7),rgba(12,17,26,.7)); }
+    .stop .cart { position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:16px; }
+    .ride-main { display:grid; grid-template-columns: 1.3fr 1fr; gap:20px; }
+    .card-panel, .bid-panel, .feed-panel { padding:18px; }
+    .cardimg { width:100%; aspect-ratio:3/4; max-height:420px; object-fit:contain; border-radius:12px; background:radial-gradient(circle at 50% 30%, rgba(55,189,255,.12), rgba(10,14,20,.9)); border:1px solid var(--border); }
+    .countdown { font-size:40px; font-weight:800; color:var(--ice); text-shadow:0 0 20px rgba(55,189,255,.4); }
+    .bid-now { font-size:40px; font-weight:800; color:#eaf3fb; }
+    .muted-s { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+    .feed { max-height:260px; overflow:auto; display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+    .feed-item { font-size:13px; padding:6px 10px; border-radius:8px; background:rgba(8,12,18,.5); border:1px solid var(--border); color:var(--text-soft); }
+    .feed-item b { color:#eaf3fb; }
+    .winner { text-align:center; padding:22px; border-radius:14px; border:1px solid rgba(240,198,116,.5); background:rgba(240,198,116,.1); color:var(--gold); font-size:20px; font-weight:800; margin-bottom:18px; }
+    .live-tag { display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:#ff8a8a; }
+    .live-tag .d { width:9px;height:9px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;animation:pulse 1.3s infinite;} @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @media (max-width:820px){ .ride-main{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <header class="site-header">
+    <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+    <div class="header-actions">
+      <span id="viewers" class="status-badge">👁 0</span>
+      <a class="btn btn-ghost btn-sm" href="/rides">All rides</a>
+    </div>
+  </header>
+
+  <main class="ride-wrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <h1 id="rideTitle" style="margin:6px 0;">Live Ride</h1>
+      <span id="phaseTag" class="live-tag"><span class="d"></span> <span id="phaseName">—</span></span>
+    </div>
+
+    <div class="track" id="track"></div>
+
+    <div id="winnerBox" class="winner" hidden></div>
+
+    <div class="ride-main">
+      <section class="card card-panel">
+        <img id="cardImg" class="cardimg" alt="Card" />
+        <h3 id="cardTitle" style="margin:12px 0 4px;">—</h3>
+        <div id="cardSub" class="muted">—</div>
+        <div style="margin-top:12px;display:flex;gap:22px;">
+          <div><div class="muted-s">Market est.</div><div id="marketPrice" style="font-weight:700;">—</div></div>
+          <div><div class="muted-s">Time left</div><div class="countdown" id="countdown">—</div></div>
+        </div>
+      </section>
+
+      <section class="card bid-panel">
+        <div class="muted-s">Current bid</div>
+        <div class="bid-now" id="currentBid">—</div>
+        <div id="currentBidder" class="muted" style="margin-bottom:14px;">No bids yet</div>
+
+        <div id="bidControls">
+          <label class="field"><span>Your name</span><input id="bidderName" maxlength="60" placeholder="Ragnar" /></label>
+          <label class="field"><span>Your bid ($) — min <span id="minBid">—</span></span><input id="bidAmount" type="number" min="0" step="1" /></label>
+          <button id="bidBtn" class="btn btn-primary" type="button">Place bid</button>
+          <p id="bidStatus" class="form-status"></p>
+        </div>
+        <p id="biddingClosed" class="muted" hidden>Bidding isn't open right now — hang tight in the lobby/showcase.</p>
+      </section>
+    </div>
+
+    <section class="card feed-panel" style="margin-top:20px;">
+      <div class="muted-s">Live feed <span class="live-tag" style="margin-left:8px;"><span class="d"></span> live</span></div>
+      <div id="feed" class="feed"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/ride.js"></script>
+</body>
+</html>
