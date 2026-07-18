@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Trading Card Marketplace</title>
+  <meta name="description" content="RAGNAR — a trust-first trading card marketplace. Scan to post, see real sold-price history, and keep more of every sale." />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <header class="site-header">
+    <div class="brand">
+      <svg class="crest" viewBox="0 0 120 80" aria-hidden="true">
+        <defs>
+          <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#cfe3f5" />
+            <stop offset="0.5" stop-color="#6f93b4" />
+            <stop offset="1" stop-color="#2b3d52" />
+          </linearGradient>
+        </defs>
+        <g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.6">
+          <path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z" />
+          <path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z" />
+        </g>
+        <g fill="url(#steel)" stroke="#0a0d12" stroke-width="0.8">
+          <path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z" />
+        </g>
+        <g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8" /><circle cx="65" cy="42" r="1.8" /></g>
+      </svg>
+      <div class="brand-word">
+        <h1>RAGNAR</h1>
+        <span class="runes">ᚱᚨᚷᚾᚨᚱ · Guided by counsel, driven by conquest</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding —</span>
+      <span id="backendStatus" class="status-badge checking">connecting…</span>
+      <button id="openListBtn" class="btn btn-primary" type="button">⚡ Scan to post</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <h2>Snap it. Price it. <span class="accent">Keep more.</span></h2>
+      <p id="heroPitch" class="hero-pitch">Upload your own photo and RAGNAR auto-identifies the card and pulls its real sold-price history — so you list in seconds and price with confidence. A flat, honest fee, and 0% for our Founding 250.</p>
+    </div>
+    <div class="hero-stats" id="heroStats"></div>
+  </section>
+
+  <main class="layout">
+    <aside class="filters card">
+      <div class="filters-head">
+        <h3>Search the vault</h3>
+        <button id="resetFilters" class="btn btn-ghost btn-sm" type="button">Reset</button>
+      </div>
+      <label class="field"><span>Search</span>
+        <input id="f-q" type="search" placeholder="Charizard, Wembanyama, Black Lotus…" />
+      </label>
+      <label class="field"><span>Category</span>
+        <select id="f-category"><option value="">All categories</option></select>
+      </label>
+      <label class="field"><span>Set</span>
+        <input id="f-set" type="text" placeholder="e.g. Base Set" />
+      </label>
+      <div class="field-row">
+        <label class="field"><span>Type</span>
+          <select id="f-graded"><option value="">Any</option><option value="true">Graded</option><option value="false">Raw</option></select>
+        </label>
+        <label class="field"><span>Min grade</span>
+          <select id="f-mingrade"><option value="">Any</option><option value="10">10</option><option value="9.5">9.5+</option><option value="9">9+</option><option value="8">8+</option><option value="7">7+</option></select>
+        </label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Condition</span><select id="f-condition"><option value="">Any</option></select></label>
+        <label class="field"><span>Grader</span><select id="f-grader"><option value="">Any</option></select></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Min $</span><input id="f-minprice" type="number" min="0" step="1" placeholder="0" /></label>
+        <label class="field"><span>Max $</span><input id="f-maxprice" type="number" min="0" step="1" placeholder="∞" /></label>
+      </div>
+      <label class="check-row"><input id="f-founding" type="checkbox" /><span>Founding Sellers only</span></label>
+    </aside>
+
+    <section class="results">
+      <div class="results-bar">
+        <span id="resultCount" class="result-count">Loading…</span>
+        <label class="sort">Sort
+          <select id="f-sort">
+            <option value="newest">Newest</option>
+            <option value="price_asc">Price ↑</option>
+            <option value="price_desc">Price ↓</option>
+            <option value="grade_desc">Grade ↓</option>
+          </select>
+        </label>
+      </div>
+      <div id="grid" class="grid"></div>
+      <div class="pager">
+        <button id="prevPage" class="btn btn-ghost" type="button" disabled>← Prev</button>
+        <span id="pageInfo" class="page-info"></span>
+        <button id="nextPage" class="btn btn-ghost" type="button" disabled>Next →</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sell / scan drawer -->
+  <div id="listDrawer" class="drawer" aria-hidden="true">
+    <div class="drawer-scrim" id="drawerScrim"></div>
+    <div class="drawer-panel card">
+      <div class="drawer-head">
+        <h3>Scan to post</h3>
+        <button id="closeListBtn" class="btn btn-ghost btn-sm" type="button">✕</button>
+      </div>
+
+      <!-- Step 1: scan -->
+      <div class="scan-zone" id="scanZone">
+        <input id="scanInput" type="file" accept="image/*" hidden />
+        <div class="scan-drop" id="scanDrop">
+          <div class="scan-drop-inner">
+            <div class="scan-icon">⚡</div>
+            <p><strong>Upload your card photo</strong></p>
+            <p class="muted">We'll auto-identify it and pull its sold-price history. You can edit anything before publishing.</p>
+          </div>
+          <img id="scanPreview" class="scan-preview" alt="" hidden />
+        </div>
+        <div id="scanResult" class="scan-result" hidden></div>
+      </div>
+
+      <!-- Sales history -->
+      <div id="historyPanel" class="history-panel" hidden></div>
+
+      <!-- Step 2: details form -->
+      <form id="listForm" class="list-form">
+        <div class="form-divider"><span>Card details</span></div>
+
+        <label class="field"><span>Title *</span>
+          <input name="title" required maxlength="140" placeholder="Charizard — Base Set Holo" />
+        </label>
+        <div class="field-row">
+          <label class="field"><span>Category *</span><select name="category" id="form-category" required></select></label>
+          <label class="field"><span>Year</span><input name="year" type="number" min="1900" max="2100" placeholder="1999" /></label>
+        </div>
+        <div class="field-row">
+          <label class="field"><span>Set</span><input name="set_name" maxlength="120" placeholder="Base Set" /></label>
+          <label class="field"><span>Card #</span><input name="card_number" maxlength="40" placeholder="4/102" /></label>
+        </div>
+        <label class="field"><span>Player / Character</span>
+          <input name="player_or_character" maxlength="120" placeholder="Charizard" />
+        </label>
+
+        <label class="check-row"><input type="checkbox" name="is_graded" id="form-graded" /><span>This card is professionally graded</span></label>
+        <div id="rawFields" class="field"><span>Condition *</span><select name="condition" id="form-condition"></select></div>
+        <div id="gradedFields" class="field-row" hidden>
+          <label class="field"><span>Grader *</span><select name="grading_company" id="form-grader"></select></label>
+          <label class="field"><span>Grade *</span><input name="grade" type="number" min="1" max="10" step="0.5" placeholder="9" /></label>
+        </div>
+
+        <div class="field-row price-row">
+          <label class="field"><span>Price ($) *</span><input name="price" id="form-price" type="number" min="0.01" step="0.01" required placeholder="42.00" /></label>
+          <label class="field"><span>Quantity</span><input name="quantity" type="number" min="1" value="1" /></label>
+        </div>
+        <button type="button" id="checkCompsBtn" class="btn btn-ghost btn-sm">↻ Check sold history for these details</button>
+
+        <label class="field"><span>Image URL</span><input name="image_url" id="form-image" type="url" maxlength="500" placeholder="auto-filled from your scan" /></label>
+        <label class="field"><span>Description</span><textarea name="description" rows="2" maxlength="2000" placeholder="Sharp corners, clean holo…"></textarea></label>
+
+        <div class="form-divider"><span>Seller</span></div>
+        <div class="field-row">
+          <label class="field"><span>Seller handle</span><input name="seller_handle" id="form-handle" maxlength="40" placeholder="yggdrasil" /></label>
+          <button type="button" id="applyFoundingBtn" class="btn btn-ghost btn-sm apply-btn">Apply as Founding Seller</button>
+        </div>
+        <label class="field"><span>Display name *</span><input name="seller_name" id="form-seller" minlength="2" maxlength="80" placeholder="Yggdrasil Cards" /></label>
+        <button type="button" id="connectPayoutsBtn" class="btn btn-ghost btn-sm">💳 Set up payouts (Stripe)</button>
+        <div id="sellerState" class="seller-state" hidden></div>
+
+        <div id="feePreview" class="fee-preview"></div>
+        <div class="drawer-actions">
+          <button type="submit" class="btn btn-primary">Publish listing</button>
+          <span id="formStatus" class="form-status"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <footer class="site-footer">
+    <p>RAGNAR · <span class="runes">ᚱᚨᚷᚾᚨᚱ</span> · a trust-first trading-card marketplace</p>
+    <p id="integrations" class="muted integrations">integrations: —</p>
+    <p class="muted">MVP · <code>uvicorn app.main:app --reload</code> · API docs at <a href="/api/docs">/api/docs</a></p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+# Render blueprint for RAGNAR — https://render.com
+# Deploy: push this repo to GitHub, then in Render: New → Blueprint → pick the repo.
+# A 1GB persistent disk keeps the SQLite DB and uploaded scan photos across deploys.
+# (For scale, swap to a managed Postgres and set DATABASE_URL accordingly.)
+services:
+  - type: web
+    name: ragnar
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: ragnar-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.6
+      - key: DATABASE_URL
+        value: sqlite:////var/data/ragnar.db
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
+      - key: ALLOWED_ORIGINS
+        value: https://ragnarcards.com,https://www.ragnarcards.com
+      - key: PUBLIC_BASE_URL
+        value: https://ragnarcards.com
+      # Secrets — set these in the Render dashboard, not in this file:
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: TCG_API_KEY
+        sync: false
+      - key: XIMILAR_TOKEN
+        sync: false
+      - key: COMPS_PROVIDER_URL
+        sync: false
+      - key: COMPS_PROVIDER_KEY
+        sync: false
