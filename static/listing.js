@@ -35,7 +35,8 @@ function renderPhoto(l) {
   if (l.is_featured) badges.push(`<span class="badge featured">FEATURED</span>`);
   if (l.status === "sold") badges.push(`<span class="badge soldout">SOLD</span>`);
   const box = $("photoBox");
-  box.innerHTML = `<div class="photo-badges">${badges.join("")}</div>${l.image_url ? `<img src="${esc(l.image_url)}" alt="${esc(l.title)}" />` : CREST}`;
+  const photo = l.image_optimized || l.image_url;
+  box.innerHTML = `<div class="photo-badges">${badges.join("")}</div>${photo ? `<img src="${esc(photo)}" alt="${esc(l.title)}" />` : CREST}`;
   const im = box.querySelector("img");
   if (im) im.addEventListener("error", () => { im.remove(); box.insertAdjacentHTML("beforeend", CREST); }, { once: true });
 }

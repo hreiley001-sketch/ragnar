@@ -121,8 +121,9 @@ function listingCard(l) {
 
   const sub = [l.set_name, l.card_number].filter(Boolean).map(escapeHtml).join(" · ");
   const { keep, savings } = keepInfo(l.price, l.is_founding_seller);
-  const img = l.image_url
-    ? `<img src="${escapeHtml(l.image_url)}" alt="${escapeHtml(l.title)}" loading="lazy" onerror="this.outerHTML='${CREST.replace(/'/g, "&#39;")}'" />`
+  const src = l.thumb_url || l.image_url;
+  const img = src
+    ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(l.title)}" loading="lazy" onerror="this.outerHTML='${CREST.replace(/'/g, "&#39;")}'" />`
     : CREST;
 
   return `<article class="listing">

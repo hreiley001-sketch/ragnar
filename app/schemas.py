@@ -79,6 +79,11 @@ class ListingRead(BaseModel):
     view_count: int = 0
     quantity: int
     image_url: Optional[str]
+    # Optimized delivery URLs (Cloudinary WebP/auto-quality). Equal to image_url
+    # when the media CDN isn't configured, so the frontend can always use them.
+    thumb_url: Optional[str] = None
+    image_optimized: Optional[str] = None
+    image_enhanced: bool = False
     description: Optional[str]
     seller_name: str
     is_founding_seller: bool
@@ -87,6 +92,9 @@ class ListingRead(BaseModel):
 
     @classmethod
     def from_listing(cls, listing: Listing) -> "ListingRead":
+        from .media import cdn_url, thumb_url  # lazy: avoids import cycles
+        img = listing.image_url
+        pid = listing.image_public_id
         return cls(
             shipping=round((listing.shipping_cents or 0) / 100, 2),
             is_featured=bool(listing.is_featured),
@@ -105,7 +113,10 @@ class ListingRead(BaseModel):
             price=round(listing.price_cents / 100, 2),
             price_cents=listing.price_cents,
             quantity=listing.quantity,
-            image_url=listing.image_url,
+            image_url=img,
+            thumb_url=(thumb_url(img, pid) if img or pid else None),
+            image_optimized=(cdn_url(img, public_id=pid) if img or pid else None),
+            image_enhanced=bool(getattr(listing, "image_enhanced", False)),
             description=listing.description,
             seller_name=listing.seller_name,
             is_founding_seller=listing.is_founding_seller,
@@ -159,6 +170,8 @@ class StoreSummary(BaseModel):
     tagline: Optional[str] = None
     avatar_url: Optional[str] = None
     banner_url: Optional[str] = None
+    avatar_optimized: Optional[str] = None
+    banner_optimized: Optional[str] = None
     accent_color: Optional[str] = None
     font_family: Optional[str] = None
     is_founding: bool = False

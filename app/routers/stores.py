@@ -40,12 +40,16 @@ def _is_live(session: Session, seller_id: int) -> bool:
 
 
 def _summary(session: Session, s: Seller) -> dict:
+    from ..media import cdn_url
     return {
         "handle": s.handle,
         "display_name": s.display_name,
         "tagline": s.tagline,
         "avatar_url": s.avatar_url,
         "banner_url": s.banner_url,
+        # Optimized (Cloudinary) variants — equal to the originals when unconfigured.
+        "avatar_optimized": (cdn_url(s.avatar_url, width=240, height=240) if s.avatar_url else None),
+        "banner_optimized": (cdn_url(s.banner_url, width=1200) if s.banner_url else None),
         "accent_color": s.accent_color,
         "font_family": s.font_family,
         "is_founding": s.is_founding,

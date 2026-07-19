@@ -50,9 +50,9 @@ function applyStore(s) {
   $("storeName").textContent = s.display_name;
   $("storeTag").textContent = s.tagline || "";
   $("storeBio").textContent = s.bio || "";
-  $("storeHero").style.background = s.banner_url ? `center/cover url('${s.banner_url}')` : accentGrad(s.accent_color);
+  $("storeHero").style.background = s.banner_url ? `center/cover url('${s.banner_optimized || s.banner_url}')` : accentGrad(s.accent_color);
   const av = $("storeAv");
-  if (s.avatar_url) { av.style.background = `center/cover url('${s.avatar_url}')`; av.textContent = ""; }
+  if (s.avatar_url) { av.style.background = `center/cover url('${s.avatar_optimized || s.avatar_url}')`; av.textContent = ""; }
   else { av.style.background = s.accent_color || "#6f93b4"; av.textContent = (s.display_name || "?").trim()[0].toUpperCase(); }
   // prefill customize
   $("c-tagline").value = s.tagline || "";
@@ -93,8 +93,9 @@ function listingCard(l) {
   if (l.is_graded && l.grading_company) badges.push(`<span class="badge grade">${esc(l.grading_company)} ${l.grade}</span>`);
   else if (l.condition) badges.push(`<span class="badge">${esc(l.condition)}</span>`);
   const sub = [l.set_name, l.card_number].filter(Boolean).map(esc).join(" · ");
-  const img = l.image_url
-    ? `<img src="${esc(l.image_url)}" alt="${esc(l.title)}" loading="lazy" onerror="this.outerHTML='${CREST.replace(/'/g, "&#39;")}'" />`
+  const src = l.thumb_url || l.image_url;
+  const img = src
+    ? `<img src="${esc(src)}" alt="${esc(l.title)}" loading="lazy" onerror="this.outerHTML='${CREST.replace(/'/g, "&#39;")}'" />`
     : CREST;
   const sold = l.status === "sold";
   return `<article class="listing">

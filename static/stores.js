@@ -42,8 +42,8 @@ async function loadStores(q) {
     if (!stores.length) { grid.innerHTML = `<p class="muted">No stores found.</p>`; return; }
     grid.innerHTML = stores.map((s) => `
       <div class="store-card" data-handle="${esc(s.handle)}">
-        <div class="store-banner" style="background:${s.banner_url ? `center/cover url('${esc(s.banner_url)}')` : accentGrad(s.accent_color)}">
-          <div class="store-avatar" style="background:${s.avatar_url ? `center/cover url('${esc(s.avatar_url)}')` : (s.accent_color || "#6f93b4")}">${s.avatar_url ? "" : initial(s.display_name)}</div>
+        <div class="store-banner" style="background:${s.banner_url ? `center/cover url('${esc(s.banner_optimized || s.banner_url)}')` : accentGrad(s.accent_color)}">
+          <div class="store-avatar" style="background:${s.avatar_url ? `center/cover url('${esc(s.avatar_optimized || s.avatar_url)}')` : (s.accent_color || "#6f93b4")}">${s.avatar_url ? "" : initial(s.display_name)}</div>
         </div>
         <div class="store-body">
           <div class="store-name">${esc(s.display_name)} ${s.is_live ? '<span class="live-dot"></span>' : ""} ${s.is_founding ? `<span class="badge founding">★ #${s.founding_number}</span>` : ""}</div>
