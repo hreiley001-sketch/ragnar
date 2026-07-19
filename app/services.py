@@ -162,18 +162,33 @@ def summarize_comps(comps: list[dict]) -> dict:
     """Aggregate comp dicts ({price, sold_at, ...}) from any source into headline
     stats + a time series for a sparkline. Median is the suggested price (more
     honest than a mean skewed by one hot sale)."""
-    comps = [c for c in comps if c.get("price") is not None and c.get("sold_at")]
-    if not comps:
+    valid: list[dict] = []
+    prices: list[float] = []
+    for comp in comps:
+        price = comp.get("price")
+        sold_at = comp.get("sold_at")
+        if price is None or not sold_at:
+            continue
+        valid.append(comp)
+        prices.append(price)
+    if not valid:
         return _empty_history()
 
-    prices = [c["price"] for c in comps]
-    by_date = sorted(comps, key=lambda c: c["sold_at"])
-    latest = by_date[-1]
-    by_recent = sorted(comps, key=lambda c: c["sold_at"], reverse=True)
+    by_recent = sorted(valid, key=lambda c: c["sold_at"], reverse=True)
+    latest = by_recent[0]
+    series_source = list(reversed(by_recent))  # oldest -> newest for charting
+    if len(series_source) > 240:
+        # Keep sparklines lightweight on very large histories by sampling evenly
+        # while always retaining the most recent point.
+        step = (len(series_source) + 239) // 240
+        sampled = series_source[::step]
+        if sampled[-1] is not series_source[-1]:
+            sampled.append(series_source[-1])
+        series_source = sampled
     median = round(statistics.median(prices), 2)
 
     return {
-        "count": len(comps),
+        "count": len(valid),
         "average": round(sum(prices) / len(prices), 2),
         "median": median,
         "low": round(min(prices), 2),
@@ -183,7 +198,7 @@ def summarize_comps(comps: list[dict]) -> dict:
         "suggested_price": median,
         "series": [
             {"date": c["sold_at"].date().isoformat(), "price": round(c["price"], 2)}
-            for c in by_date
+            for c in series_source
         ],
         "recent": [
             {

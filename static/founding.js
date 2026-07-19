@@ -66,8 +66,6 @@ async function reflectAccount() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadStatus();
-  loadSiteCopy();
-  reflectAccount();
+  Promise.allSettled([loadStatus(), loadSiteCopy(), reflectAccount()]);
   $("applyForm").addEventListener("submit", submitApplication);
 });

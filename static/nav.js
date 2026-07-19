@@ -116,9 +116,32 @@
 
   // A visitor's personal, LOCAL-only look override (set by the shopper concierge).
   // Never touches the global site — it only restyles this one browser.
+  let personalThemeCache = null;
+  let personalThemeLoaded = false;
+  function getPersonalTheme() {
+    if (personalThemeLoaded) return personalThemeCache;
+    personalThemeLoaded = true;
+    try {
+      personalThemeCache = JSON.parse(localStorage.getItem("ragnar_personal_theme") || "null");
+    } catch (_) { personalThemeCache = null; }
+    return personalThemeCache;
+  }
+  function sameTheme(a, b) {
+    const ak = Object.keys(a || {}), bk = Object.keys(b || {});
+    if (ak.length !== bk.length) return false;
+    for (const k of ak) if (a[k] !== b[k]) return false;
+    return true;
+  }
+  function writePersonalTheme(nextTheme) {
+    if (!nextTheme) return;
+    if (sameTheme(personalThemeCache, nextTheme)) return;
+    personalThemeCache = nextTheme;
+    personalThemeLoaded = true;
+    localStorage.setItem("ragnar_personal_theme", JSON.stringify(nextTheme));
+  }
   function applyPersonalTheme() {
     try {
-      const t = JSON.parse(localStorage.getItem("ragnar_personal_theme") || "null");
+      const t = getPersonalTheme();
       if (t) applyTheme(t);
     } catch (_) { /* ignore */ }
   }
@@ -219,6 +242,7 @@
     const feed = panel.querySelector("#cgFeed");
     const chipsBox = panel.querySelector("#cgChips");
     const input = panel.querySelector("#cgInput");
+    let searchInFlight = false;
 
     const msg = (html, who) => {
       const el = mk("div");
@@ -250,12 +274,14 @@
       if (fm) theme.theme_font = fm[1].trim();
       if (/reset|default|normal|undo/.test(low)) {
         localStorage.removeItem("ragnar_personal_theme");
+        personalThemeCache = null;
+        personalThemeLoaded = true;
         window.__ragnarApplySite(window.__ragnarSite || {});
         return "Reset — you're back to RAGNAR's normal look.";
       }
       if (!Object.keys(theme).length) return null;
-      const merged = Object.assign(JSON.parse(localStorage.getItem("ragnar_personal_theme") || "{}"), theme);
-      localStorage.setItem("ragnar_personal_theme", JSON.stringify(merged));
+      const merged = Object.assign({}, getPersonalTheme() || {}, theme);
+      writePersonalTheme(merged);
       applyTheme(merged);
       return "Done — I restyled your view (just for you). Say “reset my view” to undo.";
     }
@@ -271,6 +297,8 @@
         if (r) { msg(r, "ai"); return; }
       }
       // 2) Otherwise: shop by vibe -> NL search -> marketplace with filters.
+      if (searchInFlight) return;
+      searchInFlight = true;
       const thinking = msg("Searching…", "ai");
       try {
         const r = await fetch(`/api/ai/search?q=${encodeURIComponent(text)}`).then((x) => x.json());
@@ -282,6 +310,7 @@
         msg(`Hunting for ${esc(bits || text)} — taking you to the results…`, "ai");
         setTimeout(() => { location.href = "/marketplace?" + p.toString(); }, 700);
       } catch (e) { thinking.remove(); msg("Couldn't search just now — try again.", "ai"); }
+      finally { searchInFlight = false; }
     }
 
     fab.addEventListener("click", () => {
