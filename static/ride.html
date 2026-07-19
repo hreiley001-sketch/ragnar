@@ -11,17 +11,17 @@
     .track { display:flex; gap:8px; margin: 16px 0 22px; }
     .stop { flex:1; text-align:center; padding:10px 6px; border-radius:10px; border:1px solid var(--border); background:var(--panel); position:relative; font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
     .stop.done { color:var(--text-soft); }
-    .stop.active { border-color:var(--ice); color:#eaf3fb; box-shadow:0 0 18px rgba(55,189,255,.35); background:linear-gradient(180deg,rgba(23,42,60,.7),rgba(12,17,26,.7)); }
+    .stop.active { border-color:var(--ice); color:var(--text); box-shadow:0 0 18px rgba(55,189,255,.35); background:rgba(37,99,235,.10); }
     .stop .cart { position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:16px; }
     .ride-main { display:grid; grid-template-columns: 1.3fr 1fr; gap:20px; }
     .card-panel, .bid-panel, .feed-panel { padding:18px; }
-    .cardimg { width:100%; aspect-ratio:3/4; max-height:420px; object-fit:contain; border-radius:12px; background:radial-gradient(circle at 50% 30%, rgba(55,189,255,.12), rgba(10,14,20,.9)); border:1px solid var(--border); }
+    .cardimg { width:100%; aspect-ratio:3/4; max-height:420px; object-fit:contain; border-radius:12px; background:radial-gradient(circle at 50% 30%, rgba(55,189,255,.12), #e6ebf2); border:1px solid var(--border); }
     .countdown { font-size:40px; font-weight:800; color:var(--ice); text-shadow:0 0 20px rgba(55,189,255,.4); }
-    .bid-now { font-size:40px; font-weight:800; color:#eaf3fb; }
+    .bid-now { font-size:40px; font-weight:800; color:var(--text); }
     .muted-s { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
     .feed { max-height:260px; overflow:auto; display:flex; flex-direction:column; gap:6px; margin-top:8px; }
-    .feed-item { font-size:13px; padding:6px 10px; border-radius:8px; background:rgba(8,12,18,.5); border:1px solid var(--border); color:var(--text-soft); }
-    .feed-item b { color:#eaf3fb; }
+    .feed-item { font-size:13px; padding:6px 10px; border-radius:8px; background:var(--bg-2); border:1px solid var(--border); color:var(--text-soft); }
+    .feed-item b { color:var(--text); }
     .winner { text-align:center; padding:22px; border-radius:14px; border:1px solid rgba(240,198,116,.5); background:rgba(240,198,116,.1); color:var(--gold); font-size:20px; font-weight:800; margin-bottom:18px; }
     .live-tag { display:inline-flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:#ff8a8a; }
     .live-tag .d { width:9px;height:9px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;animation:pulse 1.3s infinite;} @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}

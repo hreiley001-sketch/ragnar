@@ -12,10 +12,10 @@
     .login-wrap h2 { margin-top: 0; }
     .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .tab { padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; }
-    .tab.active { background: linear-gradient(180deg,#2a8fc4,#1c6fa3); color: #f2fbff; border-color: rgba(111,214,255,0.6); font-weight: 600; }
+    .tab.active { background: var(--ice); color: #fff; border-color: rgba(111,214,255,0.6); font-weight: 600; }
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 14px; margin-bottom: 22px; }
     .kpi { padding: 16px 18px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
-    .kpi .k-num { font-size: 26px; font-weight: 800; color: #eaf3fb; }
+    .kpi .k-num { font-size: 26px; font-weight: 800; color: var(--text); }
     .kpi .k-num.hot { color: var(--ice); text-shadow: 0 0 16px rgba(55,189,255,0.4); }
     .kpi .k-num.gold { color: var(--gold); }
     .kpi .k-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 3px; }
@@ -27,9 +27,9 @@
     .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
     .pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); white-space: nowrap; }
     .pill.sold { color: var(--muted); }
-    .pill.active { color: #9be7c4; border-color: rgba(120,230,180,0.4); }
+    .pill.active { color: var(--ok); border-color: rgba(120,230,180,0.4); }
     .pill.gold { color: var(--gold); border-color: rgba(240,198,116,0.5); }
-    .pill.ok { color: #9be7c4; border-color: rgba(120,230,180,0.4); }
+    .pill.ok { color: var(--ok); border-color: rgba(120,230,180,0.4); }
     .pill.warn { color: var(--gold); border-color: rgba(240,198,116,0.5); }
     .pill.bad { color: var(--danger); border-color: rgba(255,138,138,0.4); }
     .pill.info { color: var(--ice); border-color: rgba(111,214,255,0.5); }
@@ -38,7 +38,7 @@
     .btn-danger:hover { background: rgba(255,138,138,0.12); border-color: var(--danger); }
     .ai-panel { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; }
     .ai-box { padding: 16px; }
-    .ai-out { margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(8,12,18,0.6); border: 1px solid var(--border); font-size: 13px; white-space: pre-wrap; min-height: 24px; }
+    .ai-out { margin-top: 10px; padding: 10px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--border); font-size: 13px; white-space: pre-wrap; min-height: 24px; }
     .int-list { display: flex; flex-wrap: wrap; gap: 10px 18px; }
     .int-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-soft); }
     .wrap-cell { max-width: 260px; white-space: normal; }

@@ -9,7 +9,7 @@
   <style>
     .store-hero { position:relative; height:200px; border-radius:0 0 var(--radius) var(--radius); overflow:hidden; }
     .store-hero-inner { position:absolute; inset:0; display:flex; align-items:flex-end; gap:16px; padding:18px clamp(16px,4vw,40px); background:linear-gradient(180deg, transparent, rgba(8,11,16,.85)); }
-    .store-av { width:88px;height:88px;border-radius:20px;border:3px solid var(--bg); display:grid;place-items:center;font-weight:800;font-size:34px;color:#0a0d12; flex:none; }
+    .store-av { width:88px;height:88px;border-radius:20px;border:3px solid var(--bg); display:grid;place-items:center;font-weight:800;font-size:34px;color:#fff; flex:none; }
     .store-h-meta h1 { margin:0; font-size:clamp(24px,4vw,36px); }
     .store-h-meta .tg { color:var(--text-soft); }
     .store-wrap { padding: 18px clamp(16px,4vw,40px) 60px; }
@@ -25,8 +25,8 @@
     .designer-title { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--steel); margin-bottom:6px; }
     .design-feed { display:flex; flex-direction:column; gap:6px; margin:8px 0; max-height:180px; overflow:auto; }
     .design-msg { font-size:13px; padding:8px 11px; border-radius:10px; max-width:92%; }
-    .design-msg.me { background:rgba(55,189,255,.14); align-self:flex-end; color:#eaf3fb; }
-    .design-msg.ai { background:rgba(8,12,18,.5); border:1px solid var(--border); color:var(--text-soft); align-self:flex-start; }
+    .design-msg.me { background:rgba(55,189,255,.14); align-self:flex-end; color:var(--text); }
+    .design-msg.ai { background:var(--bg-2); border:1px solid var(--border); color:var(--text-soft); align-self:flex-start; }
     .design-swatch { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px; border:1px solid rgba(255,255,255,.3); }
     .design-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }
   </style>

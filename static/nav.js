@@ -7,10 +7,9 @@
   const ITEMS = [
     { icon: "🏠", label: "Home", href: "/" },
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
-    { icon: "🏪", label: "Stores & Live", href: "/stores" },
+    { icon: "🏪", label: "Stores", href: "/stores" },
     { icon: "🎢", label: "Live Rides", href: "/rides" },
-    { icon: "🔎", label: "Want Lists", href: "/account#wants" },
-    { icon: "⭐", label: "Become a Founding Seller", href: "/#apply" },
+    { icon: "⭐", label: "Become a Seller", href: "/#apply" },
   ];
 
   const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
@@ -37,7 +36,8 @@
   links.appendChild(mk("div", "nav-div"));
   const userLine = mk("div", "nav-user"); userLine.id = "navUser"; userLine.hidden = true; links.appendChild(userLine);
   const acct = navLink({ icon: "👤", label: "Sign in", href: "/login" }); links.appendChild(acct);
-  const hub = navLink({ icon: "⚙️", label: "Command Hub", href: "/admin", cls: "nav-hub" }); links.appendChild(hub);
+  // Command Hub is staff-only — hidden until we confirm the user is staff.
+  const hub = navLink({ icon: "⚙️", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
 
   document.body.appendChild(scrim);
   document.body.appendChild(drawer);
@@ -137,7 +137,7 @@
       userLine.textContent = "Signed in · " + (d.user.name || d.user.email);
       acct.querySelector(".lbl").textContent = "My account";
       acct.href = "/account";
-      if (d.user.is_staff) { hub.querySelector(".lbl").textContent = "Command Hub (staff)"; initStudio(); }
+      if (d.user.is_staff) { hub.hidden = false; hub.querySelector(".lbl").textContent = "Command Hub (staff)"; initStudio(); }
       else initConcierge();
 
       // "Verify your email" banner for unverified accounts (site-wide reminder).

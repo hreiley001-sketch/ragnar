@@ -15,7 +15,7 @@
     .item-photo { overflow: hidden; }
     .photo-box {
       aspect-ratio: 3 / 4; position: relative; display: grid; place-items: center; overflow: hidden;
-      background: radial-gradient(circle at 50% 30%, rgba(55,189,255,0.12), rgba(10,14,20,0.9));
+      background: radial-gradient(circle at 50% 30%, rgba(55,189,255,0.12), #e6ebf2);
     }
     .photo-box img { width: 100%; height: 100%; object-fit: contain; }
     .photo-box .placeholder-crest { width: 54%; opacity: 0.28; }
@@ -31,7 +31,7 @@
     .item-main h1 { margin: 0 0 6px; font-size: clamp(22px, 3vw, 32px); line-height: 1.15; }
     .item-sub { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
     .price-line { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-    .item-price { font-size: 34px; font-weight: 800; color: #eaf3fb; }
+    .item-price { font-size: 34px; font-weight: 800; color: var(--text); }
     .ship-note { color: var(--text-soft); font-size: 14px; }
     .views { color: var(--muted); font-size: 13px; margin: 4px 0 16px; }
     .action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
@@ -50,7 +50,7 @@
     }
     .offer-chip.open { color: var(--ice); border-color: rgba(111,214,255,0.5); background: rgba(55,189,255,0.1); }
     .offer-chip.countered { color: var(--gold); border-color: rgba(240,198,116,0.5); background: rgba(240,198,116,0.1); }
-    .offer-chip.accepted { color: #9be7c4; border-color: rgba(120,230,180,0.5); background: rgba(120,230,180,0.1); }
+    .offer-chip.accepted { color: var(--ok); border-color: rgba(120,230,180,0.5); background: rgba(120,230,180,0.1); }
     .offer-chip.declined { color: var(--danger); border-color: rgba(255,138,138,0.5); background: rgba(255,138,138,0.08); }
     .offer-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
 
@@ -58,7 +58,7 @@
     .seller-card { padding: 14px 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .seller-av {
       width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; overflow: hidden;
-      font-weight: 800; font-size: 22px; color: #0a0d12; background: var(--steel); flex: none;
+      font-weight: 800; font-size: 22px; color: #fff; background: var(--steel); flex: none;
     }
     .seller-av img { width: 100%; height: 100%; object-fit: cover; }
     .seller-meta { flex: 1; min-width: 160px; }
