@@ -346,6 +346,33 @@ async function checkComps() {
   } catch (err) { toast("Could not load sold history: " + err.message); }
 }
 
+async function suggestPrice() {
+  const out = $("suggestOut");
+  const q = (n) => { const el = document.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ""; };
+  if (!q("player_or_character") && !q("title")) { out.textContent = "Add a card name/player first, then I can suggest a price."; return; }
+  out.textContent = "Pricing…";
+  const graded = $("form-graded").checked;
+  const payload = {
+    title: q("title"), player_or_character: q("player_or_character"),
+    set_name: q("set_name"), card_number: q("card_number"),
+    category: $("form-category").value || null, is_graded: graded,
+    grading_company: graded ? ($("form-grader").value || null) : null,
+    grade: graded ? (q("grade") || null) : null,
+  };
+  try {
+    const r = await api("/api/pricing/suggest", { method: "POST", body: JSON.stringify(payload) });
+    if (r.suggested_price != null) {
+      $("form-price").value = r.suggested_price;
+      updateFeePreview();
+      const range = (r.low != null && r.high != null) ? ` · range $${r.low}–$${r.high}` : "";
+      out.innerHTML = `✨ Suggested <strong>$${r.suggested_price}</strong>${range} — ${r.basis.join(" + ")}. Tweak freely.`;
+      toast("Suggested price applied.");
+    } else {
+      out.textContent = r.note || "Not enough data to suggest a price yet.";
+    }
+  } catch (e) { out.textContent = "Couldn't suggest a price: " + e.message; }
+}
+
 /* ---------------- scan-to-post ---------------- */
 function applyScanFields(f) {
   const set = (name, val) => { const el = document.querySelector(`[name="${name}"]`); if (el && val != null && val !== "") el.value = val; };
@@ -558,6 +585,7 @@ async function init() {
   $("form-graded").addEventListener("change", syncGradedFields);
   $("form-price").addEventListener("input", updateFeePreview);
   $("checkCompsBtn").addEventListener("click", checkComps);
+  $("suggestPriceBtn").addEventListener("click", suggestPrice);
   $("applyFoundingBtn").addEventListener("click", applyFounding);
   $("listForm").addEventListener("submit", submitListing);
 
