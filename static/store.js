@@ -173,13 +173,14 @@ async function runDesigner() {
   $("designPrompt").value = "";
   const thinking = addDesignMsg("Designing…", "ai");
   try {
-    const current = { accent_color: $("c-accent").value, tagline: $("c-tagline").value, bio: $("c-bio").value };
+    const current = { accent_color: $("c-accent").value, tagline: $("c-tagline").value, bio: $("c-bio").value, font_family: $("c-font").value };
     const r = await api("/api/ai/design", { method: "POST", body: JSON.stringify({ prompt, current }) });
     if (r.accent_color) $("c-accent").value = r.accent_color;
     if (r.tagline) $("c-tagline").value = r.tagline;
     if (r.bio) $("c-bio").value = r.bio;
+    if (r.font_family) setFontSelection(r.font_family);
     // Live preview (not persisted until Save).
-    applyStore({ ...STORE, accent_color: r.accent_color || STORE.accent_color, tagline: r.tagline || STORE.tagline, bio: r.bio || STORE.bio });
+    applyStore({ ...STORE, accent_color: r.accent_color || STORE.accent_color, tagline: r.tagline || STORE.tagline, bio: r.bio || STORE.bio, font_family: r.font_family || STORE.font_family });
     thinking.remove();
     const sw = r.accent_color ? `<span class="design-swatch" style="background:${esc(r.accent_color)}"></span>` : "";
     addDesignMsg(sw + esc(r.reply || "Updated the preview.") + (r.source ? ` <span class="muted" style="font-size:11px">(${esc(r.source)})</span>` : ""), "ai");

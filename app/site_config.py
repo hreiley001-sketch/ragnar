@@ -72,6 +72,15 @@ SITE_FIELDS: list[dict] = [
         "group": "Community",
         "default": "henry@ragnarips.com",
     },
+    # --- Homepage perk cards (the four boxes under the hero) ---
+    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "Fees for 90 days"},
+    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "Pay only payment processing during your intro window — keep the rest."},
+    {"key": "perk2_title", "label": "Perk 2 title", "type": "text", "group": "Homepage perks", "default": "Permanent founding rate"},
+    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "A lower rate than everyone else, locked in for good — our thank-you for being early."},
+    {"key": "perk3_title", "label": "Perk 3 title", "type": "text", "group": "Homepage perks", "default": "Founding badge"},
+    {"key": "perk3_desc", "label": "Perk 3 detail", "type": "text", "group": "Homepage perks", "default": "A permanent Founding Seller badge on your storefront. Status that never expires."},
+    {"key": "perk4_title", "label": "Perk 4 title", "type": "text", "group": "Homepage perks", "default": "Your own store"},
+    {"key": "perk4_desc", "label": "Perk 4 detail", "type": "text", "group": "Homepage perks", "default": "A customizable storefront, scan-to-list, real sold-price history, and live selling."},
     # --- Look & feel: applied site-wide as CSS variables by nav.js ---
     {
         "key": "theme_accent",

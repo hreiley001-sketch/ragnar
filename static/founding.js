@@ -26,6 +26,10 @@ async function loadSiteCopy() {
     const c = await api("/api/site-config");
     if (c.hero_headline && $("heroHeadline")) $("heroHeadline").textContent = c.hero_headline;
     if (c.hero_subtitle && $("heroSubtitle")) $("heroSubtitle").textContent = c.hero_subtitle;
+    for (let i = 1; i <= 4; i++) {
+      if (c[`perk${i}_title`] && $(`perk${i}Title`)) $(`perk${i}Title`).textContent = c[`perk${i}_title`];
+      if (c[`perk${i}_desc`] && $(`perk${i}Desc`)) $(`perk${i}Desc`).textContent = c[`perk${i}_desc`];
+    }
   } catch (_) {}
 }
 

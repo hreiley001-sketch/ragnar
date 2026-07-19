@@ -543,14 +543,32 @@
       if (!USER || !USER.seller_handle) { p.innerHTML = `<div class="empty-sm">This account doesn’t own a store yet.</div>`; return; }
       const handle = USER.seller_handle;
       p.innerHTML = `<div class="empty-sm">Loading store operations…</div>`;
-      let offers = [], orders = [], offersErr = null, ordersErr = null;
-      const [ro, rd] = await Promise.allSettled([
+      let offers = [], orders = [], listings = [], offersErr = null, ordersErr = null;
+      const [ro, rd, rl] = await Promise.allSettled([
         api(`/api/offers/store/${encodeURIComponent(handle)}`),
         api(`/api/orders/store/${encodeURIComponent(handle)}`),
+        api(`/api/stores/${encodeURIComponent(handle)}/listings?include_sold=true`),
       ]);
       if (ro.status === "fulfilled") offers = rowsOf(ro.value, "offers"); else offersErr = ro.reason;
       if (rd.status === "fulfilled") orders = rowsOf(rd.value, "orders"); else ordersErr = rd.reason;
+      if (rl.status === "fulfilled") listings = Array.isArray(rl.value) ? rl.value : rowsOf(rl.value, "listings");
       if (offersErr && offersErr.status === 401) return authWall(p);
+
+      const listingRows = listings.map((l) => {
+        const thumb = (l.thumb_url || l.image_url)
+          ? `<img src="${esc(l.thumb_url || l.image_url)}" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:6px;" />`
+          : `<span style="width:38px;height:38px;display:inline-block;border-radius:6px;background:var(--bg-2,#0c111a);"></span>`;
+        const enhanced = l.image_enhanced ? ` <span class="badge grade">✨ enhanced</span>` : "";
+        const enhBtn = (l.image_url)
+          ? `<button class="btn btn-ghost btn-sm" data-enh="${esc(l.id)}" type="button">✨ Enhance photo</button>`
+          : `<span class="empty-sm">Add a photo to enhance</span>`;
+        return `<tr>
+          <td style="display:flex;align-items:center;gap:8px;">${thumb}<span>${esc(l.title)}</span>${enhanced}</td>
+          <td>${money(l.price)}</td>
+          <td>${chip(l.status)}</td>
+          <td>${enhBtn}</td>
+        </tr>`;
+      }).join("");
 
       const offerRows = offers.map((o) => {
         const st = String(o.status || "").toLowerCase();
@@ -602,7 +620,23 @@
         ${ordersErr ? `<div class="empty-sm">Couldn’t load orders. ${esc(ordersErr.message)}</div>`
           : orders.length
             ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Item</th><th>Buyer</th><th>Total</th><th>Status</th></tr></thead><tbody>${orderRows}</tbody></table></div>`
-            : `<div class="empty-sm">No orders yet. When someone buys, shipping tools appear here.</div>`}`;
+            : `<div class="empty-sm">No orders yet. When someone buys, shipping tools appear here.</div>`}
+        <div class="sec-title">Your listings — polish your photos</div>
+        ${listings.length
+          ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Card</th><th>Price</th><th>Status</th><th>AI photo</th></tr></thead><tbody>${listingRows}</tbody></table></div>`
+          : `<div class="empty-sm">No listings yet — scan a card to post your first.</div>`}`;
+
+      p.querySelectorAll("[data-enh]").forEach((b) => b.addEventListener("click", async () => {
+        const id = b.getAttribute("data-enh");
+        if (!confirm("AI-enhance this photo (upscale / clean up)?")) return;
+        const removeBg = confirm("Also remove the background? (OK = yes, Cancel = keep it)");
+        b.disabled = true; b.textContent = "Enhancing…";
+        try {
+          await api(`/api/media/enhance/${encodeURIComponent(id)}`, { method: "POST", body: JSON.stringify({ upscale: true, remove_bg: removeBg }) });
+          toast("Enhancing — your photo updates shortly.");
+          setTimeout(loadStore, 6000);
+        } catch (e) { b.disabled = false; b.textContent = "✨ Enhance photo"; toast(e.message); }
+      }));
 
       p.querySelectorAll("[data-sact]").forEach((b) => b.addEventListener("click", async () => {
         const action = b.getAttribute("data-sact"), id = b.getAttribute("data-soid");

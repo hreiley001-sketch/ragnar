@@ -188,9 +188,21 @@ def _rules_design(prompt: str, current: dict) -> dict:
     bio = ((f"Curated {focus} cards" if focus else "Curated cards")
            + f" with a {pretty} look — grading-aware listings, real sold-price history, "
              "and buyer protection on every sale.")
+    # Pick a font that matches the vibe (only when the seller hints at style).
+    font = None
+    _FONTS = [(("premium", "lux", "elegant", "royal", "regal", "classic", "vintage"), "Cinzel"),
+              (("bold", "loud", "hype", "street", "aggressive", "impact"), "Bebas Neue"),
+              (("modern", "clean", "minimal", "sleek", "tech"), "Space Grotesk"),
+              (("fun", "playful", "cute", "friendly"), "Rubik")]
+    for kws, fam in _FONTS:
+        if any(k in low for k in kws):
+            font = fam
+            break
     return {
         "accent_color": color, "tagline": tagline[:140], "bio": bio[:1000],
-        "reply": f"Done — I gave your store a {pretty} accent ({color}) with a matching "
+        "font_family": font,
+        "reply": f"Done — I gave your store a {pretty} accent ({color})"
+                 + (f" and a {font} font" if font else "") + " with a matching "
                  "tagline and bio. Try “make it darker”, “more premium”, or name what you sell to refine.",
         "source": "rules",
     }
@@ -203,19 +215,23 @@ def design_store(prompt: str, current: dict | None = None) -> dict:
         {"role": "system", "content": "You are a store-branding designer for a trading-card "
          "marketplace. Given a seller's description and their current store, return ONLY JSON with keys: "
          "accent_color (a #RRGGBB hex that pops on a dark UI), tagline (<=80 chars), "
-         "bio (<=240 chars, no emojis), reply (a short friendly sentence describing what you changed). "
-         f"Current store: {json.dumps({k: current.get(k) for k in ('accent_color', 'tagline', 'bio')})}."},
+         "bio (<=240 chars, no emojis), font_family (a real Google Font family name that fits the vibe, "
+         "or null to keep current), reply (a short friendly sentence describing what you changed). "
+         f"Current store: {json.dumps({k: current.get(k) for k in ('accent_color', 'tagline', 'bio', 'font_family')})}."},
         {"role": "user", "content": prompt},
-    ], max_tokens=300, temperature=0.7)
+    ], max_tokens=320, temperature=0.7)
     if content:
         try:
             m = re.search(r"\{.*\}", content, re.DOTALL)
             d = json.loads(m.group(0) if m else content)
             color = d.get("accent_color") if _HEX_RE.match(str(d.get("accent_color", ""))) else (current.get("accent_color") or "#6fd6ff")
+            font = d.get("font_family")
+            font = str(font)[:80] if font and str(font).lower() not in ("null", "none", "") else None
             return {
                 "accent_color": color,
                 "tagline": (d.get("tagline") or "")[:140] or None,
                 "bio": (d.get("bio") or "")[:1000] or None,
+                "font_family": font,
                 "reply": d.get("reply") or "Updated your store design.",
                 "source": "openai",
             }
