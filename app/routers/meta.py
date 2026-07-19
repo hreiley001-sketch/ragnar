@@ -1,7 +1,11 @@
 """Reference data + fee quotes that power the storefront's dropdowns and math."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
+from sqlmodel import Session
+
+from .. import site_config
+from ..database import get_session
 
 from ..ai import is_configured as ai_configured
 from ..comps import is_configured as comps_configured
@@ -64,6 +68,13 @@ def meta() -> dict:
 async def meta_fonts(limit: int = Query(60, ge=1, le=200)) -> dict:
     """Popular Google Font families for the store typography picker."""
     return await list_fonts(limit=limit)
+
+
+@router.get("/site-config")
+def site_config_public(session: Session = Depends(get_session)) -> dict:
+    """Staff-editable site content (announcement, landing copy, links). Public —
+    every page hydrates from this."""
+    return site_config.get_all(session)
 
 
 @router.get("/fees/quote")

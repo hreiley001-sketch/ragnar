@@ -20,6 +20,15 @@ async function loadStatus() {
   } catch (_) {}
 }
 
+// Hydrate staff-editable landing copy (set in Command Hub → Site).
+async function loadSiteCopy() {
+  try {
+    const c = await api("/api/site-config");
+    if (c.hero_headline && $("heroHeadline")) $("heroHeadline").textContent = c.hero_headline;
+    if (c.hero_subtitle && $("heroSubtitle")) $("heroSubtitle").textContent = c.hero_subtitle;
+  } catch (_) {}
+}
+
 async function submitApplication(e) {
   e.preventDefault();
   const fd = new FormData(e.target);
@@ -54,6 +63,7 @@ async function reflectAccount() {
 
 document.addEventListener("DOMContentLoaded", () => {
   loadStatus();
+  loadSiteCopy();
   reflectAccount();
   $("applyForm").addEventListener("submit", submitApplication);
 });

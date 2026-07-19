@@ -85,6 +85,7 @@
       <button class="tab" data-tab="disputes">Disputes</button>
       <button class="tab" data-tab="rides">Rides</button>
       <button class="tab" data-tab="team">Team</button>
+      <button class="tab" data-tab="site">Site</button>
       <button class="tab" data-tab="ai">AI Tools</button>
     </div>
 
@@ -170,6 +171,23 @@
       </div>
       <div class="results-bar"><input id="userSearch" type="search" placeholder="Search users…" style="max-width:280px;" /></div>
       <div class="tbl-wrap"><table class="hub"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Verified</th><th>Store</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-site" class="tab-panel" hidden>
+      <div class="panel-bar">
+        <h3>Site editor — build it with the team</h3>
+        <button id="siteRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+      </div>
+      <div class="card" style="padding:14px;margin-bottom:14px;">
+        <p class="muted" style="margin-top:0;font-size:13px;">Edit the live site's content — announcement bar, landing copy, and community links. Changes publish instantly to <strong>ragnarips.com</strong>. Every edit is attributed to you.</p>
+      </div>
+      <form id="siteForm">
+        <div id="siteFields"><p class="muted">Loading…</p></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:14px;">
+          <button id="siteSaveBtn" class="btn btn-primary btn-sm" type="button">Publish changes</button>
+          <span id="siteStatus" class="form-status"></span>
+        </div>
+      </form>
     </section>
 
     <section id="tab-ai" class="tab-panel" hidden>

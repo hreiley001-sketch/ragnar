@@ -442,6 +442,43 @@ function teamAction(e) {
   else if (del) deleteUser(del, t.getAttribute("data-del-email"), t.getAttribute("data-del-store"));
 }
 
+/* ---------- site editor ---------- */
+async function loadSite() {
+  const box = $("siteFields");
+  try {
+    const d = await api("/api/admin/site-config");
+    const groups = {};
+    (d.fields || []).forEach((f) => { (groups[f.group] = groups[f.group] || []).push(f); });
+    box.innerHTML = Object.entries(groups).map(([group, fields]) => `
+      <div class="card" style="padding:14px;margin-bottom:12px;">
+        <div style="font-weight:600;margin-bottom:10px;color:var(--gold);">${esc(group)}</div>
+        ${fields.map((f) => {
+          const meta = f.updated_by ? `<span class="muted" style="font-size:11px;"> · last edited by ${esc(f.updated_by)}</span>` : "";
+          const input = f.type === "textarea"
+            ? `<textarea data-key="${esc(f.key)}" rows="3" style="width:100%;">${esc(f.value)}</textarea>`
+            : `<input data-key="${esc(f.key)}" type="${f.type === "url" ? "url" : "text"}" value="${esc(f.value)}" style="width:100%;" />`;
+          return `<label class="field" style="display:block;margin-bottom:12px;">
+            <span>${esc(f.label)}${meta}</span>
+            ${input}
+            ${f.help ? `<span class="muted" style="font-size:12px;">${esc(f.help)}</span>` : ""}
+          </label>`;
+        }).join("")}
+      </div>`).join("");
+  } catch (e) { box.innerHTML = `<p class="form-status error">${esc(e.message)}</p>`; }
+}
+
+async function saveSite() {
+  const st = $("siteStatus"); st.className = "form-status"; st.textContent = "Publishing…";
+  const updates = {};
+  document.querySelectorAll("#siteFields [data-key]").forEach((el) => { updates[el.getAttribute("data-key")] = el.value; });
+  try {
+    const r = await api("/api/admin/site-config", { method: "PUT", body: JSON.stringify({ updates }) });
+    st.className = "form-status ok"; st.textContent = `Published live ✓ (by ${r.by})`;
+    toast("Site updated — live on ragnarips.com");
+    loadSite();
+  } catch (e) { st.className = "form-status error"; st.textContent = e.message; }
+}
+
 /* ---------- tabs ---------- */
 function switchTab(name) {
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
@@ -455,6 +492,7 @@ function switchTab(name) {
   if (name === "disputes") loadDisputes();
   if (name === "rides") loadRides();
   if (name === "team") loadTeam();
+  if (name === "site") loadSite();
 }
 
 /* ---------- init ---------- */
@@ -473,6 +511,8 @@ document.addEventListener("DOMContentLoaded", () => {
   $("disputesRefresh").addEventListener("click", loadDisputes);
   $("ridesBody").addEventListener("click", ridesAction);
   $("ridesRefresh").addEventListener("click", loadRides);
+  $("siteSaveBtn").addEventListener("click", saveSite);
+  $("siteRefresh").addEventListener("click", loadSite);
   $("rideLaunchBtn").addEventListener("click", launchRide);
   $("nlBtn").addEventListener("click", nlSearch);
   $("descBtn").addEventListener("click", genDesc);

@@ -473,3 +473,14 @@ class Sale(SQLModel, table=True):
     sold_price_cents: int = Field(index=True)
     sold_at: datetime = Field(default_factory=utcnow, index=True)
     source: str = Field(default="ragnar", index=True)  # ragnar | seed | external
+
+
+class SiteSetting(SQLModel, table=True):
+    """Staff-editable site content (announcement bar, landing copy, community
+    links). A key/value store gated by a whitelist registry (see site_config.py)
+    so staff edit *content*, never code. Each edit records who made it."""
+
+    key: str = Field(primary_key=True, max_length=64)
+    value: str = Field(default="", max_length=4000)
+    updated_by: Optional[str] = Field(default=None, max_length=160)
+    updated_at: datetime = Field(default_factory=utcnow)

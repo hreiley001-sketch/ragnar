@@ -134,6 +134,32 @@ def admin_delete_user(
     return {"deleted": True, "email": email, "id": user_id}
 
 
+@router.get("/site-config")
+def admin_site_config(
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+) -> dict:
+    """The site-content registry + current values, for the hub's Site editor."""
+    from .. import site_config
+    return {"fields": site_config.field_specs(session)}
+
+
+@router.put("/site-config")
+def admin_update_site_config(
+    payload: dict,
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+    user=Depends(auth.get_current_user),
+    x_admin_token: str = Header(default=""),
+) -> dict:
+    """Save staff edits to whitelisted site content. Records who made the change."""
+    from .. import site_config
+    by = (getattr(user, "email", None) or ("admin-token" if x_admin_token else "staff"))
+    updates = payload.get("updates") if isinstance(payload.get("updates"), dict) else payload
+    config = site_config.set_many(session, updates or {}, by)
+    return {"saved": True, "by": by, "config": config}
+
+
 @router.post("/scrape-price")
 async def admin_scrape_price(payload: dict, _: None = Depends(require_admin)) -> dict:
     """Scrape a card page (any marketplace/price-guide URL) via Firecrawl and

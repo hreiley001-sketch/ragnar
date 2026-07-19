@@ -63,6 +63,19 @@
     if (href === path) a.classList.add("active");
   });
 
+  // Staff-editable announcement bar (Command Hub → Site).
+  fetch("/api/site-config").then((r) => r.json()).then((c) => {
+    const msg = c && c.announcement;
+    if (!msg) return;
+    const bar = document.createElement("div");
+    bar.style.cssText = "position:sticky;top:0;z-index:80;background:linear-gradient(90deg,#0f1620,#16202c);color:var(--ice,#6fd6ff);border-bottom:1px solid rgba(111,214,255,0.25);font-size:13px;font-weight:600;padding:8px 14px;text-align:center;";
+    const inner = c.announcement_link
+      ? `<a href="${c.announcement_link}" style="color:inherit;text-decoration:underline;">${msg}</a>`
+      : msg;
+    bar.innerHTML = inner;
+    document.body.insertBefore(bar, document.body.firstChild);
+  }).catch(() => {});
+
   // Reflect signed-in state + notifications bell
   fetch("/api/auth/me").then((r) => r.json()).then((d) => {
     if (d && d.user) {
