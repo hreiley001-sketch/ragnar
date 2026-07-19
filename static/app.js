@@ -3,7 +3,10 @@
 
 const API = "";
 let META = null;
-const state = { page: 1, pageSize: 24 };
+const state = { page: 1, pageSize: 24, lastItems: [], compareIds: [] };
+let activeListingsRequest = null;
+const COMPARE_STORAGE_KEY = "ragnar:compare:listings";
+const FREE_SHIP_TOKEN = "free shipping";
 
 /* ---------------- helpers ---------------- */
 const $ = (id) => document.getElementById(id);
@@ -14,8 +17,9 @@ const escapeHtml = (s) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 async function api(path, options) {
+  const headers = { "Content-Type": "application/json", ...(options?.headers || {}) };
   const res = await fetch(API + path, {
-    headers: { "Content-Type": "application/json" },
+    headers,
     ...options,
   });
   let data = null;
@@ -25,6 +29,76 @@ async function api(path, options) {
     throw new Error(typeof detail === "string" ? detail : `Request failed (${res.status})`);
   }
   return data;
+}
+
+function filterParams(includePaging = true) {
+  const p = new URLSearchParams();
+  const q = $("f-q").value.trim();
+  if (q) p.set("q", q);
+  const map = {
+    category: "f-category",
+    set_name: "f-set",
+    condition: "f-condition",
+    grading_company: "f-grader",
+    graded: "f-graded",
+    min_grade: "f-mingrade",
+    min_price: "f-minprice",
+    max_price: "f-maxprice",
+  };
+  for (const [key, id] of Object.entries(map)) {
+    const v = $(id).value;
+    if (v !== "" && v != null) p.set(key, v);
+  }
+  if ($("f-founding").checked) p.set("founding_only", "true");
+  if ($("f-sort").value !== "newest") p.set("sort", $("f-sort").value);
+  if (includePaging) {
+    p.set("page", String(state.page));
+    p.set("page_size", String(state.pageSize));
+  }
+  return p;
+}
+
+function syncUrlFromFilters() {
+  const p = filterParams(false);
+  if (state.compareIds.length) p.set("cmp", state.compareIds.slice(0, 3).join(","));
+  const qs = p.toString();
+  const next = qs ? `/marketplace?${qs}` : "/marketplace";
+  if (location.pathname + location.search !== next) {
+    history.replaceState(null, "", next);
+  }
+}
+
+function persistCompareState() {
+  try {
+    localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(state.compareIds.slice(0, 3)));
+  } catch (_) {}
+}
+
+function normalizeCompareIds(raw) {
+  const ids = [];
+  for (const v of raw || []) {
+    const n = Number(v);
+    if (!Number.isFinite(n) || n <= 0) continue;
+    if (!ids.includes(n)) ids.push(n);
+    if (ids.length >= 3) break;
+  }
+  return ids;
+}
+
+function hydrateCompareState() {
+  const p = new URLSearchParams(location.search);
+  const fromUrl = (p.get("cmp") || "").split(",").map((v) => v.trim()).filter(Boolean);
+  if (fromUrl.length) {
+    state.compareIds = normalizeCompareIds(fromUrl);
+    persistCompareState();
+    return;
+  }
+  try {
+    const stored = JSON.parse(localStorage.getItem(COMPARE_STORAGE_KEY) || "[]");
+    state.compareIds = normalizeCompareIds(stored);
+  } catch (_) {
+    state.compareIds = [];
+  }
 }
 
 async function apiForm(path, formData) {
@@ -95,21 +169,18 @@ async function refreshFoundingCounter() {
 
 /* ---------------- listings ---------------- */
 function currentQuery() {
-  const p = new URLSearchParams();
-  const q = $("f-q").value.trim();
-  if (q) p.set("q", q);
-  const map = { category: "f-category", set_name: "f-set", condition: "f-condition",
-    grading_company: "f-grader", graded: "f-graded", min_grade: "f-mingrade",
-    min_price: "f-minprice", max_price: "f-maxprice" };
-  for (const [key, id] of Object.entries(map)) {
-    const v = $(id).value;
-    if (v !== "" && v != null) p.set(key, v);
-  }
-  if ($("f-founding").checked) p.set("founding_only", "true");
-  p.set("sort", $("f-sort").value);
-  p.set("page", String(state.page));
-  p.set("page_size", String(state.pageSize));
-  return p.toString();
+  return filterParams(true).toString();
+}
+
+function loadingCards(count = 8) {
+  return Array.from({ length: count }, () => `<article class="listing skeleton">
+    <div class="listing-img"></div>
+    <div class="listing-body">
+      <div class="line w80"></div>
+      <div class="line w60"></div>
+      <div class="line w40"></div>
+    </div>
+  </article>`).join("");
 }
 
 function listingCard(l) {
@@ -127,13 +198,13 @@ function listingCard(l) {
     : CREST;
 
   return `<article class="listing">
-    <a class="listing-link" href="/listing/${l.id}" style="color:inherit;text-decoration:none;display:block;">
+    <a class="listing-link" href="/listing/${l.id}">
       <div class="listing-img">
         <div class="listing-badges">${badges.join("")}</div>
-        <button class="watch-heart" type="button" data-watch="${l.id}" aria-label="Watch">♡</button>
+        <button class="watch-heart" type="button" data-watch="${l.id}" aria-label="Watch ${escapeHtml(l.title)}" aria-pressed="false">♡</button>
         ${img}
       </div>
-      <div class="listing-body" style="padding-bottom:0;">
+      <div class="listing-body listing-body-main">
         <div class="listing-title">${escapeHtml(l.title)}</div>
         ${sub ? `<div class="listing-sub">${sub}</div>` : ""}
         <div class="listing-price-row">
@@ -146,10 +217,13 @@ function listingCard(l) {
         </div>
       </div>
     </a>
-    <div class="listing-body" style="padding-top:6px;">
+    <div class="listing-body listing-body-foot">
       <div class="listing-foot">
         <div class="listing-seller"><span class="seller-dot"></span>${escapeHtml(l.seller_name)}</div>
-        <button class="btn btn-sm buy-btn" type="button" data-buy="${l.id}">Buy</button>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-ghost btn-sm compare-btn ${state.compareIds.includes(l.id) ? "on" : ""}" type="button" data-compare="${l.id}" aria-pressed="${state.compareIds.includes(l.id) ? "true" : "false"}">Compare</button>
+          <button class="btn btn-sm buy-btn" type="button" data-buy="${l.id}">Buy</button>
+        </div>
       </div>
     </div>
   </article>`;
@@ -161,7 +235,17 @@ async function hydrateWatchHearts(scope) {
   try {
     const ids = hearts.map((h) => h.getAttribute("data-watch")).join(",");
     const map = await api(`/api/watch/status?ids=${ids}`);
-    hearts.forEach((h) => { if (map[h.getAttribute("data-watch")]) { h.textContent = "❤"; h.classList.add("on"); } });
+    hearts.forEach((h) => {
+      const on = !!map[h.getAttribute("data-watch")];
+      if (on) {
+        h.textContent = "❤";
+        h.classList.add("on");
+      } else {
+        h.textContent = "♡";
+        h.classList.remove("on");
+      }
+      h.setAttribute("aria-pressed", on ? "true" : "false");
+    });
   } catch (_) {}
 }
 
@@ -170,6 +254,7 @@ async function toggleWatch(btn) {
     const r = await api("/api/watch", { method: "POST", body: JSON.stringify({ listing_id: Number(btn.getAttribute("data-watch")) }) });
     btn.textContent = r.watching ? "❤" : "♡";
     btn.classList.toggle("on", r.watching);
+    btn.setAttribute("aria-pressed", r.watching ? "true" : "false");
     toast(r.watching ? "Added to your watchlist." : "Removed from watchlist.");
   } catch (e) {
     if (String(e.message).toLowerCase().includes("sign in")) toast("Sign in to watch items — /login");
@@ -196,8 +281,13 @@ async function buyListing(id) {
 
 async function loadListings() {
   const grid = $("grid");
+  if (activeListingsRequest) activeListingsRequest.abort();
+  activeListingsRequest = new AbortController();
+  grid.innerHTML = loadingCards();
+  $("resultCount").textContent = "Loading listings…";
   try {
-    const data = await api(`/api/listings?${currentQuery()}`);
+    const data = await api(`/api/listings?${currentQuery()}`, { signal: activeListingsRequest.signal });
+    state.lastItems = data.items || [];
     if (!data.items.length) {
       grid.innerHTML = `<div class="empty">No cards match your search. Try widening the filters.</div>`;
       $("resultCount").textContent = "0 cards";
@@ -206,14 +296,216 @@ async function loadListings() {
       $("resultCount").textContent = `${data.total} card${data.total === 1 ? "" : "s"} in the vault`;
       hydrateWatchHearts(grid);
     }
+    renderCompareTray();
+    setCompareButtonState();
+    updatePresetState();
     $("pageInfo").textContent = data.pages ? `Page ${data.page} of ${data.pages}` : "";
     $("prevPage").disabled = data.page <= 1;
     $("nextPage").disabled = data.page >= data.pages;
+    syncUrlFromFilters();
   } catch (err) {
+    if (err.name === "AbortError") return;
     grid.innerHTML = `<div class="empty">Could not load listings: ${escapeHtml(err.message)}</div>`;
+    $("resultCount").textContent = "Listings unavailable";
   }
 }
 function resetAndLoad() { state.page = 1; loadListings(); }
+
+function copySearchLink() {
+  const p = filterParams(false).toString();
+  const url = `${location.origin}/marketplace${p ? `?${p}` : ""}`;
+  navigator.clipboard.writeText(url)
+    .then(() => toast("Search link copied."))
+    .catch(() => toast(url));
+}
+
+function goToSurprise() {
+  const items = state.lastItems || [];
+  if (!items.length) {
+    toast("No results to choose from yet.");
+    return;
+  }
+  const pick = items[Math.floor(Math.random() * items.length)];
+  location.href = `/listing/${pick.id}`;
+}
+
+function applyQuickPreset(name) {
+  const active = isPresetActive(name);
+  if (name === "budget") {
+    $("f-minprice").value = "";
+    $("f-maxprice").value = active ? "" : "100";
+  }
+  if (name === "graded9") {
+    $("f-graded").value = active ? "" : "true";
+    $("f-mingrade").value = active ? "" : "9";
+  }
+  if (name === "freeship") {
+    const q = ($("f-q").value || "").trim();
+    const hasToken = q.toLowerCase().includes(FREE_SHIP_TOKEN);
+    if (active || hasToken) {
+      const next = q.replace(/free shipping/ig, " ").replace(/\s{2,}/g, " ").trim();
+      $("f-q").value = next;
+      const hs = $("heroSearch"); if (hs) hs.value = next;
+    } else {
+      const next = q ? `${q} ${FREE_SHIP_TOKEN}` : FREE_SHIP_TOKEN;
+      $("f-q").value = next;
+      const hs = $("heroSearch"); if (hs) hs.value = next;
+    }
+  }
+  if (name === "founding") {
+    $("f-founding").checked = !active;
+  }
+  resetAndLoad();
+}
+
+function isPresetActive(name) {
+  if (name === "budget") return $("f-maxprice").value === "100";
+  if (name === "graded9") return $("f-graded").value === "true" && $("f-mingrade").value === "9";
+  if (name === "freeship") return ((($("f-q").value || "") + "").toLowerCase().includes(FREE_SHIP_TOKEN));
+  if (name === "founding") return $("f-founding").checked;
+  return false;
+}
+
+function updatePresetState() {
+  document.querySelectorAll("[data-preset]").forEach((btn) => btn.classList.remove("active"));
+  ["budget", "graded9", "freeship", "founding"].forEach((preset) => {
+    if (!isPresetActive(preset)) return;
+    const b = document.querySelector(`[data-preset="${preset}"]`);
+    if (b) b.classList.add("active");
+  });
+}
+
+function setCompareButtonState() {
+  document.querySelectorAll("[data-compare]").forEach((btn) => {
+    const id = Number(btn.getAttribute("data-compare"));
+    const on = state.compareIds.includes(id);
+    btn.classList.toggle("on", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+
+function renderCompareTray() {
+  const tray = $("compareTray");
+  if (!tray) return;
+  const count = state.compareIds.length;
+  tray.hidden = count === 0;
+  const label = $("compareCount");
+  if (label) label.textContent = `${count} selected`;
+  const openBtn = $("openCompareBtn");
+  if (openBtn) openBtn.disabled = count < 2;
+}
+
+function toggleCompare(id) {
+  const n = Number(id);
+  if (!Number.isFinite(n)) return;
+  const idx = state.compareIds.indexOf(n);
+  if (idx >= 0) state.compareIds.splice(idx, 1);
+  else {
+    if (state.compareIds.length >= 3) {
+      toast("You can compare up to 3 cards at once.");
+      return;
+    }
+    state.compareIds.push(n);
+  }
+  persistCompareState();
+  renderCompareTray();
+  setCompareButtonState();
+  syncUrlFromFilters();
+}
+
+function compareRows(items) {
+  const get = (k) => items.map((i) => (i[k] == null || i[k] === "" ? "—" : i[k]));
+  const gradeScore = (i) => {
+    if (i.is_graded && Number.isFinite(Number(i.grade))) return Number(i.grade);
+    const c = String(i.condition || "").toLowerCase();
+    if (c.includes("near mint")) return 8;
+    if (c.includes("lightly")) return 6;
+    if (c.includes("moderately")) return 4;
+    if (c.includes("heavily")) return 2;
+    if (c.includes("damaged")) return 1;
+    return null;
+  };
+  return [
+    { label: "Title", values: get("title") },
+    {
+      label: "Price",
+      values: get("price").map((v) => (v === "—" ? v : money(v))),
+      scores: items.map((i) => (Number.isFinite(Number(i.price)) ? Number(i.price) : null)),
+      best: "min",
+    },
+    { label: "Category", values: get("category") },
+    { label: "Set", values: get("set_name") },
+    { label: "Card #", values: get("card_number") },
+    {
+      label: "Grade",
+      values: items.map((i) => (i.is_graded ? `${i.grading_company || ""} ${i.grade || ""}`.trim() : (i.condition || "—"))),
+      scores: items.map((i) => gradeScore(i)),
+      best: "max",
+    },
+    { label: "Seller", values: get("seller_name") },
+    {
+      label: "Shipping",
+      values: get("shipping").map((v) => (v === "—" ? v : (Number(v) > 0 ? money(v) : "Free"))),
+      scores: items.map((i) => (Number.isFinite(Number(i.shipping)) ? Number(i.shipping) : null)),
+      best: "min",
+    },
+  ];
+}
+
+function compareCellClass(row, idx) {
+  if (!row || !row.scores || !row.best) return "";
+  const numeric = row.scores.filter((v) => v != null && Number.isFinite(v));
+  if (!numeric.length) return "";
+  const target = row.best === "max" ? Math.max(...numeric) : Math.min(...numeric);
+  const val = row.scores[idx];
+  if (val == null || !Number.isFinite(val)) return "";
+  return val === target ? "cmp-cell best" : "cmp-cell faded";
+}
+
+async function openCompare() {
+  const ids = state.compareIds.slice(0, 3);
+  if (ids.length < 2) {
+    toast("Pick at least 2 cards to compare.");
+    return;
+  }
+  const map = new Map((state.lastItems || []).map((i) => [i.id, i]));
+  const items = [];
+  for (const id of ids) {
+    if (map.has(id)) items.push(map.get(id));
+    else {
+      try { items.push(await api(`/api/listings/${id}`)); } catch (_) {}
+    }
+  }
+  const table = $("compareTable");
+  if (!table) return;
+  const rows = compareRows(items);
+  const cols = items.map((it) => `<div class="cmp-cell head">${escapeHtml(it.title || `Listing ${it.id}`)}</div>`).join("");
+  let html = `<div class="cmp-cell head">Field</div>${cols}`;
+  for (const row of rows) {
+    html += `<div class="cmp-cell label">${escapeHtml(row.label)}</div>`;
+    for (let i = 0; i < row.values.length; i++) {
+      const klass = compareCellClass(row, i) || "cmp-cell";
+      html += `<div class="${klass}">${escapeHtml(row.values[i])}</div>`;
+    }
+    for (let i = row.values.length; i < 3; i++) html += `<div class="cmp-cell">—</div>`;
+  }
+  table.innerHTML = html;
+  const modal = $("compareModal");
+  if (modal) modal.hidden = false;
+}
+
+function closeCompare() {
+  const modal = $("compareModal");
+  if (modal) modal.hidden = true;
+}
+
+function clearCompare() {
+  state.compareIds = [];
+  persistCompareState();
+  renderCompareTray();
+  setCompareButtonState();
+  syncUrlFromFilters();
+}
 
 function applyFilters(f) {
   if (f.q !== undefined) { $("f-q").value = f.q || ""; const hs = $("heroSearch"); if (hs) hs.value = f.q || ""; }
@@ -293,6 +585,8 @@ function hydrateFromUrl() {
   ["min_grade", "min_price", "max_price"].forEach((k) => { if (p.get(k)) f[k] = Number(p.get(k)); });
   if (p.get("graded")) f.graded = p.get("graded");
   if (p.get("founding_only")) f.founding_only = p.get("founding_only");
+  const page = Number(p.get("page") || "1");
+  if (Number.isFinite(page) && page > 0) state.page = page;
   applyFilters(f);
   return true;
 }
@@ -592,21 +886,23 @@ async function checkBackend() {
 
 /* ---------------- init ---------------- */
 async function init() {
-  await checkBackend();
-  META = await api("/api/meta");
+  try {
+    await checkBackend();
+    META = await api("/api/meta");
+    hydrateCompareState();
 
-  fillSelect($("f-category"), META.categories);
-  fillSelect($("f-condition"), META.conditions);
-  fillSelect($("f-grader"), META.grading_companies);
-  fillSelect($("form-category"), META.categories, false);
-  fillSelect($("form-condition"), META.conditions, false);
-  fillSelect($("form-grader"), META.grading_companies, false);
+    fillSelect($("f-category"), META.categories);
+    fillSelect($("f-condition"), META.conditions);
+    fillSelect($("f-grader"), META.grading_companies);
+    fillSelect($("form-category"), META.categories, false);
+    fillSelect($("form-condition"), META.conditions, false);
+    fillSelect($("form-grader"), META.grading_companies, false);
 
-  buildCatChips();
-  loadLiveRail();
-  renderHero();
-  renderIntegrations();
-  refreshFoundingCounter();
+    buildCatChips();
+    loadLiveRail();
+    renderHero();
+    renderIntegrations();
+    refreshFoundingCounter();
 
   // Marketplace hero search (mirrors the sidebar search).
   const heroSearch = $("heroSearch");
@@ -634,10 +930,23 @@ async function init() {
 
   $("prevPage").addEventListener("click", () => { if (state.page > 1) { state.page--; loadListings(); } });
   $("nextPage").addEventListener("click", () => { state.page++; loadListings(); });
+  $("copySearchLinkBtn").addEventListener("click", copySearchLink);
+  $("surpriseBtn").addEventListener("click", goToSurprise);
+  document.querySelectorAll("[data-preset]").forEach((btn) => btn.addEventListener("click", () => applyQuickPreset(btn.getAttribute("data-preset"))));
+  const openCompareBtn = $("openCompareBtn");
+  if (openCompareBtn) openCompareBtn.addEventListener("click", openCompare);
+  const clearCompareBtn = $("clearCompareBtn");
+  if (clearCompareBtn) clearCompareBtn.addEventListener("click", clearCompare);
+  const closeCompareBtn = $("closeCompareBtn");
+  if (closeCompareBtn) closeCompareBtn.addEventListener("click", closeCompare);
+  const compareScrim = $("compareScrim");
+  if (compareScrim) compareScrim.addEventListener("click", closeCompare);
 
   const gridClicks = (e) => {
     const heart = e.target.closest("[data-watch]");
     if (heart) { e.preventDefault(); e.stopPropagation(); toggleWatch(heart); return; }
+    const cmp = e.target.closest("[data-compare]");
+    if (cmp) { e.preventDefault(); e.stopPropagation(); toggleCompare(cmp.getAttribute("data-compare")); return; }
     const buy = e.target.closest("[data-buy]");
     if (buy) buyListing(buy.getAttribute("data-buy"));
   };
@@ -664,8 +973,28 @@ async function init() {
   $("applyFoundingBtn").addEventListener("click", applyFounding);
   $("listForm").addEventListener("submit", submitListing);
 
-  syncGradedFields();
-  if (!hydrateFromUrl()) await loadListings();
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const tgt = e.target;
+      if (tgt && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || tgt.tagName === "SELECT")) return;
+      e.preventDefault();
+      const hs = $("heroSearch");
+      if (hs) hs.focus();
+    }
+    if (e.key === "Escape") { closeDrawer(); closeCompare(); }
+  });
+
+    syncGradedFields();
+    renderCompareTray();
+    updatePresetState();
+    if (!hydrateFromUrl()) await loadListings();
+  } catch (err) {
+    $("backendStatus").textContent = "offline";
+    $("backendStatus").className = "status-badge offline";
+    $("resultCount").textContent = "Marketplace unavailable";
+    $("grid").innerHTML = `<div class="empty">Could not load marketplace data: ${escapeHtml(err.message || "Unknown error")}.</div>`;
+    toast("Could not initialize the marketplace.");
+  }
 }
 
 document.addEventListener("DOMContentLoaded", init);

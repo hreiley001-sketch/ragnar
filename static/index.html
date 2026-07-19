@@ -69,7 +69,7 @@
       <label class="field"><span>Search</span>
         <input id="f-q" type="search" placeholder="Charizard, Wembanyama, Black Lotus…" />
       </label>
-      <button id="aiSearchBtn" class="btn btn-ghost btn-sm" type="button" title="Ask in plain English" style="width:100%;margin-bottom:12px;">✨ AI search</button>
+      <button id="aiSearchBtn" class="btn btn-ghost btn-sm w-full mb-12" type="button" title="Ask in plain English">✨ AI search</button>
       <label class="field"><span>Category</span>
         <select id="f-category"><option value="">All categories</option></select>
       </label>
@@ -97,11 +97,23 @@
 
     <section class="results">
       <div id="featuredWrap" hidden>
-        <div class="results-bar" style="margin-bottom:8px;"><span class="result-count" style="color:var(--gold);">★ Featured</span></div>
-        <div id="featuredGrid" class="grid" style="margin-bottom:18px;"></div>
+        <div class="results-bar mb-8"><span class="result-count featured-label">★ Featured</span></div>
+        <div id="featuredGrid" class="grid mb-18"></div>
+      </div>
+      <div id="quickPresets" class="quick-presets" aria-label="Quick filters">
+        <button class="preset-btn" type="button" data-preset="budget">Budget under $100</button>
+        <button class="preset-btn" type="button" data-preset="graded9">Graded 9+</button>
+        <button class="preset-btn" type="button" data-preset="freeship">Free shipping</button>
+        <button class="preset-btn" type="button" data-preset="founding">Founding only</button>
       </div>
       <div class="results-bar">
-        <span id="resultCount" class="result-count">Loading…</span>
+        <div class="results-head-left">
+          <span id="resultCount" class="result-count">Loading…</span>
+          <div class="results-actions">
+            <button id="copySearchLinkBtn" class="btn btn-ghost btn-sm" type="button">Copy search link</button>
+            <button id="surpriseBtn" class="btn btn-ghost btn-sm" type="button">Surprise me</button>
+          </div>
+        </div>
         <label class="sort">Sort
           <select id="f-sort">
             <option value="newest">Newest</option>
@@ -116,6 +128,28 @@
         <button id="prevPage" class="btn btn-ghost" type="button" disabled>← Prev</button>
         <span id="pageInfo" class="page-info"></span>
         <button id="nextPage" class="btn btn-ghost" type="button" disabled>Next →</button>
+      </div>
+
+      <div id="compareTray" class="compare-tray" hidden>
+        <div class="compare-tray-left">
+          <strong>Compare cards</strong>
+          <span id="compareCount" class="compare-count">0 selected</span>
+        </div>
+        <div class="compare-tray-actions">
+          <button id="clearCompareBtn" class="btn btn-ghost btn-sm" type="button">Clear</button>
+          <button id="openCompareBtn" class="btn btn-primary btn-sm" type="button">Compare</button>
+        </div>
+      </div>
+
+      <div id="compareModal" class="compare-modal" hidden role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+        <div id="compareScrim" class="compare-scrim"></div>
+        <div class="compare-panel card">
+          <div class="compare-head">
+            <h3 id="compareTitle">Card Comparison</h3>
+            <button id="closeCompareBtn" class="btn btn-ghost btn-sm" type="button">✕</button>
+          </div>
+          <div id="compareTable" class="compare-table"></div>
+        </div>
       </div>
     </section>
   </main>
@@ -176,11 +210,11 @@
           <label class="field"><span>Price ($) *</span><input name="price" id="form-price" type="number" min="0.01" step="0.01" required placeholder="42.00" /></label>
           <label class="field"><span>Quantity</span><input name="quantity" type="number" min="1" value="1" /></label>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="inline-row-wrap">
           <button type="button" id="suggestPriceBtn" class="btn btn-ghost btn-sm">✨ Suggest a price</button>
           <button type="button" id="checkCompsBtn" class="btn btn-ghost btn-sm">↻ Check sold history for these details</button>
         </div>
-        <div id="suggestOut" class="muted" style="font-size:12px;min-height:0;"></div>
+        <div id="suggestOut" class="muted suggest-out"></div>
 
         <label class="field"><span>Image URL</span><input name="image_url" id="form-image" type="url" maxlength="500" placeholder="auto-filled from your scan" /></label>
         <label class="field"><span>Description</span><textarea name="description" rows="2" maxlength="2000" placeholder="Sharp corners, clean holo…"></textarea></label>

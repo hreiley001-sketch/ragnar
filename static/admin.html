@@ -10,8 +10,25 @@
     .hub-main { padding: 20px clamp(16px, 4vw, 40px) 60px; }
     .login-wrap { max-width: 420px; margin: 12vh auto; padding: 26px; }
     .login-wrap h2 { margin-top: 0; }
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .cmd-title { font-size: 18px; letter-spacing: .2em; }
+    .muted-xs { font-size: 12px; }
+    .muted-sm { font-size: 13px; }
+    .no-top { margin-top: 0; }
+    .row-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .max-280 { max-width: 280px; }
+    .w-auto { width: auto; }
+    .card-pad-14 { padding: 14px; }
+    .card-pad-16 { padding: 16px; }
+    .mb-14 { margin-bottom: 14px; }
+    .mb-18 { margin-bottom: 18px; }
+    .mt-14 { margin-top: 14px; }
+    .mt-8 { margin-top: 8px; }
+    .panel-head-compact { margin-bottom: 8px; }
+    .site-actions { display: flex; gap: 10px; align-items: center; margin-top: 14px; }
+    .scroll-x { margin-top: 10px; overflow: auto; }
+    .tabs { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 20px; padding-bottom: 4px; }
     .tab { padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; }
+    .tab { white-space: nowrap; }
     .tab.active { background: var(--ice); color: #fff; border-color: rgba(111,214,255,0.6); font-weight: 600; }
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 14px; margin-bottom: 22px; }
     .kpi { padding: 16px 18px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
@@ -39,6 +56,15 @@
     .ai-panel { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; }
     .ai-box { padding: 16px; }
     .ai-out { margin-top: 10px; padding: 10px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--border); font-size: 13px; white-space: pre-wrap; min-height: 24px; }
+    .studio-feed { max-height: 220px; overflow: auto; display: grid; gap: 8px; margin-bottom: 10px; }
+    .studio-msg { border: 1px solid var(--border); background: var(--bg-2); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+    .studio-msg.me { background: rgba(37,99,235,.10); border-color: rgba(37,99,235,.25); }
+    .studio-ideas { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+    .studio-ideas .btn { padding: 5px 8px; font-size: 12px; }
+    .studio-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .collab-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .collab-table th, .collab-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+    .collab-table th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
     .int-list { display: flex; flex-wrap: wrap; gap: 10px 18px; }
     .int-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-soft); }
     .wrap-cell { max-width: 260px; white-space: normal; }
@@ -48,6 +74,19 @@
     .ride-form .field { margin-bottom: 0; }
     @media (max-width: 860px){ .ride-form { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 720px){ .ai-panel { grid-template-columns: 1fr; } }
+    @media (max-width: 640px){
+      .hub-main { padding: 16px 12px 40px; }
+      .login-wrap { margin: 6vh auto; padding: 18px; }
+      .tab { padding: 8px 12px; }
+      .ride-form { grid-template-columns: 1fr; }
+      .studio-row { grid-template-columns: 1fr; }
+      .site-actions { flex-direction: column; align-items: stretch; }
+      .site-actions .btn { width: 100%; }
+      .row-inline { align-items: stretch; }
+      .row-inline .btn { width: 100%; }
+      .max-280 { max-width: 100%; }
+      .ai-box { padding: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -56,7 +95,7 @@
   <header class="site-header">
     <div class="brand">
       <a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR Command Hub" class="logo-img" /></a>
-      <div class="brand-word"><h1 style="font-size:18px;letter-spacing:.2em;">COMMAND HUB</h1></div>
+      <div class="brand-word"><h1 class="cmd-title">COMMAND HUB</h1></div>
     </div>
     <div class="header-actions">
       <a class="btn btn-ghost btn-sm" href="/">← Storefront</a>
@@ -71,36 +110,36 @@
     <label class="field"><span>Admin token</span><input id="tokenInput" type="password" placeholder="paste ADMIN_TOKEN" /></label>
     <button id="loginBtn" class="btn btn-primary" type="button">Enter</button>
     <p id="loginErr" class="form-status error"></p>
-    <p class="muted" style="font-size:12px;">Staff account? <a href="/login">Sign in</a> and this page unlocks automatically.</p>
+    <p class="muted muted-xs">Staff account? <a href="/login">Sign in</a> and this page unlocks automatically.</p>
   </div>
 
   <main id="hub" class="hub-main" hidden>
-    <div class="tabs">
-      <button class="tab active" data-tab="dashboard">Dashboard</button>
-      <button class="tab" data-tab="listings">Listings</button>
-      <button class="tab" data-tab="sellers">Sellers</button>
-      <button class="tab" data-tab="sales">Sales</button>
-      <button class="tab" data-tab="apps">Applications</button>
-      <button class="tab" data-tab="orders">Orders</button>
-      <button class="tab" data-tab="disputes">Disputes</button>
-      <button class="tab" data-tab="rides">Rides</button>
-      <button class="tab" data-tab="team">Team</button>
-      <button class="tab" data-tab="site">Site</button>
-      <button class="tab" data-tab="ai">AI Tools</button>
+    <div class="tabs" role="tablist" aria-label="Command Hub sections">
+      <button class="tab active" data-tab="dashboard" type="button" role="tab">Dashboard</button>
+      <button class="tab" data-tab="listings" type="button" role="tab">Listings</button>
+      <button class="tab" data-tab="sellers" type="button" role="tab">Sellers</button>
+      <button class="tab" data-tab="sales" type="button" role="tab">Sales</button>
+      <button class="tab" data-tab="apps" type="button" role="tab">Applications</button>
+      <button class="tab" data-tab="orders" type="button" role="tab">Orders</button>
+      <button class="tab" data-tab="disputes" type="button" role="tab">Disputes</button>
+      <button class="tab" data-tab="rides" type="button" role="tab">Rides</button>
+      <button class="tab" data-tab="team" type="button" role="tab">Team</button>
+      <button class="tab" data-tab="site" type="button" role="tab">Site</button>
+      <button class="tab" data-tab="ai" type="button" role="tab">AI Tools</button>
     </div>
 
     <section id="tab-dashboard" class="tab-panel">
       <div id="kpiGrid" class="kpi-grid"></div>
-      <div class="card" style="padding:16px;">
-        <h3 style="margin-top:0;color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Integrations</h3>
+      <div class="card card-pad-16">
+        <h3 class="no-top" style="color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Integrations</h3>
         <div id="intList" class="int-list"></div>
       </div>
     </section>
 
     <section id="tab-listings" class="tab-panel" hidden>
       <div class="results-bar">
-        <input id="listSearch" type="search" placeholder="Search listings…" style="max-width:280px;" />
-        <select id="listStatus" style="width:auto;"><option value="">All</option><option value="active">Active</option><option value="sold">Sold</option></select>
+        <input id="listSearch" class="max-280" type="search" placeholder="Search listings…" />
+        <select id="listStatus" class="w-auto"><option value="">All</option><option value="active">Active</option><option value="sold">Sold</option></select>
       </div>
       <div class="tbl-wrap"><table class="hub"><thead><tr><th>ID</th><th>Title</th><th>Cat</th><th>Grade/Cond</th><th>Price</th><th>Seller</th><th>Status</th><th>Actions</th></tr></thead><tbody id="listBody"></tbody></table></div>
     </section>
@@ -138,8 +177,8 @@
     </section>
 
     <section id="tab-rides" class="tab-panel" hidden>
-      <div class="card" style="padding:16px;margin-bottom:18px;">
-        <h3 style="margin-top:0;color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Launch a ride</h3>
+      <div class="card card-pad-16 mb-18">
+        <h3 class="no-top" style="color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Launch a ride</h3>
         <div class="ride-form">
           <label class="field"><span>Title</span><input id="rideTitle" type="text" placeholder="e.g. Friday Night Breaks" /></label>
           <label class="field"><span>Listing ID (optional)</span><input id="rideListingId" type="number" min="1" placeholder="—" /></label>
@@ -147,7 +186,7 @@
           <label class="field"><span>Reserve ($)</span><input id="rideReserve" type="number" min="0" step="0.01" placeholder="0" /></label>
           <button id="rideLaunchBtn" class="btn btn-primary" type="button">Launch</button>
         </div>
-        <p class="muted" style="margin:10px 0 0;font-size:12px;">A launched ride starts in the lobby — hit <strong>Start</strong> on its row to go live.</p>
+        <p class="muted muted-xs mt-8">A launched ride starts in the lobby — hit <strong>Start</strong> on its row to go live.</p>
       </div>
       <div class="panel-bar">
         <h3>Rides</h3>
@@ -161,15 +200,15 @@
         <h3>Team &amp; staff access</h3>
         <button id="teamRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
       </div>
-      <div class="card" style="padding:14px;margin-bottom:14px;">
-        <p class="muted" style="margin-top:0;font-size:13px;">Staff can access this Command Hub. Verified <strong>@ragnarips.com</strong> signups become staff automatically — or grant/revoke here by email.</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-          <input id="staffEmail" type="email" placeholder="teammate@ragnarips.com" style="max-width:280px;" />
+      <div class="card card-pad-14 mb-14">
+        <p class="muted muted-sm no-top">Staff can access this Command Hub. Verified <strong>@ragnarips.com</strong> signups become staff automatically — or grant/revoke here by email.</p>
+        <div class="row-inline">
+          <input id="staffEmail" class="max-280" type="email" placeholder="teammate@ragnarips.com" />
           <button id="grantStaffBtn" class="btn btn-primary btn-sm" type="button">Grant staff</button>
         </div>
         <p id="staffStatus" class="form-status"></p>
       </div>
-      <div class="results-bar"><input id="userSearch" type="search" placeholder="Search users…" style="max-width:280px;" /></div>
+      <div class="results-bar"><input id="userSearch" class="max-280" type="search" placeholder="Search users…" /></div>
       <div class="tbl-wrap"><table class="hub"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Verified</th><th>Store</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
     </section>
 
@@ -178,33 +217,71 @@
         <h3>Site editor — build it with the team</h3>
         <button id="siteRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
       </div>
-      <div class="card" style="padding:14px;margin-bottom:14px;">
-        <p class="muted" style="margin-top:0;font-size:13px;">Edit the live site's content — announcement bar, landing copy, and community links. Changes publish instantly to <strong>ragnarips.com</strong>. Every edit is attributed to you.</p>
+      <div class="card card-pad-14 mb-14">
+        <p class="muted muted-sm no-top">Edit the live site's content — announcement bar, landing copy, and community links. Changes publish instantly to <strong>ragnarips.com</strong>. Every edit is attributed to you.</p>
+        <p class="muted muted-xs mt-8">Site Builder chat + publish is restricted to verified <strong>@ragnarips.com</strong> staff accounts.</p>
+        <p id="siteRoleNote" class="form-status mt-8"></p>
+      </div>
+      <div class="card card-pad-14 mb-14">
+        <div class="panel-bar panel-head-compact"><h3>Site Builder chat</h3></div>
+        <div id="studioFeed" class="studio-feed"></div>
+        <div class="studio-row">
+          <input id="studioPrompt" type="text" placeholder="e.g. Make the site feel darker and premium, announce Friday live drop" />
+          <button id="studioSendBtn" class="btn btn-primary btn-sm" type="button">Generate</button>
+        </div>
+        <div id="studioIdeas" class="studio-ideas"></div>
+        <p class="muted muted-xs mt-8">Generated updates are injected into the editor fields below. Click <strong>Publish changes</strong> to go live.</p>
       </div>
       <form id="siteForm">
         <div id="siteFields"><p class="muted">Loading…</p></div>
-        <div style="display:flex;gap:10px;align-items:center;margin-top:14px;">
+        <div class="site-actions">
           <button id="siteSaveBtn" class="btn btn-primary btn-sm" type="button">Publish changes</button>
           <span id="siteStatus" class="form-status"></span>
         </div>
       </form>
+      <div class="card card-pad-14 mt-14">
+        <div class="panel-bar panel-head-compact"><h3>Partners & permissions</h3></div>
+        <div class="field-row">
+          <label class="field"><span>Partner email</span><input id="collabEmail" type="email" placeholder="partner@ragnarips.com" /></label>
+          <label class="field"><span>Role</span><select id="collabRole"><option value="editor">editor (theme + content)</option><option value="content">content-only</option><option value="owner">owner</option></select></label>
+        </div>
+        <button id="addCollabBtn" class="btn btn-sm" type="button">Add/update partner</button>
+        <span id="collabStatus" class="form-status"></span>
+        <div class="scroll-x">
+          <table class="collab-table">
+            <thead><tr><th>Email</th><th>Role</th><th>Added by</th><th>Updated</th><th>Action</th></tr></thead>
+            <tbody id="collabBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card card-pad-14 mt-14">
+        <div class="panel-bar panel-head-compact"><h3>Email deliverability check</h3></div>
+        <div class="field-row">
+          <label class="field"><span>To</span><input id="emailTestTo" type="email" placeholder="you@ragnarips.com" /></label>
+          <label class="field"><span>Subject</span><input id="emailTestSubject" type="text" placeholder="RAGNAR email test" /></label>
+        </div>
+        <label class="field"><span>Message</span><textarea id="emailTestBody" rows="2" placeholder="Testing outbound emails from Command Hub."></textarea></label>
+        <button id="sendEmailTestBtn" class="btn btn-sm btn-primary" type="button">Send test email</button>
+        <span id="emailTestStatus" class="form-status"></span>
+      </div>
     </section>
 
     <section id="tab-ai" class="tab-panel" hidden>
       <div class="ai-panel">
         <div class="card ai-box">
-          <h3 style="margin-top:0;">Natural-language search</h3>
+          <h3 class="no-top">Natural-language search</h3>
           <p class="muted">e.g. "PSA 10 Charizards under $5k" — see the filters the AI extracts.</p>
           <input id="nlQuery" type="text" placeholder="Ask in plain English…" />
-          <button id="nlBtn" class="btn btn-primary btn-sm" type="button" style="margin-top:8px;">Parse → search</button>
+          <button id="nlBtn" class="btn btn-primary btn-sm mt-8" type="button">Parse → search</button>
           <div id="nlOut" class="ai-out"></div>
         </div>
         <div class="card ai-box">
-          <h3 style="margin-top:0;">AI description generator</h3>
+          <h3 class="no-top">AI description generator</h3>
           <p class="muted">Generate a listing description from card details.</p>
           <input id="descTitle" type="text" placeholder="Title (e.g. Charizard Base Set)" />
-          <input id="descExtra" type="text" placeholder="Set / grade / details" style="margin-top:8px;" />
-          <button id="descBtn" class="btn btn-primary btn-sm" type="button" style="margin-top:8px;">Generate</button>
+          <input id="descExtra" class="mt-8" type="text" placeholder="Set / grade / details" />
+          <button id="descBtn" class="btn btn-primary btn-sm mt-8" type="button">Generate</button>
           <div id="descOut" class="ai-out"></div>
         </div>
       </div>

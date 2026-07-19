@@ -4,15 +4,35 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+async function api(path) {
+  const r = await fetch(path);
+  let d = null;
+  try { d = await r.json(); } catch (_) {}
+  if (!r.ok) throw new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`);
+  return d;
+}
+
+function bindCardNavigation(nodes, onOpen) {
+  nodes.forEach((el) => {
+    el.addEventListener("click", onOpen);
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onOpen.call(el, e);
+      }
+    });
+  });
+}
+
 async function load() {
   try {
-    const d = await (await fetch("/api/rides")).json();
+    const d = await api("/api/rides");
     const grid = $("rgrid");
     if (!d.items.length) { grid.innerHTML = `<p class="muted">No live rides right now. Check back soon — or hosts can launch one from the Command Hub.</p>`; return; }
     grid.innerHTML = d.items.map((r) => {
       const live = r.status === "bidding";
       const bid = r.current_bid != null ? money(r.current_bid) : money(r.starting_bid) + " start";
-      return `<div class="rcard" data-id="${r.id}">
+      return `<div class="rcard" data-id="${r.id}" role="link" tabindex="0" aria-label="Open ride ${esc(r.title)}">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;">
           <span class="rphase ${esc(r.status)}">${live ? '<span class="live-d"></span> ' : ""}${esc(r.status)}</span>
           <span class="muted" style="font-size:12px;">👁 ${r.viewer_count}</span>
@@ -25,7 +45,11 @@ async function load() {
         </div>
       </div>`;
     }).join("");
-    grid.querySelectorAll("[data-id]").forEach((el) => el.addEventListener("click", () => { location.href = `/ride/${el.getAttribute("data-id")}`; }));
-  } catch (_) { $("rgrid").innerHTML = `<p class="muted">Could not load rides.</p>`; }
+    bindCardNavigation(grid.querySelectorAll("[data-id]"), function () {
+      location.href = `/ride/${this.getAttribute("data-id")}`;
+    });
+  } catch (err) {
+    $("rgrid").innerHTML = `<p class="muted">Could not load rides: ${esc(err.message || "Unknown error")}.</p>`;
+  }
 }
 document.addEventListener("DOMContentLoaded", () => { load(); setInterval(load, 5000); });

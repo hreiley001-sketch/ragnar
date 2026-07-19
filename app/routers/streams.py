@@ -8,9 +8,10 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlmodel import Session, select
 
+from .. import auth
 from ..config import settings
 from ..database import get_session
-from ..models import LiveStream, Seller, utcnow
+from ..models import LiveStream, LiveStreamReminder, Seller, User, utcnow
 from ..schemas import LiveStreamCreate, LiveStreamRead, LiveStreamUpdate
 
 router = APIRouter(prefix="/api/streams", tags=["streams"])
@@ -46,6 +47,7 @@ def _authz(seller: Seller, x_store_token: str, x_admin_token: str) -> None:
 @router.get("", response_model=list[LiveStreamRead])
 def list_streams(
     session: Session = Depends(get_session),
+    user: User | None = Depends(auth.get_current_user),
     status_filter: str | None = Query(None, alias="status", description="live | scheduled | ended"),
 ) -> list[LiveStreamRead]:
     stmt = select(LiveStream)
@@ -55,13 +57,55 @@ def list_streams(
         stmt = stmt.where(LiveStream.status.in_(["live", "scheduled"]))
     # Live first, then most viewers / soonest.
     streams = session.exec(stmt).all()
+    reminder_ids: set[int] = set()
+    if user:
+        reminder_ids = {
+            r.stream_id for r in session.exec(
+                select(LiveStreamReminder).where(LiveStreamReminder.user_id == user.id)
+            ).all()
+        }
+
     out = []
     for st in streams:
         seller = session.get(Seller, st.seller_id)
         if seller:
-            out.append(_read(st, seller))
-    out.sort(key=lambda r: (r.status != "live", -r.viewer_count))
+            item = _read(st, seller).model_dump()
+            item["is_notifying"] = st.id in reminder_ids
+            out.append(item)
+    out.sort(key=lambda r: (r.get("status") != "live", -int(r.get("viewer_count") or 0)))
     return out
+
+
+@router.get("/notify/mine")
+def my_notify_stream_ids(
+    session: Session = Depends(get_session),
+    user: User = Depends(auth.require_user),
+) -> dict:
+    ids = [
+        r.stream_id
+        for r in session.exec(select(LiveStreamReminder).where(LiveStreamReminder.user_id == user.id)).all()
+    ]
+    return {"stream_ids": ids}
+
+
+@router.post("/{stream_id}/notify")
+def toggle_notify(
+    stream_id: int,
+    payload: dict,
+    session: Session = Depends(get_session),
+    user: User = Depends(auth.require_user),
+) -> dict:
+    stream = session.get(LiveStream, stream_id)
+    if not stream:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stream not found")
+    wants = bool(payload.get("enabled", True))
+    existing = session.get(LiveStreamReminder, (user.id, stream_id))
+    if wants and not existing:
+        session.add(LiveStreamReminder(user_id=user.id, stream_id=stream_id))
+    if not wants and existing:
+        session.delete(existing)
+    session.commit()
+    return {"stream_id": stream_id, "enabled": wants}
 
 
 @router.post("/{handle}", response_model=LiveStreamRead, status_code=status.HTTP_201_CREATED)

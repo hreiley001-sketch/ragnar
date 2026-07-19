@@ -100,6 +100,7 @@ The database (SQLite) is created and seeded with sample listings on first run.
 | `/api/fees/quote?price=&founding=&founding_intro=` | GET | Fee breakdown + eBay comparison |
 | `/api/listings` | GET | Search/filter listings (see query params in `/api/docs`) |
 | `/api/listings` | POST | Create a listing (accepts `seller_handle` or `seller_name`) |
+| `/api/listings/import/csv` | POST | Bulk import listings from CSV (`multipart/form-data`; supports `dry_run=true`) |
 | `/api/listings/{id}` | GET | Listing detail |
 | `/api/listings/{id}/fees` | GET | Fee breakdown for a listing |
 | `/api/listings/{id}/sell` | POST | Mark sold → records a comp + accrues Founding sales |
@@ -114,6 +115,13 @@ The database (SQLite) is created and seeded with sample listings on first run.
 | `/api/payments/connect/{handle}/status` | GET | Seller payout account status |
 | `/api/payments/checkout/{listing_id}` | POST | Create a Stripe Checkout session for a buyer |
 | `/api/payments/webhook` | POST | Stripe webhook → marks listing sold |
+| `/api/auth/profile` | PATCH | Update account profile (name + marketing preference) |
+| `/api/auth/change-password` | POST | Change password for password-based accounts |
+| `/api/auth/change-email/request` | POST | Start email change flow (sends verification to new email) |
+| `/api/auth/sessions` | GET | List active sessions for the signed-in account |
+| `/api/auth/sessions/{session_id}` | DELETE | Revoke one session/device |
+| `/api/auth/logout-all` | POST | End all sessions for current account |
+| `/api/auth/deactivate` | POST | Deactivate account and remove login access |
 
 ## Configuration
 

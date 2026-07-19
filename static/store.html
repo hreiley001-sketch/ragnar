@@ -12,6 +12,9 @@
     .store-av { width:88px;height:88px;border-radius:20px;border:3px solid var(--bg); display:grid;place-items:center;font-weight:800;font-size:34px;color:#fff; flex:none; }
     .store-h-meta h1 { margin:0; font-size:clamp(24px,4vw,36px); }
     .store-h-meta .tg { color:var(--text-soft); }
+    .store-social { display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
+    .social-meta { font-size:13px; }
+    .store-bio { max-width:720px; }
     .store-wrap { padding: 18px clamp(16px,4vw,40px) 60px; }
     .live-strip { display:flex; gap:12px; flex-wrap:wrap; margin:16px 0; }
     .live-pill { display:flex;align-items:center;gap:8px; padding:8px 14px; border-radius:10px; border:1px solid var(--border-strong); background:rgba(200,30,30,.12); cursor:pointer; }
@@ -29,6 +32,28 @@
     .design-msg.ai { background:var(--bg-2); border:1px solid var(--border); color:var(--text-soft); align-self:flex-start; }
     .design-swatch { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px; border:1px solid rgba(255,255,255,.3); }
     .design-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }
+    .preset-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
+    .preset-btn { border:1px solid var(--border-strong); background:var(--bg-2); color:var(--text-soft); border-radius:999px; padding:4px 10px; font-size:11px; cursor:pointer; }
+    .preset-btn.active { background:rgba(55,189,255,.14); color:var(--text); border-color:var(--ice); }
+    .store-listing-link { color: inherit; text-decoration: none; }
+    .store-listing-link:hover { text-decoration: underline; }
+    .designer-note { font-size:12px; margin:8px 0 0; }
+    .nav-space { margin:14px 0; }
+    .token-note { margin-top:0; }
+    .message-card { margin-top:22px; padding:16px; max-width:640px; }
+    .msg-gate { font-size:13px; }
+    @media (max-width:760px) {
+      .store-wrap { padding: 14px 12px 40px; }
+      .bar { flex-direction: column; align-items: flex-start; }
+      .customize .field-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width:640px) {
+      .store-hero { height: 230px; }
+      .store-hero-inner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
+      .store-av { width:72px; height:72px; border-radius:16px; font-size:28px; }
+      .design-row { grid-template-columns: 1fr; }
+      .message-card { max-width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -49,10 +74,10 @@
       <div class="store-h-meta">
         <h1 id="storeName">Store</h1>
         <div class="tg" id="storeTag"></div>
-        <div class="store-social" style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;">
+        <div class="store-social">
           <button id="followBtn" class="btn btn-sm" type="button">♡ Follow</button>
-          <span id="followerCount" class="muted" style="font-size:13px;"></span>
-          <span id="storeRating" class="muted" style="font-size:13px;"></span>
+          <span id="followerCount" class="muted social-meta"></span>
+          <span id="storeRating" class="muted social-meta"></span>
           <a href="#message" class="btn btn-ghost btn-sm">✉ Message</a>
         </div>
       </div>
@@ -60,26 +85,30 @@
   </div>
 
   <main class="store-wrap">
-    <div id="storeBio" class="muted" style="max-width:720px;"></div>
-    <div id="liveStrip" class="live-strip"></div>
+    <div id="storeBio" class="muted store-bio"></div>
+    <div id="liveStrip" class="live-strip" aria-live="polite"></div>
 
     <div class="bar">
       <span id="listCount" class="result-count">Listings</span>
-      <button id="customizeBtn" class="btn btn-ghost btn-sm" type="button">✎ Customize this store</button>
+      <button id="customizeBtn" class="btn btn-ghost btn-sm" type="button">✨ Open store design chat</button>
     </div>
 
     <div id="customizePanel" class="card customize" hidden>
       <div class="designer">
         <div class="designer-title">✨ Store Designer — describe your vibe</div>
+        <div class="preset-row" id="designPresetRow">
+          <button class="preset-btn" type="button" data-preset="whatnot">Whatnot-style live seller</button>
+          <button class="preset-btn" type="button" data-preset="ebay">eBay-style catalog seller</button>
+        </div>
         <div id="designFeed" class="design-feed"></div>
         <div class="design-row">
           <input id="designPrompt" placeholder="e.g. dark & premium for vintage Pokémon" />
           <button id="designSend" class="btn btn-primary btn-sm" type="button">Design</button>
         </div>
-        <p class="muted" style="font-size:12px;margin:8px 0 0;">The designer updates the live preview above. Enter your token below and hit <strong>Save store</strong> to keep it.</p>
+        <p class="muted designer-note">The designer updates the live preview above. Enter your token below and hit <strong>Save store</strong> to keep it.</p>
       </div>
-      <div class="nav-div" style="margin:14px 0;"></div>
-      <p class="muted" style="margin-top:0;">Paste your <strong>store token</strong> (given when you signed up as a seller) to edit your store.</p>
+      <div class="nav-div nav-space"></div>
+      <p class="muted token-note">Paste your <strong>store token</strong> (given when you signed up as a seller) to edit your store.</p>
       <label class="field"><span>Store token</span><input id="storeToken" type="password" placeholder="X-Store-Token" /></label>
       <div class="field-row">
         <label class="field"><span>Tagline</span><input id="c-tagline" maxlength="140" /></label>
@@ -95,11 +124,11 @@
       <span id="cStatus" class="form-status"></span>
     </div>
 
-    <div id="grid" class="grid"></div>
+    <div id="grid" class="grid" aria-live="polite"></div>
 
-    <div id="message" class="card" style="margin-top:22px;padding:16px;max-width:640px;">
+    <div id="message" class="card message-card">
       <div class="designer-title">✉ Message this store</div>
-      <div id="msgGate" class="muted" style="font-size:13px;">Checking sign-in…</div>
+      <div id="msgGate" class="muted msg-gate">Checking sign-in…</div>
       <div id="msgForm" hidden>
         <label class="field"><span>Your message</span><textarea id="msgBody" rows="2" maxlength="2000" placeholder="Ask about a card, shipping, bundles…"></textarea></label>
         <button id="msgSend" class="btn btn-primary btn-sm" type="button">Send message</button>

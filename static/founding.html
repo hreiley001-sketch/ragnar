@@ -30,6 +30,8 @@
     .land { max-width: 960px; margin: 0 auto; padding: 0 clamp(16px,4vw,40px) 60px; }
     .hero-land { text-align:center; padding: clamp(30px,7vw,70px) 0 20px; }
     .hero-land h2 { font-size: clamp(32px,6vw,60px); line-height:1.05; margin:14px 0; }
+    .hero-ice { color: var(--ice); }
+    .hero-cta-wrap { margin-top: 20px; }
     .hero-land .sub { color: var(--text-soft); font-size: clamp(16px,2.4vw,20px); max-width:680px; margin:0 auto; }
     .counter-big { display:inline-flex; align-items:center; gap:10px; margin:18px auto; padding:8px 18px; border-radius:999px; border:1px solid rgba(184,121,26,.4); background:rgba(184,121,26,.1); color:var(--gold); font-weight:600; }
     .perks { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin:32px 0; }
@@ -40,6 +42,7 @@
     .perk .p-d { font-size:13px; color:var(--text-soft); line-height:1.5; }
     .apply-card { max-width:640px; margin:10px auto 0; padding:26px; }
     .apply-card h3 { margin-top:0; }
+    .apply-note { margin-top: 0; }
     .success { text-align:center; padding:30px; }
     .success .big { font-size:44px; }
     .foot-links { text-align:center; margin-top:18px; }
@@ -63,10 +66,10 @@
   <main class="land">
     <section class="hero-land">
       <img src="/static/logo.png" alt="RAGNAR" class="hero-logo" />
-      <div class="counter-big" id="counter">★ Founding Sellers — <span id="claimed">—</span> / <span id="cap">250</span> claimed</div>
-      <h2 id="heroHeadline">Be one of the <span class="accent" style="color:var(--ice)">250 Founding Sellers.</span></h2>
+      <div class="counter-big" id="counter" aria-live="polite">★ Founding Sellers — <span id="claimed">—</span> / <span id="cap">250</span> claimed</div>
+      <h2 id="heroHeadline">Be one of the <span class="accent hero-ice">250 Founding Sellers.</span></h2>
       <p class="sub" id="heroSubtitle">RAGNAR is a trust-first marketplace for trading cards — built so sellers keep more and buyers stop getting burned. The first 250 sellers lock in founding status forever.</p>
-      <div style="margin-top:20px;"><a class="btn btn-primary" href="#apply">Apply to be a Founding Seller</a></div>
+      <div class="hero-cta-wrap"><a class="btn btn-primary" href="#apply">Apply to be a Founding Seller</a></div>
     </section>
 
     <div class="perks">
@@ -78,7 +81,7 @@
 
     <section class="card apply-card" id="apply">
       <h3>Apply to be a Founding Seller</h3>
-      <p class="muted" style="margin-top:0;">Spots are limited to 250 and reviewed by hand. Tell us about your cards.</p>
+      <p class="muted apply-note">Spots are limited to 250 and reviewed by hand. Tell us about your cards.</p>
       <form id="applyForm">
         <div class="field-row">
           <label class="field"><span>Name *</span><input name="name" required minlength="2" maxlength="120" /></label>
@@ -92,7 +95,7 @@
         <label class="field"><span>Where do you sell now? (links welcome)</span><input name="current_platforms" maxlength="300" placeholder="eBay / TCGplayer / Whatnot store URL" /></label>
         <label class="field"><span>Anything else?</span><textarea name="message" rows="3" maxlength="2000" placeholder="Tell us why you'd be a great Founding Seller."></textarea></label>
         <button type="submit" class="btn btn-primary">Submit application</button>
-        <span id="formStatus" class="form-status"></span>
+        <span id="formStatus" class="form-status" aria-live="polite"></span>
       </form>
     </section>
 

@@ -252,6 +252,7 @@ class LiveStreamRead(BaseModel):
     scheduled_at: Optional[datetime] = None
     started_at: Optional[datetime] = None
     viewer_count: int = 0
+    is_notifying: bool = False
 
 
 # --------------------------- sales / comps --------------------------- #

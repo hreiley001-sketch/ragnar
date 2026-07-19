@@ -119,6 +119,9 @@ def public_user(user: User) -> dict:
         "id": user.id, "email": user.email, "name": user.name,
         "role": user.role, "is_staff": user.role == UserRole.admin.value,
         "email_verified": user.email_verified, "seller_handle": user.seller_handle,
+        "marketing_opt_in": bool(user.marketing_opt_in),
+        "has_password": bool(user.password_hash),
+        "pending_email": user.pending_email,
     }
 
 

@@ -13,7 +13,7 @@ from sqlmodel import Session, select
 
 import secrets
 
-from .. import ai, auth, catalog, comps, payments, pricing, seo_tools
+from .. import ai, auth, catalog, comps, emailer, payments, pricing, seo_tools
 from ..config import settings
 from ..database import get_session
 from ..models import (
@@ -23,6 +23,7 @@ from ..models import (
     LiveStream,
     Sale,
     Seller,
+    SiteCollaborator,
     User,
     UserRole,
     UserSession,
@@ -62,9 +63,68 @@ def integrations_status() -> dict:
         "ai": ai.is_configured(),
         "catalog": True,  # Scryfall/Pokémon TCG are free/no-key
         "payments": payments.status(),
+        "email": emailer.email_configured(),
         "psa": bool(settings.psa_access_token),
         "seo": seo_tools.providers_status(),
     }
+
+
+def _is_staff_domain_user(user) -> bool:
+    if not user or not auth.is_staff(user) or not user.email_verified:
+        return False
+    domain = (settings.staff_email_domain or "ragnarips.com").strip().lower()
+    return bool(user.email and user.email.lower().endswith("@" + domain))
+
+
+def _site_builder_role(session: Session, user) -> str | None:
+    if not _is_staff_domain_user(user):
+        return None
+    email = (user.email or "").lower().strip()
+    if not email:
+        return None
+    if email in settings.admin_emails:
+        return "owner"
+    collab = session.exec(select(SiteCollaborator).where(SiteCollaborator.email == email)).first()
+    if collab and collab.role in {"owner", "editor", "content"}:
+        return collab.role
+    owner_exists = session.exec(
+        select(SiteCollaborator.email).where(SiteCollaborator.role == "owner").limit(1)
+    ).first()
+    return "owner" if not owner_exists else "editor"
+
+
+def _allowed_site_keys_for_role(role: str) -> set[str]:
+    from .. import site_config
+    if role in {"owner", "editor"}:
+        return {f["key"] for f in site_config.SITE_FIELDS}
+    if role == "content":
+        return {f["key"] for f in site_config.SITE_FIELDS if f.get("group") != "Look & feel"}
+    return set()
+
+
+def require_site_builder_user(
+    session: Session = Depends(get_session),
+    user=Depends(auth.require_user),
+):
+    """Site Builder is reserved for verified staff on the company domain.
+
+    Intentionally does NOT allow the break-glass admin token.
+    """
+    role = _site_builder_role(session, user)
+    if role:
+        return {"user": user, "role": role}
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Site Builder access requires verified @ragnarips.com staff account plus partner role.",
+    )
+
+
+def require_site_builder_owner(
+    access=Depends(require_site_builder_user),
+):
+    if access["role"] != "owner":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Owner role required.")
+    return access
 
 
 @router.get("/users")
@@ -144,27 +204,110 @@ def admin_site_config(
     return {"fields": site_config.field_specs(session)}
 
 
+@router.get("/site-builder/access")
+def site_builder_access(
+    session: Session = Depends(get_session),
+    user=Depends(auth.get_current_user),
+) -> dict:
+    if not user:
+        return {"allowed": False, "role": None, "email": None}
+    role = _site_builder_role(session, user)
+    return {
+        "allowed": bool(role),
+        "role": role,
+        "email": user.email,
+        "allowed_keys": sorted(_allowed_site_keys_for_role(role) if role else []),
+    }
+
+
+@router.get("/site-collaborators")
+def list_site_collaborators(
+    session: Session = Depends(get_session),
+    access=Depends(require_site_builder_user),
+) -> dict:
+    rows = session.exec(select(SiteCollaborator).order_by(SiteCollaborator.email.asc())).all()
+    return {
+        "items": [{
+            "email": r.email,
+            "role": r.role,
+            "added_by": r.added_by,
+            "updated_at": r.updated_at.isoformat(),
+        } for r in rows],
+        "viewer_role": access["role"],
+    }
+
+
+@router.post("/site-collaborators")
+def upsert_site_collaborator(
+    payload: dict,
+    session: Session = Depends(get_session),
+    access=Depends(require_site_builder_owner),
+) -> dict:
+    email = (payload.get("email") or "").strip().lower()
+    role = (payload.get("role") or "editor").strip().lower()
+    if role not in {"owner", "editor", "content"}:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Role must be owner, editor, or content.")
+    domain = (settings.staff_email_domain or "ragnarips.com").strip().lower()
+    if not email.endswith("@" + domain):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Email must be @{domain}.")
+    user = session.exec(select(User).where(User.email == email)).first()
+    if not user or not user.email_verified or user.role != UserRole.admin.value:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User must exist, be verified, and have staff access before assigning site-builder role.",
+        )
+    row = session.get(SiteCollaborator, email)
+    if row:
+        row.role = role
+    else:
+        row = SiteCollaborator(email=email, role=role, added_by=access["user"].email)
+    # Always refresh timestamp on role write.
+    from ..models import utcnow
+    row.updated_at = utcnow()
+    session.add(row)
+    session.commit()
+    return {"email": row.email, "role": row.role}
+
+
+@router.delete("/site-collaborators/{email}")
+def delete_site_collaborator(
+    email: str,
+    session: Session = Depends(get_session),
+    _: dict = Depends(require_site_builder_owner),
+) -> dict:
+    key = (email or "").strip().lower()
+    row = session.get(SiteCollaborator, key)
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Collaborator not found.")
+    session.delete(row)
+    session.commit()
+    return {"deleted": True, "email": key}
+
+
 @router.put("/site-config")
 def admin_update_site_config(
     payload: dict,
     session: Session = Depends(get_session),
-    _: None = Depends(require_admin),
-    user=Depends(auth.get_current_user),
-    x_admin_token: str = Header(default=""),
+    access=Depends(require_site_builder_user),
 ) -> dict:
     """Save staff edits to whitelisted site content. Records who made the change."""
     from .. import site_config
-    by = (getattr(user, "email", None) or ("admin-token" if x_admin_token else "staff"))
+    user = access["user"]
+    role = access["role"]
+    by = getattr(user, "email", None) or "staff"
     updates = payload.get("updates") if isinstance(payload.get("updates"), dict) else payload
-    config = site_config.set_many(session, updates or {}, by)
-    return {"saved": True, "by": by, "config": config}
+    updates = updates or {}
+    allowed = _allowed_site_keys_for_role(role)
+    filtered = {k: v for k, v in updates.items() if k in allowed}
+    config = site_config.set_many(session, filtered, by)
+    return {"saved": True, "by": by, "role": role, "applied_keys": sorted(filtered.keys()), "config": config}
 
 
 @router.post("/studio")
 def admin_studio(
     payload: dict,
     session: Session = Depends(get_session),
-    _: None = Depends(require_admin),
+    access=Depends(require_site_builder_user),
 ) -> dict:
     """RAGNAR Studio — chat that proposes whole-site edits (content + theme).
 
@@ -175,7 +318,43 @@ def admin_studio(
     if not message:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Say what you'd like to change.")
     current = site_config.get_all(session)
-    return ai.site_studio(message, current, site_config.SITE_FIELDS)
+    result = ai.site_studio(message, current, site_config.SITE_FIELDS)
+    allowed = _allowed_site_keys_for_role(access["role"])
+    result["updates"] = {k: v for k, v in (result.get("updates") or {}).items() if k in allowed}
+    result["role"] = access["role"]
+    return result
+
+
+@router.post("/email/test")
+def admin_email_test(
+    payload: dict,
+    _: None = Depends(require_admin),
+    user=Depends(auth.get_current_user),
+) -> dict:
+    """Send a real test email from the site so ops can verify deliverability."""
+    to = (payload.get("to") or "").strip().lower()
+    if not to and user and getattr(user, "email", None):
+        to = user.email.lower()
+    if not to:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Provide a recipient email.")
+
+    subject = (payload.get("subject") or "RAGNAR email test").strip()[:200]
+    note = (payload.get("message") or "This is a live test email from RAGNAR Command Hub.").strip()
+    html = (
+        "<h2>RAGNAR Email Test</h2>"
+        f"<p>{note}</p>"
+        "<p style='color:#64748b;font-size:12px'>"
+        "If you received this, outbound email from your current deployment is working."
+        "</p>"
+    )
+    sent = emailer.send_email(to, subject, html)
+    return {
+        "configured": emailer.email_configured(),
+        "sent": sent,
+        "to": to,
+        "from": settings.email_from,
+        "detail": "ok" if sent else "Send failed. Check RESEND_API_KEY and verified sender domain.",
+    }
 
 
 @router.post("/scrape-price")

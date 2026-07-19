@@ -51,6 +51,7 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "verify_token": "VARCHAR",
         "verify_sent_at": "DATETIME",
         "marketing_opt_in": "BOOLEAN DEFAULT 0",
+        "pending_email": "VARCHAR",
     },
 }
 

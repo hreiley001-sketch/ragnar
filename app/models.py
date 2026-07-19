@@ -78,6 +78,7 @@ class User(SQLModel, table=True):
     email_verified: bool = Field(default=False)
     verify_token: Optional[str] = Field(default=None, index=True, max_length=64)
     verify_sent_at: Optional[datetime] = Field(default=None)
+    pending_email: Optional[str] = Field(default=None, max_length=160)
     role: str = Field(default=UserRole.user.value, index=True)
     seller_handle: Optional[str] = Field(default=None, index=True, max_length=40)
     marketing_opt_in: bool = Field(default=False)
@@ -142,6 +143,14 @@ class LiveStream(SQLModel, table=True):
     scheduled_at: Optional[datetime] = Field(default=None)
     started_at: Optional[datetime] = Field(default=None)
     viewer_count: int = Field(default=0)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class LiveStreamReminder(SQLModel, table=True):
+    """A user's 'notify me' subscription for a scheduled stream."""
+
+    user_id: int = Field(foreign_key="user.id", primary_key=True)
+    stream_id: int = Field(foreign_key="livestream.id", primary_key=True)
     created_at: datetime = Field(default_factory=utcnow, index=True)
 
 
@@ -483,4 +492,20 @@ class SiteSetting(SQLModel, table=True):
     key: str = Field(primary_key=True, max_length=64)
     value: str = Field(default="", max_length=4000)
     updated_by: Optional[str] = Field(default=None, max_length=160)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+
+class SiteCollaborator(SQLModel, table=True):
+    """Partner access for Site Builder controls in Command Hub.
+
+    role:
+    - owner: full site builder + collaborator management
+    - editor: full site builder (theme + copy), no collaborator management
+    - content: copy/content only, no look-and-feel edits
+    """
+
+    email: str = Field(primary_key=True, max_length=160)
+    role: str = Field(default="editor", max_length=20, index=True)
+    added_by: Optional[str] = Field(default=None, max_length=160)
+    created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)

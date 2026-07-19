@@ -6,6 +6,7 @@ const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefine
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fmtDate = (s) => s ? new Date(s).toLocaleDateString() : "—";
 let TOKEN = localStorage.getItem("ragnar_admin_token") || "";
+let SITE_ACCESS = { allowed: false, role: null };
 
 let toastTimer = null;
 function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2600); }
@@ -445,6 +446,13 @@ function teamAction(e) {
 /* ---------- site editor ---------- */
 async function loadSite() {
   const box = $("siteFields");
+  const access = await loadSiteAccess();
+  if (!access.allowed) {
+    box.innerHTML = `<p class="form-status error">Site Builder access denied. Use a verified @ragnarips.com staff account with partner role.</p>`;
+    setSiteBuilderDisabled(true);
+    return;
+  }
+  setSiteBuilderDisabled(false);
   try {
     const d = await api("/api/admin/site-config");
     const groups = {};
@@ -467,9 +475,158 @@ async function loadSite() {
         }).join("")}
       </div>`).join("");
   } catch (e) { box.innerHTML = `<p class="form-status error">${esc(e.message)}</p>`; }
+  await loadCollaborators();
+}
+
+function setSiteBuilderDisabled(disabled) {
+  ["siteSaveBtn", "studioSendBtn", "studioPrompt", "sendEmailTestBtn", "emailTestTo", "emailTestSubject", "emailTestBody", "addCollabBtn", "collabEmail", "collabRole"].forEach((id) => {
+    const el = $(id);
+    if (el) el.disabled = !!disabled;
+  });
+}
+
+async function loadSiteAccess() {
+  try {
+    SITE_ACCESS = await api("/api/admin/site-builder/access");
+  } catch (_) {
+    SITE_ACCESS = { allowed: false, role: null };
+  }
+  const note = $("siteRoleNote");
+  if (note) {
+    if (SITE_ACCESS.allowed) {
+      note.className = "form-status ok";
+      note.textContent = `Site Builder role: ${SITE_ACCESS.role}`;
+    } else {
+      note.className = "form-status error";
+      note.textContent = "No Site Builder partner role for this account.";
+    }
+  }
+  return SITE_ACCESS;
+}
+
+async function loadCollaborators() {
+  const body = $("collabBody");
+  if (!body) return;
+  if (!SITE_ACCESS.allowed) {
+    body.innerHTML = `<tr><td colspan="5" class="muted">Sign in with an eligible staff account.</td></tr>`;
+    return;
+  }
+  try {
+    const d = await api("/api/admin/site-collaborators");
+    body.innerHTML = (d.items || []).map((r) => `<tr>
+      <td>${esc(r.email)}</td>
+      <td>${esc(r.role)}</td>
+      <td>${esc(r.added_by || "—")}</td>
+      <td>${fmtDate(r.updated_at)}</td>
+      <td>${SITE_ACCESS.role === "owner" ? `<button class="btn btn-sm" data-del-collab="${esc(r.email)}">Remove</button>` : "—"}</td>
+    </tr>`).join("") || `<tr><td colspan="5" class="muted">No partners configured.</td></tr>`;
+  } catch (e) {
+    body.innerHTML = `<tr><td colspan="5" class="form-status error">${esc(e.message)}</td></tr>`;
+  }
+}
+
+async function saveCollaborator() {
+  const st = $("collabStatus");
+  st.className = "form-status";
+  if (SITE_ACCESS.role !== "owner") {
+    st.className = "form-status error";
+    st.textContent = "Only owners can manage partner roles.";
+    return;
+  }
+  const email = $("collabEmail").value.trim().toLowerCase();
+  const role = $("collabRole").value;
+  if (!email) {
+    st.className = "form-status error";
+    st.textContent = "Enter a partner email.";
+    return;
+  }
+  try {
+    await api("/api/admin/site-collaborators", { method: "POST", body: JSON.stringify({ email, role }) });
+    st.className = "form-status ok";
+    st.textContent = "Partner role saved.";
+    $("collabEmail").value = "";
+    loadCollaborators();
+  } catch (e) {
+    st.className = "form-status error";
+    st.textContent = e.message;
+  }
+}
+
+function collaboratorsAction(e) {
+  const btn = e.target.closest("[data-del-collab]");
+  if (!btn || SITE_ACCESS.role !== "owner") return;
+  const email = btn.getAttribute("data-del-collab");
+  if (!confirm(`Remove ${email} from Site Builder roles?`)) return;
+  api(`/api/admin/site-collaborators/${encodeURIComponent(email)}`, { method: "DELETE" })
+    .then(() => loadCollaborators())
+    .catch((err) => toast(err.message));
+}
+
+function studioMsg(text, mine = false) {
+  const feed = $("studioFeed");
+  if (!feed) return null;
+  const node = document.createElement("div");
+  node.className = "studio-msg" + (mine ? " me" : "");
+  node.textContent = text;
+  feed.appendChild(node);
+  feed.scrollTop = feed.scrollHeight;
+  return node;
+}
+
+function injectSiteUpdates(updates) {
+  Object.entries(updates || {}).forEach(([k, v]) => {
+    const el = document.querySelector(`#siteFields [data-key="${CSS.escape(k)}"]`);
+    if (el) el.value = v;
+  });
+}
+
+async function studioSuggest(seed) {
+  if (!SITE_ACCESS.allowed) { toast("Site Builder role required."); return; }
+  const input = $("studioPrompt");
+  const prompt = (seed || (input ? input.value : "") || "").trim();
+  if (!prompt) return;
+  studioMsg(prompt, true);
+  if (input) input.value = "";
+  const wait = studioMsg("Designing updates…");
+  try {
+    const r = await api("/api/admin/studio", { method: "POST", body: JSON.stringify({ message: prompt }) });
+    if (wait) wait.remove();
+    injectSiteUpdates(r.updates || {});
+    studioMsg(r.reply || "Applied suggestions into the editor fields.");
+    const ideas = $("studioIdeas");
+    if (ideas) {
+      ideas.innerHTML = (r.ideas || []).map((i) => `<button class="btn btn-ghost btn-sm" type="button" data-idea="${esc(i)}">${esc(i)}</button>`).join("");
+      ideas.querySelectorAll("[data-idea]").forEach((b) => b.addEventListener("click", () => studioSuggest(b.getAttribute("data-idea"))));
+    }
+  } catch (e) {
+    if (wait) wait.remove();
+    studioMsg("Studio failed: " + e.message);
+  }
+}
+
+async function sendEmailTest() {
+  const st = $("emailTestStatus");
+  st.className = "form-status";
+  st.textContent = "Sending…";
+  const payload = {
+    to: $("emailTestTo").value.trim(),
+    subject: $("emailTestSubject").value.trim(),
+    message: $("emailTestBody").value.trim(),
+  };
+  try {
+    const r = await api("/api/admin/email/test", { method: "POST", body: JSON.stringify(payload) });
+    st.className = r.sent ? "form-status ok" : "form-status error";
+    st.textContent = r.sent
+      ? `Sent to ${r.to} from ${r.from}`
+      : (r.detail || "Send failed");
+  } catch (e) {
+    st.className = "form-status error";
+    st.textContent = e.message;
+  }
 }
 
 async function saveSite() {
+  if (!SITE_ACCESS.allowed) { toast("Site Builder role required."); return; }
   const st = $("siteStatus"); st.className = "form-status"; st.textContent = "Publishing…";
   const updates = {};
   document.querySelectorAll("#siteFields [data-key]").forEach((el) => { updates[el.getAttribute("data-key")] = el.value; });
@@ -483,7 +640,12 @@ async function saveSite() {
 
 /* ---------- tabs ---------- */
 function switchTab(name) {
-  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+  document.querySelectorAll(".tab").forEach((t) => {
+    const active = t.dataset.tab === name;
+    t.classList.toggle("active", active);
+    t.setAttribute("aria-selected", active ? "true" : "false");
+    t.setAttribute("tabindex", active ? "0" : "-1");
+  });
   document.querySelectorAll(".tab-panel").forEach((p) => (p.hidden = p.id !== `tab-${name}`));
   if (name === "listings") loadListings();
   if (name === "sellers") loadSellers();
@@ -515,6 +677,11 @@ document.addEventListener("DOMContentLoaded", () => {
   $("ridesRefresh").addEventListener("click", loadRides);
   $("siteSaveBtn").addEventListener("click", saveSite);
   $("siteRefresh").addEventListener("click", loadSite);
+  $("studioSendBtn").addEventListener("click", () => studioSuggest());
+  $("studioPrompt").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); studioSuggest(); } });
+  $("sendEmailTestBtn").addEventListener("click", sendEmailTest);
+  $("addCollabBtn").addEventListener("click", saveCollaborator);
+  $("collabBody").addEventListener("click", collaboratorsAction);
   $("rideLaunchBtn").addEventListener("click", launchRide);
   $("nlBtn").addEventListener("click", nlSearch);
   $("descBtn").addEventListener("click", genDesc);

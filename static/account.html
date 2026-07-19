@@ -12,8 +12,9 @@
     .wrap .sub { color: var(--muted); margin: 0 0 20px; font-size: 14px; }
 
     /* Tabs (admin-hub pill pattern) */
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 20px; padding-bottom: 4px; }
     .tab { font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+    .tab { white-space: nowrap; }
     .tab:hover { background: rgba(55,189,255,0.08); color: var(--text); }
     .tab.active { background: var(--ice); color: #fff; border-color: rgba(111,214,255,0.6); font-weight: 600; }
     .tcount { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: rgba(255,90,90,0.85); color: #fff; font-size: 11px; font-weight: 700; display: none; align-items: center; justify-content: center; line-height: 1; }
@@ -84,7 +85,45 @@
     .claim-box { margin-top: 20px; padding: 16px; border: 1px dashed var(--border-strong); border-radius: 12px; background: rgba(55,189,255,0.04); max-width: 520px; }
     .claim-box h4 { margin: 0 0 6px; }
     .store-link-box { margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(240,198,116,0.45); border-radius: 12px; background: rgba(240,198,116,0.07); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    @media (max-width: 640px) { .t-last { max-width: 200px; } }
+    .strong-name { font-size: 18px; }
+    .mini-note { margin: 0 0 12px; font-size: 13px; }
+    .notif-main { min-width: 0; }
+    .clean-link { color: inherit; text-decoration: none; }
+    .w-placeholder { font-size: 26px; }
+    .w-foot-pad { padding: 0 11px 11px; }
+    .muted-sm-inline { font-size: 13px; }
+    .inline-form-top { margin-top: 16px; }
+    .want-desc { flex: 2; min-width: 220px; }
+    .want-cat { flex: 1; min-width: 130px; }
+    .want-max { width: 140px; }
+    .thumb-sm { width: 38px; height: 38px; object-fit: cover; border-radius: 6px; }
+    .thumb-sm-empty { width: 38px; height: 38px; display: inline-block; border-radius: 6px; background: var(--bg-2,#0c111a); }
+    .title-thumb-row { display: flex; align-items: center; gap: 8px; }
+    .muted-xs-inline { font-size: 12px; }
+    .track-input { flex: 1; min-width: 160px; }
+    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+    .settings-card { border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02); padding: 14px; }
+    .settings-card h4 { margin: 0 0 10px; font-size: 14px; letter-spacing: 0.02em; }
+    .settings-card .field { margin: 0 0 10px; }
+    .settings-card .field:last-of-type { margin-bottom: 0; }
+    .setting-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    .setting-note { font-size: 12px; color: var(--muted); }
+    .danger-box { margin-top: 14px; border: 1px solid rgba(255,138,138,0.4); background: rgba(255,138,138,0.06); border-radius: 12px; padding: 14px; }
+    .danger-box h4 { margin: 0 0 8px; color: var(--danger); font-size: 14px; }
+    .btn-danger { background: rgba(255,138,138,0.18); border-color: rgba(255,138,138,0.5); color: #fff; }
+    .btn-danger:hover { background: rgba(255,138,138,0.25); }
+    @media (max-width: 640px) {
+      .wrap { padding: 18px 12px 48px; }
+      .tab { padding: 8px 12px; }
+      .tab-panel { padding: 14px; }
+      .t-last { max-width: 200px; }
+      .reply-row { grid-template-columns: 1fr; }
+      .inline-form { align-items: stretch; }
+      .inline-form input, .inline-form select, .inline-form .btn { width: 100%; }
+      .want-max { width: 100%; }
+      .settings-grid { grid-template-columns: 1fr; }
+      .setting-row .btn { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -103,27 +142,29 @@
     <h2>My Account</h2>
     <p class="sub" id="acctSub">Loading your longhouse…</p>
 
-    <div class="tabs" id="tabs">
-      <button class="tab" data-tab="overview" type="button">Overview</button>
-      <button class="tab" data-tab="notifications" type="button">Notifications <span class="tcount" id="nBadge"></span></button>
-      <button class="tab" data-tab="watchlist" type="button">Watchlist</button>
-      <button class="tab" data-tab="offers" type="button">Offers</button>
-      <button class="tab" data-tab="orders" type="button">Orders</button>
-      <button class="tab" data-tab="messages" type="button">Messages <span class="tcount" id="mBadge"></span></button>
-      <button class="tab" data-tab="searches" type="button">Searches</button>
-      <button class="tab" data-tab="wants" type="button">Wants</button>
-      <button class="tab" data-tab="store" type="button" id="storeTabBtn" hidden>⚑ Store</button>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Account sections">
+      <button class="tab" data-tab="overview" type="button" role="tab" aria-controls="panel-overview">Overview</button>
+      <button class="tab" data-tab="settings" type="button" role="tab" aria-controls="panel-settings">Settings</button>
+      <button class="tab" data-tab="notifications" type="button" role="tab" aria-controls="panel-notifications">Notifications <span class="tcount" id="nBadge"></span></button>
+      <button class="tab" data-tab="watchlist" type="button" role="tab" aria-controls="panel-watchlist">Watchlist</button>
+      <button class="tab" data-tab="offers" type="button" role="tab" aria-controls="panel-offers">Offers</button>
+      <button class="tab" data-tab="orders" type="button" role="tab" aria-controls="panel-orders">Orders</button>
+      <button class="tab" data-tab="messages" type="button" role="tab" aria-controls="panel-messages">Messages <span class="tcount" id="mBadge"></span></button>
+      <button class="tab" data-tab="searches" type="button" role="tab" aria-controls="panel-searches">Searches</button>
+      <button class="tab" data-tab="wants" type="button" role="tab" aria-controls="panel-wants">Wants</button>
+      <button class="tab" data-tab="store" type="button" role="tab" aria-controls="panel-store" id="storeTabBtn" hidden>⚑ Store</button>
     </div>
 
-    <section id="panel-overview" class="card tab-panel" hidden></section>
-    <section id="panel-notifications" class="card tab-panel" hidden></section>
-    <section id="panel-watchlist" class="card tab-panel" hidden></section>
-    <section id="panel-offers" class="card tab-panel" hidden></section>
-    <section id="panel-orders" class="card tab-panel" hidden></section>
-    <section id="panel-messages" class="card tab-panel" hidden></section>
-    <section id="panel-searches" class="card tab-panel" hidden></section>
-    <section id="panel-wants" class="card tab-panel" hidden></section>
-    <section id="panel-store" class="card tab-panel" hidden></section>
+    <section id="panel-overview" class="card tab-panel" role="tabpanel" hidden></section>
+    <section id="panel-settings" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
+    <section id="panel-notifications" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
+    <section id="panel-watchlist" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
+    <section id="panel-offers" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
+    <section id="panel-orders" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
+    <section id="panel-messages" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
+    <section id="panel-searches" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
+    <section id="panel-wants" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
+    <section id="panel-store" class="card tab-panel" role="tabpanel" aria-live="polite" hidden></section>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -168,13 +209,18 @@
     const rowsOf = (d, key) => Array.isArray(d) ? d : (d && (d[key] || d.items || d.results)) || [];
 
     let USER = null;
-    const TABS = ["overview", "notifications", "watchlist", "offers", "orders", "messages", "searches", "wants", "store"];
+    const TABS = ["overview", "settings", "notifications", "watchlist", "offers", "orders", "messages", "searches", "wants", "store"];
 
     /* ---------------- Tab machinery ---------------- */
     function switchTab(name, pushHash = true) {
       if (!TABS.includes(name)) name = "overview";
       if (name === "store" && !(USER && USER.seller_handle)) name = "overview";
-      document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+      document.querySelectorAll(".tab").forEach((t) => {
+        const active = t.dataset.tab === name;
+        t.classList.toggle("active", active);
+        t.setAttribute("aria-selected", active ? "true" : "false");
+        t.setAttribute("tabindex", active ? "0" : "-1");
+      });
       TABS.forEach((t) => { const p = $("panel-" + t); if (p) p.hidden = t !== name; });
       if (pushHash && location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
       const loader = LOADERS[name];
@@ -207,17 +253,18 @@
            </div>`
         : `<div class="claim-box">
              <h4>Claim your store</h4>
-             <p class="muted" style="margin:0 0 12px;font-size:13px;">Already signed up as a seller? Link your store to this account with your handle and store token.</p>
+             <p class="muted mini-note">Already signed up as a seller? Link your store to this account with your handle and store token.</p>
              <div class="field"><span>Store handle</span><input id="claimHandle" placeholder="e.g. valhalla-cards" /></div>
              <div class="field"><span>Store token</span><input id="claimToken" type="password" placeholder="X-Store-Token" /></div>
              <button id="claimBtn" class="btn btn-primary btn-sm" type="button">Claim store</button>
              <span id="claimStatus" class="form-status"></span>
            </div>`;
       p.innerHTML = `
-        <p style="margin:0;"><strong style="font-size:18px;">${esc(u.name || u.email)}</strong><br><span class="muted">${esc(u.email)}</span></p>
+        <p style="margin:0;"><strong class="strong-name">${esc(u.name || u.email)}</strong><br><span class="muted">${esc(u.email)}</span></p>
         <div class="role-badges">${badges}</div>
         ${storeBit}
         <div class="ov-links">
+          <a class="btn btn-primary" href="#settings">Account settings</a>
           ${u.is_staff ? `<a class="btn btn-primary" href="/admin">Open Command Hub →</a>` : ""}
           <a class="btn btn-ghost" href="/">Marketplace</a>
           <a class="btn btn-ghost" href="/stores">Browse stores</a>
@@ -239,6 +286,231 @@
       });
     }
 
+    /* ---------------- 2. Settings ---------------- */
+    async function loadSettings() {
+      const p = $("panel-settings");
+      const canChangePassword = Boolean(USER && USER.has_password);
+      const pendingEmail = USER && USER.pending_email ? String(USER.pending_email) : "";
+      p.innerHTML = `
+        <div class="sec-title">Account Settings</div>
+        <div class="settings-grid">
+          <section class="settings-card">
+            <h4>Profile</h4>
+            <div class="field"><span>Display name</span><input id="profileName" maxlength="120" value="${esc(USER.name || "")}" /></div>
+            <div class="field"><span>Email</span><input value="${esc(USER.email || "")}" readonly /></div>
+            <label class="setting-row"><input id="profileMarketing" type="checkbox" ${USER.marketing_opt_in ? "checked" : ""}/> <span>Send me product updates and occasional marketplace news</span></label>
+            <div class="setting-row">
+              <button id="saveProfileBtn" class="btn btn-primary btn-sm" type="button">Save profile</button>
+              <span id="profileStatus" class="form-status"></span>
+            </div>
+          </section>
+          <section class="settings-card">
+            <h4>Email</h4>
+            <p class="setting-note">Change your login email. We verify the new address before switching it.</p>
+            ${pendingEmail ? `<p class="setting-note">Pending verification: <strong>${esc(pendingEmail)}</strong></p>` : ""}
+            <div class="field"><span>New email</span><input id="emailNew" type="email" maxlength="160" placeholder="you@example.com" /></div>
+            ${canChangePassword ? `<div class="field"><span>Current password</span><input id="emailPw" type="password" autocomplete="current-password" /></div>` : ""}
+            <div class="setting-row">
+              <button id="emailRequestBtn" class="btn btn-primary btn-sm" type="button">Send verification link</button>
+              ${pendingEmail ? `<button id="emailResendBtn" class="btn btn-ghost btn-sm" type="button">Resend</button>` : ""}
+              <span id="emailStatus" class="form-status"></span>
+            </div>
+          </section>
+          <section class="settings-card">
+            <h4>Security</h4>
+            ${canChangePassword ? `
+              <div class="field"><span>Current password</span><input id="pwCurrent" type="password" autocomplete="current-password" /></div>
+              <div class="field"><span>New password</span><input id="pwNew" type="password" minlength="8" autocomplete="new-password" /></div>
+              <div class="field"><span>Confirm new password</span><input id="pwConfirm" type="password" minlength="8" autocomplete="new-password" /></div>
+              <div class="setting-row">
+                <button id="savePwBtn" class="btn btn-primary btn-sm" type="button">Update password</button>
+                <span id="pwStatus" class="form-status"></span>
+              </div>`
+              : `<p class="setting-note">You signed up with Google. Password management is not available for this account yet.</p>`}
+            <div class="setting-row">
+              <button id="logoutAllBtn" class="btn btn-ghost btn-sm" type="button">Log out from all devices</button>
+            </div>
+          </section>
+          <section class="settings-card">
+            <h4>Active sessions</h4>
+            <p class="setting-note">Review where your account is signed in and revoke old sessions.</p>
+            <div id="sessionsBox" class="empty-sm">Loading sessions…</div>
+            <div class="setting-row">
+              <button id="sessionsRefreshBtn" class="btn btn-ghost btn-sm" type="button">Refresh sessions</button>
+            </div>
+          </section>
+        </div>
+        <section class="danger-box">
+          <h4>Danger Zone</h4>
+          <p class="setting-note">This will close your account, remove your login access, and sign you out everywhere.</p>
+          <div class="field"><span>Type DEACTIVATE to confirm</span><input id="deactivateConfirm" placeholder="DEACTIVATE" /></div>
+          ${canChangePassword ? `<div class="field"><span>Current password</span><input id="deactivatePassword" type="password" autocomplete="current-password" /></div>` : ""}
+          <div class="setting-row">
+            <button id="deactivateBtn" class="btn btn-danger btn-sm" type="button">Deactivate account</button>
+            <span id="deactivateStatus" class="form-status"></span>
+          </div>
+        </section>`;
+
+      $("saveProfileBtn").addEventListener("click", async () => {
+        const status = $("profileStatus");
+        const payload = {
+          name: $("profileName").value.trim(),
+          marketing_opt_in: Boolean($("profileMarketing").checked),
+        };
+        if (!payload.name || payload.name.length < 2) {
+          status.className = "form-status error";
+          status.textContent = "Name must be at least 2 characters.";
+          return;
+        }
+        status.className = "form-status";
+        status.textContent = "Saving…";
+        try {
+          USER = await api("/api/auth/profile", { method: "PATCH", body: JSON.stringify(payload) });
+          $("acctSub").textContent = `Signed in as ${USER.email}`;
+          status.className = "form-status ok";
+          status.textContent = "Profile updated.";
+          toast("Profile saved.");
+        } catch (e) {
+          status.className = "form-status error";
+          status.textContent = e.message;
+        }
+      });
+
+      $("emailRequestBtn").addEventListener("click", async () => {
+        const status = $("emailStatus");
+        const new_email = $("emailNew").value.trim().toLowerCase();
+        const password = canChangePassword ? $("emailPw").value : "";
+        status.className = "form-status";
+        status.textContent = "Sending verification…";
+        try {
+          const r = await api("/api/auth/change-email/request", { method: "POST", body: JSON.stringify({ new_email, password }) });
+          USER.pending_email = r.pending_email;
+          status.className = "form-status ok";
+          status.textContent = "Verification email sent. Confirm the link to finish.";
+          toast("Check your inbox to verify the new email.");
+          loadSettings();
+        } catch (e) {
+          status.className = "form-status error";
+          status.textContent = e.message;
+        }
+      });
+
+      const emailResendBtn = $("emailResendBtn");
+      if (emailResendBtn) {
+        emailResendBtn.addEventListener("click", async () => {
+          const status = $("emailStatus");
+          status.className = "form-status";
+          status.textContent = "Resending…";
+          try {
+            await api("/api/auth/resend-verification", { method: "POST" });
+            status.className = "form-status ok";
+            status.textContent = "Verification email resent.";
+            toast("Verification email resent.");
+          } catch (e) {
+            status.className = "form-status error";
+            status.textContent = e.message;
+          }
+        });
+      }
+
+      if (canChangePassword) {
+        $("savePwBtn").addEventListener("click", async () => {
+          const status = $("pwStatus");
+          const current_password = $("pwCurrent").value;
+          const new_password = $("pwNew").value;
+          const confirm_password = $("pwConfirm").value;
+          if (new_password.length < 8) {
+            status.className = "form-status error";
+            status.textContent = "New password must be at least 8 characters.";
+            return;
+          }
+          if (new_password !== confirm_password) {
+            status.className = "form-status error";
+            status.textContent = "New passwords do not match.";
+            return;
+          }
+          status.className = "form-status";
+          status.textContent = "Updating…";
+          try {
+            await api("/api/auth/change-password", { method: "POST", body: JSON.stringify({ current_password, new_password }) });
+            $("pwCurrent").value = "";
+            $("pwNew").value = "";
+            $("pwConfirm").value = "";
+            status.className = "form-status ok";
+            status.textContent = "Password updated.";
+            toast("Password updated.");
+          } catch (e) {
+            status.className = "form-status error";
+            status.textContent = e.message;
+          }
+        });
+      }
+
+      async function refreshSessions() {
+        const box = $("sessionsBox");
+        box.innerHTML = `<div class="empty-sm">Loading sessions…</div>`;
+        try {
+          const d = await api("/api/auth/sessions");
+          const sessions = rowsOf(d, "sessions");
+          if (!sessions.length) {
+            box.innerHTML = `<div class="empty-sm">No active sessions found.</div>`;
+            return;
+          }
+          const rows = sessions.map((s) => `<tr>
+            <td>${s.current ? "<strong>This device</strong>" : "Other session"}</td>
+            <td>${relDate(s.created_at)}</td>
+            <td>${relDate(s.expires_at)}</td>
+            <td><button class="btn btn-ghost btn-sm" data-revoke-session="${esc(s.id)}" type="button">${s.current ? "Log out" : "Revoke"}</button></td>
+          </tr>`).join("");
+          box.innerHTML = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Session</th><th>Signed in</th><th>Expires</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+          box.querySelectorAll("[data-revoke-session]").forEach((b) => b.addEventListener("click", async () => {
+            const sid = b.getAttribute("data-revoke-session");
+            if (!sid) return;
+            try {
+              const out = await api(`/api/auth/sessions/${encodeURIComponent(sid)}`, { method: "DELETE" });
+              if (out.was_current) {
+                location.href = "/login";
+                return;
+              }
+              toast("Session revoked.");
+              refreshSessions();
+            } catch (e) {
+              toast(e.message);
+            }
+          }));
+        } catch (e) {
+          box.innerHTML = `<div class="empty-sm">Couldn’t load sessions. ${esc(e.message)}</div>`;
+        }
+      }
+      $("sessionsRefreshBtn").addEventListener("click", refreshSessions);
+      refreshSessions();
+
+      $("logoutAllBtn").addEventListener("click", async () => {
+        if (!confirm("Log out from all devices now?")) return;
+        try {
+          await api("/api/auth/logout-all", { method: "POST" });
+          location.href = "/login";
+        } catch (e) {
+          toast(e.message);
+        }
+      });
+
+      $("deactivateBtn").addEventListener("click", async () => {
+        const status = $("deactivateStatus");
+        const confirm_text = $("deactivateConfirm").value.trim();
+        const password = canChangePassword ? $("deactivatePassword").value : "";
+        status.className = "form-status";
+        status.textContent = "Closing account…";
+        try {
+          await api("/api/auth/deactivate", { method: "POST", body: JSON.stringify({ confirm_text, password }) });
+          location.href = "/login";
+        } catch (e) {
+          status.className = "form-status error";
+          status.textContent = e.message;
+        }
+      });
+    }
+
     /* ---------------- 2. Notifications ---------------- */
     async function loadNotifications() {
       const p = $("panel-notifications");
@@ -248,7 +520,7 @@
         const unread = !(n.read ?? n.is_read ?? n.read_at);
         return `<div class="nrow ${unread ? "unread" : ""}" data-nid="${esc(n.id)}" data-link="${esc(n.link || "")}" data-unread="${unread ? 1 : 0}">
           <span class="ndot"></span>
-          <div style="min-width:0;">
+          <div class="notif-main">
             <div class="n-title">${esc(n.title || "Notification")}</div>
             ${n.body ? `<div class="n-body">${esc(n.body)}</div>` : ""}
           </div>
@@ -281,14 +553,14 @@
       const items = rowsOf(await api("/api/watch/mine"), "items");
       const cards = items.length ? items.map((l) => `
         <div class="wcard">
-          <a href="/listing/${encodeURIComponent(l.id)}" style="color:inherit;text-decoration:none;">
-            <div class="wimg">${l.image_url ? `<img src="${esc(l.image_url)}" alt="${esc(l.title)}" loading="lazy" />` : `<span class="muted" style="font-size:26px;">⚔</span>`}</div>
+          <a href="/listing/${encodeURIComponent(l.id)}" class="clean-link">
+            <div class="wimg">${l.image_url ? `<img src="${esc(l.image_url)}" alt="${esc(l.title)}" loading="lazy" />` : `<span class="muted w-placeholder">⚔</span>`}</div>
             <div class="wbody">
               <div class="wtitle">${esc(l.title)}</div>
               <div>${chip(l.status)}</div>
             </div>
           </a>
-          <div class="wfoot" style="padding:0 11px 11px;">
+          <div class="wfoot w-foot-pad">
             <span class="wprice">${money(l.price)}</span>
             <button class="btn btn-ghost btn-sm" data-unwatch="${esc(l.id)}" type="button">✕ Unwatch</button>
           </div>
@@ -365,11 +637,11 @@
         </tr>
         <tr id="fbrow-${esc(o.id)}" hidden><td colspan="5">
           <div class="inline-form">
-            <span class="muted" style="font-size:13px;">Rate this order:</span>
+            <span class="muted muted-sm-inline">Rate this order:</span>
             <select id="fbstars-${esc(o.id)}">
               <option value="5">★★★★★ (5)</option><option value="4">★★★★ (4)</option><option value="3">★★★ (3)</option><option value="2">★★ (2)</option><option value="1">★ (1)</option>
             </select>
-            <input id="fbcomment-${esc(o.id)}" placeholder="Optional comment…" style="flex:1;min-width:180px;" maxlength="500" />
+            <input id="fbcomment-${esc(o.id)}" placeholder="Optional comment…" maxlength="500" style="flex:1;min-width:180px;" />
             <button class="btn btn-primary btn-sm" data-fbsend="${esc(o.id)}" type="button">Submit</button>
           </div>
         </td></tr>`;
@@ -506,9 +778,9 @@
       p.innerHTML = `<div class="empty-sm">Loading…</div>`;
       const wants = rowsOf(await api("/api/social/wants?mine=true"), "wants");
       const rows = wants.length ? wants.map((w) => `<tr>
-          <td><strong>${esc(w.description)}</strong>${w.category ? `<br><span class="muted" style="font-size:12px;">${esc(w.category)}</span>` : ""}</td>
+          <td><strong>${esc(w.description)}</strong>${w.category ? `<br><span class="muted muted-xs-inline">${esc(w.category)}</span>` : ""}</td>
           <td>${w.max_price != null ? "up to " + money(w.max_price) : "—"}</td>
-          <td><span class="muted" style="font-size:12px;">${relDate(w.created_at)}</span></td>
+          <td><span class="muted muted-xs-inline">${relDate(w.created_at)}</span></td>
           <td><button class="btn btn-ghost btn-sm" data-del-want="${esc(w.id)}" type="button">Delete</button></td>
         </tr>`).join("") : "";
       p.innerHTML = `
@@ -516,10 +788,10 @@
         ${wants.length
           ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Looking for</th><th>Max price</th><th>Posted</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
           : `<div class="empty-sm">No wants posted. Tell the realm what you seek and sellers will come to you.</div>`}
-        <div class="inline-form" style="margin-top:16px;">
-          <input id="wantDesc" placeholder="What are you hunting for? e.g. PSA 9 Base Set Blastoise" style="flex:2;min-width:220px;" maxlength="300" />
-          <input id="wantCat" placeholder="Category (optional)" style="flex:1;min-width:130px;" maxlength="60" />
-          <input id="wantMax" type="number" min="0" step="0.01" placeholder="Max $ (optional)" style="width:140px;" />
+        <div class="inline-form inline-form-top">
+          <input id="wantDesc" class="want-desc" placeholder="What are you hunting for? e.g. PSA 9 Base Set Blastoise" maxlength="300" />
+          <input id="wantCat" class="want-cat" placeholder="Category (optional)" maxlength="60" />
+          <input id="wantMax" class="want-max" type="number" min="0" step="0.01" placeholder="Max $ (optional)" />
           <button id="wantAdd" class="btn btn-primary btn-sm" type="button">Post want</button>
         </div>`;
       p.querySelectorAll("[data-del-want]").forEach((b) => b.addEventListener("click", async () => {
@@ -556,14 +828,14 @@
 
       const listingRows = listings.map((l) => {
         const thumb = (l.thumb_url || l.image_url)
-          ? `<img src="${esc(l.thumb_url || l.image_url)}" alt="" style="width:38px;height:38px;object-fit:cover;border-radius:6px;" />`
-          : `<span style="width:38px;height:38px;display:inline-block;border-radius:6px;background:var(--bg-2,#0c111a);"></span>`;
+          ? `<img src="${esc(l.thumb_url || l.image_url)}" alt="" class="thumb-sm" />`
+          : `<span class="thumb-sm-empty"></span>`;
         const enhanced = l.image_enhanced ? ` <span class="badge grade">✨ enhanced</span>` : "";
         const enhBtn = (l.image_url)
           ? `<button class="btn btn-ghost btn-sm" data-enh="${esc(l.id)}" type="button">✨ Enhance photo</button>`
           : `<span class="empty-sm">Add a photo to enhance</span>`;
         return `<tr>
-          <td style="display:flex;align-items:center;gap:8px;">${thumb}<span>${esc(l.title)}</span>${enhanced}</td>
+          <td class="title-thumb-row">${thumb}<span>${esc(l.title)}</span>${enhanced}</td>
           <td>${money(l.price)}</td>
           <td>${chip(l.status)}</td>
           <td>${enhBtn}</td>
@@ -593,7 +865,7 @@
         const shippable = st === "paid" || st === "pending";
         const shipForm = shippable ? `
           <div class="inline-form">
-            <input id="trk-${esc(o.id)}" placeholder="Tracking number" style="flex:1;min-width:160px;" maxlength="80" />
+            <input id="trk-${esc(o.id)}" class="track-input" placeholder="Tracking number" maxlength="80" />
             <select id="car-${esc(o.id)}">
               <option value="usps">USPS</option><option value="ups">UPS</option><option value="fedex">FedEx</option><option value="dhl">DHL</option><option value="other">Other</option>
             </select>
@@ -662,6 +934,7 @@
 
     const LOADERS = {
       overview: loadOverview,
+      settings: loadSettings,
       notifications: loadNotifications,
       watchlist: loadWatchlist,
       offers: loadOffers,

@@ -5,7 +5,7 @@ const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&":
 const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const RIDE_ID = decodeURIComponent(location.pathname.split("/ride/")[1] || "").replace(/\/$/, "");
 const PHASES = ["lobby", "showcase", "bidding", "cooldown"];
-const CREST = `<svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" style="width:60%;opacity:.3"><g fill="#7fa8c9"><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g></svg>`;
+const CREST = `<svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="#7fa8c9"><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g></svg>`;
 
 let toastTimer, localLeft = null, timerInt = null, lastState = null;
 function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2600); }
@@ -15,6 +15,22 @@ async function api(p, o = {}) {
   let d = null; try { d = await r.json(); } catch (_) {}
   if (!r.ok) throw new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`);
   return d;
+}
+
+function crestDataUri() {
+  return `data:image/svg+xml;utf8,${encodeURIComponent(CREST)}`;
+}
+
+function setCardImage(url) {
+  const img = $("cardImg");
+  if (!img) return;
+  const src = url || crestDataUri();
+  img.src = src;
+  img.style.objectFit = url ? "contain" : "contain";
+  img.onerror = () => {
+    img.onerror = null;
+    img.src = crestDataUri();
+  };
 }
 
 function renderTrack(state) {
@@ -34,12 +50,12 @@ function applyState(s) {
   // card
   const l = s.listing;
   if (l) {
-    $("cardImg").src = l.image_url || "";
-    if (!l.image_url) $("cardImg").outerHTML = `<div class="cardimg" style="display:grid;place-items:center">${CREST}</div>`;
+    setCardImage(l.image_url || "");
     $("cardTitle").textContent = l.title;
     const grade = l.grading_company ? `${l.grading_company} ${l.grade}` : (l.condition || "");
     $("cardSub").textContent = [l.category, grade].filter(Boolean).join(" · ");
   } else {
+    setCardImage("");
     $("cardTitle").textContent = s.title;
   }
   $("marketPrice").textContent = money(s.market_price);

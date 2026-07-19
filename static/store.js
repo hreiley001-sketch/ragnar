@@ -19,6 +19,12 @@ const accentGrad = (c) => `linear-gradient(135deg, ${c || "#6f93b4"}44, #0a0d12)
 const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="#7fa8c9"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
 
 let STORE = null;
+let DESIGN_PRESET = "";
+
+const PRESET_HINTS = {
+  whatnot: "Preset: Whatnot-style live seller. Prioritize high-energy live-break language, stream-first CTAs, bold accent contrast, and urgency for drops.",
+  ebay: "Preset: eBay-style catalog seller. Prioritize trust signals, clean catalog readability, collector confidence tone, and stable buy-now browsing.",
+};
 
 function loadFont(family) {
   if (!family) return;
@@ -99,9 +105,11 @@ function listingCard(l) {
     : CREST;
   const sold = l.status === "sold";
   return `<article class="listing">
-    <div class="listing-img"><div class="listing-badges">${badges.join("")}${sold ? '<span class="badge">SOLD</span>' : ""}</div>${img}</div>
+    <a class="listing-link" href="/listing/${l.id}">
+      <div class="listing-img"><div class="listing-badges">${badges.join("")}${sold ? '<span class="badge">SOLD</span>' : ""}</div>${img}</div>
+    </a>
     <div class="listing-body">
-      <div class="listing-title">${esc(l.title)}</div>${sub ? `<div class="listing-sub">${sub}</div>` : ""}
+      <a class="listing-title store-listing-link" href="/listing/${l.id}">${esc(l.title)}</a>${sub ? `<div class="listing-sub">${sub}</div>` : ""}
       <div class="listing-spacer"></div>
       <div class="listing-foot">
         <span class="listing-price">${money(l.price)}</span>
@@ -133,7 +141,9 @@ async function loadListings() {
     $("listCount").textContent = `${items.filter((i) => i.status === "active").length} listings`;
     $("grid").innerHTML = items.length ? items.map(listingCard).join("") : `<div class="empty">This store has no listings yet.</div>`;
     $("grid").querySelectorAll("[data-buy]").forEach((b) => b.addEventListener("click", () => buyListing(b.getAttribute("data-buy"))));
-  } catch (_) { $("grid").innerHTML = `<div class="empty">Could not load listings.</div>`; }
+  } catch (err) {
+    $("grid").innerHTML = `<div class="empty">Could not load listings: ${esc(err.message || "Unknown error")}.</div>`;
+  }
 }
 
 async function saveStore() {
@@ -174,7 +184,9 @@ async function runDesigner() {
   const thinking = addDesignMsg("Designing…", "ai");
   try {
     const current = { accent_color: $("c-accent").value, tagline: $("c-tagline").value, bio: $("c-bio").value, font_family: $("c-font").value };
-    const r = await api("/api/ai/design", { method: "POST", body: JSON.stringify({ prompt, current }) });
+    const presetHint = PRESET_HINTS[DESIGN_PRESET] || "";
+    const mergedPrompt = presetHint ? `${presetHint}\nUser request: ${prompt}` : prompt;
+    const r = await api("/api/ai/design", { method: "POST", body: JSON.stringify({ prompt: mergedPrompt, current }) });
     if (r.accent_color) $("c-accent").value = r.accent_color;
     if (r.tagline) $("c-tagline").value = r.tagline;
     if (r.bio) $("c-bio").value = r.bio;
@@ -188,6 +200,16 @@ async function runDesigner() {
     thinking.remove();
     addDesignMsg("Design failed: " + esc(e.message), "ai");
   }
+}
+
+function pickPreset(e) {
+  const btn = e.target.closest("[data-preset]");
+  if (!btn) return;
+  DESIGN_PRESET = btn.getAttribute("data-preset") || "";
+  document.querySelectorAll("#designPresetRow [data-preset]").forEach((el) => {
+    el.classList.toggle("active", el === btn);
+  });
+  addDesignMsg(`Preset selected: ${DESIGN_PRESET === "whatnot" ? "Whatnot-style live seller" : "eBay-style catalog seller"}.`, "ai");
 }
 
 async function loadSocial() {
@@ -211,6 +233,7 @@ async function loadSocial() {
         if ((mine.items || []).some((s) => s.handle === HANDLE)) {
           $("followBtn").textContent = "❤ Following";
           $("followBtn").classList.add("btn-primary");
+          $("followBtn").setAttribute("aria-pressed", "true");
         }
       } catch (_) {}
     } else {
@@ -224,6 +247,7 @@ async function toggleFollow() {
     const r = await api("/api/social/follow", { method: "POST", body: JSON.stringify({ handle: HANDLE }) });
     $("followBtn").textContent = r.following ? "❤ Following" : "♡ Follow";
     $("followBtn").classList.toggle("btn-primary", r.following);
+    $("followBtn").setAttribute("aria-pressed", r.following ? "true" : "false");
     $("followerCount").textContent = `${r.followers} follower${r.followers === 1 ? "" : "s"}`;
     toast(r.following ? "Following this store — you'll get drop alerts." : "Unfollowed.");
   } catch (e) {
@@ -250,18 +274,29 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadLive();
   loadSocial();
   loadFontOptions();
+  $("followBtn").setAttribute("aria-pressed", "false");
   $("followBtn").addEventListener("click", toggleFollow);
   $("msgSend").addEventListener("click", sendStoreMessage);
   $("c-font").addEventListener("change", (e) => applyFont(e.target.value));
 
-  $("customizeBtn").addEventListener("click", () => {
+    $("customizeBtn").addEventListener("click", () => {
     const p = $("customizePanel"); p.hidden = !p.hidden;
     const saved = localStorage.getItem(TOKEN_KEY); if (saved) $("storeToken").value = saved;
     if (!p.hidden && !$("designFeed").children.length) {
       addDesignMsg("Hi! Describe the vibe you want and I'll design your store — colors, tagline, and bio. Try “dark and premium for vintage Pokémon” or “bright, fun, sports cards”.", "ai");
     }
   });
+
+    const savedToken = localStorage.getItem(TOKEN_KEY);
+    if (savedToken) {
+      $("storeToken").value = savedToken;
+      $("customizePanel").hidden = false;
+      if (!$("designFeed").children.length) {
+        addDesignMsg("Welcome back. Describe your next design change and I will draft it instantly.", "ai");
+      }
+    }
   $("saveStoreBtn").addEventListener("click", saveStore);
   $("designSend").addEventListener("click", runDesigner);
   $("designPrompt").addEventListener("keydown", (e) => { if (e.key === "Enter") runDesigner(); });
+  $("designPresetRow").addEventListener("click", pickPreset);
 });

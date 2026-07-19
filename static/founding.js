@@ -17,7 +17,10 @@ async function loadStatus() {
     $("claimed").textContent = s.claimed;
     $("cap").textContent = s.cap;
     if (s.remaining <= 0) $("counter").innerHTML = "Founding roster full — join the waitlist";
-  } catch (_) {}
+  } catch (err) {
+    $("counter").textContent = "Founding status unavailable right now";
+    toast(err.message || "Could not load Founding status.");
+  }
 }
 
 // Hydrate staff-editable landing copy (set in Command Hub → Site).
@@ -30,7 +33,9 @@ async function loadSiteCopy() {
       if (c[`perk${i}_title`] && $(`perk${i}Title`)) $(`perk${i}Title`).textContent = c[`perk${i}_title`];
       if (c[`perk${i}_desc`] && $(`perk${i}Desc`)) $(`perk${i}Desc`).textContent = c[`perk${i}_desc`];
     }
-  } catch (_) {}
+  } catch (err) {
+    toast(err.message || "Could not load landing copy.");
+  }
 }
 
 async function submitApplication(e) {

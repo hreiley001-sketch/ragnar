@@ -97,7 +97,7 @@
   </header>
 
   <main class="item-wrap">
-    <div id="pageState" class="card state-card"><p class="muted">Summoning the listing…</p></div>
+    <div id="pageState" class="card state-card" aria-live="polite"><p class="muted">Summoning the listing…</p></div>
 
     <div id="itemGrid" class="item-grid" hidden>
       <div class="card item-photo">
@@ -106,7 +106,7 @@
       <div class="item-main" id="itemMain"></div>
     </div>
 
-    <div id="historyWrap" hidden></div>
+    <div id="historyWrap" hidden aria-live="polite"></div>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>

@@ -6,9 +6,11 @@ facet (category, set, condition, grading company, grade floor, price band).
 """
 from __future__ import annotations
 
+import csv
+import io
 import math
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy import func
 from sqlmodel import Session, or_, select
 
@@ -29,11 +31,7 @@ from ..services import record_sale
 router = APIRouter(prefix="/api/listings", tags=["listings"])
 
 
-@router.post("", response_model=ListingRead, status_code=status.HTTP_201_CREATED)
-def create_listing(
-    payload: ListingCreate,
-    session: Session = Depends(get_session),
-) -> ListingRead:
+def _persist_listing(payload: ListingCreate, session: Session) -> ListingRead:
     # Resolve the seller: a known handle is the source of truth for Founding
     # status, so it can't be spoofed via the request body.
     seller_id = None
@@ -104,6 +102,94 @@ def create_listing(
         pass
 
     return ListingRead.from_listing(listing)
+
+
+@router.post("", response_model=ListingRead, status_code=status.HTTP_201_CREATED)
+def create_listing(
+    payload: ListingCreate,
+    session: Session = Depends(get_session),
+) -> ListingRead:
+    return _persist_listing(payload, session)
+
+
+def _row_to_payload(row: dict[str, str]) -> dict:
+    def _v(name: str) -> str | None:
+        val = (row.get(name) or "").strip()
+        return val or None
+
+    def _b(name: str, default: bool = False) -> bool:
+        raw = _v(name)
+        if raw is None:
+            return default
+        return raw.lower() in {"1", "true", "yes", "on"}
+
+    payload: dict = {
+        "title": _v("title"),
+        "category": _v("category"),
+        "set_name": _v("set_name"),
+        "card_number": _v("card_number"),
+        "player_or_character": _v("player_or_character"),
+        "year": int(_v("year")) if _v("year") else None,
+        "is_graded": _b("is_graded", False),
+        "condition": _v("condition"),
+        "grading_company": _v("grading_company"),
+        "grade": float(_v("grade")) if _v("grade") else None,
+        "price": float(_v("price")) if _v("price") else None,
+        "shipping": float(_v("shipping")) if _v("shipping") else 0,
+        "quantity": int(_v("quantity")) if _v("quantity") else 1,
+        "image_url": _v("image_url"),
+        "description": _v("description"),
+        "seller_name": _v("seller_name"),
+        "seller_handle": _v("seller_handle"),
+        "is_founding_seller": _b("is_founding_seller", False),
+    }
+    return payload
+
+
+@router.post("/import/csv")
+async def import_listings_csv(
+    file: UploadFile = File(..., description="CSV file of listing rows"),
+    dry_run: bool = Query(False, description="Validate rows without creating listings"),
+    stop_on_error: bool = Query(False, description="Abort import when any row fails validation"),
+    session: Session = Depends(get_session),
+) -> dict:
+    if not (file.filename or "").lower().endswith(".csv"):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Upload a .csv file.")
+
+    raw = await file.read()
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="CSV must be UTF-8 encoded.") from exc
+
+    reader = csv.DictReader(io.StringIO(text))
+    if not reader.fieldnames:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="CSV must include a header row.")
+
+    created: list[int] = []
+    errors: list[dict] = []
+
+    for idx, row in enumerate(reader, start=2):
+        try:
+            payload = ListingCreate(**_row_to_payload(row))
+            if dry_run:
+                continue
+            listing = _persist_listing(payload, session)
+            created.append(listing.id)
+        except Exception as exc:  # noqa: BLE001
+            errors.append({"row": idx, "error": str(exc)})
+            if stop_on_error and not dry_run:
+                break
+
+    return {
+        "status": "ok" if not errors else "partial",
+        "dry_run": dry_run,
+        "created_count": len(created),
+        "created_ids": created,
+        "error_count": len(errors),
+        "errors": errors,
+        "required_columns": ["title", "category", "price", "seller_name or seller_handle"],
+    }
 
 
 @router.post("/{listing_id}/sell")

@@ -97,7 +97,7 @@ function renderMain(l) {
     <div class="views">👁 ${Number(l.view_count || 0).toLocaleString()} views${!sold && l.quantity > 1 ? ` · ${Number(l.quantity)} available` : ""}</div>
     <div class="action-row">
       <button id="buyBtn" class="btn btn-primary" type="button" ${sold ? "disabled" : ""}>Buy now</button>
-      <button id="watchBtn" class="btn btn-ghost" type="button">♡ Watch</button>
+      <button id="watchBtn" class="btn btn-ghost" type="button" aria-pressed="false">♡ Watch</button>
       <button id="shareBtn" class="btn btn-ghost" type="button">⤴ Share</button>
     </div>
     <div id="authNote" class="form-status auth-note"></div>
@@ -134,7 +134,10 @@ async function buy(offerId) {
 /* ---------- Watch ---------- */
 function paintWatch() {
   const b = $("watchBtn");
-  if (b) b.textContent = watching ? "❤ Watching" : "♡ Watch";
+  if (b) {
+    b.textContent = watching ? "❤ Watching" : "♡ Watch";
+    b.setAttribute("aria-pressed", watching ? "true" : "false");
+  }
 }
 async function initWatch() {
   try { const st = await api(`/api/watch/status?ids=${encodeURIComponent(ID)}`); watching = !!(st && st[ID]); paintWatch(); } catch (_) {}
@@ -279,8 +282,16 @@ async function loadHistory(l) {
   params.set("graded", l.is_graded ? "true" : "false");
   if (l.is_graded && l.grading_company) params.set("grading_company", l.grading_company);
   if (l.is_graded && l.grade != null) params.set("grade", l.grade);
-  try { renderHistory(await api(`/api/sales/history?${params.toString()}`)); }
-  catch (_) { /* comps unavailable — leave the section hidden */ }
+  try {
+    renderHistory(await api(`/api/sales/history?${params.toString()}`));
+  } catch (err) {
+    const wrap = $("historyWrap");
+    wrap.innerHTML = `<div class="card history-card">
+      <div class="history-head"><span>Sold history</span></div>
+      <p class="muted" style="margin:0;">Sold history is temporarily unavailable: ${esc(err.message || "Unknown error")}.</p>
+    </div>`;
+    wrap.hidden = false;
+  }
 }
 
 /* ---------- Boot ---------- */
