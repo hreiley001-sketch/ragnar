@@ -74,10 +74,14 @@
       encodeURIComponent(family).replace(/%20/g, "+") + ":wght@400;600;700&display=swap";
     document.head.appendChild(l);
   }
-  function lighten(hex, amt) {
+  function shade(hex, amt) {
+    // Lightens dark colors and darkens light ones, so --bg-2 always has gentle
+    // contrast against --bg whether the theme is light or dark.
     const m = /^#([0-9a-fA-F]{6})$/.exec(hex || ""); if (!m) return hex;
     const n = parseInt(m[1], 16);
-    const r = Math.min(255, (n >> 16) + amt), g = Math.min(255, ((n >> 8) & 255) + amt), b = Math.min(255, (n & 255) + amt);
+    let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    const d = (r + g + b) > 384 ? -amt : amt;
+    r = Math.max(0, Math.min(255, r + d)); g = Math.max(0, Math.min(255, g + d)); b = Math.max(0, Math.min(255, b + d));
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
   function applyTheme(c) {
@@ -85,7 +89,7 @@
     const s = document.documentElement.style;
     if (c.theme_accent) { s.setProperty("--ice", c.theme_accent); s.setProperty("--ice-strong", c.theme_accent); }
     if (c.theme_gold) s.setProperty("--gold", c.theme_gold);
-    if (c.theme_bg) { s.setProperty("--bg", c.theme_bg); s.setProperty("--bg-2", lighten(c.theme_bg, 10)); }
+    if (c.theme_bg) { s.setProperty("--bg", c.theme_bg); s.setProperty("--bg-2", shade(c.theme_bg, 12)); }
     if (c.theme_text) s.setProperty("--text", c.theme_text);
     if (c.theme_font) { loadWebFont(c.theme_font); document.body.style.fontFamily = "'" + c.theme_font + "', system-ui, sans-serif"; }
   }
