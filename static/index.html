@@ -35,11 +35,16 @@
     </div>
   </header>
 
-  <section class="hero">
-    <div class="hero-copy">
-      <h2>Snap it. Price it. <span class="accent">Keep more.</span></h2>
-      <p id="heroPitch" class="hero-pitch">Upload your own photo and RAGNAR auto-identifies the card and pulls its real sold-price history — so you list in seconds and price with confidence. A flat, honest fee, and 0% for our Founding 250.</p>
+  <section class="mkt-hero">
+    <h2>Find your <span class="accent">grail.</span></h2>
+    <p id="heroPitch" class="hero-pitch">Pokémon, sports, MTG, Yu-Gi-Oh & more — every listing with real sold-price history, so you buy with confidence.</p>
+    <div class="mkt-search">
+      <span class="mkt-ico">🔍</span>
+      <input id="heroSearch" type="search" placeholder="Search Charizard, Wembanyama, Black Lotus…" aria-label="Search cards" />
+      <button id="heroAiBtn" class="btn btn-ghost btn-round" type="button" title="Ask in plain English">✨ AI</button>
+      <button id="heroSearchBtn" class="btn btn-primary btn-round" type="button">Search</button>
     </div>
+    <div id="catChips" class="cat-chips"></div>
     <div class="hero-stats" id="heroStats"></div>
   </section>
 

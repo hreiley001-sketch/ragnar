@@ -212,7 +212,7 @@ async function loadListings() {
 function resetAndLoad() { state.page = 1; loadListings(); }
 
 function applyFilters(f) {
-  if (f.q !== undefined) $("f-q").value = f.q || "";
+  if (f.q !== undefined) { $("f-q").value = f.q || ""; const hs = $("heroSearch"); if (hs) hs.value = f.q || ""; }
   if (f.category) $("f-category").value = f.category;
   if (f.grading_company) $("f-grader").value = f.grading_company;
   if (f.condition) $("f-condition").value = f.condition;
@@ -222,7 +222,38 @@ function applyFilters(f) {
   if (f.max_price !== undefined) $("f-maxprice").value = f.max_price;
   if (f.sort) $("f-sort").value = f.sort;
   if (f.founding_only !== undefined) $("f-founding").checked = String(f.founding_only) === "true";
+  syncCatChips();
   resetAndLoad();
+}
+
+/* ---------------- category browse chips ---------------- */
+const CAT_EMOJI = [
+  [/pok/i, "⚡"], [/magic|mtg/i, "🔮"], [/yu-?gi/i, "🐉"], [/one piece/i, "🏴‍☠️"],
+  [/lorcana/i, "🏰"], [/basketball/i, "🏀"], [/baseball/i, "⚾"], [/football/i, "🏈"],
+  [/soccer|fifa/i, "⚽"], [/hockey/i, "🏒"], [/sport/i, "🏅"],
+];
+function catEmoji(c) { for (const [re, e] of CAT_EMOJI) if (re.test(c)) return e; return "🃏"; }
+function catLabel(c) {
+  if (c.includes("—")) return c.split("—").pop().trim();
+  if (c.includes(":")) return c.split(":")[0].trim();
+  return c;
+}
+function syncCatChips() {
+  const cur = $("f-category").value;
+  document.querySelectorAll("#catChips .cat-chip").forEach((b) => b.classList.toggle("active", b.dataset.cat === cur));
+}
+function buildCatChips() {
+  const box = $("catChips"); if (!box) return;
+  const mkChip = (val, label) => {
+    const b = document.createElement("button");
+    b.className = "cat-chip"; b.type = "button"; b.dataset.cat = val; b.textContent = label;
+    b.addEventListener("click", () => { $("f-category").value = val; syncCatChips(); resetAndLoad(); });
+    return b;
+  };
+  box.innerHTML = "";
+  box.appendChild(mkChip("", "🗂️ All"));
+  (META.categories || []).forEach((c) => box.appendChild(mkChip(c, `${catEmoji(c)} ${catLabel(c)}`)));
+  syncCatChips();
 }
 
 function hydrateFromUrl() {
@@ -542,19 +573,33 @@ async function init() {
   fillSelect($("form-condition"), META.conditions, false);
   fillSelect($("form-grader"), META.grading_companies, false);
 
+  buildCatChips();
   renderHero();
   renderIntegrations();
   refreshFoundingCounter();
 
+  // Marketplace hero search (mirrors the sidebar search).
+  const heroSearch = $("heroSearch");
+  if (heroSearch) {
+    const heroGo = () => { $("f-q").value = heroSearch.value; resetAndLoad(); };
+    heroSearch.addEventListener("input", debounce(heroGo, 350));
+    heroSearch.addEventListener("keydown", (e) => { if (e.key === "Enter") heroGo(); });
+    $("heroSearchBtn").addEventListener("click", heroGo);
+    $("heroAiBtn").addEventListener("click", () => { $("f-q").value = heroSearch.value; aiSearch(); });
+  }
+
   $("aiSearchBtn").addEventListener("click", aiSearch);
   $("f-q").addEventListener("input", debounce(resetAndLoad, 300));
+  $("f-q").addEventListener("input", () => { const hs = $("heroSearch"); if (hs) hs.value = $("f-q").value; });
+  $("f-category").addEventListener("change", syncCatChips);
   ["f-category", "f-condition", "f-grader", "f-graded", "f-mingrade", "f-sort"].forEach((id) => $(id).addEventListener("change", resetAndLoad));
   ["f-set", "f-minprice", "f-maxprice"].forEach((id) => $(id).addEventListener("input", debounce(resetAndLoad, 300)));
   $("f-founding").addEventListener("change", resetAndLoad);
   $("resetFilters").addEventListener("click", () => {
     ["f-q", "f-set", "f-minprice", "f-maxprice"].forEach((id) => ($(id).value = ""));
     ["f-category", "f-condition", "f-grader", "f-graded", "f-mingrade"].forEach((id) => ($(id).value = ""));
-    $("f-founding").checked = false; $("f-sort").value = "newest"; resetAndLoad();
+    const hs = $("heroSearch"); if (hs) hs.value = "";
+    $("f-founding").checked = false; $("f-sort").value = "newest"; syncCatChips(); resetAndLoad();
   });
 
   $("prevPage").addEventListener("click", () => { if (state.page > 1) { state.page--; loadListings(); } });
