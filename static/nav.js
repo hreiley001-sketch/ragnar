@@ -72,6 +72,20 @@
       acct.href = "/account";
       if (d.user.is_staff) hub.querySelector(".lbl").textContent = "Command Hub (staff)";
 
+      // "Verify your email" banner for unverified accounts (site-wide reminder).
+      if (d.user.email_verified === false && !sessionStorage.getItem("ragnar_hide_verify")) {
+        const bar = document.createElement("div");
+        bar.style.cssText = "position:sticky;top:0;z-index:79;background:linear-gradient(90deg,#8a6d1f,#b8901f);color:#0a0d12;font-size:13px;font-weight:600;padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;";
+        bar.innerHTML = '📬 Verify your email to unlock full access. <a href="#" id="navResend" style="color:#0a0d12;text-decoration:underline;">Resend link</a> <span id="navVdismiss" style="cursor:pointer;opacity:.7;">✕</span>';
+        document.body.insertBefore(bar, document.body.firstChild);
+        bar.querySelector("#navResend").addEventListener("click", async (e) => {
+          e.preventDefault();
+          try { const r = await fetch("/api/auth/resend-verification", { method: "POST" }).then((x) => x.json()); e.target.textContent = r.sent ? "Sent ✓" : "Email not set up"; }
+          catch (_) { e.target.textContent = "Try again later"; }
+        });
+        bar.querySelector("#navVdismiss").addEventListener("click", () => { sessionStorage.setItem("ragnar_hide_verify", "1"); bar.remove(); });
+      }
+
       const bell = document.createElement("a");
       bell.className = "nav-bell";
       bell.href = "/account#notifications";

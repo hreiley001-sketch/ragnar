@@ -369,6 +369,53 @@ async function genDesc() {
   } catch (e) { $("descOut").textContent = e.message; }
 }
 
+/* ---------- team / staff ---------- */
+async function loadTeam() {
+  try {
+    const p = new URLSearchParams();
+    const q = $("userSearch").value.trim(); if (q) p.set("q", q);
+    const d = await api(`/api/admin/users?${p.toString()}`);
+    $("usersBody").innerHTML = d.items.map((u) => `<tr>
+      <td>${esc(u.email)}</td><td>${esc(u.name || "—")}</td>
+      <td>${u.is_staff ? '<span class="pill gold">★ staff</span>' : "member"}</td>
+      <td>${u.email_verified ? '<span class="pill ok">verified</span>' : '<span class="pill warn">unverified</span>'}</td>
+      <td>${u.seller_handle ? esc(u.seller_handle) : "—"}</td>
+      <td>${fmtDate(u.created_at)}</td>
+      <td class="row-actions">
+        ${u.is_staff
+          ? `<button class="btn btn-sm" data-revoke="${esc(u.email)}">Revoke staff</button>`
+          : `<button class="btn btn-sm" data-grant="${esc(u.email)}">Make staff</button>`}
+      </td></tr>`).join("") || `<tr><td colspan="7" class="muted" style="padding:20px;text-align:center;">No users yet</td></tr>`;
+  } catch (e) { toast(e.message); }
+}
+
+async function setStaff(email, makeStaff) {
+  try {
+    await api("/api/admin/staff", { method: "POST", body: JSON.stringify({ email, make_staff: makeStaff }) });
+    toast(makeStaff ? `Granted staff to ${email}` : `Revoked staff from ${email}`);
+    loadTeam();
+  } catch (e) { toast(e.message); }
+}
+
+async function grantStaffFromInput() {
+  const email = $("staffEmail").value.trim();
+  const st = $("staffStatus"); st.className = "form-status";
+  if (!email) { st.className = "form-status error"; st.textContent = "Enter an email."; return; }
+  try {
+    const r = await api("/api/admin/staff", { method: "POST", body: JSON.stringify({ email, make_staff: true }) });
+    st.className = "form-status ok"; st.textContent = `${r.email} is now staff.`;
+    $("staffEmail").value = ""; loadTeam();
+  } catch (e) { st.className = "form-status error"; st.textContent = e.message; }
+}
+
+function teamAction(e) {
+  const t = e.target.closest("button"); if (!t) return;
+  const grant = t.getAttribute("data-grant");
+  const revoke = t.getAttribute("data-revoke");
+  if (grant) setStaff(grant, true);
+  else if (revoke) { if (confirm(`Revoke staff access from ${revoke}?`)) setStaff(revoke, false); }
+}
+
 /* ---------- tabs ---------- */
 function switchTab(name) {
   document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
@@ -381,6 +428,7 @@ function switchTab(name) {
   if (name === "orders") loadOrders();
   if (name === "disputes") loadDisputes();
   if (name === "rides") loadRides();
+  if (name === "team") loadTeam();
 }
 
 /* ---------- init ---------- */
@@ -402,6 +450,10 @@ document.addEventListener("DOMContentLoaded", () => {
   $("rideLaunchBtn").addEventListener("click", launchRide);
   $("nlBtn").addEventListener("click", nlSearch);
   $("descBtn").addEventListener("click", genDesc);
+  $("grantStaffBtn").addEventListener("click", grantStaffFromInput);
+  $("teamRefresh").addEventListener("click", loadTeam);
+  $("usersBody").addEventListener("click", teamAction);
+  $("userSearch").addEventListener("input", () => { clearTimeout(window._us); window._us = setTimeout(loadTeam, 300); });
 
   // Token login if stored; with no token this still lets a staff session (cookie) through.
   tryLogin(TOKEN).catch(() => { /* stale token or not signed in; show gate */ });

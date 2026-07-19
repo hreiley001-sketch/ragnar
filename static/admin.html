@@ -82,6 +82,7 @@
       <button class="tab" data-tab="orders">Orders</button>
       <button class="tab" data-tab="disputes">Disputes</button>
       <button class="tab" data-tab="rides">Rides</button>
+      <button class="tab" data-tab="team">Team</button>
       <button class="tab" data-tab="ai">AI Tools</button>
     </div>
 
@@ -150,6 +151,23 @@
         <button id="ridesRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
       </div>
       <div class="tbl-wrap"><table class="hub"><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Current bid</th><th>Viewers</th><th>Actions</th></tr></thead><tbody id="ridesBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-team" class="tab-panel" hidden>
+      <div class="panel-bar">
+        <h3>Team &amp; staff access</h3>
+        <button id="teamRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+      </div>
+      <div class="card" style="padding:14px;margin-bottom:14px;">
+        <p class="muted" style="margin-top:0;font-size:13px;">Staff can access this Command Hub. Verified <strong>@ragnarips.com</strong> signups become staff automatically — or grant/revoke here by email.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <input id="staffEmail" type="email" placeholder="teammate@ragnarips.com" style="max-width:280px;" />
+          <button id="grantStaffBtn" class="btn btn-primary btn-sm" type="button">Grant staff</button>
+        </div>
+        <p id="staffStatus" class="form-status"></p>
+      </div>
+      <div class="results-bar"><input id="userSearch" type="search" placeholder="Search users…" style="max-width:280px;" /></div>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Verified</th><th>Store</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
     </section>
 
     <section id="tab-ai" class="tab-panel" hidden>

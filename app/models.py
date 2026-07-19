@@ -76,8 +76,11 @@ class User(SQLModel, table=True):
     password_hash: Optional[str] = Field(default=None, max_length=255)  # null for Google-only
     google_sub: Optional[str] = Field(default=None, index=True, max_length=64)
     email_verified: bool = Field(default=False)
+    verify_token: Optional[str] = Field(default=None, index=True, max_length=64)
+    verify_sent_at: Optional[datetime] = Field(default=None)
     role: str = Field(default=UserRole.user.value, index=True)
     seller_handle: Optional[str] = Field(default=None, index=True, max_length=40)
+    marketing_opt_in: bool = Field(default=False)
     created_at: datetime = Field(default_factory=utcnow, index=True)
 
 

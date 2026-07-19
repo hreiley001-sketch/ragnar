@@ -163,6 +163,14 @@ def login_page():
     return {"error": "login UI not found"}
 
 
+@app.get("/verify", include_in_schema=False)
+def verify_page():
+    page = STATIC_DIR / "verify.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "verify UI not found"}
+
+
 @app.get("/account", include_in_schema=False)
 def account_page():
     page = STATIC_DIR / "account.html"

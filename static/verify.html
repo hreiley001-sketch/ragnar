@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Verify email</title>
+  <link rel="icon" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <style>.vwrap { max-width: 460px; margin: 12vh auto; padding: 30px; text-align: center; } .vwrap img { height: 60px; border-radius: 12px; background: #f6f9fc; padding: 8px 14px; }</style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <main>
+    <div class="card vwrap">
+      <a href="/"><img src="/static/logo.png" alt="RAGNAR" /></a>
+      <div id="state" style="margin-top:18px;">
+        <div style="font-size:38px;">⏳</div>
+        <h2 style="margin:8px 0;">Verifying…</h2>
+        <p class="muted" id="msg">Confirming your email.</p>
+      </div>
+    </div>
+  </main>
+  <div id="toast" class="toast"></div>
+  <script>
+    "use strict";
+    async function api(p, o) { const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json" } }); let d = null; try { d = await r.json(); } catch (_) {} if (!r.ok) throw new Error((d && d.detail) || "Verification failed"); return d; }
+    document.addEventListener("DOMContentLoaded", async () => {
+      const token = new URLSearchParams(location.search).get("token");
+      const state = document.getElementById("state");
+      if (!token) { state.innerHTML = '<div style="font-size:38px;">⚠️</div><h2>Missing link</h2><p class="muted">This verification link is incomplete.</p><a class="btn btn-primary" href="/login">Go to sign in</a>'; return; }
+      try {
+        const r = await api("/api/auth/verify", { method: "POST", body: JSON.stringify({ token }) });
+        if (r.promoted_to_staff) {
+          state.innerHTML = '<div style="font-size:38px;">🐺</div><h2>You\'re verified &amp; on the team!</h2><p class="muted">Your @ragnarips.com email is confirmed — the Command Hub is unlocked.</p><a class="btn btn-primary" href="/admin">Open Command Hub →</a>';
+        } else {
+          state.innerHTML = '<div style="font-size:38px;">✅</div><h2>Email verified!</h2><p class="muted">Your account is ready.</p><a class="btn btn-primary" href="/account">Go to my account →</a>';
+        }
+      } catch (e) {
+        state.innerHTML = '<div style="font-size:38px;">⚠️</div><h2>Couldn\'t verify</h2><p class="muted">' + (e.message || "Link invalid or expired") + '</p><a class="btn btn-ghost" href="/account">Go to account &amp; resend</a>';
+      }
+    });
+  </script>
+  <script src="/static/nav.js"></script>
+</body>
+</html>

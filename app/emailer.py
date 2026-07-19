@@ -58,6 +58,40 @@ def discord_alert(message: str) -> bool:
         return False
 
 
+def _brand_wrap(inner: str) -> str:
+    return (
+        '<div style="font-family:system-ui,Segoe UI,sans-serif;background:#0b1220;'
+        'color:#dfe8f2;padding:32px;border-radius:14px;max-width:520px;margin:0 auto;">'
+        '<h1 style="letter-spacing:.3em;color:#eaf3fb;margin:0 0 4px;">RAGNAR</h1>'
+        '<p style="color:#6c8199;font-size:12px;letter-spacing:.14em;text-transform:uppercase;'
+        'margin:0 0 22px;">ᚱᚨᚷᚾᚨᚱ · trading-card marketplace</p>'
+        f'{inner}'
+        '<p style="color:#6c8199;font-size:12px;margin-top:26px;">Guided by counsel, driven by conquest.</p>'
+        '</div>'
+    )
+
+
+def send_verification_email(to: str, name: str, link: str, *, is_staff_domain: bool = False) -> bool:
+    """Send the account verification email. Returns False if email isn't configured."""
+    greeting = f"Hi {name}," if name else "Welcome,"
+    perk = (
+        '<p style="color:#f0c674;">Because you\'re on the ragnarips.com team, verifying also '
+        'unlocks the <strong>Command Hub</strong>.</p>' if is_staff_domain else ''
+    )
+    inner = (
+        f'<p>{greeting}</p>'
+        '<p>Confirm your email to activate your RAGNAR account.</p>'
+        f'{perk}'
+        f'<p style="margin:24px 0;"><a href="{link}" '
+        'style="background:#2a8fc4;color:#f2fbff;text-decoration:none;padding:12px 22px;'
+        'border-radius:10px;font-weight:600;display:inline-block;">Verify my email</a></p>'
+        f'<p style="color:#9fb2c6;font-size:13px;">Or paste this link:<br>'
+        f'<a href="{link}" style="color:#6fd6ff;">{link}</a></p>'
+        '<p style="color:#6c8199;font-size:12px;">If you didn\'t create this account, ignore this email.</p>'
+    )
+    return send_email(to, "Verify your RAGNAR account", _brand_wrap(inner))
+
+
 def ops_alert(subject: str, body: str = "") -> None:
     """Best-effort alert to the admin emails + Discord ops channel."""
     if settings.admin_emails:

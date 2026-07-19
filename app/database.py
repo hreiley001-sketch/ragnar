@@ -44,6 +44,11 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
     "bid": {
         "bidder_user_id": "INTEGER",
     },
+    "user": {
+        "verify_token": "VARCHAR",
+        "verify_sent_at": "DATETIME",
+        "marketing_opt_in": "BOOLEAN DEFAULT 0",
+    },
 }
 
 

@@ -16,7 +16,16 @@ import secrets
 from .. import ai, auth, catalog, comps, payments, pricing, seo_tools
 from ..config import settings
 from ..database import get_session
-from ..models import FoundingApplication, Listing, ListingStatus, LiveStream, Sale, Seller
+from ..models import (
+    FoundingApplication,
+    Listing,
+    ListingStatus,
+    LiveStream,
+    Sale,
+    Seller,
+    User,
+    UserRole,
+)
 from ..recognition import active_provider
 from ..schemas import FoundingApplicationRead, ListingRead
 from ..services import founding_status, grant_founding_if_available, record_sale
@@ -55,6 +64,47 @@ def integrations_status() -> dict:
         "psa": bool(settings.psa_access_token),
         "seo": seo_tools.providers_status(),
     }
+
+
+@router.get("/users")
+def admin_users(
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+    q: Optional[str] = Query(None),
+) -> dict:
+    stmt = select(User).order_by(User.created_at.desc())
+    if q:
+        like = f"%{q.strip()}%"
+        stmt = stmt.where((User.email.ilike(like)) | (User.name.ilike(like)))
+    rows = session.exec(stmt.limit(500)).all()
+    return {"items": [{
+        "id": u.id, "email": u.email, "name": u.name, "role": u.role,
+        "is_staff": u.role == UserRole.admin.value, "email_verified": u.email_verified,
+        "seller_handle": u.seller_handle, "created_at": u.created_at.isoformat(),
+    } for u in rows], "count": len(rows)}
+
+
+@router.post("/staff")
+def admin_set_staff(
+    payload: dict,
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+) -> dict:
+    """Grant or revoke Command Hub (staff) access for a user by email."""
+    email = (payload.get("email") or "").strip().lower()
+    make_staff = bool(payload.get("make_staff", True))
+    user = session.exec(select(User).where(User.email == email)).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="No account with that email (they must sign up first).")
+    user.role = UserRole.admin.value if make_staff else UserRole.user.value
+    session.add(user)
+    session.commit()
+    if make_staff:
+        from ..notify import notify
+        notify(session, user.id, "staff_granted", "You now have Command Hub access",
+               body="An admin granted your account staff access.", link="/admin")
+    return {"email": user.email, "role": user.role, "is_staff": user.role == UserRole.admin.value}
 
 
 @router.get("/keywords")

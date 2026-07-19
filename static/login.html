@@ -16,6 +16,8 @@
     .divider::before,.divider::after { content:""; flex:1; height:1px; background:var(--border); }
     .logo-c { text-align:center; margin-bottom:18px; }
     .logo-c img { height:64px; border-radius:12px; background:#f6f9fc; padding:8px 14px; }
+    .pw-meter { height:5px; border-radius:999px; background:rgba(255,255,255,.08); margin:-6px 0 12px; overflow:hidden; }
+    .pw-bar { height:100%; width:0; border-radius:999px; transition:width .2s ease, background .2s ease; }
   </style>
 </head>
 <body>
@@ -38,12 +40,25 @@
       </div>
 
       <form id="authForm">
-        <label class="field" id="nameField" hidden><span>Name</span><input name="name" maxlength="120" /></label>
-        <label class="field"><span>Email</span><input name="email" type="email" required /></label>
-        <label class="field"><span>Password</span><input name="password" type="password" required minlength="8" /></label>
+        <label class="field" id="nameField" hidden><span>Name</span><input name="name" maxlength="120" placeholder="Your name" /></label>
+        <label class="field"><span>Email</span><input name="email" type="email" required placeholder="you@example.com" /></label>
+        <label class="field"><span>Password</span><input name="password" id="pw" type="password" required minlength="8" placeholder="At least 8 characters" /></label>
+        <div id="pwMeter" class="pw-meter" hidden><div id="pwBar" class="pw-bar"></div></div>
+        <label class="field" id="confirmField" hidden><span>Confirm password</span><input name="confirm" type="password" placeholder="Re-enter password" /></label>
+        <label class="check-row" id="termsRow" hidden style="margin-bottom:10px;"><input type="checkbox" id="terms" /> <span style="font-size:13px;">I agree to RAGNAR's Terms &amp; buyer/seller conduct.</span></label>
+        <label class="check-row" id="mktRow" hidden style="margin-bottom:12px;"><input type="checkbox" id="mkt" /> <span style="font-size:13px;color:var(--muted);">Email me drop alerts &amp; news (optional).</span></label>
         <button type="submit" class="btn btn-primary" style="width:100%;">Continue</button>
         <p id="authStatus" class="form-status"></p>
       </form>
+
+      <div id="verifySent" class="card" style="padding:18px;margin-top:6px;text-align:center;" hidden>
+        <div style="font-size:34px;">📬</div>
+        <h3 style="margin:6px 0;">Check your email</h3>
+        <p class="muted" id="verifyMsg" style="font-size:14px;"></p>
+        <button id="resendBtn" class="btn btn-ghost btn-sm" type="button">Resend verification email</button>
+        <p style="margin-top:12px;"><a href="/account" class="btn btn-primary btn-sm">Continue to my account →</a></p>
+      </div>
+
       <p class="muted" style="font-size:12px;text-align:center;margin-top:10px;"><a href="/">← Back to RAGNAR</a></p>
     </div>
   </main>

@@ -11,7 +11,28 @@ from sqlmodel import Session, select
 from .. import auth
 from ..config import settings
 from ..database import get_session
+from ..emailer import send_verification_email
 from ..models import User, UserRole, utcnow
+
+def _base_url() -> str:
+    return (settings.site_url or settings.public_base_url).rstrip("/")
+
+
+def _is_staff_domain(email: str) -> bool:
+    e = email.lower()
+    return e in settings.admin_emails or (
+        bool(settings.staff_email_domain) and e.endswith("@" + settings.staff_email_domain)
+    )
+
+
+def _send_verify(session: Session, user: User) -> bool:
+    user.verify_token = secrets.token_urlsafe(24)
+    user.verify_sent_at = utcnow()
+    session.add(user)
+    session.commit()
+    link = f"{_base_url()}/verify?token={user.verify_token}"
+    return send_verification_email(user.email, user.name or "", link,
+                                   is_staff_domain=_is_staff_domain(user.email))
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -32,20 +53,68 @@ def signup(payload: dict, response: Response, session: Session = Depends(get_ses
     email = (payload.get("email") or "").strip().lower()
     password = payload.get("password") or ""
     name = (payload.get("name") or "").strip() or None
+    if not name or len(name) < 2:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Please enter your name.")
     if not _EMAIL_RE.match(email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Enter a valid email.")
     if len(password) < 8:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must be at least 8 characters.")
+    if not payload.get("accept_terms"):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Please accept the Terms & buyer/seller conduct.")
     if session.exec(select(User).where(User.email == email)).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="An account with that email already exists.")
-    # Password signup is always a regular user (email not proven → never staff).
+    # Password signup is always a regular user until the email is VERIFIED.
+    # Verifying an @ragnarips.com address (proving inbox control) promotes to staff.
     user = User(email=email, name=name, password_hash=auth.hash_password(password),
-                email_verified=False, role=UserRole.user.value)
+                email_verified=False, role=UserRole.user.value,
+                marketing_opt_in=bool(payload.get("marketing_opt_in")))
     session.add(user)
     session.commit()
     session.refresh(user)
+    sent = _send_verify(session, user)
+    session.refresh(user)
     _set_session_cookie(response, auth.create_session(session, user))
-    return auth.public_user(user)
+    out = auth.public_user(user)
+    out["verification_required"] = True
+    out["verification_email_sent"] = sent
+    out["staff_domain"] = _is_staff_domain(email)
+    return out
+
+
+@router.post("/verify")
+def verify_email(payload: dict, response: Response, session: Session = Depends(get_session)) -> dict:
+    token = (payload.get("token") or "").strip()
+    if not token:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing verification token.")
+    user = session.exec(select(User).where(User.verify_token == token)).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="This verification link is invalid or already used.")
+    user.email_verified = True
+    user.verify_token = None
+    # Proven inbox control → promote qualifying company emails to staff.
+    promoted = False
+    new_role = auth.role_for_verified_email(user.email)
+    if new_role == UserRole.admin.value and user.role != UserRole.admin.value:
+        user.role = UserRole.admin.value
+        promoted = True
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    # Log them in on this device.
+    _set_session_cookie(response, auth.create_session(session, user))
+    out = auth.public_user(user)
+    out["verified"] = True
+    out["promoted_to_staff"] = promoted
+    return out
+
+
+@router.post("/resend-verification")
+def resend_verification(session: Session = Depends(get_session), user=Depends(auth.require_user)) -> dict:
+    if user.email_verified:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Your email is already verified.")
+    sent = _send_verify(session, user)
+    return {"sent": sent, "email": user.email}
 
 
 @router.post("/login")
