@@ -140,6 +140,10 @@ function listingCard(l) {
           <span class="listing-price">${money(l.price)}</span>
           <span class="listing-keep">keep ${money(keep)}<br><span style="color:var(--muted)">+${money(savings)} vs eBay</span></span>
         </div>
+        <div class="listing-meta">
+          <span>${l.shipping ? "+ " + money(l.shipping) + " ship" : "Free shipping"}</span>
+          ${l.view_count ? `<span>👁 ${l.view_count} watching</span>` : ""}
+        </div>
       </div>
     </a>
     <div class="listing-body" style="padding-top:6px;">
@@ -242,6 +246,31 @@ function syncCatChips() {
   const cur = $("f-category").value;
   document.querySelectorAll("#catChips .cat-chip").forEach((b) => b.classList.toggle("active", b.dataset.cat === cur));
 }
+async function loadLiveRail() {
+  const wrap = $("liveRailWrap"), rail = $("liveRail");
+  if (!wrap || !rail) return;
+  try {
+    const streams = await api("/api/streams?status=live");
+    if (!streams || !streams.length) { wrap.hidden = true; return; }
+    rail.innerHTML = streams.map((s) => {
+      const bg = s.thumbnail_url
+        ? `center/cover url('${escapeHtml(s.thumbnail_url)}')`
+        : `linear-gradient(135deg, ${escapeHtml(s.accent_color || "#2563eb")}, #0b1220)`;
+      return `<a class="lr-card" href="/store/${encodeURIComponent(s.seller_handle)}">
+        <div class="lr-thumb" style="background:${bg}">
+          <span class="lr-badge">● LIVE</span>
+          <span class="lr-views">👁 ${s.viewer_count || 0}</span>
+        </div>
+        <div class="lr-body">
+          <div class="lr-title">${escapeHtml(s.title)}</div>
+          <div class="lr-seller">${escapeHtml(s.seller_name)}</div>
+        </div>
+      </a>`;
+    }).join("");
+    wrap.hidden = false;
+  } catch (_) { wrap.hidden = true; }
+}
+
 function buildCatChips() {
   const box = $("catChips"); if (!box) return;
   const mkChip = (val, label) => {
@@ -574,6 +603,7 @@ async function init() {
   fillSelect($("form-grader"), META.grading_companies, false);
 
   buildCatChips();
+  loadLiveRail();
   renderHero();
   renderIntegrations();
   refreshFoundingCounter();
