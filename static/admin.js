@@ -385,6 +385,7 @@ async function loadTeam() {
         ${u.is_staff
           ? `<button class="btn btn-sm" data-revoke="${esc(u.email)}">Revoke staff</button>`
           : `<button class="btn btn-sm" data-grant="${esc(u.email)}">Make staff</button>`}
+        <button class="btn btn-sm btn-danger" data-del="${u.id}" data-del-email="${esc(u.email)}" data-del-store="${esc(u.seller_handle || "")}">Remove</button>
       </td></tr>`).join("") || `<tr><td colspan="7" class="muted" style="padding:20px;text-align:center;">No users yet</td></tr>`;
   } catch (e) { toast(e.message); }
 }
@@ -408,12 +409,27 @@ async function grantStaffFromInput() {
   } catch (e) { st.className = "form-status error"; st.textContent = e.message; }
 }
 
+async function deleteUser(id, email, store) {
+  let force = false;
+  if (store) {
+    if (!confirm(`${email} operates store "${store}". Deleting their account will detach it. Delete anyway?`)) return;
+    force = true;
+  } else if (!confirm(`Permanently remove ${email}? This cannot be undone.`)) return;
+  try {
+    await api(`/api/admin/users/${id}${force ? "?force=true" : ""}`, { method: "DELETE" });
+    toast(`Removed ${email}`);
+    loadTeam();
+  } catch (e) { toast(e.message); }
+}
+
 function teamAction(e) {
   const t = e.target.closest("button"); if (!t) return;
   const grant = t.getAttribute("data-grant");
   const revoke = t.getAttribute("data-revoke");
+  const del = t.getAttribute("data-del");
   if (grant) setStaff(grant, true);
   else if (revoke) { if (confirm(`Revoke staff access from ${revoke}?`)) setStaff(revoke, false); }
+  else if (del) deleteUser(del, t.getAttribute("data-del-email"), t.getAttribute("data-del-store"));
 }
 
 /* ---------- tabs ---------- */

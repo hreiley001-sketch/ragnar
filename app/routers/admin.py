@@ -25,6 +25,7 @@ from ..models import (
     Seller,
     User,
     UserRole,
+    UserSession,
 )
 from ..recognition import active_provider
 from ..schemas import FoundingApplicationRead, ListingRead
@@ -105,6 +106,32 @@ def admin_set_staff(
         notify(session, user.id, "staff_granted", "You now have Command Hub access",
                body="An admin granted your account staff access.", link="/admin")
     return {"email": user.email, "role": user.role, "is_staff": user.role == UserRole.admin.value}
+
+
+@router.delete("/users/{user_id}")
+def admin_delete_user(
+    user_id: int,
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+    force: bool = Query(False, description="Delete even if the user operates a store."),
+) -> dict:
+    """Remove a user account (offboarding, spam/test cleanup). Invalidates their
+    sessions. Refuses to delete a user linked to a seller store unless force=true,
+    so sale history and an active shop are never orphaned by accident."""
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such user.")
+    if user.seller_handle and not force:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"This user operates store '{user.seller_handle}'. Pass force=true to delete anyway.",
+        )
+    email = user.email
+    for s in session.exec(select(UserSession).where(UserSession.user_id == user_id)).all():
+        session.delete(s)
+    session.delete(user)
+    session.commit()
+    return {"deleted": True, "email": email, "id": user_id}
 
 
 @router.get("/keywords")
