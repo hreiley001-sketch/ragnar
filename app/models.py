@@ -118,6 +118,7 @@ class Seller(SQLModel, table=True):
     banner_url: Optional[str] = Field(default=None, max_length=500)
     avatar_url: Optional[str] = Field(default=None, max_length=500)
     accent_color: Optional[str] = Field(default=None, max_length=16)  # hex, e.g. #6fd6ff
+    font_family: Optional[str] = Field(default=None, max_length=80)  # Google Font family
     store_public: bool = Field(default=True, index=True)
     # Secret the seller uses to edit their own store (returned once on signup).
     store_edit_token: Optional[str] = Field(default=None, index=True)
@@ -170,6 +171,8 @@ class Listing(SQLModel, table=True):
     is_featured: bool = Field(default=False, index=True)
     view_count: int = Field(default=0)
     image_url: Optional[str] = Field(default=None, max_length=500)
+    image_public_id: Optional[str] = Field(default=None, max_length=200)  # Cloudinary id
+    image_enhanced: bool = Field(default=False)  # AI-upscaled/cleaned
     description: Optional[str] = Field(default=None, max_length=2000)
 
     # Who's selling

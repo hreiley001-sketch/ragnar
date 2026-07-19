@@ -47,6 +47,7 @@ def _summary(session: Session, s: Seller) -> dict:
         "avatar_url": s.avatar_url,
         "banner_url": s.banner_url,
         "accent_color": s.accent_color,
+        "font_family": s.font_family,
         "is_founding": s.is_founding,
         "founding_number": s.founding_number,
         "listing_count": _active_count(session, s.id),

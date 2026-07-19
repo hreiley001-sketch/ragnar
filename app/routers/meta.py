@@ -6,6 +6,12 @@ from fastapi import APIRouter, Query
 from ..ai import is_configured as ai_configured
 from ..comps import is_configured as comps_configured
 from ..emailer import discord_configured, email_configured
+from ..enrich import firecrawl_configured, google_fonts_configured, list_fonts
+from ..media import (
+    background_removal_available,
+    cloudinary_configured,
+    replicate_configured,
+)
 from ..shipping import is_configured as shipping_configured
 from ..video import is_configured as video_configured
 from ..config import settings
@@ -45,8 +51,19 @@ def meta() -> dict:
             "discord": discord_configured(),
             "shipping": shipping_configured(),
             "livekit": video_configured(),
+            "media_cdn": cloudinary_configured(),
+            "background_removal": background_removal_available(),
+            "image_enhance": replicate_configured(),
+            "web_extract": firecrawl_configured(),
+            "fonts": google_fonts_configured(),
         },
     }
+
+
+@router.get("/meta/fonts")
+async def meta_fonts(limit: int = Query(60, ge=1, le=200)) -> dict:
+    """Popular Google Font families for the store typography picker."""
+    return await list_fonts(limit=limit)
 
 
 @router.get("/fees/quote")

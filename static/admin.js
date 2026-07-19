@@ -113,7 +113,8 @@ async function loadListings() {
           <button class="btn btn-sm" data-feat="${l.id}">${feat ? "★ Unfeature" : "☆ Feature"}</button>
           <button class="btn btn-sm" data-edit="${l.id}" data-price="${l.price}">Price</button>
           ${l.status === "active" ? `<button class="btn btn-sm" data-sold="${l.id}">Sold</button>` : ""}
-          <button class="btn btn-sm" data-del="${l.id}">Del</button>
+          ${l.image_url ? `<button class="btn btn-sm" data-enhance="${l.id}" title="AI upscale / clean up photo">✨ Enhance</button>` : ""}
+          <button class="btn btn-sm btn-danger" data-del="${l.id}">Del</button>
         </td></tr>`;
     }).join("") || `<tr><td colspan="8" class="muted" style="padding:20px;text-align:center;">No listings</td></tr>`;
   } catch (e) { toast(e.message); }
@@ -125,7 +126,16 @@ async function listingsAction(e) {
   const sold = t.getAttribute("data-sold");
   const del = t.getAttribute("data-del");
   const feat = t.getAttribute("data-feat");
+  const enhance = t.getAttribute("data-enhance");
   try {
+    if (enhance) {
+      if (!confirm("AI-enhance this listing photo (upscale / clean up)?")) return;
+      const removeBg = confirm("Also remove the background? (OK = yes, Cancel = keep it)");
+      await api(`/api/media/enhance/${enhance}`, { method: "POST", body: JSON.stringify({ upscale: true, remove_bg: removeBg }) });
+      toast("Enhancing… the photo will update shortly.");
+      setTimeout(loadListings, 6000);
+      return;
+    }
     if (edit) {
       const cur = t.getAttribute("data-price");
       const np = prompt("New price ($):", cur);

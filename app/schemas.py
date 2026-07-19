@@ -160,6 +160,7 @@ class StoreSummary(BaseModel):
     avatar_url: Optional[str] = None
     banner_url: Optional[str] = None
     accent_color: Optional[str] = None
+    font_family: Optional[str] = None
     is_founding: bool = False
     founding_number: Optional[int] = None
     listing_count: int = 0
@@ -176,6 +177,7 @@ class StoreUpdate(BaseModel):
     banner_url: Optional[str] = Field(default=None, max_length=500)
     avatar_url: Optional[str] = Field(default=None, max_length=500)
     accent_color: Optional[str] = Field(default=None, max_length=16)
+    font_family: Optional[str] = Field(default=None, max_length=80)
     store_public: Optional[bool] = None
 
 

@@ -20,9 +20,32 @@ const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http:/
 
 let STORE = null;
 
+function loadFont(family) {
+  if (!family) return;
+  const id = "gf-" + family.replace(/\W+/g, "-");
+  if (document.getElementById(id)) return;
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "stylesheet";
+  link.href = "https://fonts.googleapis.com/css2?family=" +
+    encodeURIComponent(family).replace(/%20/g, "+") + ":wght@400;600;700&display=swap";
+  document.head.appendChild(link);
+}
+
+function applyFont(family) {
+  loadFont(family);
+  // Valid fallback generics — "inherit" is NOT allowed inside a font-family list.
+  const stack = family ? `'${family}', system-ui, sans-serif` : "";
+  ["storeName", "storeTag"].forEach((id) => {
+    const el = $(id);
+    if (el) el.style.fontFamily = stack;
+  });
+}
+
 function applyStore(s) {
   STORE = s;
   if (s.accent_color) document.documentElement.style.setProperty("--ice", s.accent_color);
+  applyFont(s.font_family || "");
   document.title = `${s.display_name} — RAGNAR`;
   $("storeName").textContent = s.display_name;
   $("storeTag").textContent = s.tagline || "";
@@ -37,6 +60,32 @@ function applyStore(s) {
   $("c-banner").value = s.banner_url || "";
   $("c-avatar").value = s.avatar_url || "";
   if (s.accent_color) $("c-accent").value = s.accent_color;
+  setFontSelection(s.font_family || "");
+}
+
+// Populate the heading-font picker from the Google Fonts (or fallback) list.
+async function loadFontOptions() {
+  const sel = $("c-font");
+  if (!sel) return;
+  try {
+    const d = await api("/api/meta/fonts?limit=80");
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Default</option>' +
+      (d.items || []).map((f) => `<option value="${esc(f.family)}">${esc(f.family)}</option>`).join("");
+    if (cur) setFontSelection(cur);
+  } catch (_) { /* keep the Default option */ }
+}
+
+// Ensure the current family is selectable even if it's not in the fetched list.
+function setFontSelection(family) {
+  const sel = $("c-font");
+  if (!sel) return;
+  if (family && !Array.from(sel.options).some((o) => o.value === family)) {
+    const opt = document.createElement("option");
+    opt.value = family; opt.textContent = family;
+    sel.appendChild(opt);
+  }
+  sel.value = family || "";
 }
 
 function listingCard(l) {
@@ -96,6 +145,7 @@ async function saveStore() {
     banner_url: $("c-banner").value.trim() || null,
     avatar_url: $("c-avatar").value.trim() || null,
     accent_color: $("c-accent").value || null,
+    font_family: $("c-font").value || null,
   };
   const st = $("cStatus"); st.className = "form-status"; st.textContent = "Saving…";
   try {
@@ -197,8 +247,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   loadListings();
   loadLive();
   loadSocial();
+  loadFontOptions();
   $("followBtn").addEventListener("click", toggleFollow);
   $("msgSend").addEventListener("click", sendStoreMessage);
+  $("c-font").addEventListener("change", (e) => applyFont(e.target.value));
 
   $("customizeBtn").addEventListener("click", () => {
     const p = $("customizePanel"); p.hidden = !p.hidden;

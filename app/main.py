@@ -24,6 +24,7 @@ from .routers import (
     founding,
     health,
     listings,
+    media,
     meta,
     notifications,
     offers,
@@ -106,6 +107,7 @@ app.include_router(orders.router)
 app.include_router(orders.admin_router)
 app.include_router(watch.router)
 app.include_router(social.router)
+app.include_router(media.router)
 app.include_router(admin.router)
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)

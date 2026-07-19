@@ -35,11 +35,14 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "store_edit_token": "VARCHAR",
         "stripe_account_id": "VARCHAR",
         "stripe_charges_enabled": "BOOLEAN DEFAULT 0",
+        "font_family": "VARCHAR",
     },
     "listing": {
         "shipping_cents": "INTEGER DEFAULT 0",
         "is_featured": "BOOLEAN DEFAULT 0",
         "view_count": "INTEGER DEFAULT 0",
+        "image_public_id": "VARCHAR",
+        "image_enhanced": "BOOLEAN DEFAULT 0",
     },
     "bid": {
         "bidder_user_id": "INTEGER",

@@ -165,6 +165,31 @@ class Settings:
     # user. If neither is set/available, admin is disabled.
     admin_token: str = os.getenv("ADMIN_TOKEN", "").strip()
 
+    # --- Media pipeline: Cloudinary (transform-CDN + AI background removal) ---
+    # Key-gated. Without keys, media helpers return the original image untouched.
+    cloudinary_cloud_name: str = os.getenv("CLOUDINARY_CLOUD_NAME", "").strip()
+    cloudinary_api_key: str = os.getenv("CLOUDINARY_API_KEY", "").strip()
+    cloudinary_api_secret: str = os.getenv("CLOUDINARY_API_SECRET", "").strip()
+    cloudinary_folder: str = os.getenv("CLOUDINARY_FOLDER", "ragnar").strip()
+
+    # Dedicated background removal (Remove.bg) — key-gated fallback / standalone.
+    removebg_api_key: str = os.getenv("REMOVEBG_API_KEY", "").strip()
+
+    # AI image enhancement (Replicate) — key-gated; upscale/restore card photos.
+    replicate_api_token: str = os.getenv("REPLICATE_API_TOKEN", "").strip()
+    # Model run via the model-based predictions endpoint (no version hash needed).
+    replicate_upscale_model: str = os.getenv(
+        "REPLICATE_UPSCALE_MODEL", "nightmareai/real-esrgan"
+    ).strip()
+    replicate_upscale: int = int(os.getenv("REPLICATE_UPSCALE_FACTOR", "2"))
+
+    # Web extraction (Firecrawl) — key-gated; scrape a card page -> price JSON.
+    firecrawl_api_key: str = os.getenv("FIRECRAWL_API_KEY", "").strip()
+    firecrawl_base: str = os.getenv("FIRECRAWL_BASE", "https://api.firecrawl.dev").rstrip("/")
+
+    # Google Fonts metadata (per-store typography picker) — key-gated (has fallback).
+    google_fonts_api_key: str = os.getenv("GOOGLE_FONTS_API_KEY", "").strip()
+
     # --- Free card catalogs ---
     # Scryfall (MTG) needs no key. Pokémon TCG works without a key; a key raises
     # rate limits.

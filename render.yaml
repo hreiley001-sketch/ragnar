@@ -39,3 +39,26 @@ services:
         sync: false
       - key: COMPS_PROVIDER_KEY
         sync: false
+      # Email verification / notifications (Resend) — needed for the
+      # "sign up with @ragnarips.com -> verify -> Command Hub" email flow:
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      # Media pipeline (Cloudinary) — transform-CDN + AI background removal:
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # AI image enhancement + dedicated background removal:
+      - key: REPLICATE_API_TOKEN
+        sync: false
+      - key: REMOVEBG_API_KEY
+        sync: false
+      # Web extraction (Firecrawl) + Google Fonts (typography picker):
+      - key: FIRECRAWL_API_KEY
+        sync: false
+      - key: GOOGLE_FONTS_API_KEY
+        sync: false

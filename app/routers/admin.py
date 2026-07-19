@@ -134,6 +134,17 @@ def admin_delete_user(
     return {"deleted": True, "email": email, "id": user_id}
 
 
+@router.post("/scrape-price")
+async def admin_scrape_price(payload: dict, _: None = Depends(require_admin)) -> dict:
+    """Scrape a card page (any marketplace/price-guide URL) via Firecrawl and
+    return high/low/avg prices found on it — pricing-intelligence research."""
+    from ..enrich import scrape_price
+    url = (payload.get("url") or "").strip()
+    if not url.startswith("http"):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Enter a valid URL.")
+    return await scrape_price(url)
+
+
 @router.get("/keywords")
 def admin_keywords(
     q: str = Query(..., min_length=1, description="Seed keyword/topic"),
