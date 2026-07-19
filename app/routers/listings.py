@@ -71,6 +71,7 @@ def create_listing(
         ),
         grade=payload.grade,
         price_cents=round(payload.price * 100),
+        shipping_cents=round((payload.shipping or 0) * 100),
         quantity=payload.quantity,
         image_url=payload.image_url.strip() if payload.image_url else None,
         description=payload.description.strip() if payload.description else None,
@@ -81,6 +82,27 @@ def create_listing(
     session.add(listing)
     session.commit()
     session.refresh(listing)
+
+    # Post-create fan-out (never breaks creation): saved-search alerts + follower drops.
+    try:
+        from .watch import match_new_listing
+        match_new_listing(session, listing)
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        if listing.seller_id:
+            from ..notify import notify_followers
+            fol_seller = session.get(Seller, listing.seller_id)
+            if fol_seller:
+                notify_followers(
+                    session, fol_seller, "new_drop",
+                    f"New drop from {fol_seller.display_name}: {listing.title}",
+                    body=f"${listing.price_cents / 100:,.2f}",
+                    link=f"/listing/{listing.id}",
+                )
+    except Exception:  # noqa: BLE001
+        pass
+
     return ListingRead.from_listing(listing)
 
 
@@ -101,14 +123,26 @@ def sell_listing(
     price_cents = round(payload.price * 100) if payload.price else listing.price_cents
 
     sale = record_sale(session, listing, price_cents, source="ragnar")
+
+    # Manual sales get an Order record too (offline/agreed sales).
+    from ..models import Order
+    order = Order(
+        listing_id=listing.id, seller_id=listing.seller_id,
+        title=listing.title, price_cents=price_cents,
+        shipping_cents=listing.shipping_cents or 0,
+        status="paid", source="manual",
+    )
+    session.add(order)
     session.commit()
     session.refresh(sale)
+    session.refresh(order)
 
     seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
     return {
         "status": "sold",
         "listing_id": listing.id,
         "sale_id": sale.id,
+        "order_id": order.id,
         "sold_price": round(price_cents / 100, 2),
         "payout": compute_split(price_cents, seller).as_dict(),
     }
@@ -127,6 +161,7 @@ def search_listings(
     min_price: float | None = Query(None, ge=0, description="Dollars"),
     max_price: float | None = Query(None, ge=0, description="Dollars"),
     founding_only: bool = Query(False, description="Only Founding Seller listings"),
+    featured: bool = Query(False, description="Only featured/promoted listings"),
     sort: SortOption = Query(SortOption.newest),
     page: int = Query(1, ge=1),
     page_size: int = Query(24, ge=1, le=100),
@@ -160,6 +195,8 @@ def search_listings(
         filters.append(Listing.price_cents <= round(max_price * 100))
     if founding_only:
         filters.append(Listing.is_founding_seller == True)  # noqa: E712
+    if featured:
+        filters.append(Listing.is_featured == True)  # noqa: E712
 
     total = session.exec(
         select(func.count()).select_from(Listing).where(*filters)
@@ -199,6 +236,36 @@ def get_listing(
             status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found"
         )
     return ListingRead.from_listing(listing)
+
+
+@router.get("/{listing_id}/full")
+def get_listing_full(
+    listing_id: int,
+    session: Session = Depends(get_session),
+) -> dict:
+    """Everything the item page needs in one call: listing + seller + stats."""
+    listing = session.get(Listing, listing_id)
+    if not listing:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")
+    # Lightweight view analytics (eBay-style "N views") on the item page only.
+    listing.view_count = (listing.view_count or 0) + 1
+    session.add(listing)
+    session.commit()
+    session.refresh(listing)
+    seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
+    data = ListingRead.from_listing(listing).model_dump()
+    data["shipping"] = round((listing.shipping_cents or 0) / 100, 2)
+    data["is_featured"] = bool(listing.is_featured)
+    data["view_count"] = listing.view_count or 0
+    data["seller"] = None if not seller else {
+        "handle": seller.handle,
+        "display_name": seller.display_name,
+        "avatar_url": seller.avatar_url,
+        "accent_color": seller.accent_color,
+        "is_founding": seller.is_founding,
+        "founding_number": seller.founding_number,
+    }
+    return data
 
 
 @router.get("/{listing_id}/fees")

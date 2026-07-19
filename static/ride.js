@@ -83,6 +83,10 @@ function stopTimer() { clearInterval(timerInt); timerInt = null; }
 
 function addFeed(type, data, at) {
   const label = {
+    chat_message: `💬 <b>${esc(data.name)}</b>: ${esc(data.body)}`,
+    giveaway_started: `🎁 Giveaway started: <b>${esc(data.title)}</b> — enter now!`,
+    giveaway_entered: `🎟 ${esc(data.name)} entered (${data.count} entries)`,
+    giveaway_winner: `🏆 Giveaway winner: <b>${esc(data.winner)}</b> — ${esc(data.title || "")}`,
     ride_phase_changed: `➡️ Phase: <b>${esc(data.phase || "")}</b>`,
     bid_placed: `💰 <b>${esc(data.bidder)}</b> bid ${money(data.amount)}`,
     user_joined_ride: `👋 A car entered (${data.viewer_count} watching)`,
@@ -136,10 +140,80 @@ function pollFallback() {
   load(); setInterval(load, 3000);
 }
 
+/* ---------- chat ---------- */
+async function sendChat() {
+  const body = $("chatBody").value.trim();
+  if (!body) return;
+  try {
+    await api(`/api/rides/${RIDE_ID}/chat`, { method: "POST", body: JSON.stringify({ name: $("chatName").value.trim() || undefined, body }) });
+    $("chatBody").value = "";
+  } catch (e) { toast(e.message); }
+}
+
+/* ---------- giveaway ---------- */
+async function loadGiveaway() {
+  try {
+    const g = (await api(`/api/rides/${RIDE_ID}/giveaway`)).giveaway;
+    const box = $("giveawayBox");
+    if (!g) { box.hidden = true; return; }
+    box.hidden = false;
+    $("gaTitle").textContent = g.title;
+    $("gaMeta").textContent = g.status === "open" ? `${g.entries} entries` : g.status;
+    $("gaEnter").hidden = g.status !== "open";
+    if (g.status === "drawn" && g.winner) {
+      $("gaWinner").hidden = false;
+      $("gaWinner").textContent = `🏆 Winner: ${g.winner}`;
+    } else $("gaWinner").hidden = true;
+  } catch (_) {}
+}
+
+async function enterGiveaway() {
+  try {
+    const r = await api(`/api/rides/${RIDE_ID}/giveaway/enter`, { method: "POST", body: JSON.stringify({ name: $("chatName").value.trim() || undefined }) });
+    toast(`You're in! (${r.count} entries)`);
+    loadGiveaway();
+  } catch (e) {
+    toast(String(e.message).includes("name") ? "Type your name in the chat box first, then enter." : e.message);
+  }
+}
+
+/* ---------- live video (LiveKit, key-gated) ---------- */
+async function tryVideo() {
+  try {
+    const t = await api(`/api/rides/${RIDE_ID}/video-token`);
+    $("videoWrap").hidden = false;
+    await new Promise((res, rej) => {
+      const s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js";
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+    const room = new LivekitClient.Room({ adaptiveStream: true });
+    await room.connect(t.url, t.token);
+    const attach = (track) => {
+      if (track.kind === "video" || track.kind === "audio") {
+        const el = track.attach();
+        if (track.kind === "video") { el.style.width = "100%"; el.style.height = "100%"; el.style.objectFit = "cover"; $("videoBox").innerHTML = ""; }
+        $("videoBox").appendChild(el);
+      }
+    };
+    room.on(LivekitClient.RoomEvent.TrackSubscribed, attach);
+    room.remoteParticipants.forEach((p) => p.trackPublications.forEach((pub) => pub.track && attach(pub.track)));
+    $("videoBox").textContent = "Waiting for the host to go live…";
+  } catch (_) { /* video not configured — stay hidden */ }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   if (!RIDE_ID) { document.body.innerHTML = "<p style='padding:40px'>No ride specified.</p>"; return; }
   $("bidBtn").addEventListener("click", placeBid);
+  $("chatSend").addEventListener("click", sendChat);
+  $("chatBody").addEventListener("keydown", (e) => { if (e.key === "Enter") sendChat(); });
+  $("gaEnter").addEventListener("click", enterGiveaway);
+  try { const me = await api("/api/auth/me"); if (me.user) { $("chatName").value = me.user.name || me.user.email.split("@")[0]; $("bidderName") && ($("bidderName").value = $("chatName").value); } } catch (_) {}
   try { await api(`/api/rides/${RIDE_ID}/join`, { method: "POST" }); } catch (_) {}
   try { applyState(await api(`/api/rides/${RIDE_ID}/state`)); } catch (e) { toast(e.message); }
   if ("EventSource" in window) connectSSE(); else pollFallback();
+  loadGiveaway();
+  setInterval(loadGiveaway, 10000);
+  tryVideo();
 });

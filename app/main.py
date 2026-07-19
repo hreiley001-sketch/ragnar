@@ -25,15 +25,21 @@ from .routers import (
     health,
     listings,
     meta,
+    notifications,
+    offers,
+    orders,
     payments,
     pricing,
+    ride_social,
     rides,
     sales,
     scan,
     sellers,
     seo,
+    social,
     stores,
     streams,
+    watch,
 )
 from .seed import seed_if_empty
 
@@ -93,6 +99,13 @@ app.include_router(founding.router)
 app.include_router(seo.router)
 app.include_router(rides.router)
 app.include_router(rides.hub)
+app.include_router(ride_social.router)
+app.include_router(notifications.router)
+app.include_router(offers.router)
+app.include_router(orders.router)
+app.include_router(orders.admin_router)
+app.include_router(watch.router)
+app.include_router(social.router)
 app.include_router(admin.router)
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -156,6 +169,14 @@ def account_page():
     if page.exists():
         return FileResponse(str(page))
     return {"error": "account UI not found"}
+
+
+@app.get("/listing/{listing_id}", include_in_schema=False)
+def listing_page(listing_id: int):
+    page = STATIC_DIR / "listing.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "listing UI not found"}
 
 
 @app.get("/rides", include_in_schema=False)

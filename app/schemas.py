@@ -31,6 +31,7 @@ class ListingCreate(BaseModel):
     grade: Optional[float] = Field(default=None, ge=1, le=10)
 
     price: float = Field(gt=0, le=1_000_000, description="Price in dollars")
+    shipping: float = Field(default=0, ge=0, le=10_000, description="Shipping in dollars")
     quantity: int = Field(default=1, ge=1, le=100_000)
     image_url: Optional[str] = Field(default=None, max_length=500)
     description: Optional[str] = Field(default=None, max_length=2000)
@@ -73,6 +74,9 @@ class ListingRead(BaseModel):
     grade: Optional[float]
     price: float
     price_cents: int
+    shipping: float = 0
+    is_featured: bool = False
+    view_count: int = 0
     quantity: int
     image_url: Optional[str]
     description: Optional[str]
@@ -84,6 +88,9 @@ class ListingRead(BaseModel):
     @classmethod
     def from_listing(cls, listing: Listing) -> "ListingRead":
         return cls(
+            shipping=round((listing.shipping_cents or 0) / 100, 2),
+            is_featured=bool(listing.is_featured),
+            view_count=listing.view_count or 0,
             id=listing.id,
             title=listing.title,
             category=listing.category,

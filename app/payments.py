@@ -158,16 +158,20 @@ def refresh_account_status(session: Session, seller: Seller) -> dict:
 # --------------------------------------------------------------------------- #
 
 
-def create_checkout_session(listing: Listing, seller: Seller | None) -> dict:
+def create_checkout_session(listing: Listing, seller: Seller | None,
+                            amount_cents: int | None = None) -> dict:
     """Create a Stripe Checkout Session for a listing using a destination charge
-    with RAGNAR's platform fee as the application fee."""
+    with RAGNAR's platform fee as the application fee. ``amount_cents`` overrides
+    the listing price (accepted Best Offers). Shipping is added on top."""
     if not seller or not seller.stripe_account_id:
         raise PaymentsError("This seller hasn't connected a Stripe payout account yet.")
     if not seller.stripe_charges_enabled:
         raise PaymentsError("Seller's Stripe onboarding is incomplete (charges not enabled).")
 
     stripe = _stripe()
-    split = compute_split(listing.price_cents, seller)
+    price_cents = amount_cents or listing.price_cents
+    total_cents = price_cents + (listing.shipping_cents or 0)
+    split = compute_split(total_cents, seller)
     base = settings.public_base_url
     session_obj = stripe.checkout.Session.create(
         mode="payment",
@@ -175,7 +179,7 @@ def create_checkout_session(listing: Listing, seller: Seller | None) -> dict:
             "price_data": {
                 "currency": settings.platform_currency,
                 "product_data": {"name": listing.title},
-                "unit_amount": listing.price_cents,
+                "unit_amount": total_cents,
             },
             "quantity": 1,
         }],

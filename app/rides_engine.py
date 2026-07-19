@@ -201,7 +201,8 @@ def join(session: Session, ride: Ride) -> Ride:
     return ride
 
 
-def place_bid(session: Session, ride: Ride, bidder: str, amount_cents: int) -> Bid:
+def place_bid(session: Session, ride: Ride, bidder: str, amount_cents: int,
+              bidder_user_id: int | None = None) -> Bid:
     tick(session, ride)
     if ride.status != RideStatus.bidding.value:
         raise ValueError("Bidding isn't open on this ride right now.")
@@ -209,11 +210,15 @@ def place_bid(session: Session, ride: Ride, bidder: str, amount_cents: int) -> B
     if amount_cents < floor:
         raise ValueError(f"Bid must be at least ${floor / 100:,.2f}.")
 
+    outbid_user_ids: list[int] = []
     for prev in session.exec(select(Bid).where(Bid.ride_id == ride.id, Bid.status == "placed")).all():
         prev.status = "outbid"
+        if prev.bidder_user_id and prev.bidder_user_id != bidder_user_id:
+            outbid_user_ids.append(prev.bidder_user_id)
         session.add(prev)
 
-    bid = Bid(ride_id=ride.id, bidder=bidder.strip(), amount_cents=amount_cents, status="placed")
+    bid = Bid(ride_id=ride.id, bidder=bidder.strip(), amount_cents=amount_cents,
+              status="placed", bidder_user_id=bidder_user_id)
     session.add(bid)
     ride.current_bid_cents = amount_cents
     ride.current_bidder = bidder.strip()
@@ -231,6 +236,13 @@ def place_bid(session: Session, ride: Ride, bidder: str, amount_cents: int) -> B
     session.refresh(ride)
 
     event_bus.emit(session, "bid_placed", {"bidder": bidder, "amount": amount_cents / 100}, ride.id)
+    # eBay-style outbid alerts for signed-in bidders.
+    from .notify import notify
+    for uid in outbid_user_ids:
+        notify(session, uid, "outbid",
+               f"You've been outbid on {ride.title}",
+               body=f"New high bid: ${amount_cents / 100:,.2f}",
+               link=f"/ride/{ride.id}")
     if tuned:
         event_bus.emit(
             session, "ride_tuned",

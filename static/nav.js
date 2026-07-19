@@ -9,6 +9,7 @@
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
     { icon: "🏪", label: "Stores & Live", href: "/stores" },
     { icon: "🎢", label: "Live Rides", href: "/rides" },
+    { icon: "🔎", label: "Want Lists", href: "/account#wants" },
     { icon: "⭐", label: "Become a Founding Seller", href: "/#apply" },
   ];
 
@@ -62,7 +63,7 @@
     if (href === path) a.classList.add("active");
   });
 
-  // Reflect signed-in state
+  // Reflect signed-in state + notifications bell
   fetch("/api/auth/me").then((r) => r.json()).then((d) => {
     if (d && d.user) {
       userLine.hidden = false;
@@ -70,6 +71,24 @@
       acct.querySelector(".lbl").textContent = "My account";
       acct.href = "/account";
       if (d.user.is_staff) hub.querySelector(".lbl").textContent = "Command Hub (staff)";
+
+      const bell = document.createElement("a");
+      bell.className = "nav-bell";
+      bell.href = "/account#notifications";
+      bell.setAttribute("aria-label", "Notifications");
+      bell.innerHTML = "🔔";
+      if (actions) actions.insertBefore(bell, burger);
+      const refreshBell = () =>
+        fetch("/api/notifications/unread-count").then((r) => r.json()).then((c) => {
+          const n = (c && c.unread) || 0;
+          let b = bell.querySelector(".bump");
+          if (n > 0) {
+            if (!b) { b = document.createElement("span"); b.className = "bump"; bell.appendChild(b); }
+            b.textContent = n > 99 ? "99+" : String(n);
+          } else if (b) b.remove();
+        }).catch(() => {});
+      refreshBell();
+      setInterval(refreshBell, 30000);
     }
   }).catch(() => {});
 })();

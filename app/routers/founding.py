@@ -31,4 +31,22 @@ def apply(payload: FoundingApplicationCreate, session: Session = Depends(get_ses
     session.add(application)
     session.commit()
     session.refresh(application)
+
+    # Alert the crew (in-app for admins; email/Discord when configured).
+    try:
+        from ..emailer import ops_alert
+        from ..notify import notify_admins
+        notify_admins(
+            session, "founding_application",
+            f"Founding application: {application.name}",
+            body=(application.categories or application.message or application.email)[:200],
+            link="/admin",
+        )
+        ops_alert(
+            f"New Founding 250 application: {application.name} ({application.email})",
+            f"Sells: {application.categories or '—'} | Volume: {application.monthly_volume or '—'}",
+        )
+    except Exception:  # noqa: BLE001
+        pass
+
     return FoundingApplicationRead(**application.model_dump())

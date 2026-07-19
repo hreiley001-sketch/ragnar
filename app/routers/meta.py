@@ -5,6 +5,9 @@ from fastapi import APIRouter, Query
 
 from ..ai import is_configured as ai_configured
 from ..comps import is_configured as comps_configured
+from ..emailer import discord_configured, email_configured
+from ..shipping import is_configured as shipping_configured
+from ..video import is_configured as video_configured
 from ..config import settings
 from ..fees import fee_config, quote
 from ..models import Category, Condition, GradingCompany
@@ -38,6 +41,10 @@ def meta() -> dict:
             "ai": ai_configured(),
             "catalog": True,
             "psa": bool(settings.psa_access_token),
+            "email": email_configured(),
+            "discord": discord_configured(),
+            "shipping": shipping_configured(),
+            "livekit": video_configured(),
         },
     }
 

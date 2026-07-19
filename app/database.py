@@ -21,19 +21,29 @@ engine = create_engine(
 )
 
 
-# Columns added after the initial schema shipped. On SQLite we add them in place
-# so deploys don't require wiping the existing database. (For Postgres, use real
-# migrations.)
-_SELLER_ADDED_COLUMNS = {
-    "tagline": "VARCHAR",
-    "bio": "VARCHAR",
-    "banner_url": "VARCHAR",
-    "avatar_url": "VARCHAR",
-    "accent_color": "VARCHAR",
-    "store_public": "BOOLEAN DEFAULT 1",
-    "store_edit_token": "VARCHAR",
-    "stripe_account_id": "VARCHAR",
-    "stripe_charges_enabled": "BOOLEAN DEFAULT 0",
+# Columns added after each table originally shipped. On SQLite we add them in
+# place so deploys never require wiping the existing database. (For Postgres,
+# use real migrations.) table -> {column: DDL}
+_ADDED_COLUMNS: dict[str, dict[str, str]] = {
+    "seller": {
+        "tagline": "VARCHAR",
+        "bio": "VARCHAR",
+        "banner_url": "VARCHAR",
+        "avatar_url": "VARCHAR",
+        "accent_color": "VARCHAR",
+        "store_public": "BOOLEAN DEFAULT 1",
+        "store_edit_token": "VARCHAR",
+        "stripe_account_id": "VARCHAR",
+        "stripe_charges_enabled": "BOOLEAN DEFAULT 0",
+    },
+    "listing": {
+        "shipping_cents": "INTEGER DEFAULT 0",
+        "is_featured": "BOOLEAN DEFAULT 0",
+        "view_count": "INTEGER DEFAULT 0",
+    },
+    "bid": {
+        "bidder_user_id": "INTEGER",
+    },
 }
 
 
@@ -43,14 +53,15 @@ def _sqlite_add_missing_columns() -> None:
     from sqlalchemy import inspect, text
 
     inspector = inspect(engine)
-    tables = inspector.get_table_names()
-    if "seller" not in tables:
-        return  # fresh DB; create_all will build it complete
-    existing = {c["name"] for c in inspector.get_columns("seller")}
+    tables = set(inspector.get_table_names())
     with engine.begin() as conn:
-        for col, ddl in _SELLER_ADDED_COLUMNS.items():
-            if col not in existing:
-                conn.execute(text(f"ALTER TABLE seller ADD COLUMN {col} {ddl}"))
+        for table, columns in _ADDED_COLUMNS.items():
+            if table not in tables:
+                continue  # fresh DB; create_all will build it complete
+            existing = {c["name"] for c in inspector.get_columns(table)}
+            for col, ddl in columns.items():
+                if col not in existing:
+                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}"))
 
 
 def init_db() -> None:

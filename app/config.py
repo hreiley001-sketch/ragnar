@@ -102,6 +102,16 @@ class Settings:
     livekit_api_key: str = os.getenv("LIVEKIT_API_KEY", "").strip()
     livekit_api_secret: str = os.getenv("LIVEKIT_API_SECRET", "").strip()
 
+    # --- Email notifications (Resend) — key-gated ---
+    resend_api_key: str = os.getenv("RESEND_API_KEY", "").strip()
+    email_from: str = os.getenv("EMAIL_FROM", "RAGNAR <notifications@ragnarips.com>")
+
+    # --- Discord webhook alerts (ops channel) — key-gated ---
+    discord_webhook_url: str = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
+
+    # --- Shipping (Shippo) — key-gated ---
+    shippo_api_key: str = os.getenv("SHIPPO_API_KEY", "").strip()
+
     # --- PSA population/authentication (OAuth2; docs gated behind login) ---
     # Stub seam only — supply a pre-obtained access token to enable later.
     psa_access_token: str = os.getenv("PSA_ACCESS_TOKEN", "").strip()

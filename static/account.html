@@ -6,42 +6,658 @@
   <title>RAGNAR — My Account</title>
   <link rel="icon" href="/static/logo.png" />
   <link rel="stylesheet" href="/static/styles.css" />
-  <style>.acct { max-width: 560px; margin: 8vh auto; padding: 26px; }</style>
+  <style>
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 26px clamp(16px, 4vw, 40px) 70px; }
+    .wrap > h2 { margin: 0 0 4px; letter-spacing: 0.04em; }
+    .wrap .sub { color: var(--muted); margin: 0 0 20px; font-size: 14px; }
+
+    /* Tabs (admin-hub pill pattern) */
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .tab { font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+    .tab:hover { background: rgba(55,189,255,0.08); color: var(--text); }
+    .tab.active { background: linear-gradient(180deg,#2a8fc4,#1c6fa3); color: #f2fbff; border-color: rgba(111,214,255,0.6); font-weight: 600; }
+    .tcount { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: rgba(255,90,90,0.85); color: #fff; font-size: 11px; font-weight: 700; display: none; align-items: center; justify-content: center; line-height: 1; }
+    .tcount.show { display: inline-flex; }
+
+    .tab-panel { padding: 20px; }
+    .sec-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--steel); margin: 0 0 12px; font-weight: 700; }
+    .sec-title:not(:first-child) { margin-top: 26px; }
+    .panel-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .panel-bar .sec-title { margin: 0; }
+
+    /* Status chips */
+    .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-strong); color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+    .chip.good { color: #9be7c4; border-color: rgba(120,230,180,0.45); background: rgba(120,230,180,0.08); }
+    .chip.info { color: var(--ice); border-color: rgba(111,214,255,0.45); background: rgba(55,189,255,0.08); }
+    .chip.warn { color: var(--gold); border-color: rgba(240,198,116,0.5); background: rgba(240,198,116,0.08); }
+    .chip.bad  { color: var(--danger); border-color: rgba(255,138,138,0.45); background: rgba(255,138,138,0.07); }
+
+    /* Tables */
+    .tbl-wrap { overflow-x: auto; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .tbl th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
+    .tbl td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .tbl .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    /* Notifications */
+    .nrow { display: flex; gap: 12px; align-items: flex-start; padding: 12px 8px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; }
+    .nrow:hover { background: rgba(55,189,255,0.05); }
+    .ndot { width: 8px; height: 8px; border-radius: 50%; background: var(--ice-strong); box-shadow: 0 0 8px rgba(55,189,255,0.7); margin-top: 7px; flex: none; visibility: hidden; }
+    .nrow.unread .ndot { visibility: visible; }
+    .nrow .n-title { color: var(--text-soft); font-size: 14px; }
+    .nrow.unread .n-title { font-weight: 700; color: var(--text); }
+    .n-body { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .n-date { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap; padding-top: 2px; }
+
+    /* Watchlist mini cards */
+    .wgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+    .wcard { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: linear-gradient(180deg, rgba(20,28,40,0.82), rgba(12,17,26,0.82)); display: flex; flex-direction: column; transition: transform .15s ease, border-color .15s ease; }
+    .wcard:hover { transform: translateY(-3px); border-color: var(--border-strong); }
+    .wimg { aspect-ratio: 4/3; background: radial-gradient(circle at 50% 30%, rgba(55,189,255,0.12), rgba(10,14,20,0.9)); display: grid; place-items: center; overflow: hidden; }
+    .wimg img { width: 100%; height: 100%; object-fit: cover; }
+    .wbody { padding: 10px 11px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .wtitle { font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--text); }
+    .wfoot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .wprice { font-weight: 800; color: #eaf3fb; }
+
+    /* Messages */
+    .thread { display: flex; gap: 12px; align-items: center; padding: 13px 10px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; }
+    .thread:hover { background: rgba(55,189,255,0.05); }
+    .t-av { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(180deg,#2a8fc4,#1c6fa3); display: grid; place-items: center; font-weight: 800; color: #f2fbff; flex: none; }
+    .t-main { min-width: 0; flex: 1; }
+    .t-with { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .t-last { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 480px; }
+    .t-unread { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: rgba(255,90,90,0.85); color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+    .side-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); border: 1px solid rgba(240,198,116,0.5); border-radius: 999px; padding: 1px 7px; }
+    .bubbles { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; max-height: 420px; overflow-y: auto; padding: 4px; }
+    .bubble { max-width: 78%; padding: 9px 13px; border-radius: 14px; font-size: 14px; line-height: 1.4; align-self: flex-start; background: rgba(8,12,18,0.65); border: 1px solid var(--border); color: var(--text-soft); }
+    .bubble.me { align-self: flex-end; background: rgba(42,143,196,0.28); border-color: rgba(111,214,255,0.4); color: #eaf3fb; }
+    .bubble .b-date { display: block; font-size: 10px; color: var(--muted); margin-top: 4px; }
+    .reply-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+
+    /* Misc */
+    .empty-sm { padding: 26px 14px; text-align: center; color: var(--muted); font-size: 14px; }
+    .inline-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; padding: 10px; border: 1px dashed var(--border-strong); border-radius: 10px; background: rgba(55,189,255,0.04); }
+    .inline-form select, .inline-form input { width: auto; }
+    .role-badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 16px; }
+    .ov-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    .claim-box { margin-top: 20px; padding: 16px; border: 1px dashed var(--border-strong); border-radius: 12px; background: rgba(55,189,255,0.04); max-width: 520px; }
+    .claim-box h4 { margin: 0 0 6px; }
+    .store-link-box { margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(240,198,116,0.45); border-radius: 12px; background: rgba(240,198,116,0.07); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    @media (max-width: 640px) { .t-last { max-width: 200px; } }
+  </style>
 </head>
 <body>
   <div class="aurora"></div>
   <header class="site-header">
-    <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
-    <div class="header-actions"><a class="btn btn-ghost btn-sm" href="/">Home</a></div>
-  </header>
-  <main>
-    <div class="card acct">
-      <h2 style="margin-top:0;">My Account</h2>
-      <div id="acctBody"><p class="muted">Loading…</p></div>
+    <div class="brand">
+      <a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a>
     </div>
+    <div class="header-actions">
+      <a class="btn btn-ghost btn-sm" href="/">Marketplace</a>
+      <button id="logoutBtn" class="btn btn-ghost btn-sm" type="button">Log out</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h2>My Account</h2>
+    <p class="sub" id="acctSub">Loading your longhouse…</p>
+
+    <div class="tabs" id="tabs">
+      <button class="tab" data-tab="overview" type="button">Overview</button>
+      <button class="tab" data-tab="notifications" type="button">Notifications <span class="tcount" id="nBadge"></span></button>
+      <button class="tab" data-tab="watchlist" type="button">Watchlist</button>
+      <button class="tab" data-tab="offers" type="button">Offers</button>
+      <button class="tab" data-tab="orders" type="button">Orders</button>
+      <button class="tab" data-tab="messages" type="button">Messages <span class="tcount" id="mBadge"></span></button>
+      <button class="tab" data-tab="searches" type="button">Searches</button>
+      <button class="tab" data-tab="wants" type="button">Wants</button>
+      <button class="tab" data-tab="store" type="button" id="storeTabBtn" hidden>⚑ Store</button>
+    </div>
+
+    <section id="panel-overview" class="card tab-panel" hidden></section>
+    <section id="panel-notifications" class="card tab-panel" hidden></section>
+    <section id="panel-watchlist" class="card tab-panel" hidden></section>
+    <section id="panel-offers" class="card tab-panel" hidden></section>
+    <section id="panel-orders" class="card tab-panel" hidden></section>
+    <section id="panel-messages" class="card tab-panel" hidden></section>
+    <section id="panel-searches" class="card tab-panel" hidden></section>
+    <section id="panel-wants" class="card tab-panel" hidden></section>
+    <section id="panel-store" class="card tab-panel" hidden></section>
   </main>
-  <div id="toast" class="toast"></div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
   <script>
     "use strict";
     const $ = (id) => document.getElementById(id);
     const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-    async function api(p, o = {}) { const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } }); let d = null; try { d = await r.json(); } catch (_) {} if (!r.ok) throw new Error((d && d.detail) || "err"); return d; }
-    async function load() {
-      const me = await api("/api/auth/me");
-      if (!me.user) { location.href = "/login"; return; }
-      const u = me.user;
-      $("acctBody").innerHTML = `
-        <p><strong>${esc(u.name || u.email)}</strong><br><span class="muted">${esc(u.email)}${u.email_verified ? " · verified" : ""}</span></p>
-        <p>Role: <span class="badge ${u.is_staff ? "founding" : ""}">${u.is_staff ? "★ Staff (Command Hub)" : "Member"}</span></p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
-          ${u.is_staff ? '<a class="btn btn-primary" href="/admin">Open Command Hub →</a>' : ""}
-          <a class="btn btn-ghost" href="/stores">Browse stores</a>
-          <a class="btn btn-ghost" href="/">Become a seller</a>
-          <button id="logoutBtn" class="btn btn-ghost" type="button">Log out</button>
-        </div>`;
-      $("logoutBtn").addEventListener("click", async () => { await api("/api/auth/logout", { method: "POST" }); location.href = "/"; });
+    const money = (n) => n == null || isNaN(Number(n)) ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    let toastTimer;
+    function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2800); }
+
+    async function api(p, o = {}) {
+      const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
+      let d = null; try { d = await r.json(); } catch (_) {}
+      if (!r.ok) { const e = new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`); e.status = r.status; throw e; }
+      return d;
     }
-    document.addEventListener("DOMContentLoaded", () => load().catch(() => { location.href = "/login"; }));
+
+    function relDate(iso) {
+      if (!iso) return "";
+      const d = new Date(iso); if (isNaN(d)) return "";
+      const s = (Date.now() - d.getTime()) / 1000;
+      if (s < 60) return "just now";
+      if (s < 3600) return Math.floor(s / 60) + "m ago";
+      if (s < 86400) return Math.floor(s / 3600) + "h ago";
+      if (s < 604800) return Math.floor(s / 86400) + "d ago";
+      return d.toLocaleDateString();
+    }
+
+    const CHIP_KIND = { accepted: "good", paid: "good", delivered: "good", completed: "good", active: "good", live: "good", shipped: "info", open: "info", pending: "warn", countered: "warn", declined: "bad", cancelled: "bad", disputed: "bad", expired: "bad", sold: "warn" };
+    const chip = (st) => `<span class="chip ${CHIP_KIND[String(st || "").toLowerCase()] || ""}">${esc(st || "—")}</span>`;
+
+    function authWall(panel) {
+      panel.innerHTML = `<div class="empty-sm">Your session has ended — you need to sign in for this.<br><a href="/login">Sign in →</a></div>`;
+    }
+    function loadFail(panel, e) {
+      if (e && e.status === 401) return authWall(panel);
+      panel.innerHTML = `<div class="empty-sm">Couldn’t load this right now. ${esc(e && e.message || "")}</div>`;
+    }
+    const rowsOf = (d, key) => Array.isArray(d) ? d : (d && (d[key] || d.items || d.results)) || [];
+
+    let USER = null;
+    const TABS = ["overview", "notifications", "watchlist", "offers", "orders", "messages", "searches", "wants", "store"];
+
+    /* ---------------- Tab machinery ---------------- */
+    function switchTab(name, pushHash = true) {
+      if (!TABS.includes(name)) name = "overview";
+      if (name === "store" && !(USER && USER.seller_handle)) name = "overview";
+      document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+      TABS.forEach((t) => { const p = $("panel-" + t); if (p) p.hidden = t !== name; });
+      if (pushHash && location.hash !== "#" + name) history.replaceState(null, "", "#" + name);
+      const loader = LOADERS[name];
+      if (loader) loader().catch((e) => loadFail($("panel-" + name), e));
+    }
+
+    /* ---------------- Badge counts ---------------- */
+    async function refreshNotifBadge() {
+      try {
+        const d = await api("/api/notifications/unread-count");
+        const n = (d && (d.count ?? d.unread ?? d.unread_count)) || 0;
+        const b = $("nBadge"); b.textContent = n > 99 ? "99+" : n; b.classList.toggle("show", n > 0);
+      } catch (_) {}
+    }
+    function setMsgBadge(n) { const b = $("mBadge"); b.textContent = n > 99 ? "99+" : n; b.classList.toggle("show", n > 0); }
+
+    /* ---------------- 1. Overview ---------------- */
+    async function loadOverview() {
+      const p = $("panel-overview");
+      const u = USER;
+      const badges = [
+        u.is_staff ? `<span class="badge founding">★ Staff</span>` : `<span class="badge">Member</span>`,
+        u.seller_handle ? `<span class="badge grade">Seller</span>` : "",
+        u.email_verified ? `<span class="badge">✓ Verified email</span>` : "",
+      ].filter(Boolean).join("");
+      const storeBit = u.seller_handle
+        ? `<div class="store-link-box">
+             <div><strong>Your store:</strong> <a href="/store/${encodeURIComponent(u.seller_handle)}">/store/${esc(u.seller_handle)}</a></div>
+             <a class="btn btn-sm" href="#store" id="goStoreTab">Manage store operations →</a>
+           </div>`
+        : `<div class="claim-box">
+             <h4>Claim your store</h4>
+             <p class="muted" style="margin:0 0 12px;font-size:13px;">Already signed up as a seller? Link your store to this account with your handle and store token.</p>
+             <div class="field"><span>Store handle</span><input id="claimHandle" placeholder="e.g. valhalla-cards" /></div>
+             <div class="field"><span>Store token</span><input id="claimToken" type="password" placeholder="X-Store-Token" /></div>
+             <button id="claimBtn" class="btn btn-primary btn-sm" type="button">Claim store</button>
+             <span id="claimStatus" class="form-status"></span>
+           </div>`;
+      p.innerHTML = `
+        <p style="margin:0;"><strong style="font-size:18px;">${esc(u.name || u.email)}</strong><br><span class="muted">${esc(u.email)}</span></p>
+        <div class="role-badges">${badges}</div>
+        ${storeBit}
+        <div class="ov-links">
+          ${u.is_staff ? `<a class="btn btn-primary" href="/admin">Open Command Hub →</a>` : ""}
+          <a class="btn btn-ghost" href="/">Marketplace</a>
+          <a class="btn btn-ghost" href="/stores">Browse stores</a>
+        </div>`;
+      const goStore = $("goStoreTab");
+      if (goStore) goStore.addEventListener("click", (e) => { e.preventDefault(); switchTab("store"); });
+      const claimBtn = $("claimBtn");
+      if (claimBtn) claimBtn.addEventListener("click", async () => {
+        const handle = $("claimHandle").value.trim();
+        const token = $("claimToken").value.trim();
+        const st = $("claimStatus");
+        if (!handle || !token) { st.className = "form-status error"; st.textContent = "Handle and token are both required."; return; }
+        st.className = "form-status"; st.textContent = "Claiming…";
+        try {
+          await api("/api/sellers/claim", { method: "POST", body: JSON.stringify({ handle, store_token: token }) });
+          st.className = "form-status ok"; st.textContent = "Claimed! Reloading…";
+          toast("Store claimed."); setTimeout(() => location.reload(), 700);
+        } catch (e) { st.className = "form-status error"; st.textContent = e.message; }
+      });
+    }
+
+    /* ---------------- 2. Notifications ---------------- */
+    async function loadNotifications() {
+      const p = $("panel-notifications");
+      p.innerHTML = `<div class="empty-sm">Loading…</div>`;
+      const items = rowsOf(await api("/api/notifications"), "notifications");
+      const list = items.length ? items.map((n) => {
+        const unread = !(n.read ?? n.is_read ?? n.read_at);
+        return `<div class="nrow ${unread ? "unread" : ""}" data-nid="${esc(n.id)}" data-link="${esc(n.link || "")}" data-unread="${unread ? 1 : 0}">
+          <span class="ndot"></span>
+          <div style="min-width:0;">
+            <div class="n-title">${esc(n.title || "Notification")}</div>
+            ${n.body ? `<div class="n-body">${esc(n.body)}</div>` : ""}
+          </div>
+          <span class="n-date">${relDate(n.created_at)}</span>
+        </div>`;
+      }).join("") : `<div class="empty-sm">All quiet on the fjord — no notifications yet.</div>`;
+      p.innerHTML = `
+        <div class="panel-bar">
+          <div class="sec-title">Notifications</div>
+          <button id="markAllBtn" class="btn btn-ghost btn-sm" type="button">Mark all read</button>
+        </div>
+        <div id="nList">${list}</div>`;
+      $("markAllBtn").addEventListener("click", async () => {
+        try { await api("/api/notifications/read-all", { method: "POST" }); toast("All marked read."); refreshNotifBadge(); loadNotifications(); }
+        catch (e) { toast(e.message); }
+      });
+      p.querySelectorAll(".nrow").forEach((row) => row.addEventListener("click", async () => {
+        const id = row.getAttribute("data-nid"), link = row.getAttribute("data-link"), unread = row.getAttribute("data-unread") === "1";
+        try { if (unread) await api(`/api/notifications/${encodeURIComponent(id)}/read`, { method: "POST" }); } catch (_) {}
+        if (link) { location.href = link; return; }
+        refreshNotifBadge(); loadNotifications();
+      }));
+      refreshNotifBadge();
+    }
+
+    /* ---------------- 3. Watchlist ---------------- */
+    async function loadWatchlist() {
+      const p = $("panel-watchlist");
+      p.innerHTML = `<div class="empty-sm">Loading…</div>`;
+      const items = rowsOf(await api("/api/watch/mine"), "items");
+      const cards = items.length ? items.map((l) => `
+        <div class="wcard">
+          <a href="/listing/${encodeURIComponent(l.id)}" style="color:inherit;text-decoration:none;">
+            <div class="wimg">${l.image_url ? `<img src="${esc(l.image_url)}" alt="${esc(l.title)}" loading="lazy" />` : `<span class="muted" style="font-size:26px;">⚔</span>`}</div>
+            <div class="wbody">
+              <div class="wtitle">${esc(l.title)}</div>
+              <div>${chip(l.status)}</div>
+            </div>
+          </a>
+          <div class="wfoot" style="padding:0 11px 11px;">
+            <span class="wprice">${money(l.price)}</span>
+            <button class="btn btn-ghost btn-sm" data-unwatch="${esc(l.id)}" type="button">✕ Unwatch</button>
+          </div>
+        </div>`).join("") : "";
+      p.innerHTML = `
+        <div class="sec-title">Watchlist</div>
+        ${items.length ? `<div class="wgrid">${cards}</div>` : `<div class="empty-sm">Nothing on watch. Eye a treasure on the <a href="/">marketplace</a> and it will appear here.</div>`}`;
+      p.querySelectorAll("[data-unwatch]").forEach((b) => b.addEventListener("click", async () => {
+        try { await api("/api/watch", { method: "POST", body: JSON.stringify({ listing_id: b.getAttribute("data-unwatch") }) }); toast("Removed from watchlist."); loadWatchlist(); }
+        catch (e) { toast(e.message); }
+      }));
+    }
+
+    /* ---------------- 4. Offers (mine, as buyer) ---------------- */
+    async function loadOffers() {
+      const p = $("panel-offers");
+      p.innerHTML = `<div class="empty-sm">Loading…</div>`;
+      const offers = rowsOf(await api("/api/offers/mine"), "offers");
+      if (!offers.length) { p.innerHTML = `<div class="sec-title">My Offers</div><div class="empty-sm">No offers yet. Find a listing and name your price.</div>`; return; }
+      const rows = offers.map((o) => {
+        const st = String(o.status || "").toLowerCase();
+        let acts = "";
+        if (st === "countered") acts = `<button class="btn btn-primary btn-sm" data-oact="accept" data-oid="${esc(o.id)}" type="button">Accept counter</button>
+                                        <button class="btn btn-ghost btn-sm" data-oact="decline" data-oid="${esc(o.id)}" type="button">Decline</button>`;
+        else if (st === "accepted") acts = `<button class="btn btn-primary btn-sm" data-pay="${esc(o.listing_id)}" data-oid="${esc(o.id)}" type="button">Pay now</button>`;
+        return `<tr>
+          <td><a href="/listing/${encodeURIComponent(o.listing_id)}">${esc(o.listing_title || "Listing")}</a></td>
+          <td>${money(o.amount)}</td>
+          <td>${o.counter_amount != null ? money(o.counter_amount) : "—"}</td>
+          <td>${chip(o.status)}</td>
+          <td><div class="acts">${acts}</div></td>
+        </tr>`;
+      }).join("");
+      p.innerHTML = `
+        <div class="sec-title">My Offers</div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Listing</th><th>My offer</th><th>Counter</th><th>Status</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>`;
+      p.querySelectorAll("[data-oact]").forEach((b) => b.addEventListener("click", async () => {
+        try {
+          await api(`/api/offers/${encodeURIComponent(b.getAttribute("data-oid"))}/buyer-respond`, { method: "POST", body: JSON.stringify({ action: b.getAttribute("data-oact") }) });
+          toast(b.getAttribute("data-oact") === "accept" ? "Counter accepted." : "Counter declined."); loadOffers();
+        } catch (e) { toast(e.message); }
+      }));
+      p.querySelectorAll("[data-pay]").forEach((b) => b.addEventListener("click", async () => {
+        try {
+          const r = await api(`/api/payments/checkout/${encodeURIComponent(b.getAttribute("data-pay"))}`, { method: "POST", body: JSON.stringify({ offer_id: b.getAttribute("data-oid") }) });
+          if (r && r.url) { toast("Opening checkout…"); window.open(r.url, "_blank", "noopener"); }
+          else toast((r && r.detail) || "Checkout created.");
+        } catch (e) { toast(e.message); }
+      }));
+    }
+
+    /* ---------------- 5. Orders (mine, as buyer) ---------------- */
+    async function loadOrders() {
+      const p = $("panel-orders");
+      p.innerHTML = `<div class="empty-sm">Loading…</div>`;
+      const orders = rowsOf(await api("/api/orders/mine"), "orders");
+      if (!orders.length) { p.innerHTML = `<div class="sec-title">My Orders</div><div class="empty-sm">No orders yet — your hoard awaits its first treasure.</div>`; return; }
+      const rows = orders.map((o) => {
+        const st = String(o.status || "").toLowerCase();
+        const total = o.total != null ? o.total : Number(o.price || 0) + Number(o.shipping || 0);
+        const acts = [];
+        if (st === "shipped") acts.push(`<button class="btn btn-primary btn-sm" data-delivered="${esc(o.id)}" type="button">Confirm delivered</button>`);
+        if (!o.feedback_left && ["paid", "shipped", "delivered"].includes(st)) acts.push(`<button class="btn btn-ghost btn-sm" data-fb="${esc(o.id)}" type="button">Leave feedback</button>`);
+        if (!["disputed", "cancelled"].includes(st)) acts.push(`<button class="btn btn-ghost btn-sm" data-dispute="${esc(o.id)}" type="button">Report a problem</button>`);
+        return `<tr>
+          <td>${esc(o.listing_title || o.title || "Order")}</td>
+          <td>${money(total)}</td>
+          <td>${chip(o.status)}</td>
+          <td>${o.tracking_url ? `<a href="${esc(o.tracking_url)}" target="_blank" rel="noopener">Track ↗</a>` : `<span class="muted">—</span>`}</td>
+          <td><div class="acts">${acts.join("")}</div></td>
+        </tr>
+        <tr id="fbrow-${esc(o.id)}" hidden><td colspan="5">
+          <div class="inline-form">
+            <span class="muted" style="font-size:13px;">Rate this order:</span>
+            <select id="fbstars-${esc(o.id)}">
+              <option value="5">★★★★★ (5)</option><option value="4">★★★★ (4)</option><option value="3">★★★ (3)</option><option value="2">★★ (2)</option><option value="1">★ (1)</option>
+            </select>
+            <input id="fbcomment-${esc(o.id)}" placeholder="Optional comment…" style="flex:1;min-width:180px;" maxlength="500" />
+            <button class="btn btn-primary btn-sm" data-fbsend="${esc(o.id)}" type="button">Submit</button>
+          </div>
+        </td></tr>`;
+      }).join("");
+      p.innerHTML = `
+        <div class="sec-title">My Orders</div>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>Item</th><th>Total</th><th>Status</th><th>Tracking</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>`;
+      p.querySelectorAll("[data-delivered]").forEach((b) => b.addEventListener("click", async () => {
+        try { await api(`/api/orders/${encodeURIComponent(b.getAttribute("data-delivered"))}/delivered`, { method: "POST" }); toast("Delivery confirmed — enjoy the spoils."); loadOrders(); }
+        catch (e) { toast(e.message); }
+      }));
+      p.querySelectorAll("[data-fb]").forEach((b) => b.addEventListener("click", () => {
+        const row = $("fbrow-" + b.getAttribute("data-fb")); if (row) row.hidden = !row.hidden;
+      }));
+      p.querySelectorAll("[data-fbsend]").forEach((b) => b.addEventListener("click", async () => {
+        const id = b.getAttribute("data-fbsend");
+        try {
+          await api(`/api/orders/${encodeURIComponent(id)}/feedback`, { method: "POST", body: JSON.stringify({ rating: Number($("fbstars-" + id).value), comment: $("fbcomment-" + id).value.trim() || null }) });
+          toast("Feedback sent. Skål!"); loadOrders();
+        } catch (e) { toast(e.message); }
+      }));
+      p.querySelectorAll("[data-dispute]").forEach((b) => b.addEventListener("click", async () => {
+        const reason = prompt("Describe the problem with this order:");
+        if (!reason || !reason.trim()) return;
+        try { await api(`/api/orders/${encodeURIComponent(b.getAttribute("data-dispute"))}/dispute`, { method: "POST", body: JSON.stringify({ reason: reason.trim() }) }); toast("Problem reported — we’ll look into it."); loadOrders(); }
+        catch (e) { toast(e.message); }
+      }));
+    }
+
+    /* ---------------- 6. Messages ---------------- */
+    async function loadMessages() {
+      const p = $("panel-messages");
+      p.innerHTML = `<div class="empty-sm">Loading…</div>`;
+      const threads = rowsOf(await api("/api/social/messages/mine"), "threads");
+      setMsgBadge(threads.reduce((a, t) => a + (Number(t.unread) || 0), 0));
+      if (!threads.length) { p.innerHTML = `<div class="sec-title">Messages</div><div class="empty-sm">No conversations yet. Message a seller from any listing or store.</div>`; return; }
+      const rows = threads.map((t) => {
+        const withName = t.with || t.with_name || "Conversation";
+        return `<div class="thread" data-thread="${esc(t.id)}">
+          <div class="t-av">${esc(String(withName).trim()[0] || "?").toUpperCase()}</div>
+          <div class="t-main">
+            <div class="t-with">${esc(withName)} ${t.side === "seller" ? `<span class="side-tag">as seller</span>` : ""}</div>
+            <div class="t-last">${esc(t.last_body || "")}</div>
+          </div>
+          ${Number(t.unread) > 0 ? `<span class="t-unread">${Number(t.unread)}</span>` : ""}
+        </div>`;
+      }).join("");
+      p.innerHTML = `<div class="sec-title">Messages</div>${rows}`;
+      p.querySelectorAll("[data-thread]").forEach((r) => r.addEventListener("click", () => openThread(r.getAttribute("data-thread"))));
+    }
+
+    async function openThread(id) {
+      const p = $("panel-messages");
+      p.innerHTML = `<div class="empty-sm">Loading conversation…</div>`;
+      try {
+        const d = await api(`/api/social/messages/${encodeURIComponent(id)}`);
+        const t = d.thread || d;
+        const msgs = t.messages || d.messages || [];
+        const myRole = t.my_role || d.my_role;
+        const withName = t.with || t.with_name || "Conversation";
+        const bubbles = msgs.length ? msgs.map((m) => {
+          const mine = (m.role || m.sender_role || m.from) === myRole;
+          return `<div class="bubble ${mine ? "me" : ""}">${esc(m.body)}<span class="b-date">${relDate(m.created_at)}</span></div>`;
+        }).join("") : `<div class="empty-sm">No messages in this thread yet.</div>`;
+        p.innerHTML = `
+          <div class="panel-bar">
+            <div class="sec-title">${esc(withName)} ${t.side === "seller" || myRole === "seller" ? `<span class="side-tag">as seller</span>` : ""}</div>
+            <button id="backToThreads" class="btn btn-ghost btn-sm" type="button">← All messages</button>
+          </div>
+          <div class="bubbles" id="bubbles">${bubbles}</div>
+          <div class="reply-row">
+            <input id="replyBody" placeholder="Write a reply…" maxlength="2000" />
+            <button id="replySend" class="btn btn-primary btn-sm" type="button">Send</button>
+          </div>`;
+        const bx = $("bubbles"); bx.scrollTop = bx.scrollHeight;
+        $("backToThreads").addEventListener("click", () => loadMessages().catch((e) => loadFail(p, e)));
+        const send = async () => {
+          const body = $("replyBody").value.trim(); if (!body) return;
+          try { await api(`/api/social/messages/${encodeURIComponent(id)}`, { method: "POST", body: JSON.stringify({ body }) }); openThread(id); }
+          catch (e) { toast(e.message); }
+        };
+        $("replySend").addEventListener("click", send);
+        $("replyBody").addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+        $("replyBody").focus();
+      } catch (e) { loadFail(p, e); }
+    }
+
+    /* ---------------- 7. Saved searches ---------------- */
+    function filterSummary(f) {
+      const parts = Object.entries(f || {})
+        .filter(([, v]) => v != null && v !== "" && v !== false)
+        .map(([k, v]) => `${k.replace(/_/g, " ")}: ${v === true ? "yes" : v}`);
+      return parts.length ? parts.join(" · ") : "any listing";
+    }
+    async function loadSearches() {
+      const p = $("panel-searches");
+      p.innerHTML = `<div class="empty-sm">Loading…</div>`;
+      const searches = rowsOf(await api("/api/searches/mine"), "searches");
+      if (!searches.length) { p.innerHTML = `<div class="sec-title">Saved Searches</div><div class="empty-sm">No saved searches. Save one from the <a href="/">marketplace</a> filters to get alerts.</div>`; return; }
+      const rows = searches.map((s) => {
+        const f = s.filters || s.params || {};
+        return `<tr>
+          <td><strong>${esc(s.name || "Saved search")}</strong><br><span class="muted" style="font-size:12px;">${esc(filterSummary(f))}</span></td>
+          <td><div class="acts">
+            <button class="btn btn-primary btn-sm" data-run="${esc(s.id)}" type="button">Run</button>
+            <button class="btn btn-ghost btn-sm" data-del-search="${esc(s.id)}" type="button">Delete</button>
+          </div></td>
+        </tr>`;
+      }).join("");
+      p.innerHTML = `
+        <div class="sec-title">Saved Searches</div>
+        <div class="tbl-wrap"><table class="tbl"><tbody>${rows}</tbody></table></div>`;
+      const byId = {}; searches.forEach((s) => { byId[String(s.id)] = s; });
+      p.querySelectorAll("[data-run]").forEach((b) => b.addEventListener("click", () => {
+        const s = byId[b.getAttribute("data-run")]; if (!s) return;
+        const f = s.filters || s.params || {};
+        const qs = Object.entries(f)
+          .filter(([, v]) => v != null && v !== "" && v !== false)
+          .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join("&");
+        location.href = "/marketplace" + (qs ? "?" + qs : "");
+      }));
+      p.querySelectorAll("[data-del-search]").forEach((b) => b.addEventListener("click", async () => {
+        try { await api(`/api/searches/${encodeURIComponent(b.getAttribute("data-del-search"))}`, { method: "DELETE" }); toast("Search deleted."); loadSearches(); }
+        catch (e) { toast(e.message); }
+      }));
+    }
+
+    /* ---------------- 8. Wants ---------------- */
+    async function loadWants() {
+      const p = $("panel-wants");
+      p.innerHTML = `<div class="empty-sm">Loading…</div>`;
+      const wants = rowsOf(await api("/api/social/wants?mine=true"), "wants");
+      const rows = wants.length ? wants.map((w) => `<tr>
+          <td><strong>${esc(w.description)}</strong>${w.category ? `<br><span class="muted" style="font-size:12px;">${esc(w.category)}</span>` : ""}</td>
+          <td>${w.max_price != null ? "up to " + money(w.max_price) : "—"}</td>
+          <td><span class="muted" style="font-size:12px;">${relDate(w.created_at)}</span></td>
+          <td><button class="btn btn-ghost btn-sm" data-del-want="${esc(w.id)}" type="button">Delete</button></td>
+        </tr>`).join("") : "";
+      p.innerHTML = `
+        <div class="sec-title">Wants — post what you’re hunting for</div>
+        ${wants.length
+          ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Looking for</th><th>Max price</th><th>Posted</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
+          : `<div class="empty-sm">No wants posted. Tell the realm what you seek and sellers will come to you.</div>`}
+        <div class="inline-form" style="margin-top:16px;">
+          <input id="wantDesc" placeholder="What are you hunting for? e.g. PSA 9 Base Set Blastoise" style="flex:2;min-width:220px;" maxlength="300" />
+          <input id="wantCat" placeholder="Category (optional)" style="flex:1;min-width:130px;" maxlength="60" />
+          <input id="wantMax" type="number" min="0" step="0.01" placeholder="Max $ (optional)" style="width:140px;" />
+          <button id="wantAdd" class="btn btn-primary btn-sm" type="button">Post want</button>
+        </div>`;
+      p.querySelectorAll("[data-del-want]").forEach((b) => b.addEventListener("click", async () => {
+        try { await api(`/api/social/wants/${encodeURIComponent(b.getAttribute("data-del-want"))}`, { method: "DELETE" }); toast("Want removed."); loadWants(); }
+        catch (e) { toast(e.message); }
+      }));
+      $("wantAdd").addEventListener("click", async () => {
+        const description = $("wantDesc").value.trim();
+        if (!description) { toast("Describe what you’re looking for."); return; }
+        const body = { description };
+        const cat = $("wantCat").value.trim(); if (cat) body.category = cat;
+        const mx = $("wantMax").value; if (mx !== "" && !isNaN(Number(mx))) body.max_price = Number(mx);
+        try { await api("/api/social/wants", { method: "POST", body: JSON.stringify(body) }); toast("Want posted to the realm."); loadWants(); }
+        catch (e) { toast(e.message); }
+      });
+    }
+
+    /* ---------------- 9. Store operations (sellers) ---------------- */
+    async function loadStore() {
+      const p = $("panel-store");
+      if (!USER || !USER.seller_handle) { p.innerHTML = `<div class="empty-sm">This account doesn’t own a store yet.</div>`; return; }
+      const handle = USER.seller_handle;
+      p.innerHTML = `<div class="empty-sm">Loading store operations…</div>`;
+      let offers = [], orders = [], offersErr = null, ordersErr = null;
+      const [ro, rd] = await Promise.allSettled([
+        api(`/api/offers/store/${encodeURIComponent(handle)}`),
+        api(`/api/orders/store/${encodeURIComponent(handle)}`),
+      ]);
+      if (ro.status === "fulfilled") offers = rowsOf(ro.value, "offers"); else offersErr = ro.reason;
+      if (rd.status === "fulfilled") orders = rowsOf(rd.value, "orders"); else ordersErr = rd.reason;
+      if (offersErr && offersErr.status === 401) return authWall(p);
+
+      const offerRows = offers.map((o) => {
+        const st = String(o.status || "").toLowerCase();
+        const actionable = st === "open" || st === "countered";
+        const acts = actionable ? `
+          <button class="btn btn-primary btn-sm" data-sact="accept" data-soid="${esc(o.id)}" type="button">Accept</button>
+          <button class="btn btn-ghost btn-sm" data-sact="decline" data-soid="${esc(o.id)}" type="button">Decline</button>
+          <button class="btn btn-ghost btn-sm" data-sact="counter" data-soid="${esc(o.id)}" type="button">Counter $</button>` : "";
+        return `<tr>
+          <td>${esc(o.listing_title || "Listing")}</td>
+          <td>${esc(o.buyer_name || "Buyer")}</td>
+          <td>${money(o.amount)}</td>
+          <td>${o.counter_amount != null ? money(o.counter_amount) : "—"}</td>
+          <td>${chip(o.status)}</td>
+          <td><div class="acts">${acts}</div></td>
+        </tr>`;
+      }).join("");
+
+      const orderRows = orders.map((o) => {
+        const st = String(o.status || "").toLowerCase();
+        const total = o.total != null ? o.total : Number(o.price || 0) + Number(o.shipping || 0);
+        const shippable = st === "paid" || st === "pending";
+        const shipForm = shippable ? `
+          <div class="inline-form">
+            <input id="trk-${esc(o.id)}" placeholder="Tracking number" style="flex:1;min-width:160px;" maxlength="80" />
+            <select id="car-${esc(o.id)}">
+              <option value="usps">USPS</option><option value="ups">UPS</option><option value="fedex">FedEx</option><option value="dhl">DHL</option><option value="other">Other</option>
+            </select>
+            <button class="btn btn-primary btn-sm" data-ship="${esc(o.id)}" type="button">Mark shipped</button>
+          </div>` : "";
+        return `<tr>
+          <td>${esc(o.listing_title || o.title || "Order")}</td>
+          <td>${esc(o.buyer_name || o.buyer || "Buyer")}</td>
+          <td>${money(total)}</td>
+          <td>${chip(o.status)}</td>
+        </tr>${shipForm ? `<tr><td colspan="4">${shipForm}</td></tr>` : ""}`;
+      }).join("");
+
+      p.innerHTML = `
+        <div class="panel-bar">
+          <div class="sec-title">⚑ Store operations — <a href="/store/${encodeURIComponent(handle)}">/store/${esc(handle)}</a></div>
+        </div>
+        <div class="sec-title">Offers on your listings</div>
+        ${offersErr ? `<div class="empty-sm">Couldn’t load offers. ${esc(offersErr.message)}</div>`
+          : offers.length
+            ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Listing</th><th>Buyer</th><th>Offer</th><th>Counter</th><th>Status</th><th></th></tr></thead><tbody>${offerRows}</tbody></table></div>`
+            : `<div class="empty-sm">No offers yet — raiders haven’t spotted your hoard.</div>`}
+        <div class="sec-title">Orders to fulfill</div>
+        ${ordersErr ? `<div class="empty-sm">Couldn’t load orders. ${esc(ordersErr.message)}</div>`
+          : orders.length
+            ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Item</th><th>Buyer</th><th>Total</th><th>Status</th></tr></thead><tbody>${orderRows}</tbody></table></div>`
+            : `<div class="empty-sm">No orders yet. When someone buys, shipping tools appear here.</div>`}`;
+
+      p.querySelectorAll("[data-sact]").forEach((b) => b.addEventListener("click", async () => {
+        const action = b.getAttribute("data-sact"), id = b.getAttribute("data-soid");
+        const body = { action };
+        if (action === "counter") {
+          const amt = prompt("Counter offer amount ($):");
+          if (amt == null || amt.trim() === "" || isNaN(Number(amt))) return;
+          body.counter_amount = Number(amt);
+        }
+        try { await api(`/api/offers/${encodeURIComponent(id)}/respond`, { method: "POST", body: JSON.stringify(body) }); toast(`Offer ${action === "counter" ? "countered" : action + "ed"}.`); loadStore(); }
+        catch (e) { toast(e.message); }
+      }));
+      p.querySelectorAll("[data-ship]").forEach((b) => b.addEventListener("click", async () => {
+        const id = b.getAttribute("data-ship");
+        const tracking = $("trk-" + id).value.trim();
+        if (!tracking) { toast("Enter a tracking number."); return; }
+        try {
+          await api(`/api/orders/${encodeURIComponent(id)}/ship`, { method: "POST", body: JSON.stringify({ tracking_number: tracking, carrier: $("car-" + id).value }) });
+          toast("Marked shipped — the longship sails."); loadStore();
+        } catch (e) { toast(e.message); }
+      }));
+    }
+
+    const LOADERS = {
+      overview: loadOverview,
+      notifications: loadNotifications,
+      watchlist: loadWatchlist,
+      offers: loadOffers,
+      orders: loadOrders,
+      messages: loadMessages,
+      searches: loadSearches,
+      wants: loadWants,
+      store: loadStore,
+    };
+
+    /* ---------------- Boot ---------------- */
+    document.addEventListener("DOMContentLoaded", async () => {
+      $("logoutBtn").addEventListener("click", async () => {
+        try { await api("/api/auth/logout", { method: "POST" }); } catch (_) {}
+        location.href = "/";
+      });
+      let me;
+      try { me = await api("/api/auth/me"); }
+      catch (_) { location.href = "/login"; return; }
+      if (!me || !me.user) { location.href = "/login"; return; }
+      USER = me.user;
+      $("acctSub").textContent = `Signed in as ${USER.email}`;
+      if (USER.seller_handle) $("storeTabBtn").hidden = false;
+
+      document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => switchTab(t.dataset.tab)));
+      window.addEventListener("hashchange", () => switchTab(location.hash.slice(1) || "overview", false));
+
+      refreshNotifBadge();
+      switchTab(location.hash.slice(1) || "overview", false);
+    });
   </script>
   <script src="/static/nav.js"></script>
 </body>

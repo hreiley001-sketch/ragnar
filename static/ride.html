@@ -74,9 +74,28 @@
       </section>
     </div>
 
+    <div id="videoWrap" class="card" style="margin-top:20px;padding:10px;" hidden>
+      <div class="muted-s" style="margin-bottom:8px;">📺 Live video</div>
+      <div id="videoBox" style="aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000;display:grid;place-items:center;color:var(--muted);font-size:13px;">Connecting…</div>
+    </div>
+
+    <div id="giveawayBox" class="card" style="margin-top:20px;padding:14px;" hidden>
+      <div class="muted-s">🎁 Giveaway</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:6px;">
+        <div><strong id="gaTitle"></strong> <span id="gaMeta" class="muted" style="font-size:13px;"></span></div>
+        <button id="gaEnter" class="btn btn-primary btn-sm" type="button">Enter giveaway</button>
+      </div>
+      <div id="gaWinner" class="winner" style="margin:10px 0 0;padding:12px;" hidden></div>
+    </div>
+
     <section class="card feed-panel" style="margin-top:20px;">
-      <div class="muted-s">Live feed <span class="live-tag" style="margin-left:8px;"><span class="d"></span> live</span></div>
+      <div class="muted-s">Live chat &amp; feed <span class="live-tag" style="margin-left:8px;"><span class="d"></span> live</span></div>
       <div id="feed" class="feed"></div>
+      <div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px;margin-top:10px;align-items:center;">
+        <input id="chatName" placeholder="Name" style="max-width:120px;" maxlength="60" />
+        <input id="chatBody" placeholder="Say something…" maxlength="300" />
+        <button id="chatSend" class="btn btn-primary btn-sm" type="button">Chat</button>
+      </div>
     </section>
   </main>
 

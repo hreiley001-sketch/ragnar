@@ -90,6 +90,18 @@ def is_staff(user: Optional[User]) -> bool:
     return bool(user and user.role == UserRole.admin.value)
 
 
+def can_act_for_seller(user: Optional[User], seller, x_store_token: str = "") -> bool:
+    """True if this request may act as the given Seller: the store token, the
+    linked owner account (user.seller_handle), or staff."""
+    if seller is None:
+        return False
+    if is_staff(user):
+        return True
+    if user and user.seller_handle and user.seller_handle == seller.handle:
+        return True
+    return bool(seller.store_edit_token) and x_store_token == seller.store_edit_token
+
+
 # --------------------------- roles --------------------------- #
 
 def role_for_verified_email(email: str) -> str:

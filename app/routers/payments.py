@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from sqlmodel import Session, select
+from sqlmodel import Session, select  # noqa: F401  (select used in webhook)
 
 from .. import payments
 from ..database import get_session
@@ -52,16 +52,32 @@ def connect_status(handle: str, session: Session = Depends(get_session)) -> dict
 
 
 @router.post("/checkout/{listing_id}")
-def checkout(listing_id: int, session: Session = Depends(get_session)) -> dict:
-    """Create a Checkout Session so a buyer can purchase this listing."""
+def checkout(listing_id: int, payload: dict | None = None,
+             session: Session = Depends(get_session)) -> dict:
+    """Create a Checkout Session so a buyer can purchase this listing.
+
+    Pass {"offer_id": N} to pay an accepted Best Offer price instead of the
+    listing price.
+    """
     listing = session.get(Listing, listing_id)
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")
     if listing.status != ListingStatus.active.value:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Listing is not active")
     seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
+
+    amount_override = None
+    offer_id = (payload or {}).get("offer_id")
+    if offer_id:
+        from ..models import Offer, OfferStatus
+        offer = session.get(Offer, int(offer_id))
+        if not offer or offer.listing_id != listing.id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Offer not found for this listing")
+        if offer.status != OfferStatus.accepted.value:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Offer isn't accepted")
+        amount_override = offer.counter_amount_cents or offer.amount_cents
     try:
-        return payments.create_checkout_session(listing, seller)
+        return payments.create_checkout_session(listing, seller, amount_cents=amount_override)
     except payments.PaymentsError as e:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
@@ -88,7 +104,42 @@ async def webhook(request: Request, session: Session = Depends(get_session)) -> 
             if listing and listing.status == ListingStatus.active.value:
                 price_cents = int(amount_total) if amount_total else listing.price_cents
                 record_sale(session, listing, price_cents, source="stripe")
+
+                # Create the Order record buyers/sellers manage post-checkout.
+                from ..emailer import ops_alert
+                from ..models import Order, User
+                from ..notify import notify, notify_seller
+                details = obj.get("customer_details") or {}
+                buyer_email = (details.get("email") or "").lower() or None
+                buyer_user = None
+                if buyer_email:
+                    buyer_user = session.exec(select(User).where(User.email == buyer_email)).first()
+                order = Order(
+                    listing_id=listing.id,
+                    seller_id=listing.seller_id,
+                    buyer_user_id=buyer_user.id if buyer_user else None,
+                    buyer_name=details.get("name"),
+                    buyer_email=buyer_email,
+                    title=listing.title,
+                    price_cents=max(0, price_cents - (listing.shipping_cents or 0)),
+                    shipping_cents=listing.shipping_cents or 0,
+                    status="paid",
+                    stripe_session_id=obj.get("id"),
+                    source="stripe",
+                )
+                session.add(order)
                 session.commit()
-                logger.info("Listing %s marked sold via Stripe checkout", listing_id)
+                session.refresh(order)
+                seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
+                notify_seller(session, seller, "order_paid",
+                              f"Order paid — {listing.title}",
+                              body=f"${price_cents / 100:,.2f} · ship it and add tracking.",
+                              link="/account#store")
+                if buyer_user:
+                    notify(session, buyer_user.id, "order_paid",
+                           f"Order confirmed — {listing.title}",
+                           body="You'll get tracking once it ships.", link="/account#orders")
+                ops_alert(f"Order paid: {listing.title} (${price_cents / 100:,.2f})")
+                logger.info("Listing %s sold via Stripe; order %s created", listing_id, order.id)
 
     return {"received": True}

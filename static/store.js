@@ -138,12 +138,67 @@ async function runDesigner() {
   }
 }
 
+async function loadSocial() {
+  // Followers + rating (public)
+  try {
+    const f = await api(`/api/social/followers/${encodeURIComponent(HANDLE)}`);
+    $("followerCount").textContent = `${f.followers} follower${f.followers === 1 ? "" : "s"}`;
+  } catch (_) {}
+  try {
+    const r = await api(`/api/orders/store/${encodeURIComponent(HANDLE)}/rating`);
+    $("storeRating").textContent = r.count ? `★ ${r.avg_stars} (${r.count})` : "No ratings yet";
+  } catch (_) {}
+  // My follow state + message gate
+  try {
+    const me = await api("/api/auth/me");
+    if (me.user) {
+      $("msgGate").hidden = true;
+      $("msgForm").hidden = false;
+      try {
+        const mine = await api("/api/social/follows/mine");
+        if ((mine.items || []).some((s) => s.handle === HANDLE)) {
+          $("followBtn").textContent = "❤ Following";
+          $("followBtn").classList.add("btn-primary");
+        }
+      } catch (_) {}
+    } else {
+      $("msgGate").innerHTML = `<a href="/login">Sign in</a> to message this store.`;
+    }
+  } catch (_) { $("msgGate").innerHTML = `<a href="/login">Sign in</a> to message this store.`; }
+}
+
+async function toggleFollow() {
+  try {
+    const r = await api("/api/social/follow", { method: "POST", body: JSON.stringify({ handle: HANDLE }) });
+    $("followBtn").textContent = r.following ? "❤ Following" : "♡ Follow";
+    $("followBtn").classList.toggle("btn-primary", r.following);
+    $("followerCount").textContent = `${r.followers} follower${r.followers === 1 ? "" : "s"}`;
+    toast(r.following ? "Following this store — you'll get drop alerts." : "Unfollowed.");
+  } catch (e) {
+    toast(String(e.message).includes("Sign in") ? "Sign in to follow stores — /login" : e.message);
+  }
+}
+
+async function sendStoreMessage() {
+  const body = $("msgBody").value.trim();
+  if (!body) return;
+  const st = $("msgStatus"); st.className = "form-status"; st.textContent = "Sending…";
+  try {
+    await api("/api/social/messages/start", { method: "POST", body: JSON.stringify({ handle: HANDLE, body }) });
+    st.className = "form-status ok"; st.textContent = "Sent! Replies land in your account → Messages.";
+    $("msgBody").value = "";
+  } catch (e) { st.className = "form-status error"; st.textContent = e.message; }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   if (!HANDLE) { document.body.innerHTML = "<p style='padding:40px'>No store specified.</p>"; return; }
   try { applyStore(await api(`/api/stores/${encodeURIComponent(HANDLE)}`)); }
   catch (e) { $("storeName").textContent = "Store not found"; toast(e.message); return; }
   loadListings();
   loadLive();
+  loadSocial();
+  $("followBtn").addEventListener("click", toggleFollow);
+  $("msgSend").addEventListener("click", sendStoreMessage);
 
   $("customizeBtn").addEventListener("click", () => {
     const p = $("customizePanel"); p.hidden = !p.hidden;

@@ -139,6 +139,8 @@ def admin_update_listing(
         listing.price_cents = round(float(payload["price"]) * 100)
     if payload.get("status") in {s.value for s in ListingStatus}:
         listing.status = payload["status"]
+    if "is_featured" in payload:
+        listing.is_featured = bool(payload["is_featured"])
     session.add(listing)
     session.commit()
     session.refresh(listing)

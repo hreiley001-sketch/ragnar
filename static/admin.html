@@ -25,16 +25,26 @@
     table.hub td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     table.hub tr:hover td { background: rgba(55,189,255,0.05); }
     .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
-    .pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); }
+    .pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); white-space: nowrap; }
     .pill.sold { color: var(--muted); }
     .pill.active { color: #9be7c4; border-color: rgba(120,230,180,0.4); }
     .pill.gold { color: var(--gold); border-color: rgba(240,198,116,0.5); }
-    .row-actions { display: flex; gap: 6px; }
+    .pill.ok { color: #9be7c4; border-color: rgba(120,230,180,0.4); }
+    .pill.warn { color: var(--gold); border-color: rgba(240,198,116,0.5); }
+    .pill.bad { color: var(--danger); border-color: rgba(255,138,138,0.4); }
+    .pill.info { color: var(--ice); border-color: rgba(111,214,255,0.5); }
+    .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
     .ai-panel { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; }
     .ai-box { padding: 16px; }
     .ai-out { margin-top: 10px; padding: 10px; border-radius: 8px; background: rgba(8,12,18,0.6); border: 1px solid var(--border); font-size: 13px; white-space: pre-wrap; min-height: 24px; }
     .int-list { display: flex; flex-wrap: wrap; gap: 10px 18px; }
     .int-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-soft); }
+    .wrap-cell { max-width: 260px; white-space: normal; }
+    .panel-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .panel-bar h3 { margin: 0; color: var(--steel); font-size: 14px; text-transform: uppercase; letter-spacing: .05em; }
+    .ride-form { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+    .ride-form .field { margin-bottom: 0; }
+    @media (max-width: 860px){ .ride-form { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 720px){ .ai-panel { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -59,6 +69,7 @@
     <label class="field"><span>Admin token</span><input id="tokenInput" type="password" placeholder="paste ADMIN_TOKEN" /></label>
     <button id="loginBtn" class="btn btn-primary" type="button">Enter</button>
     <p id="loginErr" class="form-status error"></p>
+    <p class="muted" style="font-size:12px;">Staff account? <a href="/login">Sign in</a> and this page unlocks automatically.</p>
   </div>
 
   <main id="hub" class="hub-main" hidden>
@@ -67,6 +78,10 @@
       <button class="tab" data-tab="listings">Listings</button>
       <button class="tab" data-tab="sellers">Sellers</button>
       <button class="tab" data-tab="sales">Sales</button>
+      <button class="tab" data-tab="apps">Applications</button>
+      <button class="tab" data-tab="orders">Orders</button>
+      <button class="tab" data-tab="disputes">Disputes</button>
+      <button class="tab" data-tab="rides">Rides</button>
       <button class="tab" data-tab="ai">AI Tools</button>
     </div>
 
@@ -92,6 +107,49 @@
 
     <section id="tab-sales" class="tab-panel" hidden>
       <div class="tbl-wrap"><table class="hub"><thead><tr><th>Date</th><th>Card</th><th>Cat</th><th>Grade</th><th>Price</th><th>Source</th></tr></thead><tbody id="salesBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-apps" class="tab-panel" hidden>
+      <div class="panel-bar">
+        <h3>Founding seller applications</h3>
+        <button id="appsRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+      </div>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Handle</th><th>Categories</th><th>Platforms</th><th>Volume</th><th>Message</th><th>Status</th><th>Applied</th><th>Actions</th></tr></thead><tbody id="appsBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-orders" class="tab-panel" hidden>
+      <div class="panel-bar">
+        <h3>Orders</h3>
+        <button id="ordersRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+      </div>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>ID</th><th>Item</th><th>Price</th><th>Shipping</th><th>Total</th><th>Status</th><th>Buyer</th><th>Seller</th><th>Tracking</th><th>Date</th></tr></thead><tbody id="ordersBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-disputes" class="tab-panel" hidden>
+      <div class="panel-bar">
+        <h3>Disputes</h3>
+        <button id="disputesRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+      </div>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>ID</th><th>Order</th><th>Reason</th><th>Status</th><th>Resolution</th><th>Opened</th><th>Actions</th></tr></thead><tbody id="disputesBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-rides" class="tab-panel" hidden>
+      <div class="card" style="padding:16px;margin-bottom:18px;">
+        <h3 style="margin-top:0;color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Launch a ride</h3>
+        <div class="ride-form">
+          <label class="field"><span>Title</span><input id="rideTitle" type="text" placeholder="e.g. Friday Night Breaks" /></label>
+          <label class="field"><span>Listing ID (optional)</span><input id="rideListingId" type="number" min="1" placeholder="—" /></label>
+          <label class="field"><span>Starting bid ($)</span><input id="rideStartBid" type="number" min="0" step="0.01" placeholder="0" /></label>
+          <label class="field"><span>Reserve ($)</span><input id="rideReserve" type="number" min="0" step="0.01" placeholder="0" /></label>
+          <button id="rideLaunchBtn" class="btn btn-primary" type="button">Launch</button>
+        </div>
+        <p class="muted" style="margin:10px 0 0;font-size:12px;">A launched ride starts in the lobby — hit <strong>Start</strong> on its row to go live.</p>
+      </div>
+      <div class="panel-bar">
+        <h3>Rides</h3>
+        <button id="ridesRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+      </div>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Current bid</th><th>Viewers</th><th>Actions</th></tr></thead><tbody id="ridesBody"></tbody></table></div>
     </section>
 
     <section id="tab-ai" class="tab-panel" hidden>

@@ -163,6 +163,9 @@ class Listing(SQLModel, table=True):
     # Commerce
     price_cents: int = Field(index=True)
     quantity: int = Field(default=1)
+    shipping_cents: int = Field(default=0)
+    is_featured: bool = Field(default=False, index=True)
+    view_count: int = Field(default=0)
     image_url: Optional[str] = Field(default=None, max_length=500)
     description: Optional[str] = Field(default=None, max_length=2000)
 
@@ -174,6 +177,189 @@ class Listing(SQLModel, table=True):
     status: str = Field(default=ListingStatus.active.value, index=True)
     created_at: datetime = Field(default_factory=utcnow, index=True)
     updated_at: datetime = Field(default_factory=utcnow)
+
+
+# --------------------------------------------------------------------------- #
+# Commerce parity: orders, offers, watchlists, feedback, disputes
+# --------------------------------------------------------------------------- #
+
+
+class OrderStatus(str, Enum):
+    pending = "pending"        # awaiting payment (e.g. accepted offer, no Stripe)
+    paid = "paid"
+    shipped = "shipped"
+    delivered = "delivered"
+    cancelled = "cancelled"
+    disputed = "disputed"
+
+
+class Order(SQLModel, table=True):
+    """A purchase — the record buyers and sellers manage after checkout."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    listing_id: Optional[int] = Field(default=None, foreign_key="listing.id", index=True)
+    seller_id: Optional[int] = Field(default=None, foreign_key="seller.id", index=True)
+    buyer_user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    buyer_name: Optional[str] = Field(default=None, max_length=120)
+    buyer_email: Optional[str] = Field(default=None, max_length=160)
+
+    title: str = Field(max_length=160)  # denormalized so history survives deletes
+    price_cents: int = Field(default=0)
+    shipping_cents: int = Field(default=0)
+    status: str = Field(default=OrderStatus.paid.value, index=True)
+    tracking_number: Optional[str] = Field(default=None, max_length=80)
+    carrier: Optional[str] = Field(default=None, max_length=40)
+    stripe_session_id: Optional[str] = Field(default=None, index=True, max_length=120)
+    source: str = Field(default="manual")  # stripe | offer | manual | ride
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+
+class OfferStatus(str, Enum):
+    open = "open"
+    countered = "countered"
+    accepted = "accepted"
+    declined = "declined"
+    withdrawn = "withdrawn"
+
+
+class Offer(SQLModel, table=True):
+    """eBay-style Best Offer negotiation on a listing."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    listing_id: int = Field(foreign_key="listing.id", index=True)
+    seller_id: Optional[int] = Field(default=None, foreign_key="seller.id", index=True)
+    buyer_user_id: int = Field(foreign_key="user.id", index=True)
+    amount_cents: int
+    message: Optional[str] = Field(default=None, max_length=500)
+    counter_amount_cents: Optional[int] = Field(default=None)
+    status: str = Field(default=OfferStatus.open.value, index=True)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    updated_at: datetime = Field(default_factory=utcnow)
+
+
+class WatchItem(SQLModel, table=True):
+    """Watchlist — a user keeping an eye on a listing."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    listing_id: int = Field(foreign_key="listing.id", index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class SavedSearch(SQLModel, table=True):
+    """Saved search — alerts the user when a new listing matches."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    name: str = Field(max_length=80)
+    # Stored filters: {q, category, graded, grading_company, min_grade, min_price, max_price}
+    filters: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class Feedback(SQLModel, table=True):
+    """Buyer feedback on a completed order (seller ratings)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    order_id: int = Field(foreign_key="order.id", index=True, unique=True)
+    seller_id: int = Field(foreign_key="seller.id", index=True)
+    rater_user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    stars: int = Field(ge=1, le=5)
+    comment: Optional[str] = Field(default=None, max_length=1000)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class Dispute(SQLModel, table=True):
+    """Buyer-protection dispute on an order."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    order_id: int = Field(foreign_key="order.id", index=True)
+    opened_by_user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    reason: str = Field(max_length=1000)
+    status: str = Field(default="open", index=True)  # open | resolved_refund | resolved_denied
+    resolution: Optional[str] = Field(default=None, max_length=1000)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    resolved_at: Optional[datetime] = Field(default=None)
+
+
+# --------------------------------------------------------------------------- #
+# Social: follows, messages, want lists, notifications
+# --------------------------------------------------------------------------- #
+
+
+class Follow(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    seller_id: int = Field(foreign_key="seller.id", index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class Conversation(SQLModel, table=True):
+    """A message thread between a user (buyer) and a seller (store)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    seller_id: int = Field(foreign_key="seller.id", index=True)
+    listing_id: Optional[int] = Field(default=None, foreign_key="listing.id")
+    updated_at: datetime = Field(default_factory=utcnow, index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class ChatMessage(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    conversation_id: int = Field(foreign_key="conversation.id", index=True)
+    sender: str = Field(max_length=10)  # "user" | "seller"
+    body: str = Field(max_length=2000)
+    read: bool = Field(default=False, index=True)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class WantItem(SQLModel, table=True):
+    """Want list — 'looking for' posts sellers can browse and fulfill."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    description: str = Field(max_length=300)
+    category: Optional[str] = Field(default=None, index=True)
+    max_price_cents: Optional[int] = Field(default=None)
+    status: str = Field(default="open", index=True)  # open | fulfilled | closed
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class Notification(SQLModel, table=True):
+    """In-app notification (the bell)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    type: str = Field(index=True)
+    title: str = Field(max_length=200)
+    body: Optional[str] = Field(default=None, max_length=500)
+    link: Optional[str] = Field(default=None, max_length=300)
+    read: bool = Field(default=False, index=True)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+# --------------------------------------------------------------------------- #
+# Whatnot parity: giveaways (ride chat rides on RideEvent)
+# --------------------------------------------------------------------------- #
+
+
+class Giveaway(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    ride_id: int = Field(foreign_key="ride.id", index=True)
+    title: str = Field(max_length=140)
+    status: str = Field(default="open", index=True)  # open | drawn | cancelled
+    winner: Optional[str] = Field(default=None, max_length=80)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class GiveawayEntry(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    giveaway_id: int = Field(foreign_key="giveaway.id", index=True)
+    name: str = Field(max_length=80)
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    created_at: datetime = Field(default_factory=utcnow)
 
 
 class FoundingApplication(SQLModel, table=True):
@@ -242,6 +428,7 @@ class Bid(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     ride_id: int = Field(foreign_key="ride.id", index=True)
     bidder: str = Field(max_length=80)
+    bidder_user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
     amount_cents: int = Field(index=True)
     status: str = Field(default="placed")  # placed | outbid | won
     created_at: datetime = Field(default_factory=utcnow, index=True)

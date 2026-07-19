@@ -117,6 +117,7 @@ function listingCard(l) {
   if (l.is_graded && l.grading_company) badges.push(`<span class="badge grade">${escapeHtml(l.grading_company)} ${l.grade}</span>`);
   else if (l.condition) badges.push(`<span class="badge">${escapeHtml(l.condition)}</span>`);
   if (l.is_founding_seller) badges.push(`<span class="badge founding">★ Founding</span>`);
+  if (l.is_featured) badges.push(`<span class="badge founding">FEATURED</span>`);
 
   const sub = [l.set_name, l.card_number].filter(Boolean).map(escapeHtml).join(" · ");
   const { keep, savings } = keepInfo(l.price, l.is_founding_seller);
@@ -125,21 +126,60 @@ function listingCard(l) {
     : CREST;
 
   return `<article class="listing">
-    <div class="listing-img"><div class="listing-badges">${badges.join("")}</div>${img}</div>
-    <div class="listing-body">
-      <div class="listing-title">${escapeHtml(l.title)}</div>
-      ${sub ? `<div class="listing-sub">${sub}</div>` : ""}
-      <div class="listing-spacer"></div>
-      <div class="listing-price-row">
-        <span class="listing-price">${money(l.price)}</span>
-        <span class="listing-keep">keep ${money(keep)}<br><span style="color:var(--muted)">+${money(savings)} vs eBay</span></span>
+    <a class="listing-link" href="/listing/${l.id}" style="color:inherit;text-decoration:none;display:block;">
+      <div class="listing-img">
+        <div class="listing-badges">${badges.join("")}</div>
+        <button class="watch-heart" type="button" data-watch="${l.id}" aria-label="Watch">♡</button>
+        ${img}
       </div>
+      <div class="listing-body" style="padding-bottom:0;">
+        <div class="listing-title">${escapeHtml(l.title)}</div>
+        ${sub ? `<div class="listing-sub">${sub}</div>` : ""}
+        <div class="listing-price-row">
+          <span class="listing-price">${money(l.price)}</span>
+          <span class="listing-keep">keep ${money(keep)}<br><span style="color:var(--muted)">+${money(savings)} vs eBay</span></span>
+        </div>
+      </div>
+    </a>
+    <div class="listing-body" style="padding-top:6px;">
       <div class="listing-foot">
         <div class="listing-seller"><span class="seller-dot"></span>${escapeHtml(l.seller_name)}</div>
         <button class="btn btn-sm buy-btn" type="button" data-buy="${l.id}">Buy</button>
       </div>
     </div>
   </article>`;
+}
+
+async function hydrateWatchHearts(scope) {
+  const hearts = [...(scope || document).querySelectorAll("[data-watch]")];
+  if (!hearts.length) return;
+  try {
+    const ids = hearts.map((h) => h.getAttribute("data-watch")).join(",");
+    const map = await api(`/api/watch/status?ids=${ids}`);
+    hearts.forEach((h) => { if (map[h.getAttribute("data-watch")]) { h.textContent = "❤"; h.classList.add("on"); } });
+  } catch (_) {}
+}
+
+async function toggleWatch(btn) {
+  try {
+    const r = await api("/api/watch", { method: "POST", body: JSON.stringify({ listing_id: Number(btn.getAttribute("data-watch")) }) });
+    btn.textContent = r.watching ? "❤" : "♡";
+    btn.classList.toggle("on", r.watching);
+    toast(r.watching ? "Added to your watchlist." : "Removed from watchlist.");
+  } catch (e) {
+    if (String(e.message).toLowerCase().includes("sign in")) toast("Sign in to watch items — /login");
+    else toast(e.message);
+  }
+}
+
+async function loadFeatured() {
+  try {
+    const d = await api("/api/listings?featured=true&page_size=8");
+    if (!d.items.length) return;
+    $("featuredWrap").hidden = false;
+    $("featuredGrid").innerHTML = d.items.map(listingCard).join("");
+    hydrateWatchHearts($("featuredGrid"));
+  } catch (_) {}
 }
 
 async function buyListing(id) {
@@ -159,6 +199,7 @@ async function loadListings() {
     } else {
       grid.innerHTML = data.items.map(listingCard).join("");
       $("resultCount").textContent = `${data.total} card${data.total === 1 ? "" : "s"} in the vault`;
+      hydrateWatchHearts(grid);
     }
     $("pageInfo").textContent = data.pages ? `Page ${data.page} of ${data.pages}` : "";
     $("prevPage").disabled = data.page <= 1;
@@ -491,10 +532,16 @@ async function init() {
   $("prevPage").addEventListener("click", () => { if (state.page > 1) { state.page--; loadListings(); } });
   $("nextPage").addEventListener("click", () => { state.page++; loadListings(); });
 
-  $("grid").addEventListener("click", (e) => {
+  const gridClicks = (e) => {
+    const heart = e.target.closest("[data-watch]");
+    if (heart) { e.preventDefault(); e.stopPropagation(); toggleWatch(heart); return; }
     const buy = e.target.closest("[data-buy]");
     if (buy) buyListing(buy.getAttribute("data-buy"));
-  });
+  };
+  $("grid").addEventListener("click", gridClicks);
+  const fg = $("featuredGrid");
+  if (fg) fg.addEventListener("click", gridClicks);
+  loadFeatured();
 
   $("openListBtn").addEventListener("click", openDrawer);
   $("closeListBtn").addEventListener("click", closeDrawer);

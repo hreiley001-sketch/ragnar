@@ -26,6 +26,8 @@ def providers() -> dict:
     return {
         Category.magic.value: "scryfall",
         Category.pokemon.value: "pokemontcg",
+        Category.yugioh.value: "ygoprodeck",
+        Category.lorcana.value: "lorcast",
     }
 
 
@@ -94,6 +96,55 @@ def _pokemontcg(query: str, limit: int) -> list[dict]:
     return out
 
 
+def _ygoprodeck(query: str, limit: int) -> list[dict]:
+    """YGOPRODeck — free Yu-Gi-Oh! database, no key (https://ygoprodeck.com/api-guide/)."""
+    with httpx.Client(timeout=15.0, headers=_HEADERS) as client:
+        resp = client.get(
+            "https://db.ygoprodeck.com/api/v7/cardinfo.php",
+            params={"fname": query, "num": limit, "offset": 0},
+        )
+    if resp.status_code == 400:  # their 'no results' shape
+        return []
+    resp.raise_for_status()
+    out = []
+    for c in (resp.json().get("data") or [])[:limit]:
+        sets = c.get("card_sets") or []
+        images = c.get("card_images") or []
+        out.append({
+            "name": c.get("name"),
+            "set_name": sets[0].get("set_name") if sets else None,
+            "card_number": sets[0].get("set_code") if sets else None,
+            "year": None,
+            "rarity": sets[0].get("set_rarity") if sets else None,
+            "image_url": images[0].get("image_url") if images else None,
+            "source": "ygoprodeck",
+        })
+    return out
+
+
+def _lorcast(query: str, limit: int) -> list[dict]:
+    """Lorcast — free Disney Lorcana database, no key (https://lorcast.com/docs/api)."""
+    with httpx.Client(timeout=15.0, headers=_HEADERS) as client:
+        resp = client.get("https://api.lorcast.com/v0/cards/search", params={"q": query})
+    if resp.status_code == 404:
+        return []
+    resp.raise_for_status()
+    out = []
+    for c in (resp.json().get("results") or [])[:limit]:
+        imgs = (c.get("image_uris") or {}).get("digital") or {}
+        set_info = c.get("set") or {}
+        out.append({
+            "name": " - ".join(x for x in (c.get("name"), c.get("version")) if x),
+            "set_name": set_info.get("name"),
+            "card_number": c.get("collector_number"),
+            "year": _year_from_date(c.get("released_at")),
+            "rarity": c.get("rarity"),
+            "image_url": imgs.get("normal") or imgs.get("small"),
+            "source": "lorcast",
+        })
+    return out
+
+
 def search(query: str, category: str | None = None, limit: int = 8) -> list[dict]:
     """Look up cards by name for the given category. Returns [] on any error so
     the caller degrades gracefully."""
@@ -105,10 +156,19 @@ def search(query: str, category: str | None = None, limit: int = 8) -> list[dict
             return _scryfall(query, limit)
         if prov == "pokemontcg":
             return _pokemontcg(query, limit)
-        # No category given: best-effort try Scryfall then Pokémon.
+        if prov == "ygoprodeck":
+            return _ygoprodeck(query, limit)
+        if prov == "lorcast":
+            return _lorcast(query, limit)
+        # No category given: best-effort sweep of the free providers.
         if not category:
-            results = _scryfall(query, limit)
-            return results or _pokemontcg(query, limit)
+            for fn in (_scryfall, _pokemontcg, _ygoprodeck, _lorcast):
+                try:
+                    results = fn(query, limit)
+                    if results:
+                        return results
+                except Exception:  # noqa: BLE001
+                    continue
     except Exception as exc:  # noqa: BLE001
         logger.warning("Catalog lookup failed (%s): %s", prov, exc)
     return []

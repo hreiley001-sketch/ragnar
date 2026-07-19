@@ -254,6 +254,9 @@ select option { background: var(--panel-solid); }
 .seller-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--steel); flex: none; }
 .buy-btn { flex: none; background: linear-gradient(180deg, #2a8fc4, #1c6fa3); border-color: rgba(111,214,255,0.55); color: #f2fbff; font-weight: 600; }
 .buy-btn:hover { box-shadow: 0 0 16px rgba(55,189,255,0.4); }
+.watch-heart { position:absolute; top:8px; right:8px; z-index:3; width:34px; height:34px; border-radius:50%; border:1px solid var(--border-strong); background:rgba(8,12,18,0.75); color:#ff9ecb; font-size:16px; cursor:pointer; backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; }
+.watch-heart:hover { transform:scale(1.12); background:rgba(255,158,203,0.18); }
+.watch-heart.on { color:#ff5a8a; border-color:rgba(255,90,138,0.6); box-shadow:0 0 10px rgba(255,90,138,0.4); }
 
 .empty { padding: 50px 20px; text-align: center; color: var(--muted); grid-column: 1 / -1; }
 
@@ -424,6 +427,9 @@ select option { background: var(--panel-solid); }
 .nav-hub { border-color:rgba(240,198,116,0.4); color:var(--gold); }
 .nav-hub:hover { background:rgba(240,198,116,0.1); color:var(--gold); }
 .nav-foot { margin-top:auto; padding-top:14px; font-size:11px; color:var(--muted); text-align:center; }
+.nav-bell { position:relative; display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:10px; border:1px solid var(--border-strong); background:rgba(255,255,255,0.04); color:var(--text); cursor:pointer; font-size:17px; text-decoration:none; }
+.nav-bell:hover { background:rgba(55,189,255,0.12); text-decoration:none; }
+.nav-bell .bump { position:absolute; top:-6px; right:-6px; min-width:19px; height:19px; padding:0 5px; border-radius:999px; background:#c81e1e; color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; box-shadow:0 0 8px rgba(200,30,30,.6); }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {

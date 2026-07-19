@@ -49,6 +49,12 @@
       <div class="store-h-meta">
         <h1 id="storeName">Store</h1>
         <div class="tg" id="storeTag"></div>
+        <div class="store-social" style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap;">
+          <button id="followBtn" class="btn btn-sm" type="button">♡ Follow</button>
+          <span id="followerCount" class="muted" style="font-size:13px;"></span>
+          <span id="storeRating" class="muted" style="font-size:13px;"></span>
+          <a href="#message" class="btn btn-ghost btn-sm">✉ Message</a>
+        </div>
       </div>
     </div>
   </div>
@@ -89,6 +95,16 @@
     </div>
 
     <div id="grid" class="grid"></div>
+
+    <div id="message" class="card" style="margin-top:22px;padding:16px;max-width:640px;">
+      <div class="designer-title">✉ Message this store</div>
+      <div id="msgGate" class="muted" style="font-size:13px;">Checking sign-in…</div>
+      <div id="msgForm" hidden>
+        <label class="field"><span>Your message</span><textarea id="msgBody" rows="2" maxlength="2000" placeholder="Ask about a card, shipping, bundles…"></textarea></label>
+        <button id="msgSend" class="btn btn-primary btn-sm" type="button">Send message</button>
+        <span id="msgStatus" class="form-status"></span>
+      </div>
+    </div>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
