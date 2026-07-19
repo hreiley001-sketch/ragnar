@@ -160,6 +160,24 @@ def admin_update_site_config(
     return {"saved": True, "by": by, "config": config}
 
 
+@router.post("/studio")
+def admin_studio(
+    payload: dict,
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+) -> dict:
+    """RAGNAR Studio — chat that proposes whole-site edits (content + theme).
+
+    Returns {reply, updates, ideas, source}. Does NOT persist; the client
+    previews the updates and publishes them via PUT /api/admin/site-config."""
+    from .. import ai, site_config
+    message = (payload.get("message") or "").strip()
+    if not message:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Say what you'd like to change.")
+    current = site_config.get_all(session)
+    return ai.site_studio(message, current, site_config.SITE_FIELDS)
+
+
 @router.post("/scrape-price")
 async def admin_scrape_price(payload: dict, _: None = Depends(require_admin)) -> dict:
     """Scrape a card page (any marketplace/price-guide URL) via Firecrawl and

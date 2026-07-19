@@ -456,6 +456,8 @@ async function loadSite() {
           const meta = f.updated_by ? `<span class="muted" style="font-size:11px;"> · last edited by ${esc(f.updated_by)}</span>` : "";
           const input = f.type === "textarea"
             ? `<textarea data-key="${esc(f.key)}" rows="3" style="width:100%;">${esc(f.value)}</textarea>`
+            : f.type === "color"
+            ? `<input data-key="${esc(f.key)}" type="color" value="${esc(f.value || "#6fd6ff")}" style="width:64px;height:34px;padding:2px;" />`
             : `<input data-key="${esc(f.key)}" type="${f.type === "url" ? "url" : "text"}" value="${esc(f.value)}" style="width:100%;" />`;
           return `<label class="field" style="display:block;margin-bottom:12px;">
             <span>${esc(f.label)}${meta}</span>

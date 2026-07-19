@@ -224,6 +224,112 @@ def design_store(prompt: str, current: dict | None = None) -> dict:
     return _rules_design(prompt, current)
 
 
+# --------------------------------------------------------------------------- #
+# RAGNAR Studio — conversational whole-site editor (content + look)
+# --------------------------------------------------------------------------- #
+
+
+def _rules_studio(message: str, current: dict, fields: list[dict]) -> dict:
+    """No-OpenAI fallback: still genuinely useful. Maps colour words to the theme
+    and routes copy requests to the obvious field."""
+    low = message.lower()
+    keys = {f["key"] for f in fields}
+    updates: dict = {}
+
+    # Colour vibe -> accent (+ a matching deep background for big shifts).
+    for kws, hex_, name in _PALETTES:
+        if any(k in low for k in kws):
+            if "theme_accent" in keys:
+                updates["theme_accent"] = hex_
+            break
+
+    # Named backgrounds.
+    if "theme_bg" in keys:
+        if any(w in low for w in ("darker", "black", "midnight", "darkmode", "dark mode")):
+            updates["theme_bg"] = "#05070b"
+        elif any(w in low for w in ("lighter", "brighter", "white", "light mode")):
+            updates["theme_bg"] = "#12161d"
+
+    # Font requests: "use the font Bebas Neue" / "font: Orbitron".
+    m = re.search(r"font\s*(?:to|:|=)?\s*['\"]?([A-Z][A-Za-z ]{2,30})['\"]?", message)
+    if m and "theme_font" in keys:
+        updates["theme_font"] = m.group(1).strip()
+
+    # Copy routing.
+    quoted = re.search(r"['\"]([^'\"]{3,200})['\"]", message)
+    said = quoted.group(1).strip() if quoted else None
+    if any(w in low for w in ("announce", "banner", "announcement")) and "announcement" in keys:
+        updates["announcement"] = said or "Something big is coming to RAGNAR — stay tuned."
+    if any(w in low for w in ("headline", "hero", "title", "tagline")) and "hero_headline" in keys and said:
+        updates["hero_headline"] = said
+
+    if updates:
+        reply = "Done — I applied a few changes. Preview them, then hit Publish. (For richer, "
+        reply += "free-form edits, add an OpenAI key.)"
+    else:
+        reply = ("I can change the site's colors, font, announcement bar, and landing copy. "
+                 "Try “make the whole site midnight black with ember-gold accents” or "
+                 "“announce our Friday drop”. (Add an OpenAI key for fully free-form edits.)")
+    return {
+        "reply": reply,
+        "updates": updates,
+        "ideas": ["Make it feel more premium", "Write a bold new headline", "Announce a live drop"],
+        "source": "rules",
+    }
+
+
+def site_studio(message: str, current: dict, fields: list[dict]) -> dict:
+    """Turn a plain-English request into whole-site updates (content + theme).
+
+    Returns {reply, updates, ideas, source}. Only whitelisted keys are returned;
+    colour keys are validated as #RRGGBB. Never persists — the caller previews
+    then publishes.
+    """
+    keys = {f["key"] for f in fields}
+    color_keys = {f["key"] for f in fields if f.get("type") == "color"}
+    keydoc = "; ".join(f"{f['key']} = {f['label']}" for f in fields)
+    cur = {k: current.get(k) for k in keys}
+
+    content = _chat([
+        {"role": "system", "content":
+            "You are RAGNAR Studio, the in-house design + copy assistant for RAGNAR, a bold "
+            "Norse-themed trading-card marketplace ('a better eBay + Whatnot'). Staff talk to "
+            "you to sculpt the ENTIRE website — its look and its words. Be imaginative and "
+            "decisive: it's good to change several keys at once for one cohesive vibe. "
+            f"Editable keys: {keydoc}. "
+            "Color keys MUST be #RRGGBB hex that looks great on the UI. theme_font is a real "
+            "Google Font family name. Keep copy punchy and on-brand; no emojis in copy fields. "
+            "Return ONLY JSON: {\"reply\": one friendly sentence on what you changed, "
+            "\"updates\": {key: value} for ONLY the keys you change, "
+            "\"ideas\": [2-3 short next-move suggestions]}. "
+            f"Current values: {json.dumps(cur)}."},
+        {"role": "user", "content": message},
+    ], max_tokens=600, temperature=0.85)
+
+    if content:
+        try:
+            m = re.search(r"\{.*\}", content, re.DOTALL)
+            d = json.loads(m.group(0) if m else content)
+            updates = {}
+            for k, v in (d.get("updates") or {}).items():
+                if k not in keys or v is None:
+                    continue
+                v = str(v)
+                if k in color_keys and not _HEX_RE.match(v):
+                    continue
+                updates[k] = v[:4000]
+            ideas = [str(i)[:80] for i in (d.get("ideas") or [])][:3]
+            return {
+                "reply": (d.get("reply") or "Here are some changes — preview and publish.")[:400],
+                "updates": updates,
+                "ideas": ideas,
+                "source": "openai",
+            }
+        except Exception:  # noqa: BLE001
+            pass
+    return _rules_studio(message, current, fields)
+
+
 def generate_description(fields: dict) -> dict:
     """Return {description, source}."""
     name = fields.get("title") or fields.get("player_or_character") or "this card"

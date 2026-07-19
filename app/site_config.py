@@ -7,9 +7,13 @@ editor from ``field_specs()``.
 """
 from __future__ import annotations
 
+import re
+
 from sqlmodel import Session, select
 
 from .models import SiteSetting, utcnow
+
+_HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 # key, label, input type, group, default, help. `type` drives the hub UI widget.
 SITE_FIELDS: list[dict] = [
@@ -68,7 +72,48 @@ SITE_FIELDS: list[dict] = [
         "group": "Community",
         "default": "henry@ragnarips.com",
     },
+    # --- Look & feel: applied site-wide as CSS variables by nav.js ---
+    {
+        "key": "theme_accent",
+        "label": "Accent color",
+        "type": "color",
+        "group": "Look & feel",
+        "default": "#6fd6ff",
+        "help": "Primary highlight — buttons, links, the ice glow.",
+    },
+    {
+        "key": "theme_gold",
+        "label": "Gold / badge color",
+        "type": "color",
+        "group": "Look & feel",
+        "default": "#f0c674",
+    },
+    {
+        "key": "theme_bg",
+        "label": "Background",
+        "type": "color",
+        "group": "Look & feel",
+        "default": "#080b10",
+    },
+    {
+        "key": "theme_text",
+        "label": "Text color",
+        "type": "color",
+        "group": "Look & feel",
+        "default": "#dfe8f2",
+    },
+    {
+        "key": "theme_font",
+        "label": "Site font",
+        "type": "text",
+        "group": "Look & feel",
+        "default": "",
+        "help": "A Google Font family, e.g. 'Space Grotesk'. Blank = default.",
+    },
 ]
+
+# Keys whose values must be a #RRGGBB color (validated on save + by the studio).
+COLOR_KEYS: set[str] = {f["key"] for f in SITE_FIELDS if f["type"] == "color"}
 
 DEFAULTS: dict[str, str] = {f["key"]: f["default"] for f in SITE_FIELDS}
 ALLOWED: set[str] = set(DEFAULTS)
@@ -108,6 +153,10 @@ def set_many(session: Session, updates: dict, by: str | None) -> dict[str, str]:
         if key not in ALLOWED:
             continue
         value = ("" if value is None else str(value))[:_MAX_LEN]
+        # Color fields must be valid hex, or we skip them (never store junk that
+        # would break the site theme).
+        if key in COLOR_KEYS and value and not _HEX_RE.match(value):
+            continue
         row = session.get(SiteSetting, key)
         if row:
             row.value = value
