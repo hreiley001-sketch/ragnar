@@ -127,9 +127,13 @@
     return personalThemeCache;
   }
   function sameTheme(a, b) {
-    const ak = Object.keys(a || {}), bk = Object.keys(b || {});
+    const ak = Object.keys(a || {}).sort();
+    const bk = Object.keys(b || {}).sort();
     if (ak.length !== bk.length) return false;
-    for (const k of ak) if (a[k] !== b[k]) return false;
+    for (let i = 0; i < ak.length; i++) {
+      if (ak[i] !== bk[i]) return false;
+      if (a[ak[i]] !== b[bk[i]]) return false;
+    }
     return true;
   }
   function writePersonalTheme(nextTheme) {

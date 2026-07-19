@@ -177,12 +177,14 @@ def summarize_comps(comps: list[dict]) -> dict:
     by_recent = sorted(valid, key=lambda c: c["sold_at"], reverse=True)
     latest = by_recent[0]
     series_source = list(reversed(by_recent))  # oldest -> newest for charting
-    if len(series_source) > 240:
+    max_sparkline_points = 240
+    if len(series_source) > max_sparkline_points:
         # Keep sparklines lightweight on very large histories by sampling evenly
         # while always retaining the most recent point.
-        step = (len(series_source) + 239) // 240
+        # Ceiling division picks a step that caps the sampled point count.
+        step = (len(series_source) + max_sparkline_points - 1) // max_sparkline_points
         sampled = series_source[::step]
-        if sampled[-1] is not series_source[-1]:
+        if sampled[-1] != series_source[-1]:
             sampled.append(series_source[-1])
         series_source = sampled
     median = round(statistics.median(prices), 2)
