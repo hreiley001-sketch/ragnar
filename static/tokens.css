@@ -43,8 +43,8 @@
   --color-disabled-surface: rgba(255, 255, 255, 0.035);
 
   /* Typography */
-  --font-display: "Inter Tight", "Inter", "Arial Narrow", "Helvetica Neue", sans-serif;
-  --font-body: "Inter Tight", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Syne", "Inter Tight", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --font-body: "Inter Tight", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-mono: "Space Mono", "SFMono-Regular", Consolas, monospace;
 
   /* Shape and depth */

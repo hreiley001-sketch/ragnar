@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RAGNAR — Trading Card Marketplace</title>
+  <title>RAGNAR Vault — Trading Card Marketplace</title>
   <meta name="description" content="Browse and buy trading cards on RAGNAR — Pokémon, sports, MTG, Yu-Gi-Oh & more. Structured, grading-aware listings with real sold-price history." />
   <meta name="keywords" content="buy trading cards, trading card marketplace, Pokemon cards, PSA graded cards, sports cards, MTG singles, Yu-Gi-Oh cards, card sold prices" />
   <link rel="canonical" href="https://ragnarips.com/marketplace" />
@@ -11,38 +11,54 @@
   <link rel="apple-touch-icon" href="/static/logo.png" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="RAGNAR" />
-  <meta property="og:title" content="RAGNAR — Trading Card Marketplace" />
+  <meta property="og:title" content="RAGNAR Vault — Trading Card Marketplace" />
   <meta property="og:description" content="Browse and buy trading cards with real sold-price history. Sellers keep more." />
   <meta property="og:url" content="https://ragnarips.com/marketplace" />
   <meta property="og:image" content="https://ragnarips.com/static/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://ragnarips.com/static/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/tokens.css" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/marketplace.css" />
 </head>
-<body>
-  <div class="aurora"></div>
+<body class="vault-page">
+  <div class="vault-atmosphere" aria-hidden="true"></div>
 
   <header id="siteHeader"></header>
 
-  <section class="mkt-hero">
-    <h2>Find your <span class="accent">grail.</span></h2>
-    <p id="heroPitch" class="hero-pitch">Pokémon, sports, MTG, Yu-Gi-Oh & more — every listing with real sold-price history, so you buy with confidence.</p>
-    <div class="mkt-search">
-      <span class="mkt-ico">🔍</span>
-      <input id="heroSearch" type="search" placeholder="Search Charizard, Wembanyama, Black Lotus…" aria-label="Search cards" />
-      <button id="heroAiBtn" class="btn btn-ghost btn-round" type="button" title="Ask in plain English">AI</button>
-      <button id="heroSearchBtn" class="btn btn-primary btn-round" type="button">Search</button>
+  <section class="vault-hero" aria-label="Marketplace hero">
+    <div class="vault-brand">
+      <div class="vault-brand-mark">RAGNAR <span>Vault</span></div>
+      <div class="vault-brand-runes">The marketplace</div>
     </div>
-    <div id="catChips" class="cat-chips"></div>
-    <div class="hero-stats" id="heroStats"></div>
+    <h1>Find your <em>grail.</em></h1>
+    <p id="heroPitch" class="vault-hero-sub">
+      Structured, grading-aware listings with real sold-price history — so every buy feels certain.
+    </p>
+    <div class="vault-search mkt-search" role="search">
+      <span class="vault-search-ico" aria-hidden="true"></span>
+      <input id="heroSearch" type="search" placeholder="Charizard, Wembanyama, Black Lotus…" aria-label="Search cards" />
+      <button id="heroAiBtn" class="btn btn-ghost" type="button" title="Ask in plain English">Ask AI</button>
+      <button id="heroSearchBtn" class="btn btn-primary" type="button">Search</button>
+    </div>
+    <!-- Populated by app.js; visually suppressed in the first composition -->
+    <div class="hero-stats" id="heroStats" hidden></div>
   </section>
 
-  <div class="trust-bar">
-    <span>01 / <b>Buyer protection</b> on every order</span>
-    <span>02 / <b>Real sold-price</b> history</span>
-    <span>03 / <b>Flat low fees</b> — keep more</span>
-    <span>04 / <b>Grading-aware</b> listings</span>
+  <div class="vault-band">
+    <div class="vault-band-label">Browse by category</div>
+    <div id="catChips" class="cat-chips"></div>
+  </div>
+
+  <div class="trust-bar" aria-label="Why RAGNAR">
+    <span><span class="tb-num">01</span> <b>Buyer protection</b> on every order</span>
+    <span><span class="tb-num">02</span> <b>Real sold-price</b> history</span>
+    <span><span class="tb-num">03</span> <b>Flat low fees</b> — keep more</span>
+    <span><span class="tb-num">04</span> <b>Grading-aware</b> listings</span>
   </div>
 
   <div id="liveRailWrap" class="live-rail-wrap" hidden>
@@ -87,7 +103,7 @@
 
     <section class="results">
       <div id="featuredWrap" hidden>
-        <div class="results-bar mb-8"><span class="result-count featured-label">★ Featured</span></div>
+        <div class="results-bar mb-8"><span class="result-count featured-label">Featured</span></div>
         <div id="featuredGrid" class="grid mb-18"></div>
       </div>
       <div id="quickPresets" class="quick-presets" aria-label="Quick filters">
@@ -119,41 +135,12 @@
         <span id="pageInfo" class="page-info"></span>
         <button id="nextPage" class="btn btn-ghost" type="button" disabled>Next →</button>
       </div>
-
-      <div id="compareTray" class="compare-tray" hidden>
-        <div class="compare-tray-left">
-          <strong>Compare cards</strong>
-          <span id="compareCount" class="compare-count">0 selected</span>
-        </div>
-        <div class="compare-tray-actions">
-          <button id="clearCompareBtn" class="btn btn-ghost btn-sm" type="button">Clear</button>
-          <button id="openCompareBtn" class="btn btn-primary btn-sm" type="button">Compare</button>
-        </div>
-      </div>
-
-      <div id="compareModal" class="compare-modal" hidden role="dialog" aria-modal="true" aria-labelledby="compareTitle">
-        <div id="compareScrim" class="compare-scrim"></div>
-        <div class="compare-panel card">
-          <div class="compare-head">
-            <h3 id="compareTitle">Card Comparison</h3>
-            <button id="closeCompareBtn" class="btn btn-ghost btn-sm" type="button">✕</button>
-          </div>
-          <div id="compareTable" class="compare-table"></div>
-        </div>
-      </div>
     </section>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <footer class="site-footer">
-    <p>RAGNAR · <span class="runes">ᚱᚨᚷᚾᚨᚱ</span> · a trust-first trading-card marketplace</p>
-    <p id="integrations" class="muted integrations">integrations: —</p>
-    <p class="muted">MVP · <code>uvicorn app.main:app --reload</code> · API docs at <a href="/api/docs">/api/docs</a></p>
-  </footer>
-
-  <script src="/static/app.js"></script>
   <script src="/static/nav.js"></script>
+  <script src="/static/app.js"></script>
   <script src="/static/sell.js"></script>
 </body>
 </html>

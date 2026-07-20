@@ -141,8 +141,10 @@ function fillSelect(el, values, keepFirst = true) {
 }
 
 function renderHero() {
+  const el = $("heroStats");
+  if (!el || !META.fees) return;
   const f = META.fees;
-  $("heroStats").innerHTML = `
+  el.innerHTML = `
     <div class="stat hot"><div class="stat-num">0%</div><div class="stat-label">Founding ${f.founding_cap} fee</div></div>
     <div class="stat"><div class="stat-num">${(f.founding_rate * 100).toFixed(0)}%</div><div class="stat-label">Founding rate after</div></div>
     <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Standard fee</div></div>`;
@@ -577,7 +579,7 @@ function buildCatChips() {
   };
   box.innerHTML = "";
   box.appendChild(mkChip("", "All"));
-  (META.categories || []).forEach((c) => box.appendChild(mkChip(c, catLabel(c)));
+  (META.categories || []).forEach((c) => box.appendChild(mkChip(c, catLabel(c))));
   syncCatChips();
 }
 

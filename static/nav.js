@@ -306,6 +306,16 @@
     }
   }).catch(() => { initConcierge(); });
 
+  // Ensure display font (Syne) is available on every page that uses nav.
+  (function loadDisplayFont() {
+    if (document.getElementById("ragnar-display-font")) return;
+    const l = document.createElement("link");
+    l.id = "ragnar-display-font";
+    l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap";
+    document.head.appendChild(l);
+  })();
+
   // Ensure Counsel design tokens load on every page (floating widget).
   (function loadCounselCss() {
     if (document.getElementById("counsel-css")) return;

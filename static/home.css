@@ -152,7 +152,8 @@ body.arena-home {
 .arena-kicker .live-signal { width: 6px; height: 6px; margin-left: 3px; border-radius: 50%; background: var(--arena-red); animation: arenaPulse 1.4s ease-in-out infinite; }
 .arena-hero h1 {
   margin: 0; max-width: 900px; color: var(--arena-white);
-  font-size: clamp(66px, 8.7vw, 154px); font-weight: 900;
+  font-family: var(--arena-display);
+  font-size: clamp(66px, 8.7vw, 154px); font-weight: 800;
   line-height: .78; letter-spacing: -.072em; text-transform: uppercase;
 }
 .arena-hero h1 span { display: block; }
@@ -189,8 +190,17 @@ body.arena-home {
   display: flex; gap: 24px; flex-wrap: wrap; margin-top: 38px; padding-top: 22px;
   border-top: 1px solid var(--arena-line);
 }
+.arena-metrics {
+  position: relative; z-index: 2;
+  padding: 4px clamp(18px, 4vw, 64px) 20px;
+}
+.arena-metrics .arena-proof {
+  margin-top: 0;
+  padding-top: 20px;
+  justify-content: flex-start;
+}
 .arena-proof-item { min-width: 105px; }
-.arena-proof-item strong { display: block; font-size: 22px; letter-spacing: -.04em; }
+.arena-proof-item strong { display: block; font-size: 22px; letter-spacing: -.04em; font-family: var(--arena-display); }
 .arena-proof-item.hot strong { color: var(--arena-gold); }
 .arena-proof-item span {
   color: #77818a; font: 8px/1.4 var(--arena-mono);
