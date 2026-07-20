@@ -333,7 +333,7 @@ body.page-store .store-h-meta h1 {
   color: var(--color-text-primary);
   font-size: clamp(34px, 6vw, 76px);
   line-height: .9;
-  letter-spacing: -.055em;
+  letter-spacing: var(--tracking-display);
   text-transform: uppercase;
 }
 body.page-store .store-h-meta .tg,
@@ -495,7 +495,7 @@ body.page-listing .item-main h1 {
   color: var(--color-text-primary);
   font-size: clamp(32px, 5vw, 64px);
   line-height: .96;
-  letter-spacing: -.045em;
+  letter-spacing: var(--tracking-display);
 }
 body.page-listing .item-sub {
   color: var(--color-text-muted);
@@ -614,7 +614,7 @@ body.page-rides .rides-title {
   color: var(--color-text-primary);
   font-size: clamp(28px, 4.5vw, 48px);
   line-height: 1.05;
-  letter-spacing: -.04em;
+  letter-spacing: var(--tracking-tight);
   font-weight: 800;
 }
 body.page-rides .section-title { margin: 12px 0 0; }
@@ -656,7 +656,7 @@ body.page-rides .rcard-title {
   font-size: 23px;
   font-weight: 800;
   line-height: 1.05;
-  letter-spacing: -.025em;
+  letter-spacing: var(--tracking-tight);
 }
 body.page-rides .rcard-sub { color: var(--color-text-muted); font-size: 13px; }
 body.page-rides .rcard-bid-row {

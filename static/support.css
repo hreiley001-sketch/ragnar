@@ -1,8 +1,9 @@
 /* RAGNAR Counsel — support UX.
    Conquest forge chamber on shared tokens. */
 :root {
-  --counsel-display: var(--font-display, "Syne", "Inter Tight", sans-serif);
-  --counsel-mono: var(--font-mono, "Space Mono", Consolas, monospace);
+  --counsel-display: var(--font-display);
+  --counsel-body: var(--font-body);
+  --counsel-mono: var(--font-mono);
   --counsel-ink: var(--color-bg-base, #07090c);
   --counsel-panel: var(--color-bg-glass, rgba(12, 15, 19, 0.86));
   --counsel-line: var(--color-border-subtle, rgba(230, 238, 244, 0.08));
@@ -17,10 +18,16 @@
 
 /* ---------- Full-page counsel chamber ---------- */
 body.counsel-page {
-  font-family: var(--counsel-display);
+  font-family: var(--counsel-body);
   background: var(--counsel-ink);
   min-height: 100vh;
   color: var(--text);
+}
+body.counsel-page h1,
+body.counsel-page h2,
+body.counsel-page h3,
+body.counsel-page .counsel-brand-name {
+  font-family: var(--counsel-display);
 }
 
 .counsel-atmosphere {
@@ -83,8 +90,8 @@ body.counsel-page {
 }
 .counsel-brand-name {
   font-size: clamp(28px, 4vw, 40px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
   line-height: 1;
   color: var(--text);
 }
@@ -92,7 +99,7 @@ body.counsel-page {
 .counsel-brand-runes {
   font-family: var(--counsel-mono);
   font-size: 10px;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--counsel-steel);
 }
@@ -100,7 +107,7 @@ body.counsel-page {
   margin: 0 0 14px;
   font-size: clamp(26px, 4.2vw, 40px);
   font-weight: 700;
-  letter-spacing: -0.025em;
+  letter-spacing: var(--tracking-tight);
   line-height: 1.12;
   color: var(--text);
   max-width: 16ch;
@@ -251,7 +258,7 @@ body.counsel-page {
 .cx-receipt-label {
   font-family: var(--counsel-mono);
   font-size: 10px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--counsel-ice);
   margin-bottom: 8px;
@@ -382,7 +389,7 @@ body.counsel-page {
 .counsel-rail-kicker {
   font-family: var(--counsel-mono);
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--counsel-steel);
   margin-bottom: 10px;
@@ -508,7 +515,7 @@ body.counsel-page {
 .chat-fab-support .fab-copy small {
   font-family: var(--counsel-mono);
   font-size: 9px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--counsel-steel);
   font-weight: 400;
@@ -546,7 +553,7 @@ body.counsel-page {
   font-family: var(--counsel-mono);
   font-size: 9px;
   font-weight: 400;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--counsel-steel);
 }

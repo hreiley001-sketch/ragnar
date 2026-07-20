@@ -1,9 +1,8 @@
 /* RAGNAR Command Hub — mission control.
    Staff-only ops bridge. Brand-first mast, grouped modules, live systems. */
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap");
 
 body.page-admin {
-  --cmd-display: "Syne", var(--font-display);
+  --cmd-display: var(--font-display);
   --cmd-mono: var(--font-mono);
   --cmd-ink: var(--color-bg-base);
   --cmd-panel: color-mix(in srgb, var(--color-bg-panel) 88%, #000);
@@ -105,8 +104,8 @@ body.page-admin .cmd-brand-stack {
 body.page-admin .cmd-brand-mark {
   font-family: var(--cmd-display);
   font-size: clamp(18px, 2.4vw, 26px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
   line-height: 1;
   color: var(--color-text-primary);
 }
@@ -118,7 +117,7 @@ body.page-admin .cmd-title {
   font-family: var(--cmd-mono);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-text-muted);
 }
@@ -185,7 +184,7 @@ body.page-admin .login-wrap::before {
   top: 14px;
   font-family: var(--cmd-mono);
   font-size: 9px;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--tracking-label);
   color: var(--cmd-accent);
 }
 body.page-admin .login-wrap h2 {
@@ -193,13 +192,13 @@ body.page-admin .login-wrap h2 {
   font-family: var(--cmd-display);
   font-size: 28px;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-tight);
 }
 body.page-admin .login-kicker {
   margin: 0 0 18px;
   font-family: var(--cmd-mono);
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--cmd-accent);
 }
@@ -241,7 +240,7 @@ body.page-admin .hub-main {
   font-family: var(--cmd-display);
   font-size: clamp(96px, 16vw, 180px);
   font-weight: 800;
-  letter-spacing: -0.08em;
+  letter-spacing: var(--tracking-display);
   line-height: 0.8;
   color: rgba(255, 255, 255, 0.03);
   pointer-events: none;
@@ -249,7 +248,7 @@ body.page-admin .hub-main {
 .cmd-brief-kicker {
   font-family: var(--cmd-mono);
   font-size: 10px;
-  letter-spacing: 0.2em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--cmd-accent);
   margin-bottom: 10px;
@@ -261,8 +260,8 @@ body.page-admin .hub-main {
   max-width: 16ch;
   font-family: var(--cmd-display);
   font-size: clamp(32px, 4.6vw, 52px);
-  font-weight: 800;
-  letter-spacing: -0.045em;
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
   line-height: 0.95;
   text-transform: none;
 }
@@ -334,7 +333,7 @@ body.page-admin .hub-main {
 .cmd-nav-label {
   font-family: var(--cmd-mono);
   font-size: 9px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-text-muted);
   padding-left: 4px;
@@ -414,7 +413,7 @@ body.page-admin .kpi .k-num {
   font-family: var(--cmd-display);
   font-size: clamp(24px, 3vw, 30px);
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-tight);
   line-height: 1;
   color: var(--color-text-primary);
 }
@@ -458,7 +457,7 @@ body.page-admin .kpi .k-sub {
   margin: 0;
   font-family: var(--cmd-mono);
   font-size: 11px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-text-secondary);
 }

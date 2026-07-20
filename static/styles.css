@@ -2,28 +2,35 @@
 
 /* RAGNAR global live-commerce system.
    Semantic tokens are defined once in tokens.css; this file owns shared
-   foundations, components, and supporting-page layouts. */
+   foundations, components, and supporting-page layouts.
+   Nordic fonts (Manrope / Space Grotesk / Space Mono) load via each page
+   <link> and a nav.js fallback — keep stacks in tokens.css only. */
 
 * { box-sizing: border-box; }
 
 html, body { margin: 0; padding: 0; }
 
 body {
-  font-family: var(--font-body, "Inter Tight", "Segoe UI", system-ui, sans-serif);
+  font-family: var(--font-body);
   color: var(--text);
   background: var(--bg);
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  line-height: 1.45;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1;
+  line-height: var(--leading-body);
 }
 
 h1, h2, h3 {
-  line-height: 1.15;
-  font-family: var(--font-display, inherit);
-  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  font-feature-settings: "kern" 1, "liga" 1;
 }
-p { line-height: 1.55; }
+p { line-height: var(--leading-body); }
 
 .aurora {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
@@ -64,9 +71,10 @@ code { background: rgba(255,255,255,0.07); padding: 1px 6px; border-radius: 5px;
 .hero-logo { display: block; width: min(360px, 74%); margin: 0 auto 18px; }
 .crest { width: 62px; height: 42px; }
 .brand-word h1 {
-  margin: 0; font-size: 22px; font-weight: 800; letter-spacing: 0.02em; color: var(--text);
+  margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.02em; color: var(--text);
+  font-family: var(--font-display);
 }
-.runes { display: block; font-size: 11px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; }
+.runes { display: block; font-size: 11px; letter-spacing: var(--tracking-label); color: var(--muted); text-transform: uppercase; font-family: var(--font-mono); }
 
 .site-nav {
   display: none; align-items: center; gap: 2px; flex: 1; min-width: 0;
@@ -226,7 +234,7 @@ a:focus-visible {
   padding: clamp(28px, 5vw, 56px) clamp(16px, 4vw, 40px) 20px;
 }
 .hero-copy { max-width: 660px; }
-.hero h2 { margin: 0 0 12px; font-size: clamp(30px, 5vw, 52px); line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+.hero h2 { margin: 0 0 12px; font-size: clamp(30px, 5vw, 52px); line-height: 1.05; font-weight: 700; letter-spacing: var(--tracking-tight); }
 .hero .accent { color: var(--ice); }
 .hero-pitch { margin: 0; color: var(--text-soft); font-size: 17px; line-height: 1.55; }
 .hero-stats { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -244,7 +252,7 @@ a:focus-visible {
   padding: clamp(30px, 5vw, 56px) clamp(16px, 4vw, 40px) 22px;
   max-width: 880px; margin: 0 auto;
 }
-.mkt-hero h2 { margin: 0 0 8px; font-size: clamp(28px, 4.5vw, 44px); font-weight: 800; letter-spacing: -0.02em; }
+.mkt-hero h2 { margin: 0 0 8px; font-size: clamp(28px, 4.5vw, 44px); font-weight: 700; letter-spacing: var(--tracking-tight); }
 .mkt-hero .hero-pitch { margin: 0 auto 22px; max-width: 560px; text-align: center; }
 .mkt-search {
   display: flex; align-items: center; gap: 8px;
