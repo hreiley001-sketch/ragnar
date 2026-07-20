@@ -57,17 +57,19 @@ body.arena-home {
 .arena-rays {
   z-index: 0;
   background:
-    conic-gradient(from 210deg at 72% 18%, transparent 0deg, rgba(78,182,232,.07) 28deg, transparent 62deg),
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(125,206,242,.16), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 18% 80%, rgba(78,182,232,.06), transparent 50%);
+    conic-gradient(from 210deg at 72% 18%, transparent 0deg, rgba(78,182,232,.11) 28deg, transparent 62deg),
+    conic-gradient(from 40deg at 28% 22%, transparent 0deg, rgba(184,228,247,.07) 22deg, transparent 50deg),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(125,206,242,.22), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 18% 80%, rgba(78,182,232,.1), transparent 50%);
   animation: rayDrift 22s ease-in-out infinite alternate;
 }
 .arena-frost {
   z-index: 0;
-  opacity: .55;
+  opacity: .7;
   background:
-    linear-gradient(115deg, transparent 40%, rgba(232,244,252,.03) 50%, transparent 60%),
-    linear-gradient(185deg, rgba(184,228,247,.04), transparent 35%);
+    linear-gradient(115deg, transparent 38%, rgba(232,244,252,.055) 50%, transparent 62%),
+    linear-gradient(185deg, rgba(184,228,247,.07), transparent 38%),
+    radial-gradient(circle at 80% 70%, rgba(168,188,203,.06), transparent 40%);
   mix-blend-mode: screen;
 }
 .arena-grid {
@@ -139,26 +141,26 @@ body.arena-home {
 }
 .vault-orbit {
   position: absolute;
-  left: 50%; top: 42%;
-  width: min(920px, 92vw);
-  height: min(520px, 58vh);
+  left: 50%; top: 38%;
+  width: min(980px, 96vw);
+  height: min(560px, 62vh);
   transform: translate(-50%, -50%) translateZ(40px);
   transform-style: preserve-3d;
 }
 .vault-core {
   position: absolute;
   left: 50%; top: 48%;
-  width: min(340px, 58vw);
+  width: min(420px, 72vw);
   aspect-ratio: 1;
   transform: translate(-50%, -50%) translateZ(80px);
   display: grid; place-items: center;
 }
 .vault-core-logo {
-  width: 78%;
+  width: 92%;
   height: auto;
   filter:
-    drop-shadow(0 0 28px rgba(78,182,232,.35))
-    drop-shadow(0 24px 60px rgba(0,0,0,.65));
+    drop-shadow(0 0 36px rgba(78,182,232,.45))
+    drop-shadow(0 28px 70px rgba(0,0,0,.7));
   animation: logoBreath 6s ease-in-out infinite;
 }
 .vault-core-ring,
@@ -180,13 +182,23 @@ body.arena-home {
   width: min(180px, 28vw);
   aspect-ratio: .7;
   border-radius: 14px;
-  border: 1px solid rgba(184,228,247,.28);
+  border: 1px solid rgba(184,228,247,.42);
   background:
-    linear-gradient(145deg, rgba(184,228,247,.12), transparent 40%),
-    linear-gradient(160deg, #152030, #070d16 70%);
-  box-shadow: 0 30px 60px rgba(0,0,0,.45), 0 0 24px rgba(78,182,232,.08);
+    linear-gradient(145deg, rgba(232,244,252,.18), transparent 38%),
+    linear-gradient(160deg, #1a2e42, #0a1522 55%, #050a12 100%);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,.5),
+    0 0 36px rgba(78,182,232,.16),
+    inset 0 1px 0 rgba(232,244,252,.25);
   transform-style: preserve-3d;
   overflow: hidden;
+}
+.vault-slab::after {
+  content: "";
+  position: absolute; inset: 8px;
+  border: 1px solid rgba(184,228,247,.2);
+  border-radius: 8px;
+  pointer-events: none;
 }
 .vault-slab::before {
   content: "";
@@ -214,13 +226,16 @@ body.arena-home {
 .vault-glass-panel {
   position: absolute;
   top: 12%; bottom: 18%;
-  width: min(220px, 18vw);
-  border: 1px solid rgba(184,228,247,.1);
-  background: linear-gradient(180deg, rgba(184,228,247,.06), rgba(8,16,28,.15));
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  width: min(240px, 20vw);
+  border: 1px solid rgba(184,228,247,.18);
+  background:
+    linear-gradient(180deg, rgba(184,228,247,.1), rgba(78,182,232,.03) 40%, rgba(8,16,28,.25));
+  backdrop-filter: blur(22px) saturate(1.3);
+  -webkit-backdrop-filter: blur(22px) saturate(1.3);
   transform-style: preserve-3d;
-  box-shadow: inset 0 0 40px rgba(78,182,232,.04);
+  box-shadow:
+    inset 0 0 50px rgba(78,182,232,.08),
+    0 0 40px rgba(78,182,232,.06);
 }
 .vault-glass-left {
   left: 2%;
@@ -237,20 +252,9 @@ body.arena-home {
   position: relative;
   z-index: 3;
   max-width: 820px;
-  padding-top: clamp(100px, 18vh, 180px);
+  padding-top: clamp(52vh, 58vh, 62vh);
   text-align: center;
   margin-inline: auto;
-}
-.vault-brand-mark {
-  margin: 0 0 28px;
-  display: flex;
-  justify-content: center;
-}
-.vault-brand-logo {
-  width: min(280px, 62vw);
-  height: auto;
-  filter: drop-shadow(0 0 36px rgba(78,182,232,.4));
-  animation: brandReveal 1.2s var(--ease-premium) both;
 }
 .vault-hero-copy h1 {
   margin: 0;
@@ -943,8 +947,7 @@ body.arena-home {
 }
 @media (max-width: 820px) {
   .arena-shell { width: min(100% - 30px, 1480px); }
-  .vault-hero-copy { text-align: left; margin-inline: 0; padding-top: clamp(88px, 14vh, 140px); }
-  .vault-brand-mark { justify-content: flex-start; }
+  .vault-hero-copy { text-align: left; margin-inline: 0; padding-top: clamp(46vh, 52vh, 58vh); }
   .arena-hero-actions { justify-content: flex-start; }
   .vault-scroll-cue { justify-content: flex-start; }
   .vault-activity-grid { grid-template-columns: 1fr; }
@@ -964,7 +967,7 @@ body.arena-home {
 }
 @media (max-width: 580px) {
   .vault-hero-scene { min-height: auto; padding-bottom: 54px; }
-  .vault-brand-logo { width: min(220px, 72vw); }
+  .vault-hero-copy { padding-top: clamp(40vh, 46vh, 52vh); }
   .vault-hero-copy h1 { font-size: clamp(32px, 9vw, 48px); }
   .vault-hero-sub { width: 100%; }
   .arena-proof { gap: 14px; }

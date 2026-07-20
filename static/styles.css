@@ -36,7 +36,7 @@ p { line-height: var(--leading-body); }
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
     radial-gradient(900px 500px at 82% -8%, rgba(169, 213, 226, 0.05), transparent 62%),
-    radial-gradient(800px 440px at 5% -12%, rgba(201, 170, 109, 0.035), transparent 62%),
+    radial-gradient(800px 440px at 5% -12%, rgba(168, 188, 203, 0.035), transparent 62%),
     linear-gradient(180deg, rgba(255,255,255,.01), transparent 35%);
 }
 
@@ -454,9 +454,9 @@ select option { background: var(--panel-solid); color: var(--text); }
   background: rgba(9,11,14,0.88); border: 1px solid var(--border-strong);
   color: var(--text-soft); backdrop-filter: blur(4px); white-space: nowrap;
 }
-.badge.grade { background: rgba(232, 160, 69, 0.10); border-color: rgba(232,160,69,0.32); color: var(--ice-strong); }
+.badge.grade { background: rgba(78,182,232, 0.10); border-color: rgba(78,182,232,0.32); color: var(--ice-strong); }
 .badge.founding {
-  background: rgba(201, 170, 109, 0.14); border-color: rgba(201, 170, 109,0.4); color: var(--gold);
+  background: rgba(168, 188, 203, 0.14); border-color: rgba(168, 188, 203,0.4); color: var(--gold);
 }
 .listing-body { padding: 13px 14px 15px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
 .listing-body-main { padding-bottom: 0; }
@@ -717,7 +717,7 @@ select option { background: var(--panel-solid); color: var(--text); }
 }
 .scan-result.loading { border-color: rgba(169, 213, 226, 0.35); }
 .scan-result.ok { border-color: rgba(18,133,90,0.45); }
-.scan-result.warn { border-color: rgba(201, 170, 109,0.5); }
+.scan-result.warn { border-color: rgba(168, 188, 203,0.5); }
 .scan-result.error { border-color: rgba(220,38,38,0.5); color: var(--danger); }
 .scan-result strong { color: var(--text); }
 
@@ -744,7 +744,7 @@ select option { background: var(--panel-solid); color: var(--text); }
 .price-row { margin-bottom: 6px; }
 .apply-btn { align-self: end; margin-bottom: 12px; white-space: nowrap; }
 .seller-state { font-size: 13px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); color: var(--text-soft); margin-bottom: 6px; background: var(--bg-2); }
-.seller-state.founding { border-color: rgba(201, 170, 109,0.4); background: rgba(201, 170, 109,0.08); color: var(--gold); }
+.seller-state.founding { border-color: rgba(168, 188, 203,0.4); background: rgba(168, 188, 203,0.08); color: var(--gold); }
 
 /* ---------- Market price row ---------- */
 .market-row {
@@ -778,8 +778,8 @@ select option { background: var(--panel-solid); color: var(--text); }
 .nav-link .ico { width:22px; text-align:center; font-size:16px; }
 .nav-div { height:1px; background:var(--border); margin:12px 2px; }
 .nav-user { font-size:12px; color:var(--muted); padding:2px 12px 6px; text-transform:uppercase; letter-spacing:.05em; }
-.nav-hub { border-color:rgba(201, 170, 109,0.4); color:var(--gold); }
-.nav-hub:hover { background:rgba(201, 170, 109,0.1); color:var(--gold); }
+.nav-hub { border-color:rgba(168, 188, 203,0.4); color:var(--gold); }
+.nav-hub:hover { background:rgba(168, 188, 203,0.1); color:var(--gold); }
 .nav-foot { margin-top:auto; padding-top:14px; font-size:11px; color:var(--muted); text-align:center; }
 .nav-bell { position:relative; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:var(--radius-sm); border:1px solid var(--color-border-subtle); background:transparent; color:var(--color-text-secondary); cursor:pointer; font-size:15px; text-decoration:none; }
 .nav-bell:hover { background:var(--color-hover-surface); color:var(--color-text-primary); text-decoration:none; }
@@ -904,11 +904,11 @@ select option { background: var(--panel-solid); color: var(--text); }
 }
 .sell-choice-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); border-color: var(--ice); }
 .sell-choice-btn strong { font-size: 15px; }
-.sell-choice-ai { border-color: rgba(201, 170, 109,0.45); background: rgba(201, 170, 109,0.05); }
+.sell-choice-ai { border-color: rgba(168, 188, 203,0.45); background: rgba(168, 188, 203,0.05); }
 .sell-choice-ai:hover { border-color: var(--gold); }
 .sc-badge {
   display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
-  background: rgba(201, 170, 109,0.16); border: 1px solid rgba(201, 170, 109,0.4); color: var(--gold);
+  background: rgba(168, 188, 203,0.16); border: 1px solid rgba(168, 188, 203,0.4); color: var(--gold);
 }
 .back-to-choice { align-self: flex-start; margin-bottom: 10px; }
 .seller-summary {
@@ -925,7 +925,7 @@ select option { background: var(--panel-solid); color: var(--text); }
 .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-strong); color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
 .chip.good { color: var(--ok); border-color: rgba(18,133,90,0.4); background: rgba(18,133,90,0.08); }
 .chip.info { color: var(--ice); border-color: rgba(169, 213, 226, 0.35); background: rgba(169, 213, 226, 0.08); }
-.chip.warn { color: var(--gold); border-color: rgba(201, 170, 109,0.4); background: rgba(201, 170, 109,0.08); }
+.chip.warn { color: var(--gold); border-color: rgba(168, 188, 203,0.4); background: rgba(168, 188, 203,0.08); }
 .chip.bad { color: var(--danger); border-color: rgba(220,38,38,0.4); background: rgba(220,38,38,0.06); }
 .tbl-wrap { overflow-x: auto; }
 .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -939,7 +939,7 @@ body:not(.arena-home):not(.premium-room) {
   isolation: isolate;
   background:
     radial-gradient(900px 480px at 88% -10%, rgba(169, 213, 226, 0.05), transparent 58%),
-    radial-gradient(700px 420px at -6% 30%, rgba(201, 170, 109, 0.03), transparent 60%),
+    radial-gradient(700px 420px at -6% 30%, rgba(168, 188, 203, 0.03), transparent 60%),
     var(--color-bg-base);
 }
 body:not(.arena-home):not(.premium-room)::before {
@@ -993,7 +993,7 @@ body:not(.arena-home):not(.premium-room) > div:not(.aurora):not(.nav-scrim):not(
   position: relative; overflow: hidden; margin: 30px 0 26px; padding: clamp(32px,5vw,62px);
   border: 1px solid var(--border-strong);
   background:
-    linear-gradient(120deg, rgba(232,160,69,.11), transparent 45%),
+    linear-gradient(120deg, rgba(78,182,232,.11), transparent 45%),
     linear-gradient(160deg, rgba(255,255,255,.035), transparent 62%),
     rgba(20,17,14,.92);
 }
@@ -1106,14 +1106,14 @@ body:not(.arena-home):not(.premium-room) > div:not(.aurora):not(.nav-scrim):not(
 }
 .tbl-wrap { border: 1px solid var(--border); background: rgba(8,10,12,.55); }
 .tbl th,
-table.hub th { color: var(--ice); background: rgba(232,160,69,.035); }
+table.hub th { color: var(--ice); background: rgba(78,182,232,.035); }
 .tbl td,
 table.hub td { border-bottom-color: var(--border); }
 .chip { border-radius: 3px; }
 
 .drawer-panel {
   background:
-    radial-gradient(520px 300px at 70% 0, rgba(232,160,69,.08), transparent 65%),
+    radial-gradient(520px 300px at 70% 0, rgba(78,182,232,.08), transparent 65%),
     var(--panel-solid);
 }
 .sell-choice-btn { border-radius: 5px; background: rgba(255,255,255,.035); color: var(--text); }
