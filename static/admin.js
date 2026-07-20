@@ -29,6 +29,8 @@ const PILL_CLASS = {
   rejected: "bad", cancelled: "bad", canceled: "bad", failed: "bad", resolved_denied: "bad",
   scheduled: "info", pre_show: "info", lobby: "info",
   sold: "sold", ended: "sold",
+  escalated: "warn", pending_review: "info", resolved: "ok", in_workflow: "info",
+  legal: "bad", high_value: "warn", chargeback: "bad", fraud: "bad", general: "info",
 };
 const pill = (s) => `<span class="pill ${PILL_CLASS[s] || ""}">${esc(String(s || "—").replace(/_/g, " "))}</span>`;
 
@@ -288,6 +290,62 @@ async function disputesAction(e) {
     toast(rf ? "Dispute resolved — buyer refunded" : "Dispute denied");
     loadDisputes();
   } catch (err) { toast(err.message); }
+}
+
+/* ---------- AI Support queue ---------- */
+let _supportSelected = null;
+
+async function loadSupportQueue() {
+  const q = $("supportQueueFilter")?.value || "";
+  const params = q ? `?queue=${encodeURIComponent(q)}` : "";
+  try {
+    const d = await api(`/api/admin/support/queue${params}`);
+    $("supportBody").innerHTML = (d.items || []).map((x) => `<tr>
+      <td><code>${esc(x.id)}</code></td>
+      <td>${esc(x.intent || "—")}</td>
+      <td>${x.confidence != null ? Math.round(x.confidence * 100) + "%" : "—"}</td>
+      <td>${pill(x.queue || "—")}</td>
+      <td>${pill(x.status)}</td>
+      <td>${x.order_id != null ? "#" + esc(x.order_id) : "—"}</td>
+      <td class="muted">${esc((x.updated_at || "").slice(0, 16).replace("T", " "))}</td>
+      <td><button class="btn btn-sm btn-primary" data-support-view="${esc(x.id)}">Open</button></td>
+    </tr>`).join("") || `<tr><td colspan="8" class="muted" style="padding:20px;text-align:center;">Queue clear — AI is handling it</td></tr>`;
+  } catch (err) {
+    $("supportBody").innerHTML = `<tr><td colspan="8" class="muted">${esc(err.message)}</td></tr>`;
+  }
+}
+
+async function supportAction(e) {
+  const t = e.target.closest("[data-support-view]");
+  if (!t) return;
+  const id = t.getAttribute("data-support-view");
+  try {
+    const d = await api(`/api/admin/support/conversations/${encodeURIComponent(id)}`);
+    _supportSelected = d.id;
+    $("supportDetail").hidden = false;
+    $("supportThread").innerHTML = (d.messages || []).map((m) =>
+      `<div class="chat-msg${m.role === "user" ? " me" : ""}"><b>${esc(m.role)}</b>: ${esc(m.body)}</div>`
+    ).join("") || "<div class='muted'>No messages</div>";
+    $("supportAudit").innerHTML = (d.audit || []).slice(0, 8).map((a) =>
+      `<div>• ${esc(a.created_at || "").slice(0, 19)} — <b>${esc(a.decision || a.actor)}</b> ${esc(a.reason || "")} <span class="muted">[${(a.policy_refs || []).map(esc).join(", ")}]</span></div>`
+    ).join("") || "No audit entries.";
+    $("supportResolveNote").value = "";
+  } catch (err) { toast(err.message || "Failed to load case"); }
+}
+
+async function resolveSupportCase() {
+  if (!_supportSelected) return;
+  const resolution = ($("supportResolveNote").value || "").trim();
+  if (!resolution) { toast("Add a resolution note"); return; }
+  try {
+    await api(`/api/admin/support/conversations/${encodeURIComponent(_supportSelected)}/resolve`, {
+      method: "POST", body: JSON.stringify({ resolution, status: "resolved" }),
+    });
+    toast("Support case resolved");
+    $("supportDetail").hidden = true;
+    _supportSelected = null;
+    loadSupportQueue();
+  } catch (err) { toast(err.message || "Failed"); }
 }
 
 /* ---------- rides ---------- */
@@ -612,6 +670,7 @@ function switchTab(name) {
   if (name === "apps") loadApps();
   if (name === "orders") loadOrders();
   if (name === "disputes") loadDisputes();
+  if (name === "support") loadSupportQueue();
   if (name === "rides") loadRides();
   if (name === "team") loadTeam();
   if (name === "site") loadSite();
@@ -631,6 +690,10 @@ document.addEventListener("DOMContentLoaded", () => {
   $("ordersRefresh").addEventListener("click", loadOrders);
   $("disputesBody").addEventListener("click", disputesAction);
   $("disputesRefresh").addEventListener("click", loadDisputes);
+  $("supportRefresh")?.addEventListener("click", loadSupportQueue);
+  $("supportQueueFilter")?.addEventListener("change", loadSupportQueue);
+  $("supportBody")?.addEventListener("click", supportAction);
+  $("supportResolveBtn")?.addEventListener("click", resolveSupportCase);
   $("ridesBody").addEventListener("click", ridesAction);
   $("ridesRefresh").addEventListener("click", loadRides);
   $("siteSaveBtn").addEventListener("click", saveSite);

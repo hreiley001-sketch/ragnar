@@ -436,4 +436,85 @@
 
   // Let any page open Studio directly (e.g. the Command Hub Site tab hint link).
   window.__ragnarOpenStudio = () => { initStudio(); document.getElementById("fab-studio")?.click(); };
+
+  // ---- RAGNAR Support OS: AI-owned intake → policy → action → resolution.
+  // Humans only for escalations. Separate from the shopper Concierge. ----
+  let supportBuilt = false;
+  let supportConvId = localStorage.getItem("ragnar_support_id") || null;
+  function initSupport() {
+    if (supportBuilt) return;
+    supportBuilt = true;
+    const w = createChatWidget({
+      key: "support",
+      icon: "?",
+      label: "Support",
+      footNote: "Order #, refund, return, tracking…",
+    });
+    // Sit on the left so it doesn't collide with Ask RAGNAR / Studio.
+    w.fab.classList.add("chat-fab-support");
+    w.panel.classList.add("chat-panel-support");
+
+    async function ensureConv() {
+      if (supportConvId) {
+        try {
+          const c = await fetch(`/api/support/conversations/${encodeURIComponent(supportConvId)}`)
+            .then((r) => { if (!r.ok) throw new Error("gone"); return r.json(); });
+          return c;
+        } catch (_) { supportConvId = null; localStorage.removeItem("ragnar_support_id"); }
+      }
+      const c = await fetch("/api/support/conversations", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channel: "web" }),
+      }).then((r) => r.json());
+      supportConvId = c.id;
+      localStorage.setItem("ragnar_support_id", supportConvId);
+      return c;
+    }
+
+    w.onFirstOpen(async () => {
+      try {
+        const c = await ensureConv();
+        (c.messages || []).forEach((m) => {
+          if (m.role === "user") w.msg(escHtml(m.body), "me");
+          else w.msg(escHtml(m.body));
+        });
+        if (!(c.messages || []).length) {
+          w.msg(escHtml(c.reply || "How can I help?"));
+        }
+        w.chips(c.chips || ["Track my order", "I need a refund", "How do fees work?", "Talk to a human"]);
+      } catch (_) {
+        w.msg("Support is warming up — try again in a moment.");
+      }
+    });
+
+    w.onSend(async () => {
+      const text = w.input.value.trim();
+      if (!text) return;
+      w.input.value = "";
+      w.msg(escHtml(text), "me");
+      const thinking = w.msg("…");
+      try {
+        await ensureConv();
+        const r = await fetch("/api/support/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text, conversation_id: supportConvId }),
+        }).then((x) => x.json());
+        thinking.remove();
+        if (r.id) {
+          supportConvId = r.id;
+          localStorage.setItem("ragnar_support_id", supportConvId);
+        }
+        w.msg(escHtml(r.reply || "Done."));
+        if (r.chips) w.chips(r.chips);
+        if (r.queue || r.decision === "escalate") {
+          w.msg(`<span class="chat-note">Case ${escHtml(r.conversation_id || supportConvId)} — human review queue.</span>`);
+        }
+      } catch (e) {
+        thinking.remove();
+        w.msg("Something went wrong — try again, or say “Talk to a human”.");
+      }
+    });
+  }
+  initSupport();
 })();

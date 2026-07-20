@@ -34,8 +34,12 @@ a branded storefront.
   Checkout with RAGNAR's platform fee as the `application_fee_amount`, and a webhook that
   marks listings sold. Key-gated (503 without `STRIPE_SECRET_KEY`); use test keys first.
 
-Not yet built (next slices): bulk CSV import from eBay/TCGplayer, buyer protection /
-dispute flow, and (with keys) validating the recognition/comps adapters against live APIs.
+Not yet built (next slices): bulk CSV import from eBay/TCGplayer, and (with keys)
+validating the recognition/comps adapters against live APIs.
+
+**AI Support OS** — AI owns intake → policy → action → resolution (humans only for
+edge cases). Web chat widget on every page; Command Hub → AI Support for the review
+queue. See `/api/support/*` and `/api/admin/support/*`.
 
 ### Turning on Stripe payments
 1. Create a Stripe account and grab **test** keys at
@@ -122,6 +126,11 @@ The database (SQLite) is created and seeded with sample listings on first run.
 | `/api/auth/sessions/{session_id}` | DELETE | Revoke one session/device |
 | `/api/auth/logout-all` | POST | End all sessions for current account |
 | `/api/auth/deactivate` | POST | Deactivate account and remove login access |
+| `/api/support/conversations` | POST | Start an AI Support conversation |
+| `/api/support/chat` | POST | Send a support message (intent → policy → action) |
+| `/api/support/knowledge` | GET | Search/list support knowledge base articles |
+| `/api/admin/support/queue` | GET | Human review queue (escalations + flagged cases) |
+| `/api/admin/support/audit` | GET | AI decision audit trail |
 
 ## Configuration
 
