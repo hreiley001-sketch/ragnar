@@ -77,8 +77,11 @@ def init_db() -> None:
     """Create tables + apply lightweight in-place migrations."""
     from . import models  # noqa: F401  (side effect: registers tables)
 
-    _sqlite_add_missing_columns()      # add new columns to pre-existing tables
-    SQLModel.metadata.create_all(engine)  # create any brand-new tables (livestream)
+    # Create brand-new tables first (e.g. support OS), then backfill columns on
+    # pre-existing tables. Order matters so deploys with an old DB pick up the
+    # Support / Counsel schema without a wipe.
+    SQLModel.metadata.create_all(engine)
+    _sqlite_add_missing_columns()
 
 
 def get_session() -> Iterator[Session]:

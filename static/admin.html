@@ -6,6 +6,7 @@
   <title>RAGNAR — Command Hub</title>
   <link rel="icon" href="/static/logo.png" />
   <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/support.css" />
   <style>
     .hub-main { padding: 20px clamp(16px, 4vw, 40px) 60px; }
     .login-wrap { max-width: 420px; margin: 12vh auto; padding: 26px; }
@@ -118,7 +119,7 @@
       <button class="tab" data-tab="apps" type="button" role="tab">Applications</button>
       <button class="tab" data-tab="orders" type="button" role="tab">Orders</button>
       <button class="tab" data-tab="disputes" type="button" role="tab">Disputes</button>
-      <button class="tab" data-tab="support" type="button" role="tab">AI Support</button>
+      <button class="tab" data-tab="support" type="button" role="tab">Counsel</button>
       <button class="tab" data-tab="rides" type="button" role="tab">Rides</button>
       <button class="tab" data-tab="team" type="button" role="tab">Team</button>
       <button class="tab" data-tab="site" type="button" role="tab">Site</button>
@@ -175,7 +176,7 @@
 
     <section id="tab-support" class="tab-panel" hidden>
       <div class="panel-bar">
-        <h3>AI Support — human review queue</h3>
+        <h3>Counsel — human review desk</h3>
         <div style="display:flex;gap:8px;align-items:center;">
           <select id="supportQueueFilter" class="w-auto">
             <option value="">All queues</option>
@@ -188,15 +189,28 @@
           <button id="supportRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
         </div>
       </div>
-      <p class="muted muted-xs mb-12">AI resolves most cases alone. This queue is for escalations and post-action review flags — governors, not frontline.</p>
-      <div class="tbl-wrap"><table class="hub"><thead><tr><th>Case</th><th>Intent</th><th>Conf</th><th>Queue</th><th>Status</th><th>Order</th><th>Updated</th><th>Actions</th></tr></thead><tbody id="supportBody"></tbody></table></div>
-      <div id="supportDetail" class="card card-pad-16 mt-18" hidden>
-        <h3 class="no-top" style="color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Case detail</h3>
-        <div id="supportThread" class="chat-feed" style="max-height:280px;margin:12px 0;border:1px solid var(--border);border-radius:12px;"></div>
-        <div id="supportAudit" class="muted muted-xs mb-12"></div>
-        <div class="ride-form">
-          <label class="field"><span>Resolution note</span><input id="supportResolveNote" type="text" placeholder="What you decided…" /></label>
-          <button id="supportResolveBtn" class="btn btn-primary" type="button">Mark resolved</button>
+      <p class="muted muted-xs mb-12">AI resolves most cases alone. This desk is for escalations and post-action review — governors, not frontline.</p>
+      <div class="support-desk">
+        <div class="support-desk-list">
+          <div class="tbl-wrap"><table class="hub"><thead><tr><th>Case</th><th>Intent</th><th>Conf</th><th>Queue</th><th>Status</th><th>Order</th><th></th></tr></thead><tbody id="supportBody"></tbody></table></div>
+        </div>
+        <div id="supportDetail" class="support-desk-detail">
+          <div id="supportDeskEmpty" class="support-desk-empty">
+            <strong>Select a case</strong>
+            Open a queued conversation to read the thread, audit trail, and resolve.
+          </div>
+          <div id="supportDeskActive" hidden>
+            <div class="counsel-rail-kicker">Case detail</div>
+            <h3 class="no-top" id="supportDetailTitle" style="margin:0 0 4px;font-size:18px;">—</h3>
+            <p class="muted muted-xs" id="supportDetailMeta" style="margin:0 0 8px;"></p>
+            <div id="supportThread" class="support-thread"></div>
+            <div class="counsel-rail-kicker">Audit</div>
+            <div id="supportAudit" class="mb-12"></div>
+            <div class="ride-form">
+              <label class="field"><span>Resolution note</span><input id="supportResolveNote" type="text" placeholder="What you decided…" /></label>
+              <button id="supportResolveBtn" class="btn btn-primary" type="button">Mark resolved</button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

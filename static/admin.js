@@ -302,16 +302,15 @@ async function loadSupportQueue() {
     const d = await api(`/api/admin/support/queue${params}`);
     $("supportBody").innerHTML = (d.items || []).map((x) => `<tr>
       <td><code>${esc(x.id)}</code></td>
-      <td>${esc(x.intent || "—")}</td>
+      <td>${esc((x.intent || "—").replace(/_/g, " "))}</td>
       <td>${x.confidence != null ? Math.round(x.confidence * 100) + "%" : "—"}</td>
       <td>${pill(x.queue || "—")}</td>
       <td>${pill(x.status)}</td>
       <td>${x.order_id != null ? "#" + esc(x.order_id) : "—"}</td>
-      <td class="muted">${esc((x.updated_at || "").slice(0, 16).replace("T", " "))}</td>
       <td><button class="btn btn-sm btn-primary" data-support-view="${esc(x.id)}">Open</button></td>
-    </tr>`).join("") || `<tr><td colspan="8" class="muted" style="padding:20px;text-align:center;">Queue clear — AI is handling it</td></tr>`;
+    </tr>`).join("") || `<tr><td colspan="7" class="muted" style="padding:20px;text-align:center;">Queue clear — Counsel is handling it</td></tr>`;
   } catch (err) {
-    $("supportBody").innerHTML = `<tr><td colspan="8" class="muted">${esc(err.message)}</td></tr>`;
+    $("supportBody").innerHTML = `<tr><td colspan="7" class="muted">${esc(err.message)}</td></tr>`;
   }
 }
 
@@ -322,13 +321,19 @@ async function supportAction(e) {
   try {
     const d = await api(`/api/admin/support/conversations/${encodeURIComponent(id)}`);
     _supportSelected = d.id;
-    $("supportDetail").hidden = false;
+    $("supportDeskEmpty").hidden = true;
+    $("supportDeskActive").hidden = false;
+    $("supportDetailTitle").textContent = (d.intent || "Case").replace(/_/g, " ");
+    $("supportDetailMeta").textContent =
+      `${d.id} · ${d.status || ""} · conf ${d.confidence != null ? Math.round(d.confidence * 100) + "%" : "—"}`
+      + (d.order_id != null ? ` · order #${d.order_id}` : "")
+      + (d.queue ? ` · queue ${d.queue}` : "");
     $("supportThread").innerHTML = (d.messages || []).map((m) =>
       `<div class="chat-msg${m.role === "user" ? " me" : ""}"><b>${esc(m.role)}</b>: ${esc(m.body)}</div>`
     ).join("") || "<div class='muted'>No messages</div>";
-    $("supportAudit").innerHTML = (d.audit || []).slice(0, 8).map((a) =>
-      `<div>• ${esc(a.created_at || "").slice(0, 19)} — <b>${esc(a.decision || a.actor)}</b> ${esc(a.reason || "")} <span class="muted">[${(a.policy_refs || []).map(esc).join(", ")}]</span></div>`
-    ).join("") || "No audit entries.";
+    $("supportAudit").innerHTML = (d.audit || []).slice(0, 10).map((a) =>
+      `<div class="support-audit-line"><b>${esc(a.decision || a.actor)}</b> ${esc(a.reason || "")} <span class="muted">[${(a.policy_refs || []).map(esc).join(", ")}]</span></div>`
+    ).join("") || "<div class='muted'>No audit entries.</div>";
     $("supportResolveNote").value = "";
   } catch (err) { toast(err.message || "Failed to load case"); }
 }
@@ -341,8 +346,9 @@ async function resolveSupportCase() {
     await api(`/api/admin/support/conversations/${encodeURIComponent(_supportSelected)}/resolve`, {
       method: "POST", body: JSON.stringify({ resolution, status: "resolved" }),
     });
-    toast("Support case resolved");
-    $("supportDetail").hidden = true;
+    toast("Case resolved");
+    $("supportDeskEmpty").hidden = false;
+    $("supportDeskActive").hidden = true;
     _supportSelected = null;
     loadSupportQueue();
   } catch (err) { toast(err.message || "Failed"); }

@@ -19,7 +19,8 @@
     { icon: "02", label: "Marketplace", href: "/marketplace" },
     { icon: "03", label: "Live Sellers", href: "/stores" },
     { icon: "04", label: "Live Rooms", href: "/rides" },
-    { icon: "05", label: "Sell on RAGNAR", href: "/#apply" },
+    { icon: "05", label: "Counsel", href: "/support" },
+    { icon: "06", label: "Sell on RAGNAR", href: "/#apply" },
   ];
 
   const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
@@ -305,21 +306,37 @@
     }
   }).catch(() => { initConcierge(); });
 
+  // Ensure Counsel design tokens load on every page (floating widget).
+  (function loadCounselCss() {
+    if (document.getElementById("counsel-css")) return;
+    const l = document.createElement("link");
+    l.id = "counsel-css";
+    l.rel = "stylesheet";
+    l.href = "/static/support.css";
+    document.head.appendChild(l);
+  })();
+
   // ---- Shared chat-widget factory: builds a FAB + slide-up panel with a
   // feed/chips/input, used by Concierge, Studio, and (via window.__ragnarChat)
   // the seller-facing Store Designer. One visual language, one place to tweak it. ----
   const escHtml = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   function createChatWidget(opts) {
-    const { key, icon, label, gold, publish, footNote } = opts;
+    const { key, icon, label, gold, publish, footNote, headSub, fabHtml, expandHref, headHtml } = opts;
     const fab = mk("button", "chat-fab" + (gold ? " chat-fab-gold" : ""));
-    fab.innerHTML = `${icon} ${label}`;
+    fab.innerHTML = fabHtml || `${icon} ${label}`;
     fab.id = "fab-" + key;
+    fab.setAttribute("aria-label", label);
 
     const panel = mk("div", "chat-panel");
     panel.id = "panel-" + key;
+    const titleHtml = headHtml || (
+      headSub
+        ? `<span>${escHtml(label)}</span><span class="sub">${escHtml(headSub)}</span>`
+        : `${icon ? escHtml(icon) + " " : ""}${escHtml(label)}`
+    );
     panel.innerHTML = `
       <div class="chat-head">
-        <div class="chat-head-title">${icon} ${label}</div>
+        <div class="chat-head-title">${titleHtml}</div>
         <button class="chat-close" aria-label="Close">✕</button>
       </div>
       <div class="chat-feed"></div>
@@ -328,6 +345,7 @@
         <input placeholder="${footNote ? escHtml(footNote) : "Type a message…"}" />
         <button class="chat-send" type="button">➤</button>
       </div>
+      ${expandHref ? `<a class="chat-expand" href="${escHtml(expandHref)}">Open full Counsel →</a>` : ""}
       ${publish ? `<div class="chat-foot">
         <div class="chat-publish-row">
           <button class="btn btn-ghost btn-sm chat-revert" type="button">Revert</button>
@@ -377,6 +395,7 @@
       statusEl: panel.querySelector(".chat-status"),
       onFirstOpen: (fn) => { onOpenFirst = fn; },
       onSend: (fn) => { sendBtn.addEventListener("click", fn); },
+      open: () => { if (!panel.classList.contains("open")) toggle(); },
     };
   }
   window.__ragnarChat = createChatWidget;
@@ -512,20 +531,35 @@
   // Let any page open Studio directly (e.g. the Command Hub Site tab hint link).
   window.__ragnarOpenStudio = () => { initStudio(); document.getElementById("fab-studio")?.click(); };
 
-  // ---- RAGNAR Support OS: AI-owned intake → policy → action → resolution.
-  // Humans only for escalations. Separate from the shopper Concierge. ----
+  // ---- RAGNAR Counsel: AI Support OS floating portal.
+  // Full chamber lives at /support; this is the always-on entry. ----
   let supportBuilt = false;
   let supportConvId = localStorage.getItem("ragnar_support_id") || null;
+  function supportReceipt(workflow) {
+    if (!workflow) return "";
+    const decision = workflow.decision || (workflow.policy && workflow.policy.decision);
+    const order = workflow.order || {};
+    const refund = workflow.refund || {};
+    const bits = [];
+    if (decision) bits.push(`<div class="cx-receipt-row"><span>Decision</span><strong>${escHtml(decision)}</strong></div>`);
+    if (order.id) bits.push(`<div class="cx-receipt-row"><span>Order</span><strong>#${escHtml(order.id)}</strong></div>`);
+    if (refund.amount != null) bits.push(`<div class="cx-receipt-row"><span>Refund</span><strong>$${Number(refund.amount).toFixed(2)}</strong></div>`);
+    if (!bits.length) return "";
+    return `<div class="cx-receipt"><div class="cx-receipt-label">Action record</div><div class="cx-receipt-rows">${bits.join("")}</div></div>`;
+  }
   function initSupport() {
     if (supportBuilt) return;
+    if ((location.pathname.replace(/\/+$/, "") || "/") === "/support") return; // full page owns UX
     supportBuilt = true;
     const w = createChatWidget({
       key: "support",
-      icon: "?",
-      label: "Support",
+      icon: "R",
+      label: "Counsel",
+      headSub: "Guided resolution",
       footNote: "Order #, refund, return, tracking…",
+      expandHref: "/support",
+      fabHtml: `<span class="fab-crest">R</span><span class="fab-copy"><b>Counsel</b><small>Support</small></span>`,
     });
-    // Sit on the left so it doesn't collide with Ask RAGNAR / Studio.
     w.fab.classList.add("chat-fab-support");
     w.panel.classList.add("chat-panel-support");
 
@@ -554,11 +588,11 @@
           else w.msg(escHtml(m.body));
         });
         if (!(c.messages || []).length) {
-          w.msg(escHtml(c.reply || "How can I help?"));
+          w.msg(escHtml(c.reply || "Counsel is ready — refunds, returns, tracking."));
         }
         w.chips(c.chips || ["Track my order", "I need a refund", "How do fees work?", "Talk to a human"]);
       } catch (_) {
-        w.msg("Support is warming up — try again in a moment.");
+        w.msg("Counsel is warming up — try again in a moment.");
       }
     });
 
@@ -567,7 +601,7 @@
       if (!text) return;
       w.input.value = "";
       w.msg(escHtml(text), "me");
-      const thinking = w.msg("…");
+      const thinking = w.msg('<span class="cx-typing" aria-label="Thinking"><span></span><span></span><span></span></span>');
       try {
         await ensureConv();
         const r = await fetch("/api/support/chat", {
@@ -580,16 +614,18 @@
           supportConvId = r.id;
           localStorage.setItem("ragnar_support_id", supportConvId);
         }
-        w.msg(escHtml(r.reply || "Done."));
+        w.msg(escHtml(r.reply || "Done.") + supportReceipt(r.workflow));
         if (r.chips) w.chips(r.chips);
         if (r.queue || r.decision === "escalate") {
           w.msg(`<span class="chat-note">Case ${escHtml(r.conversation_id || supportConvId)} — human review queue.</span>`);
         }
       } catch (e) {
         thinking.remove();
-        w.msg("Something went wrong — try again, or say “Talk to a human”.");
+        w.msg("Something went wrong — try again, or open full Counsel.");
       }
     });
+
+    window.__ragnarOpenCounsel = () => { w.open(); };
   }
   initSupport();
 })();

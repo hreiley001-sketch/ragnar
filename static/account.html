@@ -240,6 +240,7 @@
         ${storeBit}
         <div class="ov-links">
           <a class="btn btn-primary" href="#settings">Account settings</a>
+          <a class="btn btn-primary" href="/support">Open Counsel</a>
           ${u.is_staff ? `<a class="btn btn-primary" href="/admin">Open Command Hub →</a>` : ""}
           <a class="btn btn-ghost" href="/">Marketplace</a>
           <a class="btn btn-ghost" href="/stores">Browse stores</a>
@@ -602,7 +603,10 @@
         const acts = [];
         if (st === "shipped") acts.push(`<button class="btn btn-primary btn-sm" data-delivered="${esc(o.id)}" type="button">Confirm delivered</button>`);
         if (!o.feedback_left && ["paid", "shipped", "delivered"].includes(st)) acts.push(`<button class="btn btn-ghost btn-sm" data-fb="${esc(o.id)}" type="button">Leave feedback</button>`);
-        if (!["disputed", "cancelled"].includes(st)) acts.push(`<button class="btn btn-ghost btn-sm" data-dispute="${esc(o.id)}" type="button">Report a problem</button>`);
+        if (!["disputed", "cancelled"].includes(st)) {
+          acts.push(`<a class="btn btn-ghost btn-sm" href="/support">Ask Counsel</a>`);
+          acts.push(`<button class="btn btn-ghost btn-sm" data-dispute="${esc(o.id)}" type="button">Report a problem</button>`);
+        }
         return `<tr>
           <td>${esc(o.listing_title || o.title || "Order")}</td>
           <td>${money(total)}</td>
@@ -623,6 +627,7 @@
       }).join("");
       p.innerHTML = `
         <div class="sec-title">My Orders</div>
+        <p class="muted mini-note">Need a refund, return, or tracking help? <a href="/support">Open Counsel</a> — AI resolves most cases instantly.</p>
         <div class="tbl-wrap"><table class="tbl">
           <thead><tr><th>Item</th><th>Total</th><th>Status</th><th>Tracking</th><th></th></tr></thead>
           <tbody>${rows}</tbody>
