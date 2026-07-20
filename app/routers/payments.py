@@ -3,6 +3,8 @@
 Commerce write paths require authentication:
 - Connect onboarding: store owner / staff / store token
 - Checkout: signed-in buyer
+
+Webhook processing is idempotent via ProcessedStripeEvent + stripe_session_id.
 """
 from __future__ import annotations
 
@@ -10,12 +12,13 @@ import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
-from sqlmodel import Session, select  # noqa: F401  (select used in webhook)
+from sqlmodel import Session, select
 
-from .. import payments
+from .. import inventory, payments
 from ..auth import get_current_user, require_can_act_for_seller, require_user
 from ..database import get_session
-from ..models import Listing, ListingStatus, Seller, User
+from ..models import Listing, ListingStatus, Order, ProcessedStripeEvent, Seller, User
+from ..services import record_sale
 
 logger = logging.getLogger("ragnar.payments")
 router = APIRouter(prefix="/api/payments", tags=["payments"])
@@ -79,13 +82,16 @@ def checkout(
     """Create a Checkout Session so a signed-in buyer can purchase this listing.
 
     Pass {"offer_id": N} to pay an accepted Best Offer price instead of the
-    listing price.
+    listing price. Reserves inventory until the session expires or pays.
     """
     listing = session.get(Listing, listing_id)
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")
-    if listing.status != ListingStatus.active.value:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Listing is not active")
+    try:
+        inventory.assert_purchasable(session, listing)
+    except inventory.InventoryError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+
     seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
 
     amount_override = None
@@ -101,17 +107,123 @@ def checkout(
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This offer belongs to another buyer")
         amount_override = offer.counter_amount_cents or offer.amount_cents
     try:
-        return payments.create_checkout_session(
+        result = payments.create_checkout_session(
             listing, seller, amount_cents=amount_override, buyer_user_id=user.id,
         )
     except payments.PaymentsError as e:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
 
+    try:
+        inventory.create_hold(
+            session, listing,
+            stripe_session_id=result["id"],
+            buyer_user_id=user.id,
+        )
+    except inventory.InventoryError as e:
+        # Race: another buyer reserved the last unit between assert and hold.
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    return result
+
+
+def _already_processed(session: Session, event_id: str) -> bool:
+    return session.get(ProcessedStripeEvent, event_id) is not None
+
+
+def _mark_processed(session: Session, event_id: str, event_type: str) -> None:
+    session.add(ProcessedStripeEvent(event_id=event_id, event_type=event_type))
+    session.commit()
+
+
+def _order_for_session(session: Session, stripe_session_id: str | None) -> Order | None:
+    if not stripe_session_id:
+        return None
+    return session.exec(
+        select(Order).where(Order.stripe_session_id == stripe_session_id)
+    ).first()
+
+
+def _handle_checkout_completed(session: Session, obj: dict) -> None:
+    session_id = obj.get("id")
+    if _order_for_session(session, session_id):
+        logger.info("Skipping duplicate order for Stripe session %s", session_id)
+        inventory.convert_hold(session, session_id)
+        session.commit()
+        return
+
+    listing_id = (obj.get("metadata") or {}).get("listing_id")
+    amount_total = obj.get("amount_total")
+    if not listing_id:
+        return
+
+    listing = session.get(Listing, int(listing_id))
+    if not listing:
+        logger.warning("Webhook listing %s missing", listing_id)
+        return
+
+    # Convert hold first so available units don't block finalization.
+    inventory.convert_hold(session, session_id)
+
+    if listing.status == ListingStatus.sold.value and (listing.quantity or 0) <= 0:
+        # Already fully sold — still record order if missing (shouldn't happen).
+        if _order_for_session(session, session_id):
+            session.commit()
+            return
+
+    price_cents = int(amount_total) if amount_total else listing.price_cents
+    # Only decrement inventory / mark sold when still active with stock.
+    if listing.status == ListingStatus.active.value and (listing.quantity or 0) > 0:
+        record_sale(session, listing, price_cents, source="stripe")
+    elif listing.status == ListingStatus.active.value:
+        # Quantity already 0 but status lag — mark sold without extra Sale if needed.
+        listing.status = ListingStatus.sold.value
+        session.add(listing)
+
+    from ..emailer import ops_alert
+    from ..notify import notify, notify_seller
+
+    details = obj.get("customer_details") or {}
+    buyer_email = (details.get("email") or "").lower() or None
+    meta = obj.get("metadata") or {}
+    buyer_user = None
+    buyer_user_id = meta.get("buyer_user_id")
+    if buyer_user_id:
+        buyer_user = session.get(User, int(buyer_user_id))
+    if not buyer_user and buyer_email:
+        buyer_user = session.exec(select(User).where(User.email == buyer_email)).first()
+
+    order = Order(
+        listing_id=listing.id,
+        seller_id=listing.seller_id,
+        buyer_user_id=buyer_user.id if buyer_user else None,
+        buyer_name=details.get("name") or (buyer_user.name if buyer_user else None),
+        buyer_email=buyer_email or (buyer_user.email if buyer_user else None),
+        title=listing.title,
+        price_cents=max(0, price_cents - (listing.shipping_cents or 0)),
+        shipping_cents=listing.shipping_cents or 0,
+        status="paid",
+        stripe_session_id=session_id,
+        source="stripe",
+    )
+    session.add(order)
+    session.commit()
+    session.refresh(order)
+
+    seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
+    notify_seller(session, seller, "order_paid",
+                  f"Order paid — {listing.title}",
+                  body=f"${price_cents / 100:,.2f} · ship it and add tracking.",
+                  link="/account#store")
+    if buyer_user:
+        notify(session, buyer_user.id, "order_paid",
+               f"Order confirmed — {listing.title}",
+               body="You'll get tracking once it ships.", link="/account#orders")
+    ops_alert(f"Order paid: {listing.title} (${price_cents / 100:,.2f})")
+    logger.info("Listing %s sold via Stripe; order %s created", listing_id, order.id)
+
 
 @router.post("/webhook")
 async def webhook(request: Request, session: Session = Depends(get_session)) -> dict:
-    """Stripe webhook receiver. On checkout.session.completed, mark the listing
-    sold and record the comp."""
+    """Stripe webhook receiver. Idempotent on event.id and checkout session id."""
     payload = await request.body()
     sig = request.headers.get("stripe-signature", "")
     try:
@@ -121,56 +233,25 @@ async def webhook(request: Request, session: Session = Depends(get_session)) -> 
     except Exception as e:  # signature/parse failure
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid webhook: {e}")
 
-    if event["type"] == "checkout.session.completed":
-        obj = event["data"]["object"]
-        listing_id = (obj.get("metadata") or {}).get("listing_id")
-        amount_total = obj.get("amount_total")
-        if listing_id:
-            listing = session.get(Listing, int(listing_id))
-            if listing and listing.status == ListingStatus.active.value:
-                from ..services import record_sale
-                price_cents = int(amount_total) if amount_total else listing.price_cents
-                record_sale(session, listing, price_cents, source="stripe")
+    event_id = event.get("id") or ""
+    event_type = event.get("type") or ""
+    if event_id and _already_processed(session, event_id):
+        return {"received": True, "duplicate": True}
 
-                # Create the Order record buyers/sellers manage post-checkout.
-                from ..emailer import ops_alert
-                from ..models import Order
-                from ..notify import notify, notify_seller
-                details = obj.get("customer_details") or {}
-                buyer_email = (details.get("email") or "").lower() or None
-                meta = obj.get("metadata") or {}
-                buyer_user = None
-                buyer_user_id = meta.get("buyer_user_id")
-                if buyer_user_id:
-                    buyer_user = session.get(User, int(buyer_user_id))
-                if not buyer_user and buyer_email:
-                    buyer_user = session.exec(select(User).where(User.email == buyer_email)).first()
-                order = Order(
-                    listing_id=listing.id,
-                    seller_id=listing.seller_id,
-                    buyer_user_id=buyer_user.id if buyer_user else None,
-                    buyer_name=details.get("name") or (buyer_user.name if buyer_user else None),
-                    buyer_email=buyer_email or (buyer_user.email if buyer_user else None),
-                    title=listing.title,
-                    price_cents=max(0, price_cents - (listing.shipping_cents or 0)),
-                    shipping_cents=listing.shipping_cents or 0,
-                    status="paid",
-                    stripe_session_id=obj.get("id"),
-                    source="stripe",
-                )
-                session.add(order)
-                session.commit()
-                session.refresh(order)
-                seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
-                notify_seller(session, seller, "order_paid",
-                              f"Order paid — {listing.title}",
-                              body=f"${price_cents / 100:,.2f} · ship it and add tracking.",
-                              link="/account#store")
-                if buyer_user:
-                    notify(session, buyer_user.id, "order_paid",
-                           f"Order confirmed — {listing.title}",
-                           body="You'll get tracking once it ships.", link="/account#orders")
-                ops_alert(f"Order paid: {listing.title} (${price_cents / 100:,.2f})")
-                logger.info("Listing %s sold via Stripe; order %s created", listing_id, order.id)
+    if event_type == "checkout.session.completed":
+        _handle_checkout_completed(session, event["data"]["object"])
+    elif event_type == "checkout.session.expired":
+        obj = event["data"]["object"]
+        inventory.release_hold(session, obj.get("id"))
+
+    if event_id:
+        # Ignore IntegrityError races if two workers process the same event.
+        try:
+            _mark_processed(session, event_id, event_type)
+        except Exception:  # noqa: BLE001
+            session.rollback()
+            if _already_processed(session, event_id):
+                return {"received": True, "duplicate": True}
+            raise
 
     return {"received": True}

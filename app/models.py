@@ -230,6 +230,31 @@ class Order(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=utcnow)
 
 
+class ProcessedStripeEvent(SQLModel, table=True):
+    """Idempotency ledger for Stripe webhooks — event_id is unique."""
+
+    event_id: str = Field(primary_key=True, max_length=120)
+    event_type: str = Field(max_length=80)
+    processed_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class InventoryHold(SQLModel, table=True):
+    """Temporary reservation created at Checkout Session creation.
+
+    Available units = listing.quantity - active (unreleased, unconverted, unexpired) holds.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    listing_id: int = Field(foreign_key="listing.id", index=True)
+    buyer_user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    stripe_session_id: str = Field(index=True, unique=True, max_length=120)
+    quantity: int = Field(default=1)
+    expires_at: datetime = Field(index=True)
+    released: bool = Field(default=False, index=True)
+    converted: bool = Field(default=False, index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
 class OfferStatus(str, Enum):
     open = "open"
     countered = "countered"

@@ -211,9 +211,13 @@ def record_sale(
     price_cents: int,
     *,
     source: str = "ragnar",
+    units: int = 1,
 ) -> Sale:
-    """Mark a listing sold, record the comp, and accrue Founding intro sales.
-    Shared by the manual /sell endpoint and the Stripe webhook. Caller commits.
+    """Record a sold unit, accrue Founding intro sales, and update inventory.
+
+    Decrements ``listing.quantity`` by ``units``. Marks the listing sold when
+    remaining quantity hits zero. Shared by manual /sell and Stripe webhook.
+    Caller commits.
     """
     sale = Sale(
         listing_id=listing.id,
@@ -234,7 +238,10 @@ def record_sale(
             seller.founding_intro_sales_cents += price_cents
             session.add(seller)
 
-    listing.status = ListingStatus.sold.value
+    remaining = max(0, int(listing.quantity or 0) - max(1, units))
+    listing.quantity = remaining
+    if remaining <= 0:
+        listing.status = ListingStatus.sold.value
     listing.updated_at = utcnow()
     session.add(sale)
     session.add(listing)
