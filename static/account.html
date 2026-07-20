@@ -16,7 +16,7 @@
     .tab { font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
     .tab { white-space: nowrap; }
     .tab:hover { background: rgba(55,189,255,0.08); color: var(--text); }
-    .tab.active { background: var(--ice); color: #fff; border-color: rgba(111,214,255,0.6); font-weight: 600; }
+    .tab.active { background: var(--ice); color: var(--color-on-accent); border-color: var(--ice); font-weight: 600; }
     .tcount { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: rgba(255,90,90,0.85); color: #fff; font-size: 11px; font-weight: 700; display: none; align-items: center; justify-content: center; line-height: 1; }
     .tcount.show { display: inline-flex; }
 
@@ -36,7 +36,7 @@
     .wgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
     .wcard { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--panel); display: flex; flex-direction: column; transition: transform .15s ease, border-color .15s ease; }
     .wcard:hover { transform: translateY(-3px); border-color: var(--border-strong); }
-    .wimg { aspect-ratio: 4/3; background: radial-gradient(circle at 50% 30%, rgba(55,189,255,0.12), #e6ebf2); display: grid; place-items: center; overflow: hidden; }
+    .wimg { aspect-ratio: 4/3; background: radial-gradient(circle at 50% 30%, rgba(183,231,244,.12), var(--color-bg-panel-strong)); display: grid; place-items: center; overflow: hidden; }
     .wimg img { width: 100%; height: 100%; object-fit: cover; }
     .wbody { padding: 10px 11px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
     .wtitle { font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--text); }
@@ -46,7 +46,7 @@
     /* Messages */
     .thread { display: flex; gap: 12px; align-items: center; padding: 13px 10px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; }
     .thread:hover { background: rgba(55,189,255,0.05); }
-    .t-av { width: 38px; height: 38px; border-radius: 50%; background: var(--ice); display: grid; place-items: center; font-weight: 800; color: #fff; flex: none; }
+    .t-av { width: 38px; height: 38px; border-radius: 50%; background: var(--ice); display: grid; place-items: center; font-weight: 800; color: var(--color-on-accent); flex: none; }
     .t-main { min-width: 0; flex: 1; }
     .t-with { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
     .t-last { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 480px; }
@@ -107,6 +107,7 @@
       .setting-row .btn { width: 100%; }
     }
   </style>
+  <link rel="stylesheet" href="/static/pages.css" />
 </head>
 <body>
   <div class="aurora"></div>
@@ -936,7 +937,21 @@
       $("acctSub").textContent = `Signed in as ${USER.email}`;
       if (USER.seller_handle) $("storeTabBtn").hidden = false;
 
-      document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => switchTab(t.dataset.tab)));
+      const tabButtons = [...document.querySelectorAll(".tab")];
+      tabButtons.forEach((t) => {
+        t.addEventListener("click", () => switchTab(t.dataset.tab));
+        t.addEventListener("keydown", (event) => {
+          if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+          event.preventDefault();
+          const visible = tabButtons.filter((button) => !button.hidden);
+          const current = visible.indexOf(t);
+          const next = event.key === "Home" ? visible[0]
+            : event.key === "End" ? visible[visible.length - 1]
+            : visible[(current + (event.key === "ArrowRight" ? 1 : -1) + visible.length) % visible.length];
+          switchTab(next.dataset.tab);
+          next.focus();
+        });
+      });
       window.addEventListener("hashchange", () => switchTab(location.hash.slice(1) || "overview", false));
 
       refreshNotifBadge();

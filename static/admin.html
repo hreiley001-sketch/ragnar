@@ -29,7 +29,7 @@
     .tabs { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 20px; padding-bottom: 4px; }
     .tab { padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; }
     .tab { white-space: nowrap; }
-    .tab.active { background: var(--ice); color: #fff; border-color: rgba(111,214,255,0.6); font-weight: 600; }
+    .tab.active { background: var(--ice); color: var(--color-on-accent); border-color: var(--ice); font-weight: 600; }
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 14px; margin-bottom: 22px; }
     .kpi { padding: 16px 18px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
     .kpi .k-num { font-size: 26px; font-weight: 800; color: var(--text); }
@@ -83,6 +83,7 @@
       .ai-box { padding: 12px; }
     }
   </style>
+  <link rel="stylesheet" href="/static/pages.css" />
 </head>
 <body>
   <div class="aurora"></div>

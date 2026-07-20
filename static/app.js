@@ -123,7 +123,7 @@ function toast(msg) {
 
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
-const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="#7fa8c9"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
+const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="var(--crest-primary)"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="var(--crest-accent)"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
 
 /* ---------------- fee math (mirrors backend fees.py) ---------------- */
 function keepInfo(price, founding) {
@@ -209,7 +209,7 @@ function listingCard(l) {
         ${sub ? `<div class="listing-sub">${sub}</div>` : ""}
         <div class="listing-price-row">
           <span class="listing-price">${money(l.price)}</span>
-          <span class="listing-keep">keep ${money(keep)}<br><span style="color:var(--muted)">+${money(savings)} vs eBay</span></span>
+          <span class="listing-keep">keep ${money(keep)}<br><span class="listing-savings">+${money(savings)} vs eBay</span></span>
         </div>
         <div class="listing-meta">
           <span>${l.shipping ? "+ " + money(l.shipping) + " ship" : "Free shipping"}</span>
@@ -220,7 +220,7 @@ function listingCard(l) {
     <div class="listing-body listing-body-foot">
       <div class="listing-foot">
         <div class="listing-seller"><span class="seller-dot"></span>${escapeHtml(l.seller_name)}</div>
-        <div style="display:flex;gap:6px;">
+        <div class="listing-foot-actions">
           <button class="btn btn-ghost btn-sm compare-btn ${state.compareIds.includes(l.id) ? "on" : ""}" type="button" data-compare="${l.id}" aria-pressed="${state.compareIds.includes(l.id) ? "true" : "false"}">Compare</button>
           <button class="btn btn-sm buy-btn" type="button" data-buy="${l.id}">Buy</button>
         </div>
@@ -463,6 +463,7 @@ function compareCellClass(row, idx) {
   return val === target ? "cmp-cell best" : "cmp-cell faded";
 }
 
+let compareReturnFocus = null;
 async function openCompare() {
   const ids = state.compareIds.slice(0, 3);
   if (ids.length < 2) {
@@ -492,12 +493,20 @@ async function openCompare() {
   }
   table.innerHTML = html;
   const modal = $("compareModal");
-  if (modal) modal.hidden = false;
+  if (modal) {
+    compareReturnFocus = document.activeElement;
+    modal.hidden = false;
+    const closeButton = $("closeCompareBtn");
+    if (closeButton) closeButton.focus();
+  }
 }
 
 function closeCompare() {
   const modal = $("compareModal");
-  if (modal) modal.hidden = true;
+  if (modal && !modal.hidden) {
+    modal.hidden = true;
+    if (compareReturnFocus && typeof compareReturnFocus.focus === "function") compareReturnFocus.focus();
+  }
 }
 
 function clearCompare() {
@@ -542,7 +551,7 @@ async function loadLiveRail() {
     rail.innerHTML = streams.map((s) => {
       const bg = s.thumbnail_url
         ? `center/cover url('${escapeHtml(s.thumbnail_url)}')`
-        : `linear-gradient(135deg, ${escapeHtml(s.accent_color || "#2563eb")}, #0b1220)`;
+        : `linear-gradient(135deg, ${escapeHtml(s.accent_color || "var(--color-accent-fallback)")}, var(--color-bg-elevated))`;
       return `<a class="lr-card" href="/store/${encodeURIComponent(s.seller_handle)}">
         <div class="lr-thumb" style="background:${bg}">
           <span class="lr-badge">● LIVE</span>

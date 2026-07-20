@@ -161,6 +161,9 @@
   const drawer = document.createElement("div");
   drawer.id = "sellDrawer";
   drawer.className = "drawer";
+  drawer.setAttribute("role", "dialog");
+  drawer.setAttribute("aria-modal", "true");
+  drawer.setAttribute("aria-label", "Sell a card");
   drawer.setAttribute("aria-hidden", "true");
   drawer.innerHTML = DRAWER_HTML;
   document.body.appendChild(drawer);
@@ -282,13 +285,13 @@
       return `${x.toFixed(1)},${y.toFixed(1)}`;
     }).join(" ");
     return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
-      <polyline points="${pts}" fill="none" stroke="#6fd6ff" stroke-width="2" /></svg>`;
+      <polyline points="${pts}" fill="none" stroke="var(--color-accent-primary)" stroke-width="2" /></svg>`;
   }
 
   function marketBlock(market) {
     if (!market || market.market == null) return "";
     const chg = market.change_7d;
-    const chgHtml = chg == null ? "" : ` <span style="color:${chg >= 0 ? "#9be7c4" : "#ff9a9a"}">${chg >= 0 ? "▲" : "▼"} ${Math.abs(chg)}% 7d</span>`;
+    const chgHtml = chg == null ? "" : ` <span class="${chg >= 0 ? "delta-up" : "delta-down"}">${chg >= 0 ? "▲" : "▼"} ${Math.abs(chg)}% 7d</span>`;
     return `<div class="market-row">
       <span class="market-label">Live market${market.source ? ` · ${escapeHtml(market.source)}` : ""}</span>
       <span class="market-val">${money(market.market)}${chgHtml}</span>
@@ -487,17 +490,32 @@
     }
   }
 
+  let returnFocus = null;
   function open(mode) {
+    returnFocus = document.activeElement;
     ensureMeta().then(() => { updateFeePreview(); ensureSellerState(); });
     drawer.classList.add("open");
     drawer.setAttribute("aria-hidden", "false");
     if (mode === "ai" || mode === "manual") showPath(mode); else showChoice();
+    els.close.focus();
   }
   function close() {
     drawer.classList.remove("open");
     drawer.setAttribute("aria-hidden", "true");
+    if (returnFocus && typeof returnFocus.focus === "function") returnFocus.focus();
   }
   window.RagnarSell = { open, close };
+
+  drawer.addEventListener("keydown", (event) => {
+    if (event.key !== "Tab") return;
+    const focusable = [...drawer.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+      .filter((element) => !element.hidden && element.offsetParent !== null);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
 
   // Delegated so ANY page/button can open the drawer with data-open-sell
   // (optionally data-open-sell="ai" / "manual" to skip the choice screen).

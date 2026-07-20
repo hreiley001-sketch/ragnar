@@ -15,8 +15,11 @@ async function api(p, o = {}) {
   if (!r.ok) throw new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`);
   return d;
 }
-const accentGrad = (c) => `linear-gradient(135deg, ${c || "#6f93b4"}44, #0a0d12), radial-gradient(circle at 30% 20%, ${c || "#6f93b4"}66, transparent 60%)`;
-const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="#7fa8c9"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
+const accentGrad = (c) => {
+  const accent = c || "var(--color-accent-fallback)";
+  return `linear-gradient(135deg, color-mix(in srgb, ${accent} 28%, transparent), var(--color-bg-base)), radial-gradient(circle at 30% 20%, color-mix(in srgb, ${accent} 42%, transparent), transparent 60%)`;
+};
+const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="var(--crest-primary)"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="var(--crest-accent)"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
 
 let STORE = null;
 let DESIGN_PRESET = "";
@@ -50,7 +53,7 @@ function applyFont(family) {
 
 function applyStore(s) {
   STORE = s;
-  if (s.accent_color) document.documentElement.style.setProperty("--ice", s.accent_color);
+  document.body.style.setProperty("--store-accent", s.accent_color || "var(--color-accent-fallback)");
   applyFont(s.font_family || "");
   document.title = `${s.display_name} — RAGNAR`;
   $("storeName").textContent = s.display_name;
@@ -59,7 +62,10 @@ function applyStore(s) {
   $("storeHero").style.background = s.banner_url ? `center/cover url('${s.banner_optimized || s.banner_url}')` : accentGrad(s.accent_color);
   const av = $("storeAv");
   if (s.avatar_url) { av.style.background = `center/cover url('${s.avatar_optimized || s.avatar_url}')`; av.textContent = ""; }
-  else { av.style.background = s.accent_color || "#6f93b4"; av.textContent = (s.display_name || "?").trim()[0].toUpperCase(); }
+  else {
+    av.style.background = `linear-gradient(rgba(3,8,12,.38),rgba(3,8,12,.38)), ${s.accent_color || "var(--color-accent-fallback)"}`;
+    av.textContent = (s.display_name || "?").trim()[0].toUpperCase();
+  }
   // prefill customize
   $("c-tagline").value = s.tagline || "";
   $("c-bio").value = s.bio || "";

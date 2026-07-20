@@ -622,7 +622,20 @@ document.addEventListener("DOMContentLoaded", () => {
   $("loginBtn").addEventListener("click", () => tryLogin($("tokenInput").value.trim()).catch((e) => { $("loginErr").textContent = e.message; }));
   $("tokenInput").addEventListener("keydown", (e) => { if (e.key === "Enter") $("loginBtn").click(); });
   $("logoutBtn").addEventListener("click", logout);
-  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => switchTab(t.dataset.tab)));
+  const tabButtons = [...document.querySelectorAll(".tab")];
+  tabButtons.forEach((t) => {
+    t.addEventListener("click", () => switchTab(t.dataset.tab));
+    t.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const current = tabButtons.indexOf(t);
+      const next = event.key === "Home" ? tabButtons[0]
+        : event.key === "End" ? tabButtons[tabButtons.length - 1]
+        : tabButtons[(current + (event.key === "ArrowRight" ? 1 : -1) + tabButtons.length) % tabButtons.length];
+      switchTab(next.dataset.tab);
+      next.focus();
+    });
+  });
   $("listBody").addEventListener("click", listingsAction);
   $("listSearch").addEventListener("input", () => { clearTimeout(window._ls); window._ls = setTimeout(loadListings, 300); });
   $("listStatus").addEventListener("change", loadListings);

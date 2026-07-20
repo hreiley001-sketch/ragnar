@@ -4,6 +4,15 @@
 "use strict";
 (function () {
   const path = (location.pathname.replace(/\/+$/, "") || "/");
+  const pageMain = document.querySelector("main");
+  if (pageMain && !document.querySelector(".arena-skip, .site-skip")) {
+    if (!pageMain.id) pageMain.id = "main";
+    const skip = document.createElement("a");
+    skip.className = "site-skip";
+    skip.href = `#${pageMain.id}`;
+    skip.textContent = "Skip to content";
+    document.body.insertBefore(skip, document.body.firstChild);
+  }
 
   const ITEMS = [
     { icon: "01", label: "Home", href: "/" },
@@ -74,6 +83,11 @@
   // Drawer
   const scrim = mk("div", "nav-scrim");
   const drawer = mk("div", "nav-drawer");
+  drawer.id = "navDrawer";
+  drawer.setAttribute("role", "dialog");
+  drawer.setAttribute("aria-modal", "true");
+  drawer.setAttribute("aria-label", "Site navigation");
+  drawer.setAttribute("aria-hidden", "true");
   drawer.innerHTML = `
     <div class="nav-head">
       <a href="/" style="display:inline-flex"><img src="/static/logo.png" alt="RAGNAR" /></a>
@@ -95,18 +109,42 @@
 
   // Burger button — into the header if present, else a floating button.
   const burger = mk("button", "nav-burger");
-  burger.innerHTML = "☰";
+  burger.innerHTML = '<span aria-hidden="true">☰</span>';
   burger.setAttribute("aria-label", "Open menu");
+  burger.setAttribute("aria-controls", "navDrawer");
+  burger.setAttribute("aria-expanded", "false");
   const actions = document.querySelector(".header-actions");
   if (actions) actions.appendChild(burger);
   else { Object.assign(burger.style, { position: "fixed", top: "14px", right: "14px", zIndex: "82" }); document.body.appendChild(burger); }
 
-  const open = () => { scrim.classList.add("open"); drawer.classList.add("open"); };
-  const close = () => { scrim.classList.remove("open"); drawer.classList.remove("open"); };
+  const open = () => {
+    scrim.classList.add("open");
+    drawer.classList.add("open");
+    drawer.setAttribute("aria-hidden", "false");
+    burger.setAttribute("aria-expanded", "true");
+    drawer.querySelector(".nav-close").focus();
+  };
+  const close = () => {
+    if (!drawer.classList.contains("open")) return;
+    scrim.classList.remove("open");
+    drawer.classList.remove("open");
+    drawer.setAttribute("aria-hidden", "true");
+    burger.setAttribute("aria-expanded", "false");
+    burger.focus();
+  };
   burger.addEventListener("click", open);
   scrim.addEventListener("click", close);
   drawer.querySelector(".nav-close").addEventListener("click", close);
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") close();
+    if (e.key !== "Tab" || !drawer.classList.contains("open")) return;
+    const focusable = [...drawer.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')].filter((el) => !el.hidden);
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
 
   // Highlight current page
   links.querySelectorAll("a.nav-link").forEach((a) => {
@@ -125,6 +163,7 @@
       encodeURIComponent(family).replace(/%20/g, "+") + ":wght@400;600;700&display=swap";
     document.head.appendChild(l);
   }
+  loadWebFont("Inter Tight");
   function shade(hex, amt) {
     // Lightens dark colors and darkens light ones, so --bg-2 always has gentle
     // contrast against --bg whether the theme is light or dark.
@@ -135,13 +174,49 @@
     r = Math.max(0, Math.min(255, r + d)); g = Math.max(0, Math.min(255, g + d)); b = Math.max(0, Math.min(255, b + d));
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
+  function readableOn(hex) {
+    const m = /^#([0-9a-fA-F]{6})$/.exec(hex || "");
+    if (!m) return "#061016";
+    const n = parseInt(m[1], 16);
+    const channels = [n >> 16, (n >> 8) & 255, n & 255].map((v) => {
+      const c = v / 255;
+      return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4);
+    });
+    return (.2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2]) > .42
+      ? "#061016"
+      : "#f6f8fa";
+  }
   function applyTheme(c) {
     if (!c) return;
     const s = document.documentElement.style;
-    if (c.theme_accent) { s.setProperty("--ice", c.theme_accent); s.setProperty("--ice-strong", c.theme_accent); }
-    if (c.theme_gold) s.setProperty("--gold", c.theme_gold);
-    if (c.theme_bg) { s.setProperty("--bg", c.theme_bg); s.setProperty("--bg-2", shade(c.theme_bg, 12)); }
-    if (c.theme_text) s.setProperty("--text", c.theme_text);
+    if (c.theme_accent) {
+      const strong = shade(c.theme_accent, 22);
+      s.setProperty("--color-accent-primary", c.theme_accent);
+      s.setProperty("--color-accent-primary-strong", strong);
+      s.setProperty("--color-on-accent", readableOn(c.theme_accent));
+      s.setProperty("--ice", c.theme_accent);
+      s.setProperty("--ice-strong", strong);
+    }
+    if (c.theme_gold) {
+      s.setProperty("--color-accent-secondary", c.theme_gold);
+      s.setProperty("--gold", c.theme_gold);
+    }
+    if (c.theme_bg) {
+      const elevated = shade(c.theme_bg, 12);
+      const panel = shade(c.theme_bg, 18);
+      s.setProperty("--color-bg-base", c.theme_bg);
+      s.setProperty("--color-bg-elevated", elevated);
+      s.setProperty("--color-bg-panel", panel);
+      s.setProperty("--bg", c.theme_bg);
+      s.setProperty("--bg-2", elevated);
+      s.setProperty("--panel-solid", panel);
+    }
+    if (c.theme_text) {
+      s.setProperty("--color-text-primary", c.theme_text);
+      s.setProperty("--color-text-secondary", shade(c.theme_text, 34));
+      s.setProperty("--text", c.theme_text);
+      s.setProperty("--text-soft", shade(c.theme_text, 34));
+    }
     if (c.theme_font) { loadWebFont(c.theme_font); document.body.style.fontFamily = "'" + c.theme_font + "', system-ui, sans-serif"; }
   }
   function applyAnnouncement(c) {
@@ -151,11 +226,11 @@
     if (!bar) {
       bar = document.createElement("div");
       bar.id = "navAnnounce";
-      bar.style.cssText = "position:sticky;top:0;z-index:80;background:linear-gradient(90deg,#0f1620,#16202c);color:var(--ice,#6fd6ff);border-bottom:1px solid rgba(111,214,255,0.25);font-size:13px;font-weight:600;padding:8px 14px;text-align:center;";
+      bar.className = "site-announce";
       document.body.insertBefore(bar, document.body.firstChild);
     }
     bar.innerHTML = c.announcement_link
-      ? `<a href="${c.announcement_link}" style="color:inherit;text-decoration:underline;">${msg}</a>`
+      ? `<a href="${c.announcement_link}" class="site-announce-link">${msg}</a>`
       : msg;
   }
   function applyContent(c) {
@@ -197,8 +272,8 @@
       // "Verify your email" banner for unverified accounts (site-wide reminder).
       if (d.user.email_verified === false && !sessionStorage.getItem("ragnar_hide_verify")) {
         const bar = document.createElement("div");
-        bar.style.cssText = "position:sticky;top:0;z-index:79;background:linear-gradient(90deg,#8a6d1f,#b8901f);color:#0a0d12;font-size:13px;font-weight:600;padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;";
-        bar.innerHTML = '📬 Verify your email to unlock full access. <a href="#" id="navResend" style="color:#0a0d12;text-decoration:underline;">Resend link</a> <span id="navVdismiss" style="cursor:pointer;opacity:.7;">✕</span>';
+        bar.className = "verify-email-bar";
+        bar.innerHTML = 'Verify your email to unlock full access. <a href="#" id="navResend">Resend link</a> <button id="navVdismiss" type="button" aria-label="Dismiss verification reminder">Close</button>';
         document.body.insertBefore(bar, document.body.firstChild);
         bar.querySelector("#navResend").addEventListener("click", async (e) => {
           e.preventDefault();

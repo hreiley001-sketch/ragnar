@@ -15,7 +15,7 @@ async function api(p, o = {}) {
   return d;
 }
 
-const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="#7fa8c9"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="#6fd6ff"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
+const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="var(--crest-primary)"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="var(--crest-accent)"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
 
 let LISTING = null;
 let myOffer = null;
@@ -50,7 +50,7 @@ function offerBoxHtml() {
       <input id="offerMsg" maxlength="500" placeholder="Message to the seller (optional)" />
       <button id="offerSend" class="btn btn-primary" type="button">Send offer</button>
     </div>
-    <div id="offerFormStatus" class="form-status" style="margin-top:8px;"></div>
+    <div id="offerFormStatus" class="form-status offer-form-status"></div>
     <div id="offerMine" class="offer-mine"></div>
   </div>`;
 }
@@ -63,7 +63,7 @@ function sellerCardHtml(l) {
   const initial = esc((name || "?").trim().charAt(0).toUpperCase());
   const av = s && s.avatar_url
     ? `<div class="seller-av"><img src="${esc(s.avatar_url)}" alt="${esc(name)}" /></div>`
-    : `<div class="seller-av" style="background:${esc((s && s.accent_color) || "#7fa8c9")}">${initial}</div>`;
+    : `<div class="seller-av" style="--store-accent:${esc((s && s.accent_color) || "var(--color-accent-fallback)")}">${initial}</div>`;
   if (!s) {
     return `<div class="card seller-card">${av}
       <div class="seller-meta">
@@ -249,7 +249,7 @@ function renderHistory(h) {
   if (!h || !h.count) {
     wrap.innerHTML = `<div class="card history-card">
       <div class="history-head"><span>Sold history</span></div>
-      <p class="muted" style="margin:0;">No recorded sales for this card yet — you might be holding the first.</p>
+      <p class="muted flush">No recorded sales for this card yet — you might be holding the first.</p>
     </div>`;
     wrap.hidden = false;
     return;
@@ -288,7 +288,7 @@ async function loadHistory(l) {
     const wrap = $("historyWrap");
     wrap.innerHTML = `<div class="card history-card">
       <div class="history-head"><span>Sold history</span></div>
-      <p class="muted" style="margin:0;">Sold history is temporarily unavailable: ${esc(err.message || "Unknown error")}.</p>
+      <p class="muted flush">Sold history is temporarily unavailable: ${esc(err.message || "Unknown error")}.</p>
     </div>`;
     wrap.hidden = false;
   }
