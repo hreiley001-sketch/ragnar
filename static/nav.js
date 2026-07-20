@@ -86,7 +86,7 @@
     if (light) {
       header.classList.add("site-header--light");
       header.innerHTML = `
-        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo-nav.png" alt="RAGNAR" class="logo-img" width="45" height="36" /></a></div>
         <div class="header-actions"></div>`;
       return;
     }
@@ -96,7 +96,7 @@
       ? `<a class="btn btn-primary btn-sm" href="${sellHref}">${sellLabel}</a>`
       : `<button class="btn btn-primary btn-sm" type="button" data-open-sell>${sellLabel}</button>`;
     header.innerHTML = `
-      <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+      <div class="brand"><a href="/" class="logo-link"><img src="/static/logo-nav.png" alt="RAGNAR" class="logo-img" width="45" height="36" /></a></div>
       <nav class="site-nav" aria-label="Primary">${midNavHtml()}</nav>
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
@@ -118,11 +118,11 @@
   drawer.setAttribute("aria-hidden", "true");
   drawer.innerHTML = `
     <div class="nav-head">
-      <a href="/" style="display:inline-flex"><img src="/static/logo.png" alt="RAGNAR" /></a>
+      <a href="/" style="display:inline-flex"><img src="/static/logo-nav.png" alt="RAGNAR" /></a>
       <button class="nav-close" aria-label="Close menu">✕</button>
     </div>
     <nav class="nav-links" id="navLinks"></nav>
-    <div class="nav-foot">RAGNAR · ᚱᚨᚷᚾᚨᚱ</div>`;
+    <div class="nav-foot">RAGNAR · Built for elite collectors</div>`;
   const links = drawer.querySelector("#navLinks");
   ITEMS.forEach((it) => links.appendChild(navLink(it)));
   links.appendChild(mk("div", "nav-div"));

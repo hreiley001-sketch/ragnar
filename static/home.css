@@ -85,6 +85,23 @@ body.arena-home {
     linear-gradient(180deg, #0d1d2e 0%, var(--color-bg-base) 44%, #071019 100%);
   transition: background 0.4s linear;
 }
+/* Aurora — slow cold light ribbons breathing across the upper vault */
+.vault-env-aurora {
+  position: absolute; inset: -20% -30%;
+  background:
+    radial-gradient(ellipse 46% 18% at 30% 22%, rgba(86, 200, 242, .12), transparent 70%),
+    radial-gradient(ellipse 52% 14% at 68% 14%, rgba(138, 220, 255, .09), transparent 70%),
+    radial-gradient(ellipse 40% 12% at 50% 30%, rgba(159, 180, 198, .06), transparent 70%);
+  filter: blur(22px);
+  opacity: calc(0.55 + var(--vault-p) * 0.35);
+  animation: auroraDrift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes auroraDrift {
+  from { transform: translate3d(-3%, -1%, 0) rotate(-1.2deg) scale(1); }
+  to { transform: translate3d(3%, 1.5%, 0) rotate(1.2deg) scale(1.06); }
+}
+
 .vault-env-depth { position: absolute; inset: -12%; will-change: transform; }
 .vault-env-far {
   background:
@@ -93,6 +110,65 @@ body.arena-home {
   transform: translate3d(0, var(--vault-far-y), 0) scale(calc(1.05 + var(--vault-p) * 0.08));
   opacity: calc(0.45 + var(--vault-p) * 0.4);
 }
+
+/* Glacial horizon — a cold light line deep in the world that brightens with descent */
+.vault-env-horizon {
+  position: absolute; left: -10%; right: -10%;
+  top: calc(64% - var(--vault-p) * 14%);
+  height: 42%;
+  background:
+    radial-gradient(ellipse 62% 30% at 50% 0%,
+      color-mix(in srgb, var(--color-accent-primary) calc(10% + var(--vault-p) * 26%), transparent),
+      transparent 72%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--color-crystal) calc(3% + var(--vault-p) * 9%), transparent),
+      transparent 55%);
+  border-top: 1px solid color-mix(in srgb, var(--color-accent-primary) calc(8% + var(--vault-p) * 26%), transparent);
+  opacity: calc(0.35 + var(--vault-p) * 0.65);
+  transform: translate3d(0, var(--vault-far-y), 0);
+  will-change: transform, opacity;
+}
+
+/* Titanium monoliths — vault architecture rising from the deep as you descend */
+.vault-env-monoliths {
+  position: absolute; inset: 0;
+  transform: translate3d(0, var(--vault-mid-y), 0);
+  will-change: transform;
+}
+.vault-monolith {
+  position: absolute;
+  bottom: -12%;
+  width: 7vw; min-width: 60px; max-width: 130px;
+  height: 62%;
+  border: 1px solid rgba(191, 234, 255, .08);
+  border-bottom: none;
+  background:
+    linear-gradient(180deg,
+      rgba(191, 234, 255, .07),
+      rgba(159, 180, 198, .05) 30%,
+      rgba(14, 27, 41, .5) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(191, 234, 255, .14),
+    inset 0 0 46px rgba(86, 200, 242, .05);
+  border-radius: 6px 6px 0 0;
+  opacity: calc(0.12 + var(--vault-p) * 0.75);
+  transform: translate3d(0, calc((1 - var(--vault-p)) * 22%), 0);
+  transition: opacity .3s linear;
+  will-change: transform, opacity;
+}
+.vault-monolith::before {
+  content: "";
+  position: absolute; left: 12%; right: 12%; top: 8%;
+  height: 34%;
+  border: 1px solid rgba(138, 220, 255, .12);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(86, 200, 242, .08), transparent 75%);
+}
+.vault-monolith-a { left: 4%; height: 48%; transform: translate3d(0, calc((1 - var(--vault-p)) * 30%), 0) perspective(800px) rotateY(16deg); }
+.vault-monolith-b { left: 15%; height: 66%; width: 5.4vw; }
+.vault-monolith-c { left: 50%; margin-left: -3vw; height: 40%; opacity: calc(0.06 + var(--vault-p) * 0.5); }
+.vault-monolith-d { right: 15%; height: 60%; width: 5.4vw; }
+.vault-monolith-e { right: 4%; height: 50%; transform: translate3d(0, calc((1 - var(--vault-p)) * 30%), 0) perspective(800px) rotateY(-16deg); }
 .vault-env-mid {
   background:
     linear-gradient(180deg, transparent 18%, rgba(3, 9, 15, .3) 100%);
@@ -149,6 +225,27 @@ body.arena-home {
   transform: translate3d(0, var(--vault-glass-y), 0) perspective(1000px) rotateY(-32deg);
   border-radius: 20px 0 0 20px;
 }
+/* Moving reflection — a slow light sweep gliding across the glass world */
+.vault-env-reflection {
+  position: absolute; inset: -10%;
+  background:
+    linear-gradient(105deg,
+      transparent 30%,
+      rgba(191, 234, 255, .05) 44%,
+      rgba(244, 251, 255, .09) 50%,
+      rgba(86, 200, 242, .05) 56%,
+      transparent 70%);
+  mix-blend-mode: screen;
+  opacity: calc(0.5 + var(--vault-p) * 0.4);
+  animation: reflectionSweep 22s var(--ease-premium) infinite;
+  will-change: transform;
+}
+@keyframes reflectionSweep {
+  0% { transform: translateX(-46%) skewX(-4deg); }
+  55% { transform: translateX(46%) skewX(-4deg); }
+  100% { transform: translateX(46%) skewX(-4deg); }
+}
+
 .vault-env-ice {
   position: absolute; inset: 0;
   background:
@@ -165,6 +262,16 @@ body.arena-home {
       transparent 70%);
   opacity: calc(0.4 + var(--vault-p) * 0.5);
 }
+/* Vault floor — cold reflective ground plane that gains presence with depth */
+.vault-env-floor {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 30%;
+  background:
+    linear-gradient(180deg, transparent,
+      color-mix(in srgb, var(--color-accent-primary) calc(2% + var(--vault-p) * 8%), transparent) 60%,
+      rgba(4, 10, 17, .8));
+  opacity: calc(0.3 + var(--vault-p) * 0.7);
+}
 .vault-env-haze {
   position: absolute; inset: 0;
   background:
@@ -177,12 +284,17 @@ body.arena-home {
   to { transform: translateX(4%); }
 }
 
+/* Stage choreography — the world grows as the journey deepens */
+body.arena-home[data-vault-stage="1"] .vault-env-monoliths { opacity: .5; }
 body.arena-home[data-vault-stage="3"] .vault-env-arch,
 body.arena-home[data-vault-stage="4"] .vault-env-arch {
   opacity: calc(0.45 + var(--vault-p) * 0.4);
 }
 body.arena-home[data-vault-stage="4"] .vault-env-glass {
   opacity: calc(0.5 + var(--vault-p) * 0.35);
+}
+body.arena-home[data-vault-stage="4"] .vault-env-horizon {
+  opacity: 1;
 }
 
 .arena-main { position: relative; z-index: 2; }
@@ -393,10 +505,14 @@ body.arena-home[data-vault-stage="4"] .vault-env-glass {
   .arena-hero-actions, .vault-scroll-cue { justify-content: center; }
   .vault-hero-sub { margin-inline: auto; }
   .vault-env-arch, .vault-env-glass { opacity: calc(0.08 + var(--vault-p) * 0.25) !important; width: min(22vw, 120px); }
+  .vault-env-aurora { filter: blur(16px); }
+  .vault-monolith { width: 12vw; }
+  .vault-monolith-c { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vault-env-ice, .vault-key-ring-2, .vault-scroll-cue span { animation: none !important; }
+  .vault-env-ice, .vault-key-ring-2, .vault-scroll-cue span,
+  .vault-env-aurora, .vault-env-reflection { animation: none !important; }
 }
 
 .arena-btn {
