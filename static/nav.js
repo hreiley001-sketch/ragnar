@@ -196,7 +196,7 @@
     const l = document.createElement("link");
     l.id = "ragnar-fonts";
     l.rel = "stylesheet";
-    l.href = "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@500;600;700;800&display=swap";
+    l.href = "https://fonts.googleapis.com/css2?family=Germania+One&family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap";
     document.head.appendChild(l);
   })();
   function shade(hex, amt) {
@@ -239,20 +239,42 @@
     if (c.theme_bg) {
       const elevated = shade(c.theme_bg, 12);
       const panel = shade(c.theme_bg, 18);
+      const deep = shade(c.theme_bg, -14);
       s.setProperty("--color-bg-base", c.theme_bg);
       s.setProperty("--color-bg-elevated", elevated);
       s.setProperty("--color-bg-panel", panel);
+      s.setProperty("--color-bg-panel-strong", shade(c.theme_bg, 24));
+      s.setProperty("--color-surface-deep", deep);
+      s.setProperty("--color-bg-input", shade(c.theme_bg, 20));
       s.setProperty("--bg", c.theme_bg);
       s.setProperty("--bg-2", elevated);
       s.setProperty("--panel-solid", panel);
+      // Soft glass fills that track the active background
+      s.setProperty("--color-bg-glass", elevToGlass(panel, 0.88));
+      s.setProperty("--color-bg-glass-soft", elevToGlass(elevated, 0.78));
     }
     if (c.theme_text) {
       s.setProperty("--color-text-primary", c.theme_text);
-      s.setProperty("--color-text-secondary", shade(c.theme_text, 34));
+      s.setProperty("--color-frost", c.theme_text);
+      s.setProperty("--color-text-secondary", shade(c.theme_text, isLightHex(c.theme_text) ? -34 : 34));
+      s.setProperty("--color-text-muted", shade(c.theme_text, isLightHex(c.theme_text) ? -54 : 54));
       s.setProperty("--text", c.theme_text);
-      s.setProperty("--text-soft", shade(c.theme_text, 34));
+      s.setProperty("--text-soft", shade(c.theme_text, isLightHex(c.theme_text) ? -34 : 34));
     }
     if (c.theme_font) { loadWebFont(c.theme_font); document.body.style.fontFamily = "'" + c.theme_font + "', system-ui, sans-serif"; }
+  }
+  function isLightHex(hex) {
+    const m = /^#([0-9a-fA-F]{6})$/.exec(hex || "");
+    if (!m) return false;
+    const n = parseInt(m[1], 16);
+    const r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    return (r + g + b) > 384;
+  }
+  function elevToGlass(hex, alpha) {
+    const m = /^#([0-9a-fA-F]{6})$/.exec(hex || "");
+    if (!m) return hex;
+    const n = parseInt(m[1], 16);
+    return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
   }
   function applyAnnouncement(c) {
     let bar = document.getElementById("navAnnounce");
@@ -473,8 +495,10 @@
       const low = text.toLowerCase();
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
-      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#0a1220";
-      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#2a3546";
+      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#2a2826";
+      else if (/\b(light|lighter|bright|brighter|white|day|fur|grey|gray)\b/.test(low)) theme.theme_bg = "#e4e0da";
+      if (/\b(light|brighter|day|fur)\b/.test(low)) theme.theme_text = "#1c1b19";
+      else if (/\b(dark|midnight|night)\b/.test(low)) theme.theme_text = "#f2f7fc";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);
       if (fm) theme.theme_font = fm[1].trim();
       if (/reset|default|normal|undo/.test(low)) {
