@@ -674,78 +674,78 @@ async function init() {
     renderIntegrations();
     refreshFoundingCounter();
 
-  // Marketplace hero search (mirrors the sidebar search).
-  const heroSearch = $("heroSearch");
-  if (heroSearch) {
-    const heroGo = () => { $("f-q").value = heroSearch.value; resetAndLoad(); };
-    heroSearch.addEventListener("input", debounce(heroGo, 350));
-    heroSearch.addEventListener("keydown", (e) => { if (e.key === "Enter") heroGo(); });
-    $("heroSearchBtn").addEventListener("click", heroGo);
-    $("heroAiBtn").addEventListener("click", () => { $("f-q").value = heroSearch.value; aiSearch(); });
-  }
-
-  $("aiSearchBtn").addEventListener("click", aiSearch);
-  $("vaultAdvisorApply")?.addEventListener("click", applyVaultAdvisor);
-  $("vaultAdvisorDismiss")?.addEventListener("click", () => { const c = $("vaultAdvisor"); if (c) c.hidden = true; });
-  document.querySelectorAll(".vault-prompt").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const q = btn.getAttribute("data-q") || "";
-      const hs = $("heroSearch");
-      if (hs) hs.value = q;
-      $("f-q").value = q;
-      aiSearch();
-    });
-  });
-  $("f-q").addEventListener("input", debounce(resetAndLoad, 300));
-  $("f-q").addEventListener("input", () => { const hs = $("heroSearch"); if (hs) hs.value = $("f-q").value; });
-  $("f-category").addEventListener("change", syncCatChips);
-  ["f-category", "f-condition", "f-grader", "f-graded", "f-mingrade", "f-sort"].forEach((id) => $(id).addEventListener("change", resetAndLoad));
-  ["f-set", "f-minprice", "f-maxprice"].forEach((id) => $(id).addEventListener("input", debounce(resetAndLoad, 300)));
-  $("f-founding").addEventListener("change", resetAndLoad);
-  $("resetFilters").addEventListener("click", () => {
-    ["f-q", "f-set", "f-minprice", "f-maxprice"].forEach((id) => ($(id).value = ""));
-    ["f-category", "f-condition", "f-grader", "f-graded", "f-mingrade"].forEach((id) => ($(id).value = ""));
-    const hs = $("heroSearch"); if (hs) hs.value = "";
-    $("f-founding").checked = false; $("f-sort").value = "newest"; syncCatChips(); resetAndLoad();
-  });
-
-  $("prevPage").addEventListener("click", () => { if (state.page > 1) { state.page--; loadListings(); } });
-  $("nextPage").addEventListener("click", () => { state.page++; loadListings(); });
-  $("copySearchLinkBtn").addEventListener("click", copySearchLink);
-  $("surpriseBtn").addEventListener("click", goToSurprise);
-  document.querySelectorAll("[data-preset]").forEach((btn) => btn.addEventListener("click", () => applyQuickPreset(btn.getAttribute("data-preset"))));
-  const openCompareBtn = $("openCompareBtn");
-  if (openCompareBtn) openCompareBtn.addEventListener("click", openCompare);
-  const clearCompareBtn = $("clearCompareBtn");
-  if (clearCompareBtn) clearCompareBtn.addEventListener("click", clearCompare);
-  const closeCompareBtn = $("closeCompareBtn");
-  if (closeCompareBtn) closeCompareBtn.addEventListener("click", closeCompare);
-  const compareScrim = $("compareScrim");
-  if (compareScrim) compareScrim.addEventListener("click", closeCompare);
-
-  const gridClicks = (e) => {
-    const heart = e.target.closest("[data-watch]");
-    if (heart) { e.preventDefault(); e.stopPropagation(); toggleWatch(heart); return; }
-    const cmp = e.target.closest("[data-compare]");
-    if (cmp) { e.preventDefault(); e.stopPropagation(); toggleCompare(cmp.getAttribute("data-compare")); return; }
-    const buy = e.target.closest("[data-buy]");
-    if (buy) buyListing(buy.getAttribute("data-buy"));
-  };
-  $("grid").addEventListener("click", gridClicks);
-  const fg = $("featuredGrid");
-  if (fg) fg.addEventListener("click", gridClicks);
-  loadFeatured();
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      const tgt = e.target;
-      if (tgt && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || tgt.tagName === "SELECT")) return;
-      e.preventDefault();
-      const hs = $("heroSearch");
-      if (hs) hs.focus();
+    // Marketplace hero search (mirrors the sidebar search).
+    const heroSearch = $("heroSearch");
+    if (heroSearch) {
+      const heroGo = () => { $("f-q").value = heroSearch.value; resetAndLoad(); };
+      heroSearch.addEventListener("input", debounce(heroGo, 350));
+      heroSearch.addEventListener("keydown", (e) => { if (e.key === "Enter") heroGo(); });
+      $("heroSearchBtn").addEventListener("click", heroGo);
+      $("heroAiBtn").addEventListener("click", () => { $("f-q").value = heroSearch.value; aiSearch(); });
     }
-    if (e.key === "Escape") { closeCompare(); }
-  });
+
+    $("aiSearchBtn").addEventListener("click", aiSearch);
+    $("vaultAdvisorApply")?.addEventListener("click", applyVaultAdvisor);
+    $("vaultAdvisorDismiss")?.addEventListener("click", () => { const c = $("vaultAdvisor"); if (c) c.hidden = true; });
+    document.querySelectorAll(".vault-prompt").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const q = btn.getAttribute("data-q") || "";
+        const hs = $("heroSearch");
+        if (hs) hs.value = q;
+        $("f-q").value = q;
+        aiSearch();
+      });
+    });
+    $("f-q").addEventListener("input", debounce(resetAndLoad, 300));
+    $("f-q").addEventListener("input", () => { const hs = $("heroSearch"); if (hs) hs.value = $("f-q").value; });
+    $("f-category").addEventListener("change", syncCatChips);
+    ["f-category", "f-condition", "f-grader", "f-graded", "f-mingrade", "f-sort"].forEach((id) => $(id).addEventListener("change", resetAndLoad));
+    ["f-set", "f-minprice", "f-maxprice"].forEach((id) => $(id).addEventListener("input", debounce(resetAndLoad, 300)));
+    $("f-founding").addEventListener("change", resetAndLoad);
+    $("resetFilters").addEventListener("click", () => {
+      ["f-q", "f-set", "f-minprice", "f-maxprice"].forEach((id) => ($(id).value = ""));
+      ["f-category", "f-condition", "f-grader", "f-graded", "f-mingrade"].forEach((id) => ($(id).value = ""));
+      const hs = $("heroSearch"); if (hs) hs.value = "";
+      $("f-founding").checked = false; $("f-sort").value = "newest"; syncCatChips(); resetAndLoad();
+    });
+
+    $("prevPage").addEventListener("click", () => { if (state.page > 1) { state.page--; loadListings(); } });
+    $("nextPage").addEventListener("click", () => { state.page++; loadListings(); });
+    $("copySearchLinkBtn").addEventListener("click", copySearchLink);
+    $("surpriseBtn").addEventListener("click", goToSurprise);
+    document.querySelectorAll("[data-preset]").forEach((btn) => btn.addEventListener("click", () => applyQuickPreset(btn.getAttribute("data-preset"))));
+    const openCompareBtn = $("openCompareBtn");
+    if (openCompareBtn) openCompareBtn.addEventListener("click", openCompare);
+    const clearCompareBtn = $("clearCompareBtn");
+    if (clearCompareBtn) clearCompareBtn.addEventListener("click", clearCompare);
+    const closeCompareBtn = $("closeCompareBtn");
+    if (closeCompareBtn) closeCompareBtn.addEventListener("click", closeCompare);
+    const compareScrim = $("compareScrim");
+    if (compareScrim) compareScrim.addEventListener("click", closeCompare);
+
+    const gridClicks = (e) => {
+      const heart = e.target.closest("[data-watch]");
+      if (heart) { e.preventDefault(); e.stopPropagation(); toggleWatch(heart); return; }
+      const cmp = e.target.closest("[data-compare]");
+      if (cmp) { e.preventDefault(); e.stopPropagation(); toggleCompare(cmp.getAttribute("data-compare")); return; }
+      const buy = e.target.closest("[data-buy]");
+      if (buy) buyListing(buy.getAttribute("data-buy"));
+    };
+    $("grid").addEventListener("click", gridClicks);
+    const fg = $("featuredGrid");
+    if (fg) fg.addEventListener("click", gridClicks);
+    loadFeatured();
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const tgt = e.target;
+        if (tgt && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || tgt.tagName === "SELECT")) return;
+        e.preventDefault();
+        const hs = $("heroSearch");
+        if (hs) hs.focus();
+      }
+      if (e.key === "Escape") { closeCompare(); }
+    });
 
     renderCompareTray();
     updatePresetState();
