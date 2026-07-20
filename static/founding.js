@@ -397,6 +397,27 @@ function initCardTilt() {
   });
 }
 
+function initScrollDepth() {
+  const stage = $("arenaStage");
+  const hero = document.querySelector(".arena-hero");
+  if (!stage || !hero || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let ticking = false;
+  function apply() {
+    const rect = hero.getBoundingClientRect();
+    const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height)));
+    stage.style.transform = `translateY(${progress * 46}px) scale(${1 - progress * 0.08}) translateZ(0)`;
+    stage.style.opacity = String(1 - progress * 0.55);
+    document.documentElement.style.setProperty("--scroll-depth", progress.toFixed(3));
+    ticking = false;
+  }
+  window.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(apply);
+  }, { passive: true });
+  apply();
+}
+
 function initArenaCanvas() {
   const canvas = $("arenaCanvas");
   if (!canvas || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -433,7 +454,7 @@ function initArenaCanvas() {
   function draw() {
     if (!active) return;
     context.clearRect(0, 0, width, height);
-    context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#e8a045";
+    context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#5fd4ff";
     points.forEach((point) => {
       point.y -= point.speed * point.z;
       point.x += Math.sin((point.y + point.z * 100) * 0.005) * 0.035;
@@ -464,6 +485,7 @@ function initArenaCanvas() {
 document.addEventListener("DOMContentLoaded", () => {
   initReveal();
   initCardTilt();
+  initScrollDepth();
   initArenaCanvas();
   loadArena();
   loadFoundingStatus();

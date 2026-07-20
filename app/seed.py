@@ -21,7 +21,7 @@ logger = logging.getLogger("ragnar.seed")
 _SELLERS = [
     ("yggdrasil", "Yggdrasil Cards", True, {
         "tagline": "Roots of the hobby.",
-        "accent_color": "#e8a045",
+        "accent_color": "#5fd4ff",
         "bio": "Vintage Pokémon & Lorcana, graded and raw. Founding Seller since day one.",
         "store_edit_token": "demo-yggdrasil-token",
     }),
@@ -111,7 +111,6 @@ def _make_founding(seller: Seller, number: int) -> None:
     seller.is_founding = True
     seller.founding_number = number
     seller.founding_activated_at = utcnow()
-    seller.founding_intro_ends_at = utcnow() + timedelta(days=settings.founding_intro_days)
 
 
 def seed_if_empty() -> None:

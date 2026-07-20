@@ -341,8 +341,9 @@ def sell_listing(
     user: Optional[User] = Depends(get_current_user),
     x_store_token: str = Header(default=""),
 ) -> dict:
-    """Mark a listing sold. Records a Sale (which becomes a future comp) and, for
-    Founding Sellers still in their 0% window, accrues toward the $ cap."""
+    """Mark a listing sold. Records a Sale (which becomes a future comp) and,
+    for Founding Sellers still within their $250 introductory-rate cap,
+    accrues toward it."""
     listing = session.get(Listing, listing_id)
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")

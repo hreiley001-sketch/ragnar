@@ -98,10 +98,11 @@ SEED_ARTICLES: list[dict] = [
         "tags": ["seller", "founding", "fees", "stripe", "onboarding"],
         "body": (
             "Apply via the Founding 250 page or create a seller account from Sell. "
-            "Connect Stripe Express to receive payouts. Founding Sellers get a 0% "
-            "intro window (90 days or $2,500 in sales), then a permanent 4% platform "
-            "fee. Standard sellers pay a flat 5%. Structured, grading-aware listings "
-            "are required."
+            "Connect Stripe Express to receive payouts. Founding Sellers get a 4% "
+            "introductory platform fee on their first $250 in sales, then the "
+            "standard 5% like everyone else. Non-founding sellers pay the flat 5% "
+            "standard fee from day one. Structured, grading-aware listings are "
+            "required."
         ),
         "rules": {},
     },
@@ -111,9 +112,11 @@ SEED_ARTICLES: list[dict] = [
         "category": "faq",
         "tags": ["fees", "pricing", "ebay", "keep"],
         "body": (
-            "RAGNAR charges a flat 5% platform fee (4% for Founding Sellers after "
-            "intro, 0% during the Founding intro window). Payment processing is "
-            "pass-through (roughly 2.9% + $0.30). There are no insertion fees."
+            "RAGNAR's standard platform fee is a flat 5% for every seller. Our "
+            "founders program, the Founding 250, get an introductory 4% rate on "
+            "their first $250 in sales, then 5% like everyone else — no time "
+            "window, just a simple dollar cap. Payment processing is pass-through "
+            "(roughly 2.9% + $0.30). There are no insertion fees."
         ),
         "rules": {},
     },

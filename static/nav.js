@@ -108,6 +108,23 @@
   }
   buildHeader();
 
+  // Premium scroll interaction: condense + glow the header once the page scrolls.
+  (function initHeaderScroll() {
+    const header = document.getElementById("siteHeader");
+    if (!header) return;
+    let ticking = false;
+    function apply() {
+      header.classList.toggle("is-scrolled", window.scrollY > 8);
+      ticking = false;
+    }
+    window.addEventListener("scroll", () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(apply);
+    }, { passive: true });
+    apply();
+  })();
+
   // Drawer
   const scrim = mk("div", "nav-scrim");
   const drawer = mk("div", "nav-drawer");
@@ -447,11 +464,11 @@
   // cards by vibe (plain language, not exact keywords) and can restyle the
   // visitor's OWN view — local-only, never the real site or anyone else. ----
   const VIBES = [
-    [["ice", "frost", "arctic", "cool", "cold", "steel", "platinum"], "#9ec4d1"],
-    [["gold", "lux", "premium", "elite", "luxury", "grail", "champagne"], "#c4a86a"],
+    [["ice", "frost", "arctic", "cool", "cold", "steel", "platinum", "glacier"], "#5fd4ff"],
+    [["gold", "lux", "premium", "elite", "luxury", "grail", "champagne", "titanium", "silver"], "#c9d6e0"],
     [["ember", "warm accent", "copper", "forge"], "#d4a574"],
-    [["live", "signal", "alert", "hot"], "#e85a5f"],
-    [["mint", "success", "emerald"], "#6ec9a8"],
+    [["live", "signal", "alert", "hot"], "#ff5f7a"],
+    [["mint", "success", "emerald"], "#5fe0b8"],
   ];
   const PERSONAL_RE = /\b(my view|make it|make my|theme|background|colou?r|font|dark mode|light mode|high contrast|restyle|recolou?r|bigger text|darker|lighter|brighter)\b/i;
 
@@ -474,8 +491,8 @@
       const low = text.toLowerCase();
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
-      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#07090c";
-      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#12171d";
+      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#03060a";
+      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#12212f";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);
       if (fm) theme.theme_font = fm[1].trim();
       if (/reset|default|normal|undo/.test(low)) {

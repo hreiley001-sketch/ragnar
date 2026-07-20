@@ -145,8 +145,7 @@ function renderHero() {
   if (!el || !META.fees) return;
   const f = META.fees;
   el.innerHTML = `
-    <div class="stat hot"><div class="stat-num">0%</div><div class="stat-label">Founding ${f.founding_cap} fee</div></div>
-    <div class="stat"><div class="stat-num">${(f.founding_rate * 100).toFixed(0)}%</div><div class="stat-label">Founding rate after</div></div>
+    <div class="stat hot"><div class="stat-num">${(f.founding_rate * 100).toFixed(0)}%</div><div class="stat-label">Founding ${f.founding_cap} rate, first $${f.founding_intro_sales_cap}</div></div>
     <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Standard fee</div></div>`;
 }
 
@@ -165,7 +164,7 @@ async function refreshFoundingCounter() {
   try {
     const s = await api("/api/sellers/founding-status");
     $("foundingCounter").textContent = `Founding ${s.claimed}/${s.cap}`;
-    $("foundingCounter").title = `${s.remaining} Founding Seller slots left`;
+    $("foundingCounter").title = `${s.remaining} Founding Seller slots left — 4% on your first $${s.intro_sales_cap} in sales, then 5% standard`;
   } catch (_) {}
 }
 
