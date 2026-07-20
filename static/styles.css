@@ -673,7 +673,15 @@ select option { background: var(--panel-solid); color: var(--text); }
 
 .drawer-actions { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
 .form-status { font-size: 13px; color: var(--text-soft); }
-.form-status.error { color: var(--danger); }
+.form-status.error {
+  color: var(--danger);
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+.form-status.error:empty { display: none; }
 .form-status.ok { color: var(--ok); }
 
 /* ---------- Toast ---------- */
@@ -1127,7 +1135,7 @@ body:not(.arena-home):not(.premium-room) > div:not(.aurora):not(.nav-scrim):not(
 }
 .tbl-wrap { border: 1px solid var(--border); background: rgba(8,10,12,.55); }
 .tbl th,
-table.hub th { color: var(--ice); background: rgba(86, 200, 242,.035); }
+table.hub th { color: var(--color-text-muted); background: rgba(86, 200, 242,.035); }
 .tbl td,
 table.hub td { border-bottom-color: var(--border); }
 .chip { border-radius: 3px; }

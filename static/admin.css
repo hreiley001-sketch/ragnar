@@ -514,7 +514,7 @@ body.page-admin .tbl-wrap {
 }
 body.page-admin table.hub th {
   background: color-mix(in srgb, var(--cmd-accent) 5%, transparent);
-  color: var(--cmd-accent);
+  color: var(--color-text-muted);
   border-bottom-color: color-mix(in srgb, var(--cmd-accent) 18%, transparent);
 }
 body.page-admin .card {
@@ -595,8 +595,9 @@ body.page-admin .pill.info {
   color: var(--cmd-accent);
   border-color: color-mix(in srgb, var(--cmd-accent) 45%, transparent);
 }
-body.page-admin .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+body.page-admin .row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 body.page-admin .btn-danger {
+  margin-left: 6px;
   color: var(--color-error);
   border-color: color-mix(in srgb, var(--color-error) 45%, transparent);
 }
