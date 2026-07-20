@@ -56,12 +56,8 @@
     .ai-panel { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; }
     .ai-box { padding: 16px; }
     .ai-out { margin-top: 10px; padding: 10px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--border); font-size: 13px; white-space: pre-wrap; min-height: 24px; }
-    .studio-feed { max-height: 220px; overflow: auto; display: grid; gap: 8px; margin-bottom: 10px; }
-    .studio-msg { border: 1px solid var(--border); background: var(--bg-2); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
-    .studio-msg.me { background: rgba(37,99,235,.10); border-color: rgba(37,99,235,.25); }
-    .studio-ideas { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-    .studio-ideas .btn { padding: 5px 8px; font-size: 12px; }
-    .studio-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .studio-hint { padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--border-strong); background: rgba(184,121,26,0.06); font-size: 13px; color: var(--text-soft); }
+    .studio-hint a { font-weight: 700; }
     .collab-table { width: 100%; border-collapse: collapse; font-size: 13px; }
     .collab-table th, .collab-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
     .collab-table th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
@@ -79,7 +75,6 @@
       .login-wrap { margin: 6vh auto; padding: 18px; }
       .tab { padding: 8px 12px; }
       .ride-form { grid-template-columns: 1fr; }
-      .studio-row { grid-template-columns: 1fr; }
       .site-actions { flex-direction: column; align-items: stretch; }
       .site-actions .btn { width: 100%; }
       .row-inline { align-items: stretch; }
@@ -223,14 +218,8 @@
         <p id="siteRoleNote" class="form-status mt-8"></p>
       </div>
       <div class="card card-pad-14 mb-14">
-        <div class="panel-bar panel-head-compact"><h3>Site Builder chat</h3></div>
-        <div id="studioFeed" class="studio-feed"></div>
-        <div class="studio-row">
-          <input id="studioPrompt" type="text" placeholder="e.g. Make the site feel darker and premium, announce Friday live drop" />
-          <button id="studioSendBtn" class="btn btn-primary btn-sm" type="button">Generate</button>
-        </div>
-        <div id="studioIdeas" class="studio-ideas"></div>
-        <p class="muted muted-xs mt-8">Generated updates are injected into the editor fields below. Click <strong>Publish changes</strong> to go live.</p>
+        <div class="panel-bar panel-head-compact"><h3>Chat-driven editing</h3></div>
+        <p class="studio-hint">Use the <a href="#" id="openStudioLink">✨ Studio</a> chat button in the bottom-right corner of any page to sculpt the site's look and copy by chat — it previews live and publishes with one tap. The fields below are for precise manual edits.</p>
       </div>
       <form id="siteForm">
         <div id="siteFields"><p class="muted">Loading…</p></div>

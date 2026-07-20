@@ -22,18 +22,7 @@
 <body>
   <div class="aurora"></div>
 
-  <header class="site-header">
-    <div class="brand">
-      <a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR — trading card marketplace" class="logo-img" /></a>
-    </div>
-    <div class="header-actions">
-      <span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding —</span>
-      <a class="btn btn-ghost btn-sm" href="/">Apply to sell</a>
-      <a class="btn btn-ghost btn-sm" href="/stores">Stores &amp; Live</a>
-      <span id="backendStatus" class="status-badge checking">connecting…</span>
-      <button id="openListBtn" class="btn btn-primary" type="button">⚡ Scan to post</button>
-    </div>
-  </header>
+  <header id="siteHeader"></header>
 
   <section class="mkt-hero">
     <h2>Find your <span class="accent">grail.</span></h2>
@@ -154,89 +143,6 @@
     </section>
   </main>
 
-  <!-- Sell / scan drawer -->
-  <div id="listDrawer" class="drawer" aria-hidden="true">
-    <div class="drawer-scrim" id="drawerScrim"></div>
-    <div class="drawer-panel card">
-      <div class="drawer-head">
-        <h3>Scan to post</h3>
-        <button id="closeListBtn" class="btn btn-ghost btn-sm" type="button">✕</button>
-      </div>
-
-      <!-- Step 1: scan -->
-      <div class="scan-zone" id="scanZone">
-        <input id="scanInput" type="file" accept="image/*" hidden />
-        <div class="scan-drop" id="scanDrop">
-          <div class="scan-drop-inner">
-            <div class="scan-icon">⚡</div>
-            <p><strong>Upload your card photo</strong></p>
-            <p class="muted">We'll auto-identify it and pull its sold-price history. You can edit anything before publishing.</p>
-          </div>
-          <img id="scanPreview" class="scan-preview" alt="" hidden />
-        </div>
-        <div id="scanResult" class="scan-result" hidden></div>
-      </div>
-
-      <!-- Sales history -->
-      <div id="historyPanel" class="history-panel" hidden></div>
-
-      <!-- Step 2: details form -->
-      <form id="listForm" class="list-form">
-        <div class="form-divider"><span>Card details</span></div>
-
-        <label class="field"><span>Title *</span>
-          <input name="title" required maxlength="140" placeholder="Charizard — Base Set Holo" />
-        </label>
-        <div class="field-row">
-          <label class="field"><span>Category *</span><select name="category" id="form-category" required></select></label>
-          <label class="field"><span>Year</span><input name="year" type="number" min="1900" max="2100" placeholder="1999" /></label>
-        </div>
-        <div class="field-row">
-          <label class="field"><span>Set</span><input name="set_name" maxlength="120" placeholder="Base Set" /></label>
-          <label class="field"><span>Card #</span><input name="card_number" maxlength="40" placeholder="4/102" /></label>
-        </div>
-        <label class="field"><span>Player / Character</span>
-          <input name="player_or_character" maxlength="120" placeholder="Charizard" />
-        </label>
-
-        <label class="check-row"><input type="checkbox" name="is_graded" id="form-graded" /><span>This card is professionally graded</span></label>
-        <div id="rawFields" class="field"><span>Condition *</span><select name="condition" id="form-condition"></select></div>
-        <div id="gradedFields" class="field-row" hidden>
-          <label class="field"><span>Grader *</span><select name="grading_company" id="form-grader"></select></label>
-          <label class="field"><span>Grade *</span><input name="grade" type="number" min="1" max="10" step="0.5" placeholder="9" /></label>
-        </div>
-
-        <div class="field-row price-row">
-          <label class="field"><span>Price ($) *</span><input name="price" id="form-price" type="number" min="0.01" step="0.01" required placeholder="42.00" /></label>
-          <label class="field"><span>Quantity</span><input name="quantity" type="number" min="1" value="1" /></label>
-        </div>
-        <div class="inline-row-wrap">
-          <button type="button" id="suggestPriceBtn" class="btn btn-ghost btn-sm">✨ Suggest a price</button>
-          <button type="button" id="checkCompsBtn" class="btn btn-ghost btn-sm">↻ Check sold history for these details</button>
-        </div>
-        <div id="suggestOut" class="muted suggest-out"></div>
-
-        <label class="field"><span>Image URL</span><input name="image_url" id="form-image" type="url" maxlength="500" placeholder="auto-filled from your scan" /></label>
-        <label class="field"><span>Description</span><textarea name="description" rows="2" maxlength="2000" placeholder="Sharp corners, clean holo…"></textarea></label>
-
-        <div class="form-divider"><span>Seller</span></div>
-        <div class="field-row">
-          <label class="field"><span>Seller handle</span><input name="seller_handle" id="form-handle" maxlength="40" placeholder="yggdrasil" /></label>
-          <button type="button" id="applyFoundingBtn" class="btn btn-ghost btn-sm apply-btn">Apply as Founding Seller</button>
-        </div>
-        <label class="field"><span>Display name *</span><input name="seller_name" id="form-seller" minlength="2" maxlength="80" placeholder="Yggdrasil Cards" /></label>
-        <button type="button" id="connectPayoutsBtn" class="btn btn-ghost btn-sm">💳 Set up payouts (Stripe)</button>
-        <div id="sellerState" class="seller-state" hidden></div>
-
-        <div id="feePreview" class="fee-preview"></div>
-        <div class="drawer-actions">
-          <button type="submit" class="btn btn-primary">Publish listing</button>
-          <span id="formStatus" class="form-status"></span>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <footer class="site-footer">
@@ -247,5 +153,6 @@
 
   <script src="/static/app.js"></script>
   <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
 </body>
 </html>
