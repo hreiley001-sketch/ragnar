@@ -295,11 +295,13 @@ def validate_launch_config() -> dict:
     else:
         _ok("SITE_URL", site or "(unset)")
 
-    # Stripe
+    # Stripe — hard-required only when money is supposed to move (PAYMENTS_LIVE).
     sk = settings.stripe_secret_key
     if not sk:
-        if settings.is_production or settings.payments_live:
-            _err("STRIPE_SECRET_KEY", "required when ENVIRONMENT=production or PAYMENTS_LIVE")
+        if settings.payments_live:
+            _err("STRIPE_SECRET_KEY", "required when PAYMENTS_LIVE=true")
+        elif settings.is_production:
+            _warn("STRIPE_SECRET_KEY", "unset — checkout disabled until you add sk_test_/sk_live_ in Render")
         else:
             _warn("STRIPE_SECRET_KEY", "unset — checkout disabled")
     else:
@@ -311,8 +313,10 @@ def validate_launch_config() -> dict:
             _ok("STRIPE_SECRET_KEY", "sk_live_…" if sk.startswith("sk_live_") else "sk_test_…")
 
     if not settings.stripe_publishable_key:
-        if settings.is_production or settings.payments_live:
-            _err("STRIPE_PUBLISHABLE_KEY", "required for Checkout")
+        if settings.payments_live:
+            _err("STRIPE_PUBLISHABLE_KEY", "required when PAYMENTS_LIVE=true")
+        elif settings.is_production:
+            _warn("STRIPE_PUBLISHABLE_KEY", "unset — add pk_test_/pk_live_ in Render")
         else:
             _warn("STRIPE_PUBLISHABLE_KEY", "unset")
     else:
@@ -323,17 +327,19 @@ def validate_launch_config() -> dict:
             _ok("STRIPE_PUBLISHABLE_KEY", "set")
 
     if not settings.stripe_webhook_secret:
-        if settings.is_production or settings.payments_live:
-            _err("STRIPE_WEBHOOK_SECRET", "required to verify checkout.session.completed")
+        if settings.payments_live:
+            _err("STRIPE_WEBHOOK_SECRET", "required when PAYMENTS_LIVE=true")
+        elif settings.is_production:
+            _warn("STRIPE_WEBHOOK_SECRET", "unset — orders won't finalize until webhook is configured")
         else:
             _warn("STRIPE_WEBHOOK_SECRET", "unset — webhooks will 503")
     else:
         _ok("STRIPE_WEBHOOK_SECRET", "set")
 
-    # Email (Resend)
+    # Email (Resend) — warn in production; don't brick the site if unset
     if not settings.resend_api_key:
         if settings.is_production:
-            _err("RESEND_API_KEY", "required for verification + password reset emails")
+            _warn("RESEND_API_KEY", "unset — verification/reset emails will not send")
         else:
             _warn("RESEND_API_KEY", "unset — auth emails will not send")
     else:
@@ -343,9 +349,12 @@ def validate_launch_config() -> dict:
     else:
         _ok("EMAIL_FROM", settings.email_from)
 
-    # Schema
+    # Schema — SQLite on Render still uses create_all + ALTER unless forced to alembic
     if settings.is_production and settings.use_create_all:
-        _err("SCHEMA_BOOTSTRAP", "production must use Alembic (SCHEMA_BOOTSTRAP=alembic)")
+        _warn(
+            "SCHEMA_BOOTSTRAP",
+            "using create_all (OK for SQLite disk). Set SCHEMA_BOOTSTRAP=alembic after Postgres.",
+        )
     else:
         _ok("SCHEMA_BOOTSTRAP", "create_all" if settings.use_create_all else "alembic")
 
