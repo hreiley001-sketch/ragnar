@@ -425,10 +425,10 @@ function initVaultCamera() {
     const viewH = window.innerHeight || 1;
     // 0 at top of hero in view → 1 when hero has scrolled fully past
     const progress = Math.min(1, Math.max(0, -rect.top / Math.max(rect.height * 0.85, 1)));
-    const depth = progress * 220;
-    const lift = progress * -80;
-    const pitch = progress * 8 + pointerY * 3;
-    const yaw = pointerX * 6 - progress * 4;
+    const depth = progress * 320;
+    const lift = progress * -120;
+    const pitch = progress * 12 + pointerY * 6;
+    const yaw = pointerX * 11 - progress * 7;
     world.style.setProperty("--cam-z", `${depth}px`);
     world.style.setProperty("--cam-y", `${lift}px`);
     world.style.setProperty("--cam-rx", `${pitch}deg`);
@@ -461,6 +461,82 @@ function initVaultCamera() {
   apply();
 }
 
+// The "hall of thunder" chase-card: idle floating motion running constantly,
+// a scroll-driven 3D reveal as it enters the viewport, and a mouse-reactive
+// tilt + light-sheen sweep on hover. Never fully static.
+function initMomentDrama() {
+  const card = $("momentCardLarge");
+  const stage = card && card.closest(".moment-visual");
+  if (!card || !stage || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  if (!card.querySelector(".moment-card-sheen")) {
+    const sheen = document.createElement("div");
+    sheen.className = "moment-card-sheen";
+    card.appendChild(sheen);
+  }
+
+  let pointerX = 0;
+  let pointerY = 0;
+  let hovering = false;
+  let raf = null;
+
+  function scrollProgress() {
+    const rect = stage.getBoundingClientRect();
+    const viewH = window.innerHeight || 1;
+    // 0 when the stage is below the viewport, 1 once it's centered/passed center.
+    const raw = 1 - (rect.top + rect.height * 0.5) / (viewH * 0.9);
+    return Math.min(1, Math.max(0, raw));
+  }
+
+  function tick(time) {
+    const progress = scrollProgress();
+    const t = time / 1000;
+    const idleRx = Math.sin(t * 0.55) * 3.5;
+    const idleRy = Math.cos(t * 0.4) * 5;
+    const idleLift = Math.sin(t * 0.7) * 8;
+    const pulse = (Math.sin(t * 1.3) + 1) / 2; // 0..1 breathing glow
+
+    const enterRy = -34 * (1 - progress);
+    const scale = 0.86 + progress * 0.14;
+
+    const rx = idleRx + pointerY * (hovering ? 10 : 0);
+    const ry = idleRy + enterRy + pointerX * (hovering ? 14 : 0);
+
+    card.style.setProperty("--mc-rx", `${rx.toFixed(2)}deg`);
+    card.style.setProperty("--mc-ry", `${ry.toFixed(2)}deg`);
+    card.style.setProperty("--mc-y", `${idleLift.toFixed(1)}px`);
+    card.style.setProperty("--mc-scale", scale.toFixed(3));
+    card.style.setProperty("--mc-glow", `${(12 + pulse * 18 + progress * 14).toFixed(1)}px`);
+    card.style.setProperty("--mc-glow-a", (0.1 + pulse * 0.12 + progress * 0.1).toFixed(3));
+    card.style.setProperty("--mc-sheen", `${(-60 + ((t * 14) % 220)).toFixed(1)}%`);
+
+    raf = requestAnimationFrame(tick);
+  }
+
+  stage.addEventListener("pointermove", (event) => {
+    const bounds = stage.getBoundingClientRect();
+    pointerX = (event.clientX - bounds.left) / bounds.width - 0.5;
+    pointerY = (event.clientY - bounds.top) / bounds.height - 0.5;
+    hovering = true;
+  });
+  stage.addEventListener("pointerleave", () => {
+    hovering = false;
+    pointerX = 0;
+    pointerY = 0;
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (raf) cancelAnimationFrame(raf);
+      raf = null;
+    } else if (!raf) {
+      raf = requestAnimationFrame(tick);
+    }
+  });
+
+  raf = requestAnimationFrame(tick);
+}
+
 function initArenaCanvas() {
   const canvas = $("arenaCanvas");
   if (!canvas || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -484,17 +560,17 @@ function initArenaCanvas() {
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     points.length = 0;
     shards.length = 0;
-    const count = Math.min(90, Math.max(40, Math.floor(width / 18)));
+    const count = Math.min(140, Math.max(60, Math.floor(width / 12)));
     for (let index = 0; index < count; index += 1) {
       points.push({
         x: Math.random() * width,
         y: Math.random() * height,
         z: Math.random() * 1 + 0.2,
-        speed: Math.random() * 0.22 + 0.05,
-        size: Math.random() * 1.4 + 0.3,
+        speed: Math.random() * 0.34 + 0.08,
+        size: Math.random() * 1.6 + 0.3,
       });
     }
-    for (let i = 0; i < 12; i += 1) {
+    for (let i = 0; i < 18; i += 1) {
       shards.push({
         x: Math.random() * width,
         y: Math.random() * height,
@@ -518,15 +594,15 @@ function initArenaCanvas() {
       context.translate(s.x, s.y);
       context.rotate(s.ang);
       const grad = context.createLinearGradient(0, 0, 0, s.len);
-      grad.addColorStop(0, `rgba(184,228,247,0)`);
-      grad.addColorStop(0.45, `rgba(125,206,242,${s.alpha})`);
-      grad.addColorStop(1, `rgba(78,182,232,0)`);
+      grad.addColorStop(0, `rgba(184,240,255,0)`);
+      grad.addColorStop(0.45, `rgba(143,232,255,${s.alpha})`);
+      grad.addColorStop(1, `rgba(62,208,255,0)`);
       context.fillStyle = grad;
       context.fillRect(-1.2, 0, 2.4, s.len);
       context.restore();
     });
 
-    const ice = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#4eb6e8";
+    const ice = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#3ed0ff";
     context.fillStyle = ice;
     points.forEach((point) => {
       point.y -= point.speed * point.z;
@@ -557,6 +633,7 @@ function initArenaCanvas() {
 document.addEventListener("DOMContentLoaded", () => {
   initReveal();
   initVaultCamera();
+  initMomentDrama();
   initArenaCanvas();
   loadArena();
   loadFoundingStatus();

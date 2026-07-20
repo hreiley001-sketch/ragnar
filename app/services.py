@@ -1,5 +1,10 @@
 """Business logic shared across routers: Founding-250 seller state, effective
 fee rates, and sold-comp matching/aggregation for sales history.
+
+Founders program: the first 250 sellers to sign up get a 4% platform fee,
+flat, forever. Every seller after that pays the 5% standard rate. There is
+no dollar cap, no sales threshold, and no time window — just a permanent
+rate for being one of the first 250.
 """
 from __future__ import annotations
 
@@ -18,23 +23,14 @@ from .models import Listing, ListingStatus, Sale, Seller, utcnow
 
 
 def founding_intro_active(seller: Optional[Seller]) -> bool:
-    """True while a Founding Seller is still inside the 0% window (by both time
-    and the dollar cap)."""
-    if not seller or not seller.is_founding:
-        return False
-    if not seller.founding_intro_ends_at:
-        return False
-    if utcnow() >= seller.founding_intro_ends_at:
-        return False
-    if seller.founding_intro_sales_cents >= settings.founding_intro_sales_cap_cents:
-        return False
-    return True
+    """Back-compat alias — Founding status itself is the whole benefit now
+    (flat 4% forever), so this is just ``is_founding``."""
+    return bool(seller and seller.is_founding)
 
 
 def effective_platform_rate(seller: Optional[Seller]) -> float:
-    """The platform take rate that applies to this seller right now."""
-    if founding_intro_active(seller):
-        return 0.0
+    """The platform take rate for this seller: 4% flat forever if they're one
+    of the Founding 250, else the 5% standard rate."""
     if seller and seller.is_founding:
         return settings.founding_rate
     return settings.standard_rate
@@ -42,25 +38,15 @@ def effective_platform_rate(seller: Optional[Seller]) -> float:
 
 def seller_state(seller: Seller) -> dict:
     """Serializable snapshot of a seller's Founding status for the API/UI."""
-    intro_active = founding_intro_active(seller)
-    days_left = None
-    sales_remaining = None
-    if seller.is_founding and seller.founding_intro_ends_at:
-        delta = seller.founding_intro_ends_at - utcnow()
-        days_left = max(0, delta.days + (1 if delta.seconds else 0)) if delta.total_seconds() > 0 else 0
-        sales_remaining = max(
-            0.0,
-            (settings.founding_intro_sales_cap_cents - seller.founding_intro_sales_cents) / 100,
-        )
     return {
         "handle": seller.handle,
         "display_name": seller.display_name,
         "is_founding": seller.is_founding,
         "founding_number": seller.founding_number,
-        "intro_active": intro_active,
-        "intro_ends_at": seller.founding_intro_ends_at,
-        "intro_days_left": days_left,
-        "intro_sales_remaining": sales_remaining,
+        "intro_active": seller.is_founding,
+        "intro_ends_at": None,
+        "intro_days_left": None,
+        "intro_sales_remaining": None,
         "effective_rate": effective_platform_rate(seller),
     }
 
@@ -79,15 +65,14 @@ def founding_status(session: Session) -> dict:
 
 
 def grant_founding_if_available(session: Session, seller: Seller) -> None:
-    """Give the seller Founding status if slots remain. Caller commits."""
+    """Give the seller permanent Founding status (flat 4% forever) if one of
+    the first 250 slots remain. Caller commits."""
     status = founding_status(session)
     if status["remaining"] <= 0:
         return
     seller.is_founding = True
     seller.founding_number = status["claimed"] + 1
     seller.founding_activated_at = utcnow()
-    seller.founding_intro_ends_at = utcnow() + timedelta(days=settings.founding_intro_days)
-    seller.founding_intro_sales_cents = 0
 
 
 # --------------------------------------------------------------------------- #
@@ -213,7 +198,7 @@ def record_sale(
     source: str = "ragnar",
     units: int = 1,
 ) -> Sale:
-    """Record a sold unit, accrue Founding intro sales, and update inventory.
+    """Record a sold unit and update inventory.
 
     Decrements ``listing.quantity`` by ``units``. Marks the listing sold when
     remaining quantity hits zero. Shared by manual /sell and Stripe webhook.
@@ -232,12 +217,6 @@ def record_sale(
         sold_price_cents=price_cents,
         source=source,
     )
-    if listing.seller_id:
-        seller = session.get(Seller, listing.seller_id)
-        if seller and founding_intro_active(seller):
-            seller.founding_intro_sales_cents += price_cents
-            session.add(seller)
-
     remaining = max(0, int(listing.quantity or 0) - max(1, units))
     listing.quantity = remaining
     if remaining <= 0:

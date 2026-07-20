@@ -96,8 +96,9 @@ class UserSession(SQLModel, table=True):
 
 
 class Seller(SQLModel, table=True):
-    """A seller account. Founding Sellers get the 0% intro window and permanent
-    4% rate; everyone else is on the standard rate."""
+    """A seller account. The first 250 sellers to sign up (Founding Sellers)
+    get a flat 4% platform rate forever; everyone else pays the standard
+    rate. No time window, no sales cap — just a permanent founders rate."""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     handle: str = Field(index=True, unique=True, max_length=40)
@@ -107,8 +108,8 @@ class Seller(SQLModel, table=True):
     is_founding: bool = Field(default=False, index=True)
     founding_number: Optional[int] = Field(default=None, index=True)  # 1..cap
     founding_activated_at: Optional[datetime] = Field(default=None)
+    # Unused by the fee engine (no intro window/cap) — kept for schema back-compat.
     founding_intro_ends_at: Optional[datetime] = Field(default=None)
-    # Sales accrued during the 0% intro window, to enforce the $ cap.
     founding_intro_sales_cents: int = Field(default=0)
 
     # Stripe Connect (Express) — seller's connected account for payouts.

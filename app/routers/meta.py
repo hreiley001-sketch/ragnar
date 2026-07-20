@@ -80,9 +80,9 @@ def site_config_public(session: Session = Depends(get_session)) -> dict:
 @router.get("/fees/quote")
 def fees_quote(
     price: float = Query(..., gt=0, le=1_000_000, description="Sale price in dollars"),
-    founding: bool = Query(False, description="Seller is a Founding Seller"),
+    founding: bool = Query(False, description="Seller is one of the Founding 250 (flat 4% forever)"),
     founding_intro: bool = Query(
-        False, description="Within the Founding intro (0% platform) window"
+        False, description="Deprecated — no intro window; founding status alone sets the rate"
     ),
 ) -> dict:
     return quote(price, is_founding=founding, founding_intro=founding_intro)

@@ -26,7 +26,7 @@ body.page-admin {
     radial-gradient(980px 540px at 78% -12%, color-mix(in srgb, var(--cmd-accent) 16%, transparent), transparent 58%),
     radial-gradient(720px 480px at 4% 18%, color-mix(in srgb, var(--cmd-gold) 8%, transparent), transparent 55%),
     radial-gradient(640px 420px at 90% 100%, color-mix(in srgb, var(--cmd-accent) 7%, transparent), transparent 50%),
-    linear-gradient(180deg, #151c26 0%, #1b2431 42%, #151c26 100%);
+    linear-gradient(180deg, #101a2c 0%, #16223a 42%, #101a2c 100%);
 }
 .cmd-atmosphere::before {
   content: "";

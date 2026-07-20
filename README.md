@@ -4,8 +4,9 @@
 *Guided by counsel, driven by conquest.*
 
 RAGNAR is a marketplace built to beat eBay and Whatnot on the two things
-collectors care about most: **fees** (sellers keep **95%** — a simple flat **5%**
-seller fee) and **trust** (structured, grading-aware listings and real buyer
+collectors care about most: **fees** (a flat **5%** standard seller fee, with a
+**founders program** — the first 250 sellers to sign up lock in a flat **4%**
+forever) and **trust** (structured, grading-aware listings and real buyer
 protection). This repo is the **MVP: the structured listings + search core** plus
 a branded storefront.
 
@@ -21,9 +22,9 @@ a branded storefront.
 - **Branded storefront** — wolf-and-raven steel/ice theme, search vault, sell drawer.
 
 **Slice 2 — sellers, scan-to-post, sold history**
-- **Seller accounts + Founding 250 lifecycle** — `apply` (auto-grants Founding # while
-  slots remain), founding badge/status, server-side effective fee rate (flat 5%
-  standard positioning), and a live Founding counter.
+- **Seller accounts + Founding 250 founders program** — `apply` (auto-grants
+  Founding # while slots remain) gives a permanent flat 4% platform rate,
+  forever — everyone else pays the standard 5%, server-side. Live Founding counter.
 - **Scan-to-post** — upload your own photo; `/api/scan` auto-identifies the card
   (pluggable: OpenAI vision if configured, filename/heuristic fallback), pre-fills the
   listing, and returns the card's sold history in one call.

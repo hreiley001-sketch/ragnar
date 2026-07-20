@@ -57,27 +57,27 @@ body.arena-home {
 .arena-rays {
   z-index: 0;
   background:
-    conic-gradient(from 210deg at 72% 18%, transparent 0deg, rgba(78,182,232,.11) 28deg, transparent 62deg),
-    conic-gradient(from 40deg at 28% 22%, transparent 0deg, rgba(184,228,247,.07) 22deg, transparent 50deg),
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(125,206,242,.22), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 18% 80%, rgba(78,182,232,.1), transparent 50%);
-  animation: rayDrift 22s ease-in-out infinite alternate;
+    conic-gradient(from 210deg at 72% 18%, transparent 0deg, rgba(62, 208, 255,.11) 28deg, transparent 62deg),
+    conic-gradient(from 40deg at 28% 22%, transparent 0deg, rgba(184, 240, 255,.07) 22deg, transparent 50deg),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(143, 232, 255,.22), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 18% 80%, rgba(62, 208, 255,.1), transparent 50%);
+  animation: rayDrift 13s ease-in-out infinite alternate;
 }
 .arena-frost {
   z-index: 0;
   opacity: .7;
   background:
-    linear-gradient(115deg, transparent 38%, rgba(232,244,252,.055) 50%, transparent 62%),
-    linear-gradient(185deg, rgba(184,228,247,.07), transparent 38%),
-    radial-gradient(circle at 80% 70%, rgba(168,188,203,.06), transparent 40%);
+    linear-gradient(115deg, transparent 38%, rgba(238, 251, 255,.055) 50%, transparent 62%),
+    linear-gradient(185deg, rgba(184, 240, 255,.07), transparent 38%),
+    radial-gradient(circle at 80% 70%, rgba(174, 198, 216,.06), transparent 40%);
   mix-blend-mode: screen;
 }
 .arena-grid {
   z-index: 0;
   opacity: .1;
   background-image:
-    linear-gradient(rgba(78, 182, 232, .1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(78, 182, 232, .1) 1px, transparent 1px);
+    linear-gradient(rgba(62, 208, 255, .1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(62, 208, 255, .1) 1px, transparent 1px);
   background-size: 80px 80px;
   -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
   mask-image: linear-gradient(to bottom, #000, transparent 70%);
@@ -91,7 +91,7 @@ body.arena-home {
 .arena-vignette {
   z-index: 1;
   background:
-    radial-gradient(circle at 50% 28%, transparent 0, rgba(21, 28, 38, .2) 42%, #151c26 94%),
+    radial-gradient(circle at 50% 28%, transparent 0, rgba(21, 28, 38, .2) 42%, #101a2c 94%),
     linear-gradient(90deg, rgba(21,28,38,.9), transparent 22%, transparent 78%, rgba(21,28,38,.9));
 }
 
@@ -130,8 +130,8 @@ body.arena-home {
 }
 .vault-depth-far {
   background:
-    radial-gradient(ellipse 50% 40% at 50% 45%, rgba(78,182,232,.12), transparent 60%),
-    radial-gradient(circle at 30% 60%, rgba(110,168,201,.08), transparent 40%);
+    radial-gradient(ellipse 50% 40% at 50% 45%, rgba(62, 208, 255,.12), transparent 60%),
+    radial-gradient(circle at 30% 60%, rgba(82, 194, 240,.08), transparent 40%);
   transform: translateZ(-400px) scale(1.4);
 }
 .vault-depth-mid {
@@ -159,7 +159,7 @@ body.arena-home {
   width: 92%;
   height: auto;
   filter:
-    drop-shadow(0 0 36px rgba(78,182,232,.45))
+    drop-shadow(0 0 36px rgba(62, 208, 255,.45))
     drop-shadow(0 28px 70px rgba(0,0,0,.7));
   animation: logoBreath 6s ease-in-out infinite;
 }
@@ -167,14 +167,14 @@ body.arena-home {
 .vault-core-ring-2 {
   position: absolute; inset: 0;
   border-radius: 50%;
-  border: 1px solid rgba(184,228,247,.18);
-  box-shadow: inset 0 0 40px rgba(78,182,232,.06), 0 0 40px rgba(78,182,232,.08);
+  border: 1px solid rgba(184, 240, 255,.18);
+  box-shadow: inset 0 0 40px rgba(62, 208, 255,.06), 0 0 40px rgba(62, 208, 255,.08);
 }
 .vault-core-ring { animation: arenaSpin 36s linear infinite; }
 .vault-core-ring-2 {
   inset: 12%;
   border-style: dashed;
-  border-color: rgba(168,188,203,.22);
+  border-color: rgba(174, 198, 216,.22);
   animation: arenaSpin 24s linear infinite reverse;
 }
 .vault-slab {
@@ -182,60 +182,60 @@ body.arena-home {
   width: min(180px, 28vw);
   aspect-ratio: .7;
   border-radius: 14px;
-  border: 1px solid rgba(184,228,247,.42);
+  border: 1px solid rgba(184, 240, 255,.42);
   background:
-    linear-gradient(145deg, rgba(232,244,252,.18), transparent 38%),
-    linear-gradient(160deg, #2a3d52, #1a2533 55%, #1b2431 100%);
+    linear-gradient(145deg, rgba(238, 251, 255,.18), transparent 38%),
+    linear-gradient(160deg, #2a3d52, #1a2533 55%, #16223a 100%);
   box-shadow:
     0 30px 60px rgba(0,0,0,.5),
-    0 0 36px rgba(78,182,232,.16),
-    inset 0 1px 0 rgba(232,244,252,.25);
+    0 0 36px rgba(62, 208, 255,.16),
+    inset 0 1px 0 rgba(238, 251, 255,.25);
   transform-style: preserve-3d;
   overflow: hidden;
 }
 .vault-slab::after {
   content: "";
   position: absolute; inset: 8px;
-  border: 1px solid rgba(184,228,247,.2);
+  border: 1px solid rgba(184, 240, 255,.2);
   border-radius: 8px;
   pointer-events: none;
 }
 .vault-slab::before {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(232,244,252,.14) 48%, transparent 62%);
+  background: linear-gradient(115deg, transparent 30%, rgba(238, 251, 255,.14) 48%, transparent 62%);
   animation: slabSheen 5.5s ease-in-out infinite;
 }
 .vault-slab-a {
   left: 4%; top: 18%;
   transform: translateZ(-40px) rotateY(28deg) rotateZ(-8deg);
-  animation: floatA 7s ease-in-out infinite;
+  animation: floatA 5s ease-in-out infinite;
 }
 .vault-slab-b {
   right: 6%; top: 12%;
   transform: translateZ(20px) rotateY(-24deg) rotateZ(6deg);
-  animation: floatB 8s ease-in-out infinite;
+  animation: floatB 5.6s ease-in-out infinite;
 }
 .vault-slab-c {
   left: 18%; bottom: 4%;
   width: min(140px, 22vw);
   transform: translateZ(-90px) rotateY(16deg) rotateX(8deg);
   opacity: .7;
-  animation: floatC 9s ease-in-out infinite;
+  animation: floatC 6.4s ease-in-out infinite;
 }
 .vault-glass-panel {
   position: absolute;
   top: 12%; bottom: 18%;
   width: min(240px, 20vw);
-  border: 1px solid rgba(184,228,247,.18);
+  border: 1px solid rgba(184, 240, 255,.18);
   background:
-    linear-gradient(180deg, rgba(184,228,247,.1), rgba(78,182,232,.03) 40%, rgba(8,16,28,.25));
+    linear-gradient(180deg, rgba(184, 240, 255,.1), rgba(62, 208, 255,.03) 40%, rgba(8,16,28,.25));
   backdrop-filter: blur(22px) saturate(1.3);
   -webkit-backdrop-filter: blur(22px) saturate(1.3);
   transform-style: preserve-3d;
   box-shadow:
-    inset 0 0 50px rgba(78,182,232,.08),
-    0 0 40px rgba(78,182,232,.06);
+    inset 0 0 50px rgba(62, 208, 255,.08),
+    0 0 40px rgba(62, 208, 255,.06);
 }
 .vault-glass-left {
   left: 2%;
@@ -341,7 +341,7 @@ body.arena-home {
   padding: clamp(40px, 8vh, 96px) 0;
   border-top: 1px solid var(--arena-line);
   background:
-    linear-gradient(180deg, rgba(78,182,232,.04), transparent 40%),
+    linear-gradient(180deg, rgba(62, 208, 255,.04), transparent 40%),
     transparent;
 }
 .vault-activity-grid {
@@ -358,7 +358,7 @@ body.arena-home {
   background: var(--color-bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(232,244,252,.06);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(238, 251, 255,.06);
 }
 .activity-rail-head {
   display: flex; align-items: center; gap: 10px;
@@ -414,7 +414,7 @@ body.arena-home {
   right: 8%; bottom: 10%;
   width: min(150px, 34%);
   aspect-ratio: .7;
-  border: 1px solid rgba(184,228,247,.35);
+  border: 1px solid rgba(184, 240, 255,.35);
   background: var(--moment-fallback);
   border-radius: 12px;
   box-shadow: 0 28px 60px rgba(0,0,0,.5), var(--glow-ice);
@@ -499,8 +499,8 @@ body.arena-home {
 .live-marquee {
   display: flex; align-items: center; gap: 12px; margin: 0 calc(50% - 50vw) 28px;
   padding: 11px 4vw; overflow: hidden;
-  border-block: 1px solid rgba(78,182,232,.16);
-  color: var(--color-text-secondary); background: rgba(78,182,232,.04);
+  border-block: 1px solid rgba(62, 208, 255,.16);
+  color: var(--color-text-secondary); background: rgba(62, 208, 255,.04);
   font: 10px/1 var(--arena-mono); letter-spacing: var(--tracking-label); text-transform: uppercase;
 }
 .live-marquee-track { display: flex; gap: 34px; min-width: max-content; animation: ticker 30s linear infinite; }
@@ -532,7 +532,7 @@ body.arena-home {
   position: relative; grid-column: span 4; min-height: 430px; overflow: hidden;
   border: 1px solid var(--arena-line);
   background:
-    linear-gradient(145deg, rgba(184,228,247,.05), transparent 42%),
+    linear-gradient(145deg, rgba(184, 240, 255,.05), transparent 42%),
     var(--color-bg-glass);
   color: var(--arena-white); text-decoration: none; isolation: isolate;
   transition: transform .28s var(--ease-premium), border-color .25s ease, box-shadow .25s;
@@ -546,15 +546,15 @@ body.arena-home {
 }
 .live-card::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(112deg, transparent 24%, rgba(184,228,247,.1) 46%, transparent 66%);
+  background: linear-gradient(112deg, transparent 24%, rgba(184, 240, 255,.1) 46%, transparent 66%);
   transform: translateX(-120%);
   transition: transform 760ms var(--ease-premium);
 }
 .live-card:hover::after { transform: translateX(120%); }
 .live-card-media {
   position: absolute; inset: 0; z-index: -2; background:
-    radial-gradient(circle at 72% 20%, rgba(78,182,232,.14), transparent 34%),
-    linear-gradient(145deg, #222c3b, #1b2431 70%);
+    radial-gradient(circle at 72% 20%, rgba(62, 208, 255,.14), transparent 34%),
+    linear-gradient(145deg, #1c2b46, #16223a 70%);
 }
 .live-card-media.has-image { background-size: cover; background-position: center; }
 .live-card-media::after {
@@ -586,7 +586,7 @@ body.arena-home {
 .live-card-body p { margin: 0; color: var(--color-text-secondary); font-size: 13px; }
 .live-card-foot {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  margin-top: 22px; padding-top: 15px; border-top: 1px solid rgba(184,228,247,.14);
+  margin-top: 22px; padding-top: 15px; border-top: 1px solid rgba(184, 240, 255,.14);
 }
 .breaker-id {
   display: flex; align-items: center; gap: 9px; color: var(--color-text-secondary);
@@ -601,7 +601,7 @@ body.arena-home {
 .arena-empty {
   grid-column: 1 / -1; min-height: 300px; display: grid; place-items: center;
   padding: 40px; text-align: center; border: 1px solid var(--arena-line);
-  background: linear-gradient(145deg, rgba(78,182,232,.06), transparent);
+  background: linear-gradient(145deg, rgba(62, 208, 255,.06), transparent);
 }
 .arena-empty strong { display: block; margin-bottom: 8px; font-size: 28px; }
 .arena-empty span { color: var(--arena-silver); }
@@ -622,11 +622,11 @@ body.arena-home {
   min-height: 100%; padding: 28px; display: flex; flex-direction: column; justify-content: space-between;
   border: 1px solid var(--arena-line);
   background:
-    linear-gradient(145deg, rgba(78,182,232,.12), transparent 48%),
-    #1b2431;
+    linear-gradient(145deg, rgba(62, 208, 255,.12), transparent 48%),
+    #16223a;
 }
 .break-feature .number {
-  color: rgba(184,228,247,.1); font-size: 96px; font-weight: 900;
+  color: rgba(184, 240, 255,.1); font-size: 96px; font-weight: 900;
   line-height: .8; letter-spacing: var(--tracking-display);
 }
 .break-feature h3 { margin: 60px 0 8px; font-size: 30px; letter-spacing: var(--tracking-tight); }
@@ -635,12 +635,12 @@ body.arena-home {
 .breaker-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--arena-line); border: 1px solid var(--arena-line); }
 .breaker-card {
   position: relative; min-height: 330px; padding: 22px; display: flex; flex-direction: column;
-  background: #1b2431; color: inherit; text-decoration: none; overflow: hidden;
+  background: #16223a; color: inherit; text-decoration: none; overflow: hidden;
 }
-.breaker-card:hover { text-decoration: none; background: #222c3b; }
+.breaker-card:hover { text-decoration: none; background: #1c2b46; }
 .breaker-card::before {
   content: attr(data-rank); position: absolute; right: -8px; top: 4px;
-  color: rgba(184,228,247,.04); font-size: 130px; font-weight: 900; line-height: 1;
+  color: rgba(184, 240, 255,.04); font-size: 130px; font-weight: 900; line-height: 1;
 }
 .breaker-avatar-lg {
   position: relative; width: 84px; height: 84px; display: grid; place-items: center;
@@ -690,7 +690,7 @@ body.arena-home {
 }
 .difference-card p { margin: 20px 0 0; color: var(--color-text-muted); font-size: 13px; line-height: 1.6; }
 .difference-card.fee-card {
-  background: linear-gradient(145deg, rgba(78,182,232,.16), transparent 62%), #1b2431;
+  background: linear-gradient(145deg, rgba(62, 208, 255,.16), transparent 62%), #16223a;
 }
 .difference-card.fee-card::before { background: var(--arena-ice); }
 .difference-card.fee-card strong { color: var(--arena-ice); }
@@ -717,44 +717,60 @@ body.arena-home {
   position: relative; min-height: 650px; overflow: hidden; display: grid;
   grid-template-columns: 1fr 1fr; align-items: center; border: 1px solid var(--arena-line);
   background:
-    radial-gradient(680px 420px at 18% 48%, rgba(78,182,232,.1), transparent 65%),
-    radial-gradient(620px 360px at 88% 20%, rgba(168,188,203,.08), transparent 65%),
+    radial-gradient(680px 420px at 18% 48%, rgba(62, 208, 255,.1), transparent 65%),
+    radial-gradient(620px 360px at 88% 20%, rgba(174, 198, 216,.08), transparent 65%),
     var(--color-bg-glass);
   box-shadow: var(--shadow-lg);
 }
-.moment-visual { position: relative; align-self: stretch; min-height: 520px; overflow: hidden; }
+.moment-visual { position: relative; align-self: stretch; min-height: 520px; overflow: hidden; perspective: 1500px; }
 .moment-visual::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent 55%, #151c26), linear-gradient(to top, #151c26, transparent 42%);
+  background: linear-gradient(90deg, transparent 55%, #101a2c), linear-gradient(to top, #101a2c, transparent 42%);
 }
 .moment-ring {
   position: absolute; width: 450px; height: 450px; left: 50%; top: 50%;
   transform: translate(-50%,-50%);
-  border: 1px solid rgba(78,182,232,.28); border-radius: 50%;
-  box-shadow: inset 0 0 90px rgba(78,182,232,.08);
+  border: 1px solid rgba(62, 208, 255,.28); border-radius: 50%;
+  box-shadow: inset 0 0 90px rgba(62, 208, 255,.08);
 }
 .moment-ring::before,
 .moment-ring::after {
   content: ""; position: absolute; inset: 48px;
-  border: 1px dashed rgba(78,182,232,.18); border-radius: inherit;
+  border: 1px dashed rgba(62, 208, 255,.18); border-radius: inherit;
   animation: arenaSpin 24s linear infinite;
 }
 .moment-ring::after { inset: 108px; animation-direction: reverse; animation-duration: 17s; }
 .moment-card {
   position: absolute; left: 50%; top: 50%; width: 225px; aspect-ratio: .7;
-  transform: translate(-50%,-50%) rotate(-5deg);
-  border: 1px solid rgba(184,228,247,.4);
+  overflow: hidden; transform-style: preserve-3d; will-change: transform, box-shadow;
+  transform:
+    translate(-50%, -50%)
+    translateY(var(--mc-y, 0px))
+    rotateX(var(--mc-rx, 0deg)) rotateY(var(--mc-ry, -18deg))
+    rotate(var(--mc-rot, -5deg))
+    scale(var(--mc-scale, 0.92));
+  border: 1px solid rgba(184, 240, 255,.4);
   background:
-    linear-gradient(125deg, rgba(78,182,232,.1), transparent 42%),
+    linear-gradient(125deg, rgba(62, 208, 255,.1), transparent 42%),
     var(--moment-fallback);
-  box-shadow: 0 36px 80px rgba(0,0,0,.62), 0 0 46px rgba(78,182,232,.12);
+  box-shadow:
+    0 36px 80px rgba(0,0,0,.62),
+    0 0 calc(46px + var(--mc-glow, 0px)) rgba(62, 208, 255, calc(0.12 + var(--mc-glow-a, 0)));
   border-radius: 12px;
 }
 .moment-card::before {
   content: "R"; position: absolute; inset: 0; display: grid; place-items: center;
   color: var(--arena-ice); font-size: 120px; font-weight: 900; opacity: .8;
 }
-.moment-card::after { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(184,228,247,.18); border-radius: 8px; }
+.moment-card::after {
+  content: ""; position: absolute; inset: 9px; border: 1px solid rgba(184, 240, 255,.18); border-radius: 8px;
+}
+.moment-card-sheen {
+  position: absolute; inset: -40%; z-index: 3; overflow: hidden;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.22) 47%, rgba(184, 240, 255,.3) 51%, transparent 68%);
+  transform: translateX(var(--mc-sheen, -60%)) rotate(8deg);
+  pointer-events: none; border-radius: inherit;
+}
 .moment-card.with-image::before { display: none; }
 .moment-copy { position: relative; z-index: 2; padding: clamp(30px,5vw,76px) clamp(30px,5vw,76px) clamp(30px,5vw,76px) 0; }
 .moment-copy .eyebrow {
@@ -770,7 +786,7 @@ body.arena-home {
   display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
   margin-top: 34px; background: var(--arena-line); border: 1px solid var(--arena-line);
 }
-.moment-meta > div { padding: 15px; background: #1b2431; }
+.moment-meta > div { padding: 15px; background: #16223a; }
 .moment-meta b { display: block; font-size: 17px; }
 .moment-meta span {
   color: var(--color-text-muted); font: 9px/1 var(--arena-mono);
@@ -803,8 +819,8 @@ body.arena-home {
   display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: center;
   padding: clamp(32px,5vw,70px); border: 1px solid var(--arena-line-hot);
   background:
-    linear-gradient(110deg, rgba(78,182,232,.1), transparent 44%),
-    #1b2431;
+    linear-gradient(110deg, rgba(62, 208, 255,.1), transparent 44%),
+    #16223a;
 }
 .market-gateway h2 { margin: 0 0 13px; font-size: clamp(32px,4vw,52px); letter-spacing: var(--tracking-tight); font-weight: 700; }
 .market-gateway p { max-width: 690px; margin: 0; color: var(--color-text-secondary); font-size: 16px; line-height: 1.6; }
@@ -817,19 +833,19 @@ body.arena-home {
 .breaker-copy p { color: var(--color-text-secondary); font-size: 17px; line-height: 1.65; }
 .founding-counter-premium {
   display: inline-flex; align-items: center; gap: 10px; margin-top: 18px; padding: 10px 12px;
-  border: 1px solid rgba(78,182,232,.3); color: var(--arena-ice);
+  border: 1px solid rgba(62, 208, 255,.3); color: var(--arena-ice);
   font: 10px/1 var(--arena-mono); letter-spacing: .12em; text-transform: uppercase;
-  background: rgba(78,182,232,.06);
+  background: rgba(62, 208, 255,.06);
 }
 .founding-counter-premium::before {
   content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--arena-ice);
-  box-shadow: 0 0 8px rgba(78,182,232,.5);
+  box-shadow: 0 0 8px rgba(62, 208, 255,.5);
 }
 .breaker-benefits {
   display: grid; grid-template-columns: repeat(3,1fr); gap: 1px;
   margin-top: 32px; background: var(--arena-line); border: 1px solid var(--arena-line);
 }
-.breaker-benefits div { padding: 16px; background: #1b2431; }
+.breaker-benefits div { padding: 16px; background: #16223a; }
 .breaker-benefits b { display: block; color: var(--arena-ice); font-size: 23px; }
 .breaker-benefits span {
   color: var(--color-text-muted); font: 9px/1.35 var(--arena-mono);
@@ -859,7 +875,7 @@ body.arena-home {
 .arena-field textarea { min-height: 100px; resize: vertical; }
 .arena-field input:focus,
 .arena-field textarea:focus {
-  border-color: var(--arena-line-hot); background: rgba(78,182,232,.04);
+  border-color: var(--arena-line-hot); background: rgba(62, 208, 255,.04);
   box-shadow: var(--shadow-focus);
 }
 .arena-field input::placeholder,
@@ -870,7 +886,7 @@ body.arena-home {
 .arena-status.ok { color: var(--arena-ice); }
 .success-panel {
   padding: 50px; text-align: center;
-  border: 1px solid rgba(78,182,232,.28); background: rgba(78,182,232,.05);
+  border: 1px solid rgba(62, 208, 255,.28); background: rgba(62, 208, 255,.05);
 }
 .success-panel h3 { margin: 0 0 10px; font-size: 34px; }
 .success-panel p { color: var(--color-text-secondary); }
@@ -910,8 +926,8 @@ body.arena-home {
   to { opacity: 1; transform: scale(1.04) translateY(-1%); }
 }
 @keyframes logoBreath {
-  0%,100% { filter: drop-shadow(0 0 28px rgba(78,182,232,.35)) drop-shadow(0 24px 60px rgba(0,0,0,.65)); transform: scale(1); }
-  50% { filter: drop-shadow(0 0 42px rgba(125,206,242,.5)) drop-shadow(0 24px 60px rgba(0,0,0,.65)); transform: scale(1.02); }
+  0%,100% { filter: drop-shadow(0 0 28px rgba(62, 208, 255,.35)) drop-shadow(0 24px 60px rgba(0,0,0,.65)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 42px rgba(143, 232, 255,.5)) drop-shadow(0 24px 60px rgba(0,0,0,.65)); transform: scale(1.02); }
 }
 @keyframes brandReveal {
   from { opacity: 0; transform: translateY(28px); }
@@ -923,15 +939,15 @@ body.arena-home {
 }
 @keyframes floatA {
   0%,100% { transform: translateZ(-40px) rotateY(28deg) rotateZ(-8deg) translateY(0); }
-  50% { transform: translateZ(-40px) rotateY(28deg) rotateZ(-8deg) translateY(-14px); }
+  50% { transform: translateZ(-40px) rotateY(32deg) rotateZ(-11deg) translateY(-24px); }
 }
 @keyframes floatB {
   0%,100% { transform: translateZ(20px) rotateY(-24deg) rotateZ(6deg) translateY(0); }
-  50% { transform: translateZ(20px) rotateY(-24deg) rotateZ(6deg) translateY(-18px); }
+  50% { transform: translateZ(20px) rotateY(-29deg) rotateZ(9deg) translateY(-30px); }
 }
 @keyframes floatC {
   0%,100% { transform: translateZ(-90px) rotateY(16deg) rotateX(8deg) translateY(0); }
-  50% { transform: translateZ(-90px) rotateY(16deg) rotateX(8deg) translateY(-10px); }
+  50% { transform: translateZ(-90px) rotateY(20deg) rotateX(11deg) translateY(-18px); }
 }
 @keyframes slabSheen {
   0%,100% { transform: translateX(-30%); opacity: .4; }
@@ -958,7 +974,7 @@ body.arena-home {
   .break-grid, .moment, .pulse-layout, .breaker-cta, .difference-layout { grid-template-columns: 1fr; }
   .break-feature { min-height: 360px; }
   .moment-copy { padding: 0 28px 45px; }
-  .moment-visual::after { background: linear-gradient(to bottom, transparent 55%, #151c26); }
+  .moment-visual::after { background: linear-gradient(to bottom, transparent 55%, #101a2c); }
   .pulse-intro, .breaker-copy { position: static; }
   .market-gateway { grid-template-columns: 1fr; }
   .arena-footer { grid-template-columns: 1fr; align-items: start; }

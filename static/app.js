@@ -145,9 +145,9 @@ function renderHero() {
   if (!el || !META.fees) return;
   const f = META.fees;
   el.innerHTML = `
-    <div class="stat hot"><div class="stat-num">95%</div><div class="stat-label">Sellers keep</div></div>
-    <div class="stat"><div class="stat-num">5%</div><div class="stat-label">Flat seller fee</div></div>
-    <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Platform rate</div></div>`;
+    <div class="stat hot"><div class="stat-num">${(f.founding_rate * 100).toFixed(0)}%</div><div class="stat-label">Founding 250 rate</div></div>
+    <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Standard seller fee</div></div>
+    <div class="stat"><div class="stat-num">★</div><div class="stat-label">Founding ${f.founding_cap} badge</div></div>`;
 }
 
 function renderIntegrations() {

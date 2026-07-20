@@ -47,7 +47,8 @@ SITE_FIELDS: list[dict] = [
         "type": "textarea",
         "group": "Landing page",
         "default": "Enter the most exclusive trading-card marketplace in the world. "
-                   "Sellers keep 95%. One flat 5% fee. Precision commerce, carved from ice.",
+                   "Standard fee: 5%. The first 250 sellers to join lock in a flat "
+                   "4% forever. Precision commerce, carved from ice.",
         "help": "Supporting sentence under the headline.",
     },
     {
@@ -72,10 +73,10 @@ SITE_FIELDS: list[dict] = [
         "default": "henry@ragnarips.com",
     },
     # --- Homepage perk cards (the four boxes under the hero) ---
-    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "Sellers keep 95%"},
-    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "A simple flat 5% seller fee. Premium. Easy to understand."},
-    {"key": "perk2_title", "label": "Perk 2 title", "type": "text", "group": "Homepage perks", "default": "5% flat seller fee"},
-    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "One transparent rate. No category maze. No surprise tiers."},
+    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "4% founders rate"},
+    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "The first 250 sellers to sign up lock in a flat 4% platform fee, forever."},
+    {"key": "perk2_title", "label": "Perk 2 title", "type": "text", "group": "Homepage perks", "default": "5% standard fee"},
+    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "One transparent rate for every other seller. No category maze. No surprise tiers."},
     {"key": "perk3_title", "label": "Perk 3 title", "type": "text", "group": "Homepage perks", "default": "Founding badge"},
     {"key": "perk3_desc", "label": "Perk 3 detail", "type": "text", "group": "Homepage perks", "default": "A permanent Founding Seller badge on your storefront. Status that never expires."},
     {"key": "perk4_title", "label": "Perk 4 title", "type": "text", "group": "Homepage perks", "default": "Your own store"},

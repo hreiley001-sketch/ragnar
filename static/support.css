@@ -4,15 +4,15 @@
   --counsel-display: var(--font-display);
   --counsel-body: var(--font-body);
   --counsel-mono: var(--font-mono);
-  --counsel-ink: var(--color-bg-base, #151c26);
+  --counsel-ink: var(--color-bg-base, #101a2c);
   --counsel-panel: var(--color-bg-glass, rgba(8, 16, 28, 0.72));
-  --counsel-line: var(--color-border-subtle, rgba(184, 228, 247, 0.08));
-  --counsel-ice: var(--color-accent-primary, #4eb6e8);
-  --counsel-ice-dim: var(--color-hover-surface, rgba(78, 182, 232, 0.08));
+  --counsel-line: var(--color-border-subtle, rgba(184, 240, 255, 0.08));
+  --counsel-ice: var(--color-accent-primary, #3ed0ff);
+  --counsel-ice-dim: var(--color-hover-surface, rgba(62, 208, 255, 0.08));
   --counsel-steel: var(--color-text-muted, #8396aa);
-  --counsel-gold: var(--color-accent-secondary, #a8bccb);
+  --counsel-gold: var(--color-accent-secondary, #aec6d8);
   --counsel-ok: var(--color-success, #6ec9a8);
-  --counsel-warn: var(--color-warning, #a8bccb);
+  --counsel-warn: var(--color-warning, #aec6d8);
   --counsel-danger: var(--color-error, #e87074);
 }
 
@@ -36,7 +36,7 @@ body.counsel-page .counsel-brand-name {
     radial-gradient(1100px 620px at 78% -10%, color-mix(in srgb, var(--counsel-ice) 16%, transparent), transparent 58%),
     radial-gradient(900px 520px at 8% 10%, color-mix(in srgb, var(--counsel-gold) 8%, transparent), transparent 55%),
     radial-gradient(700px 400px at 50% 110%, color-mix(in srgb, var(--counsel-ice) 6%, transparent), transparent 50%),
-    linear-gradient(180deg, #151c26 0%, #1b2431 45%, #151c26 100%);
+    linear-gradient(180deg, #101a2c 0%, #16223a 45%, #101a2c 100%);
 }
 .counsel-atmosphere::before {
   content: "";
@@ -74,9 +74,9 @@ body.counsel-page .counsel-brand-name {
 .counsel-crest {
   width: 44px; height: 44px;
   display: grid; place-items: center;
-  border: 1px solid rgba(78,182,232, 0.5);
+  border: 1px solid rgba(62, 208, 255, 0.5);
   background:
-    linear-gradient(145deg, rgba(78,182,232,0.2), transparent 55%),
+    linear-gradient(145deg, rgba(62, 208, 255,0.2), transparent 55%),
     rgba(10, 14, 18, 0.9);
   color: var(--counsel-ice);
   font-family: var(--counsel-mono);
@@ -129,7 +129,7 @@ body.counsel-page .counsel-brand-name {
 .counsel-cta {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 12px 18px;
-  border: 1px solid rgba(78,182,232, 0.6);
+  border: 1px solid rgba(62, 208, 255, 0.6);
   background: var(--counsel-ice);
   color: var(--color-on-accent);
   font-weight: 700; font-size: 14px;
@@ -142,7 +142,7 @@ body.counsel-page .counsel-brand-name {
   color: var(--text);
   border-color: var(--counsel-line);
 }
-.counsel-cta.ghost:hover { border-color: rgba(78,182,232,0.4); background: rgba(78,182,232,0.08); }
+.counsel-cta.ghost:hover { border-color: rgba(62, 208, 255,0.4); background: rgba(62, 208, 255,0.08); }
 .counsel-cta .arrow { font-family: var(--counsel-mono); opacity: 0.7; }
 
 /* Workspace — conversation is the interaction, not a card grid */
@@ -163,7 +163,7 @@ body.counsel-page .counsel-brand-name {
   display: flex; flex-direction: column;
   border: 1px solid var(--counsel-line);
   background:
-    linear-gradient(180deg, rgba(78,182,232,0.05), transparent 28%),
+    linear-gradient(180deg, rgba(62, 208, 255,0.05), transparent 28%),
     var(--counsel-panel);
   backdrop-filter: blur(14px);
   overflow: hidden;
@@ -229,7 +229,7 @@ body.counsel-page .counsel-brand-name {
   color: var(--text-soft);
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--counsel-line);
-  border-left: 2px solid rgba(78,182,232, 0.4);
+  border-left: 2px solid rgba(62, 208, 255, 0.4);
 }
 .cx-msg.me .cx-bubble {
   color: var(--color-on-accent);
@@ -252,7 +252,7 @@ body.counsel-page .counsel-brand-name {
 .cx-receipt {
   margin-top: 10px;
   padding: 12px 12px 10px;
-  border: 1px solid rgba(78,182,232, 0.28);
+  border: 1px solid rgba(62, 208, 255, 0.28);
   background: rgba(6, 10, 14, 0.55);
 }
 .cx-receipt-label {
@@ -339,7 +339,7 @@ body.counsel-page .counsel-brand-name {
 }
 .counsel-intent:hover,
 .counsel-intent:focus-visible {
-  border-color: rgba(78,182,232,0.5);
+  border-color: rgba(62, 208, 255,0.5);
   color: var(--counsel-ice);
   background: var(--counsel-ice-dim);
   outline: none;
@@ -360,13 +360,13 @@ body.counsel-page .counsel-brand-name {
 }
 .counsel-input-row input:focus {
   outline: none;
-  border-color: rgba(78,182,232, 0.55);
-  box-shadow: 0 0 0 3px rgba(78,182,232, 0.14);
+  border-color: rgba(62, 208, 255, 0.55);
+  box-shadow: 0 0 0 3px rgba(62, 208, 255, 0.14);
 }
 .counsel-input-row input::placeholder { color: var(--muted); }
 .counsel-send {
   padding: 0 18px;
-  border: 1px solid rgba(78,182,232, 0.55);
+  border: 1px solid rgba(62, 208, 255, 0.55);
   background: var(--counsel-ice);
   color: var(--color-on-accent);
   font-weight: 700;
@@ -445,8 +445,8 @@ body.counsel-page .counsel-brand-name {
   transition: border-color 150ms ease, background 150ms ease, transform 140ms ease;
 }
 .counsel-lane:hover {
-  border-color: rgba(78,182,232, 0.4);
-  background: rgba(78,182,232, 0.06);
+  border-color: rgba(62, 208, 255, 0.4);
+  background: rgba(62, 208, 255, 0.06);
   transform: translateX(2px);
 }
 .counsel-lane-idx {
@@ -483,9 +483,9 @@ body.counsel-page .counsel-brand-name {
   gap: 10px;
   padding: 11px 16px 11px 12px;
   border-radius: 0;
-  border: 1px solid rgba(78,182,232, 0.4);
+  border: 1px solid rgba(62, 208, 255, 0.4);
   background:
-    linear-gradient(135deg, rgba(78,182,232,0.14), transparent 50%),
+    linear-gradient(135deg, rgba(62, 208, 255,0.14), transparent 50%),
     rgba(10, 13, 16, 0.94);
   color: var(--text);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
@@ -495,15 +495,15 @@ body.counsel-page .counsel-brand-name {
 }
 .chat-fab.chat-fab-support:hover {
   transform: translateY(-2px);
-  border-color: rgba(78,182,232, 0.7);
+  border-color: rgba(62, 208, 255, 0.7);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
 }
 .chat-fab-support .fab-crest {
   width: 28px; height: 28px;
   display: grid; place-items: center;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  background: rgba(78,182,232, 0.18);
-  border: 1px solid rgba(78,182,232, 0.4);
+  background: rgba(62, 208, 255, 0.18);
+  border: 1px solid rgba(62, 208, 255, 0.4);
   font-family: var(--counsel-mono);
   font-size: 11px;
   color: var(--counsel-ice);
@@ -526,9 +526,9 @@ body.counsel-page .counsel-brand-name {
   width: min(400px, calc(100vw - 28px));
   height: min(620px, calc(100vh - 110px));
   border-radius: 0;
-  border: 1px solid rgba(78,182,232, 0.28);
+  border: 1px solid rgba(62, 208, 255, 0.28);
   background:
-    linear-gradient(180deg, rgba(78,182,232,0.06), transparent 24%),
+    linear-gradient(180deg, rgba(62, 208, 255,0.06), transparent 24%),
     rgba(10, 13, 16, 0.97);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(16px);
@@ -569,11 +569,11 @@ body.counsel-page .counsel-brand-name {
   padding: 14px;
   gap: 12px;
   background:
-    radial-gradient(500px 200px at 10% 0%, rgba(78,182,232,0.05), transparent 60%);
+    radial-gradient(500px 200px at 10% 0%, rgba(62, 208, 255,0.05), transparent 60%);
 }
 .chat-panel-support .chat-msg {
   border-radius: 0;
-  border-left: 2px solid rgba(78,182,232, 0.35);
+  border-left: 2px solid rgba(62, 208, 255, 0.35);
   background: rgba(255,255,255,0.03);
   animation: counselMsgIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -595,7 +595,7 @@ body.counsel-page .counsel-brand-name {
   transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
 }
 .chat-panel-support .chat-chip:hover {
-  border-color: rgba(78,182,232,0.5);
+  border-color: rgba(62, 208, 255,0.5);
   color: var(--counsel-ice);
   background: var(--counsel-ice-dim);
 }
@@ -628,7 +628,7 @@ body.counsel-page .counsel-brand-name {
 }
 .chat-panel-support .chat-expand:hover {
   color: var(--counsel-ice);
-  border-color: rgba(78,182,232,0.4);
+  border-color: rgba(62, 208, 255,0.4);
   text-decoration: none;
 }
 
@@ -661,7 +661,7 @@ body.counsel-page .counsel-brand-name {
 .support-desk-detail {
   border: 1px solid var(--border);
   background:
-    linear-gradient(180deg, rgba(78,182,232,0.05), transparent 30%),
+    linear-gradient(180deg, rgba(62, 208, 255,0.05), transparent 30%),
     rgba(12, 15, 18, 0.7);
   padding: 16px;
   min-height: 420px;
