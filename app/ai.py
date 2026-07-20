@@ -261,10 +261,14 @@ def _rules_studio(message: str, current: dict, fields: list[dict]) -> dict:
 
     # Named backgrounds.
     if "theme_bg" in keys:
-        if any(w in low for w in ("darker", "black", "midnight", "darkmode", "dark mode")):
-            updates["theme_bg"] = "#05070b"
-        elif any(w in low for w in ("lighter", "brighter", "white", "light mode")):
-            updates["theme_bg"] = "#12161d"
+        if any(w in low for w in ("darker", "black", "midnight", "darkmode", "dark mode", "dark theme")):
+            updates["theme_bg"] = "#2a2826"
+            if "theme_text" in keys:
+                updates["theme_text"] = "#f2f7fc"
+        elif any(w in low for w in ("lighter", "brighter", "white", "light mode", "light theme", "wolf fur", "fur grey", "fur gray")):
+            updates["theme_bg"] = "#e4e0da"
+            if "theme_text" in keys:
+                updates["theme_text"] = "#1c1b19"
 
     # Font requests: "use the font Bebas Neue" / "font: Orbitron".
     m = re.search(r"font\s*(?:to|:|=)?\s*['\"]?([A-Z][A-Za-z ]{2,30})['\"]?", message)

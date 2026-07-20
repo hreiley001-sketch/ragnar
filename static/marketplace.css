@@ -13,7 +13,7 @@ body.vault-page {
     radial-gradient(1200px 680px at 74% -8%, color-mix(in srgb, var(--color-accent-primary) 22%, transparent), transparent 58%),
     radial-gradient(900px 520px at 4% 18%, color-mix(in srgb, var(--color-crystal) 8%, transparent), transparent 55%),
     radial-gradient(700px 420px at 90% 98%, color-mix(in srgb, var(--color-accent-primary) 12%, transparent), transparent 50%),
-    linear-gradient(180deg, #e4e0da 0%, #efebe6 42%, #e4e0da 100%);
+    linear-gradient(180deg, var(--color-bg-base) 0%, var(--color-bg-elevated) 42%, var(--color-bg-base) 100%);
 }
 .vault-atmosphere::before {
   content: "";

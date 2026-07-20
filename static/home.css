@@ -295,7 +295,7 @@ body.arena-home {
   border: 1px solid var(--arena-line-hot);
   border-radius: var(--radius-xs);
   color: var(--arena-white);
-  background: rgba(6, 14, 26, .72);
+  background: rgba(246, 243, 239, .85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   text-decoration: none; cursor: pointer; overflow: hidden;
@@ -569,7 +569,7 @@ body.arena-home {
 .live-badge {
   display: inline-flex; align-items: center; gap: 7px; padding: 7px 9px;
   border-radius: var(--radius-xs);
-  color: var(--color-on-accent); background: color-mix(in srgb, var(--arena-ice) 82%, #031018);
+  color: var(--color-on-accent); background: color-mix(in srgb, var(--arena-ice) 82%, #1c1b19);
   font: 650 10px/1 var(--arena-mono); letter-spacing: .12em;
 }
 .viewer-badge {
