@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" role="img" aria-labelledby="title">
+  <title id="title">RAGNAR</title>
+  <rect width="320" height="72" rx="8" fill="#080a0c"/>
+  <g fill="none" stroke="#b8e8f7" stroke-width="2.4">
+    <path d="M16 11h31l13 13v11L47 47l12 14H43L30 47v14H16V11Z"/>
+    <path d="M30 24h13l4 4v4l-7 6H30V24Z" fill="#b8e8f7" stroke="none"/>
+  </g>
+  <text x="78" y="47" fill="#f3f6f7" font-family="Arial Narrow,Helvetica Neue,Arial,sans-serif" font-size="35" font-weight="900" letter-spacing="8">RAGNAR</text>
+  <path d="M79 57h218" stroke="#b8e8f7" stroke-width="1" opacity=".35"/>
+</svg>

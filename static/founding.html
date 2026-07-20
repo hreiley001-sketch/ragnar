@@ -3,113 +3,250 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RAGNAR — Become a Founding Seller | Trading Card Marketplace</title>
-  <meta name="description" content="Apply to be one of RAGNAR's 250 Founding Sellers. Keep more of every sale on a trust-first trading-card marketplace — Pokémon, sports, MTG, Yu-Gi-Oh & more." />
-  <meta name="keywords" content="trading card marketplace, sell trading cards, Pokemon cards, PSA graded cards, sports cards, TCG marketplace, founding sellers, Magic the Gathering, Yu-Gi-Oh, One Piece cards, sell sports cards online" />
+  <meta name="theme-color" content="#050607" />
+  <title>RAGNAR — The Arena for Live Collectibles</title>
+  <meta name="description" content="Enter RAGNAR: a premium live-commerce arena for sports cards, TCG breaks, collectors, and the breakers defining what comes next." />
+  <meta name="keywords" content="live card breaks, sports card breaks, TCG live breaks, trading card marketplace, live commerce, card breakers" />
   <link rel="canonical" href="https://ragnarips.com/" />
-  <link rel="icon" href="/static/logo.png" />
-  <link rel="apple-touch-icon" href="/static/logo.png" />
+  <link rel="icon" href="/static/logo.svg" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="RAGNAR" />
-  <meta property="og:title" content="RAGNAR — Become a Founding Seller" />
-  <meta property="og:description" content="A trust-first trading-card marketplace. Keep more of every sale. Apply to be one of 250 Founding Sellers." />
+  <meta property="og:title" content="RAGNAR — The Arena for Live Collectibles" />
+  <meta property="og:description" content="Live breaks. Legendary pulls. One arena." />
   <meta property="og:url" content="https://ragnarips.com/" />
-  <meta property="og:image" content="https://ragnarips.com/static/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="RAGNAR — Become a Founding Seller" />
-  <meta name="twitter:description" content="A trust-first trading-card marketplace. Keep more of every sale." />
-  <meta name="twitter:image" content="https://ragnarips.com/static/logo.png" />
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","logo":"https://ragnarips.com/static/logo.png","description":"A trust-first trading-card marketplace where sellers keep more of every sale."}
-  </script>
-  <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"WebSite","name":"RAGNAR","url":"https://ragnarips.com","potentialAction":{"@type":"SearchAction","target":"https://ragnarips.com/marketplace?q={search_term_string}","query-input":"required name=search_term_string"}}
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/styles.css" />
-  <style>
-    .land { max-width: 960px; margin: 0 auto; padding: 0 clamp(16px,4vw,40px) 60px; }
-    .hero-land { text-align:center; padding: clamp(30px,7vw,70px) 0 20px; }
-    .hero-land h2 { font-size: clamp(32px,6vw,60px); line-height:1.05; margin:14px 0; }
-    .hero-ice { color: var(--ice); }
-    .hero-cta-wrap { margin-top: 20px; }
-    .hero-land .sub { color: var(--text-soft); font-size: clamp(16px,2.4vw,20px); max-width:680px; margin:0 auto; }
-    .counter-big { display:inline-flex; align-items:center; gap:10px; margin:18px auto; padding:8px 18px; border-radius:999px; border:1px solid rgba(184,121,26,.4); background:rgba(184,121,26,.1); color:var(--gold); font-weight:600; }
-    .perks { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin:32px 0; }
-    .perk { padding:20px; border-radius:var(--radius); border:1px solid var(--border); background:var(--panel); box-shadow:var(--shadow); transition:transform 150ms ease, box-shadow 180ms ease; }
-    .perk:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); }
-    .perk .p-num { font-size:28px; font-weight:800; color:var(--ice); }
-    .perk .p-t { font-weight:700; margin:8px 0 4px; }
-    .perk .p-d { font-size:13px; color:var(--text-soft); line-height:1.5; }
-    .apply-card { max-width:640px; margin:10px auto 0; padding:26px; }
-    .apply-card h3 { margin-top:0; }
-    .apply-note { margin-top: 0; }
-    .success { text-align:center; padding:30px; }
-    .success .big { font-size:44px; }
-    .foot-links { text-align:center; margin-top:18px; }
-    .foot-links a { margin:0 10px; }
-  </style>
+  <link rel="stylesheet" href="/static/home.css" />
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","description":"A premium live-commerce and collectibles platform for live breaks, cards, and collectors."}
+  </script>
 </head>
-<body>
-  <div class="aurora"></div>
+<body class="arena-home">
+  <a class="arena-skip" href="#main">Skip to content</a>
+  <canvas id="arenaCanvas" aria-hidden="true"></canvas>
+  <div class="arena-grid" aria-hidden="true"></div>
+  <div class="arena-noise" aria-hidden="true"></div>
+  <div class="arena-vignette" aria-hidden="true"></div>
 
-  <header class="site-header">
-    <div class="brand">
-      <a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR — trading card marketplace" class="logo-img" /></a>
-    </div>
+  <header class="arena-nav">
+    <a class="arena-brand" href="/" aria-label="RAGNAR home">
+      <svg class="arena-mark" viewBox="0 0 42 50" fill="none" aria-hidden="true">
+        <path d="M5 3h22l10 10v10L27 33l10 14H25L15 34v13H5V3Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M15 13h10l3 3v4l-5 5h-8V13Z" fill="currentColor"/>
+      </svg>
+      <span>RAGNAR<small>Live commerce arena</small></span>
+    </a>
+    <nav class="arena-primary-nav" aria-label="Primary navigation">
+      <a href="#live">Live now</a>
+      <a href="#breaks">Breaks</a>
+      <a href="#breakers">Breakers</a>
+      <a href="/marketplace">Marketplace</a>
+      <a href="#pulse">Pulse</a>
+    </nav>
     <div class="header-actions">
-      <a class="btn btn-ghost btn-sm" href="/stores">Explore stores</a>
-      <a id="acctLink" class="btn btn-ghost btn-sm" href="/login">Sign in</a>
-      <a class="btn btn-primary btn-sm" href="#apply">Apply</a>
+      <a id="acctLink" class="arena-nav-link" href="/login">Sign in</a>
+      <a class="arena-nav-cta" href="#apply">Become a breaker</a>
     </div>
   </header>
 
-  <main class="land">
-    <section class="hero-land">
-      <img src="/static/logo.png" alt="RAGNAR" class="hero-logo" />
-      <div class="counter-big" id="counter" aria-live="polite">★ Founding Sellers — <span id="claimed">—</span> / <span id="cap">250</span> claimed</div>
-      <h2 id="heroHeadline">Be one of the <span class="accent hero-ice">250 Founding Sellers.</span></h2>
-      <p class="sub" id="heroSubtitle">RAGNAR is a trust-first marketplace for trading cards — built so sellers keep more and buyers stop getting burned. The first 250 sellers lock in founding status forever.</p>
-      <div class="hero-cta-wrap"><a class="btn btn-primary" href="#apply">Apply to be a Founding Seller</a></div>
+  <main id="main" class="arena-main">
+    <section class="arena-hero arena-shell">
+      <div class="arena-hero-copy">
+        <div class="arena-kicker"><span class="live-signal"></span> The arena is open</div>
+        <h1 id="arenaHeadline" aria-label="Break the expected">
+          <span>Break</span>
+          <span class="outline">the</span>
+          <span class="cut">expected.</span>
+        </h1>
+        <p id="arenaSubtitle" class="arena-hero-sub">Live breaks engineered like main events. The best breakers, the biggest pulls, and a marketplace built for collectors who refuse ordinary.</p>
+        <div class="arena-hero-actions">
+          <a class="arena-btn primary" href="#live">Enter the arena <span class="arrow">↗</span></a>
+          <a class="arena-btn" href="/marketplace">Explore the vault <span class="arrow">→</span></a>
+        </div>
+        <div class="arena-proof" aria-label="Platform activity">
+          <div class="arena-proof-item"><strong id="liveCount">0</strong><span>Live rooms</span></div>
+          <div class="arena-proof-item"><strong id="breakerCount">—</strong><span>Elite breakers</span></div>
+          <div class="arena-proof-item"><strong id="vaultCount">—</strong><span>Vault listings</span></div>
+          <div class="arena-proof-item"><strong>24/7</strong><span>Arena access</span></div>
+        </div>
+      </div>
+
+      <div class="arena-stage" id="arenaStage" aria-hidden="true">
+        <div class="stage-halo"></div>
+        <div class="holo-stack" id="holoStack">
+          <div class="holo-card back-one"><div class="holo-card-face"></div></div>
+          <div class="holo-card back-two"><div class="holo-card-face"></div></div>
+          <div class="holo-card front">
+            <div class="holo-card-face">
+              <div class="holo-top"><span>RAGNAR // 001</span><span>ONE OF ONE</span></div>
+              <div class="holo-rune">R</div>
+              <div class="holo-bottom"><b>THE ARENA</b><span>Live breaks · verified commerce</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="stage-index"><span>Current protocol</span><strong>LIVE // 01</strong><span>Encrypted access granted</span></div>
+      </div>
     </section>
 
-    <div class="perks">
-      <div class="perk"><div class="p-num" id="perkIntro">0%</div><div class="p-t" id="perk1Title">Fees for 90 days</div><div class="p-d" id="perk1Desc">Pay only payment processing during your intro window — keep the rest.</div></div>
-      <div class="perk"><div class="p-num" id="perkRate">4%</div><div class="p-t" id="perk2Title">Permanent founding rate</div><div class="p-d" id="perk2Desc">A lower rate than everyone else, locked in for good — our thank-you for being early.</div></div>
-      <div class="perk"><div class="p-num">★</div><div class="p-t" id="perk3Title">Founding badge</div><div class="p-d" id="perk3Desc">A permanent Founding Seller badge on your storefront. Status that never expires.</div></div>
-      <div class="perk"><div class="p-num">⚡</div><div class="p-t" id="perk4Title">Your own store</div><div class="p-d" id="perk4Desc">A customizable storefront, scan-to-list, real sold-price history, and live selling.</div></div>
-    </div>
-
-    <section class="card apply-card" id="apply">
-      <h3>Apply to be a Founding Seller</h3>
-      <p class="muted apply-note">Spots are limited to 250 and reviewed by hand. Tell us about your cards.</p>
-      <form id="applyForm">
-        <div class="field-row">
-          <label class="field"><span>Name *</span><input name="name" required minlength="2" maxlength="120" /></label>
-          <label class="field"><span>Email *</span><input name="email" type="email" required maxlength="160" /></label>
+    <section id="live" class="section">
+      <div class="live-marquee" aria-hidden="true">
+        <div class="live-marquee-track">
+          <span><i class="signal-dot"></i>Live now</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span>
+          <span><i class="signal-dot"></i>Live now</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span>
         </div>
-        <div class="field-row">
-          <label class="field"><span>Store handle you want</span><input name="handle_wanted" maxlength="40" placeholder="yggdrasil" /></label>
-          <label class="field"><span>Rough monthly sales</span><input name="monthly_volume" maxlength="80" placeholder="$2,000 / mo" /></label>
+      </div>
+      <div class="arena-shell">
+        <div class="section-head reveal">
+          <div><span class="section-label">01 / Live now</span><h2>The floor<br>is live.</h2></div>
+          <p>Every room is a main event. Enter live breaks, watch the reveal, and own the moment in real time.</p>
+          <a class="section-link" href="/stores">View all live rooms →</a>
         </div>
-        <label class="field"><span>What do you sell?</span><input name="categories" maxlength="300" placeholder="Vintage Pokémon, PSA-graded basketball…" /></label>
-        <label class="field"><span>Where do you sell now? (links welcome)</span><input name="current_platforms" maxlength="300" placeholder="eBay / TCGplayer / Whatnot store URL" /></label>
-        <label class="field"><span>Anything else?</span><textarea name="message" rows="3" maxlength="2000" placeholder="Tell us why you'd be a great Founding Seller."></textarea></label>
-        <button type="submit" class="btn btn-primary">Submit application</button>
-        <span id="formStatus" class="form-status" aria-live="polite"></span>
-      </form>
+        <div id="liveArena" class="live-grid reveal" aria-live="polite">
+          <div class="arena-empty"><div><strong>Scanning the arena…</strong><span>Loading live rooms and active rides.</span></div></div>
+        </div>
+      </div>
     </section>
 
-    <div id="successBox" class="card apply-card success" hidden>
-      <div class="big">🐺</div>
-      <h3>Application received.</h3>
-      <p class="muted">Thanks — we review Founding applications by hand and will reach out by email. Keep an eye on your inbox.</p>
-      <a class="btn btn-ghost" href="/stores">Explore stores while you wait →</a>
-    </div>
+    <section id="breaks" class="section">
+      <div class="arena-shell">
+        <div class="section-head reveal">
+          <div><span class="section-label">02 / The lineup</span><h2>Featured<br>breaks.</h2></div>
+          <p>Chase product, premium rooms, and scheduled drops worth setting an alarm for.</p>
+        </div>
+        <div class="break-grid reveal">
+          <div id="breakList" class="break-list" aria-live="polite"></div>
+          <aside class="break-feature">
+            <div class="number">250</div>
+            <div>
+              <span class="section-label">Founding class</span>
+              <h3>Built for the breakers building culture.</h3>
+              <p>The first 250 breakers receive permanent founding status, a lower lifetime platform rate, and priority access to what comes next.</p>
+              <a class="arena-btn small" href="#apply">Claim your place <span class="arrow">→</span></a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
 
-    <div class="foot-links">
-      <a href="/stores">Stores & Live</a> · <a href="/marketplace">Marketplace</a>
-    </div>
+    <section id="breakers" class="section">
+      <div class="arena-shell">
+        <div class="section-head reveal">
+          <div><span class="section-label">03 / Ranked talent</span><h2>Top<br>breakers.</h2></div>
+          <p>The personalities, operators, and collectors turning every broadcast into an event.</p>
+          <a class="section-link" href="/stores">Meet every breaker →</a>
+        </div>
+        <div id="breakerGrid" class="breaker-grid reveal" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="pulls" class="section">
+      <div class="arena-shell">
+        <div class="section-head reveal">
+          <div><span class="section-label">04 / Biggest pulls</span><h2>The hall.</h2></div>
+          <p>Every monster hit deserves a permanent place in RAGNAR history.</p>
+        </div>
+        <article class="moment reveal">
+          <div class="moment-visual">
+            <div class="moment-ring"></div>
+            <div id="momentCard" class="moment-card"></div>
+          </div>
+          <div class="moment-copy">
+            <span class="eyebrow">Verified pull archive // opening soon</span>
+            <h3 id="momentTitle">Legends need a stage.</h3>
+            <p id="momentDescription">RAGNAR will capture the room, the reaction, the breaker, and the card—turning every once-in-a-lifetime hit into a permanent cinematic moment.</p>
+            <div class="moment-meta">
+              <div><b id="momentCategory">1 / 1</b><span>Moment class</span></div>
+              <div><b id="momentGrade">Verified</b><span>Pull status</span></div>
+              <div><b id="momentValue">Live</b><span>Arena capture</span></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="pulse" class="section">
+      <div class="arena-shell pulse-layout">
+        <div class="pulse-intro reveal">
+          <span class="section-label">05 / RAGNAR Pulse</span>
+          <h2>The market<br>has a pulse.</h2>
+          <p>Live rooms, fresh inventory, rising bids, and breaker activity—one real-time signal from across the entire arena.</p>
+          <a class="arena-btn small" href="/marketplace">Open marketplace <span class="arrow">→</span></a>
+        </div>
+        <div id="pulseList" class="pulse-list reveal" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="section section-tight">
+      <div class="arena-shell">
+        <div class="market-gateway reveal">
+          <div>
+            <span class="section-label">Beyond the broadcast</span>
+            <h2>The vault never closes.</h2>
+            <p>Search graded cards, compare comps, scan inventory, make offers, and buy from trusted sellers across the RAGNAR marketplace.</p>
+          </div>
+          <a class="arena-btn primary" href="/marketplace">Enter marketplace <span class="arrow">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section id="apply" class="section">
+      <div class="arena-shell breaker-cta">
+        <div class="breaker-copy reveal">
+          <span class="section-label">06 / Enter the inner circle</span>
+          <h2>Become a<br>breaker.</h2>
+          <p>Bring your audience. Build your room. Own your business. RAGNAR gives serious breakers the stage and economics they deserve.</p>
+          <div id="counter" class="founding-counter-premium"><span><span id="claimed">—</span> / <span id="cap">250</span> founding positions claimed</span></div>
+          <div class="breaker-benefits">
+            <div><b id="perkIntro">0%</b><span id="perk1Title">Intro platform fee</span></div>
+            <div><b id="perkRate">4%</b><span id="perk2Title">Founding lifetime rate</span></div>
+            <div><b>01</b><span id="perk3Title">Permanent founding badge</span></div>
+          </div>
+          <span id="perk1Desc" hidden>Pay only payment processing during your intro window.</span>
+          <span id="perk2Desc" hidden>A lower rate than everyone else, locked in for good.</span>
+          <span id="perk3Desc" hidden>A permanent Founding Seller badge on your storefront.</span>
+          <span id="perk4Title" hidden>Your own store</span>
+          <span id="perk4Desc" hidden>A customizable storefront, scan-to-list, sold-price history, and live selling.</span>
+        </div>
+
+        <div>
+          <div class="apply-panel reveal">
+            <h3>Apply for founding access</h3>
+            <p>Applications are reviewed by hand. Tell us what you break and where you are taking it.</p>
+            <form id="applyForm">
+              <div class="arena-form-grid">
+                <label class="arena-field"><span>Name *</span><input name="name" required minlength="2" maxlength="120" autocomplete="name" placeholder="Your name" /></label>
+                <label class="arena-field"><span>Email *</span><input name="email" type="email" required maxlength="160" autocomplete="email" placeholder="you@example.com" /></label>
+                <label class="arena-field"><span>Breaker handle</span><input name="handle_wanted" maxlength="40" placeholder="@yourbreakroom" /></label>
+                <label class="arena-field"><span>Monthly volume</span><input name="monthly_volume" maxlength="80" placeholder="$10,000 / month" /></label>
+                <label class="arena-field full"><span>What do you break?</span><input name="categories" maxlength="300" placeholder="High-end football, basketball, Pokémon, One Piece…" /></label>
+                <label class="arena-field full"><span>Where do you sell now?</span><input name="current_platforms" maxlength="300" placeholder="Whatnot, Fanatics Live, eBay, your social channels…" /></label>
+                <label class="arena-field full"><span>Why RAGNAR?</span><textarea name="message" maxlength="2000" placeholder="Tell us about your audience, operation, and vision."></textarea></label>
+              </div>
+              <div class="apply-actions">
+                <button type="submit" class="arena-btn primary">Submit application <span class="arrow">→</span></button>
+                <span id="formStatus" class="arena-status" aria-live="polite"></span>
+              </div>
+            </form>
+          </div>
+          <div id="successBox" class="success-panel" hidden>
+            <span class="section-label">Transmission received</span>
+            <h3>You're on our radar.</h3>
+            <p>We review every founding application personally. Watch your inbox.</p>
+            <a class="arena-btn small" href="/stores">Explore the arena <span class="arrow">→</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
+
+  <footer class="arena-footer">
+    <div><div class="arena-footer-brand">RAGNAR</div><p>Live commerce, forged different.</p></div>
+    <div class="arena-footer-links"><a href="/stores">Live</a><a href="/marketplace">Marketplace</a><a href="/login">Account</a><a href="#apply">Breakers</a></div>
+    <div class="arena-footer-meta">RAGNAR // 2026<br>Guided by counsel. Driven by conquest.</div>
+  </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="/static/founding.js"></script>

@@ -37,7 +37,7 @@ function renderTrack(state) {
   const idx = PHASES.indexOf(state.current_phase);
   $("track").innerHTML = PHASES.map((p, i) => {
     const cls = state.status === "archived" ? "done" : (i === idx ? "active" : (i < idx ? "done" : ""));
-    return `<div class="stop ${cls}">${cls === "active" ? '<span class="cart">🎢</span>' : ""}${esc(p)}</div>`;
+    return `<div class="stop ${cls}">${esc(p)}</div>`;
   }).join("");
 }
 
@@ -65,7 +65,7 @@ function applyState(s) {
   $("currentBidder").textContent = s.current_bidder ? `High bidder: ${s.current_bidder}` : "No bids yet";
   $("minBid").textContent = money(s.min_next_bid);
   if (!$("bidAmount").value) $("bidAmount").value = Math.ceil(s.min_next_bid);
-  $("viewers").textContent = `👁 ${s.viewer_count}`;
+  $("viewers").textContent = `${Number(s.viewer_count || 0).toLocaleString()} watching`;
 
   const biddingOpen = s.status === "bidding";
   $("bidControls").style.display = biddingOpen ? "" : "none";
@@ -75,7 +75,7 @@ function applyState(s) {
   if (s.status === "archived") {
     $("winnerBox").hidden = false;
     $("winnerBox").innerHTML = s.winner
-      ? `🏆 SOLD to <b>${esc(s.winner)}</b> for ${money(s.current_bid)}${s.market_price ? ` · market est. ${money(s.market_price)}` : ""}`
+      ? `SOLD // <b>${esc(s.winner)}</b> // ${money(s.current_bid)}${s.market_price ? ` · market estimate ${money(s.market_price)}` : ""}`
       : "Ride ended — reserve not met, no sale.";
     $("phaseName").textContent = "ENDED";
     $("countdown").textContent = "—";
@@ -99,20 +99,20 @@ function stopTimer() { clearInterval(timerInt); timerInt = null; }
 
 function addFeed(type, data, at) {
   const label = {
-    chat_message: `💬 <b>${esc(data.name)}</b>: ${esc(data.body)}`,
-    giveaway_started: `🎁 Giveaway started: <b>${esc(data.title)}</b> — enter now!`,
-    giveaway_entered: `🎟 ${esc(data.name)} entered (${data.count} entries)`,
-    giveaway_winner: `🏆 Giveaway winner: <b>${esc(data.winner)}</b> — ${esc(data.title || "")}`,
-    ride_phase_changed: `➡️ Phase: <b>${esc(data.phase || "")}</b>`,
-    bid_placed: `💰 <b>${esc(data.bidder)}</b> bid ${money(data.amount)}`,
-    user_joined_ride: `👋 A car entered (${data.viewer_count} watching)`,
-    market_price_fetched: `📊 Market est. ${money(data.market_price)}`,
-    bidding_open: `🟢 Bidding is OPEN`,
-    ride_tuned: `⚙️ Tuned: ${esc(data.reason)}${data.extended_sec ? ` (+${data.extended_sec}s)` : ""}`,
-    payment_captured: `✅ Payment captured — ${esc(data.winner)} ${money(data.amount)}`,
-    ride_complete: data.winner ? `🏁 Complete — winner ${esc(data.winner)} at ${money(data.final_price)}` : `🏁 Complete — no sale`,
-    lobby_open: `🚪 Lobby open`,
-    cooldown_open: `❄️ Cooldown`,
+    chat_message: `[CHAT] <b>${esc(data.name)}</b>: ${esc(data.body)}`,
+    giveaway_started: `[DROP] Giveaway started: <b>${esc(data.title)}</b> — enter now`,
+    giveaway_entered: `[ENTRY] ${esc(data.name)} entered · ${data.count} total`,
+    giveaway_winner: `[WINNER] <b>${esc(data.winner)}</b> — ${esc(data.title || "")}`,
+    ride_phase_changed: `[SEQUENCE] <b>${esc(data.phase || "")}</b>`,
+    bid_placed: `[BID] <b>${esc(data.bidder)}</b> took control at ${money(data.amount)}`,
+    user_joined_ride: `[ROOM] New buyer entered · ${data.viewer_count} watching`,
+    market_price_fetched: `[MARKET] Estimate locked at ${money(data.market_price)}`,
+    bidding_open: `[FLOOR] Bidding is open`,
+    ride_tuned: `[SYSTEM] ${esc(data.reason)}${data.extended_sec ? ` · +${data.extended_sec}s` : ""}`,
+    payment_captured: `[SOLD] ${esc(data.winner)} · ${money(data.amount)}`,
+    ride_complete: data.winner ? `[FINAL] ${esc(data.winner)} · ${money(data.final_price)}` : `[FINAL] Reserve not met`,
+    lobby_open: `[ROOM] Lobby open`,
+    cooldown_open: `[SEQUENCE] Cooldown`,
   }[type] || `• ${esc(type)}`;
   const el = document.createElement("div");
   el.className = "feed-item";
@@ -178,7 +178,7 @@ async function loadGiveaway() {
     $("gaEnter").hidden = g.status !== "open";
     if (g.status === "drawn" && g.winner) {
       $("gaWinner").hidden = false;
-      $("gaWinner").textContent = `🏆 Winner: ${g.winner}`;
+      $("gaWinner").textContent = `WINNER // ${g.winner}`;
     } else $("gaWinner").hidden = true;
   } catch (_) {}
 }

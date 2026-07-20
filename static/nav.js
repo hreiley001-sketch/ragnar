@@ -26,7 +26,7 @@
   const drawer = mk("div", "nav-drawer");
   drawer.innerHTML = `
     <div class="nav-head">
-      <a href="/" style="display:inline-flex"><img src="/static/logo.png" alt="RAGNAR" /></a>
+      <a href="/" style="display:inline-flex"><img src="/static/logo.svg" alt="RAGNAR" /></a>
       <button class="nav-close" aria-label="Close menu">✕</button>
     </div>
     <nav class="nav-links" id="navLinks"></nav>
