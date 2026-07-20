@@ -38,7 +38,7 @@ SITE_FIELDS: list[dict] = [
         "label": "Landing headline",
         "type": "text",
         "group": "Landing page",
-        "default": "The future of sports card breaking.",
+        "default": "Live breaks. Elite marketplace.",
         "help": "Big headline on the front door.",
     },
     {
@@ -46,9 +46,8 @@ SITE_FIELDS: list[dict] = [
         "label": "Landing subtitle",
         "type": "textarea",
         "group": "Landing page",
-        "default": "Enter the most exclusive trading-card marketplace in the world. "
-                   "Standard fee: 5%. The first 250 sellers to join lock in a flat "
-                   "4% forever. Precision commerce, carved from ice.",
+        "default": "The premium platform for sports card collectors. "
+                   "Standard fee: 5%. The first 250 sellers lock in a flat 4% forever.",
         "help": "Supporting sentence under the headline.",
     },
     {
@@ -87,30 +86,30 @@ SITE_FIELDS: list[dict] = [
         "label": "Accent color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#1f6f8f",
-        "help": "Primary highlight — buttons, links, prices. Default steel-ice from the RAGNAR crest: #1f6f8f.",
+        "default": "#1a7fa8",
+        "help": "Primary highlight — buttons, links, prices. Default arctic ice from the RAGNAR crest: #1a7fa8.",
     },
     {
         "key": "theme_gold",
         "label": "Titanium / badge color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#7a756e",
+        "default": "#8a96a0",
     },
     {
         "key": "theme_bg",
         "label": "Background",
         "type": "color",
         "group": "Look & feel",
-        "default": "#e4e0da",
-        "help": "Light wolf-fur grey. Site surfaces derive from this.",
+        "default": "#eef5f9",
+        "help": "Ice vault base. Site surfaces derive from this.",
     },
     {
         "key": "theme_text",
         "label": "Text color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#1c1b19",
+        "default": "#0f1c24",
     },
     {
         "key": "theme_font",
@@ -118,7 +117,7 @@ SITE_FIELDS: list[dict] = [
         "type": "text",
         "group": "Look & feel",
         "default": "",
-        "help": "A Google Font family for body text, e.g. 'Outfit'. Blank = Nordic system default (Outfit + Germania One display).",
+        "help": "A Google Font family for body text, e.g. 'Inter'. Blank = Space Grotesk + Inter system.",
     },
 ]
 

@@ -3,7 +3,7 @@
 /* RAGNAR global live-commerce system.
    Semantic tokens are defined once in tokens.css; this file owns shared
    foundations, components, and supporting-page layouts.
-   Nordic fonts (Germania One / Outfit / IBM Plex Mono) load via each page
+   Nordic fonts (Space Grotesk / Inter / IBM Plex Mono) load via each page
    <link> and a nav.js fallback — keep stacks in tokens.css only. */
 
 * { box-sizing: border-box; }
@@ -27,7 +27,7 @@ body {
 h1, h2, h3 {
   line-height: var(--leading-tight);
   font-family: var(--font-display);
-  font-weight: 400; /* Germania One is single-weight — avoid faux bold */
+  font-weight: 600; 
   letter-spacing: var(--tracking-display);
   text-wrap: balance;
   font-feature-settings: "kern" 1, "liga" 1;
@@ -88,13 +88,13 @@ code {
   transform: translateY(-0.5px);
 }
 .logo-img {
-  height: 48px; width: auto; max-width: 168px; display: block;
+  height: 36px; width: auto; max-width: 132px; display: block;
   object-fit: contain; border-radius: 0;
 }
-.hero-logo { display: block; width: min(360px, 74%); margin: 0 auto 18px; }
+.hero-logo { display: block; width: min(200px, 42%); margin: 0 auto 18px; }
 .crest { width: 62px; height: 42px; }
 .brand-word h1 {
-  margin: 0; font-size: clamp(18px, 2.4vw, 24px); font-weight: 400;
+  margin: 0; font-size: clamp(18px, 2.4vw, 24px); font-weight: 600;
   letter-spacing: var(--tracking-display); color: var(--text);
   font-family: var(--font-display);
 }
@@ -833,7 +833,7 @@ select option { background: var(--panel-solid); color: var(--text); }
 
 @media (max-width: 640px) {
   .site-header { padding: 0 12px; gap: 10px; min-height: 60px; }
-  .logo-img { height: 40px; max-width: 140px; }
+  .logo-img { height: 32px; max-width: 118px; }
   .site-header .header-actions { width: auto; margin-left: auto; justify-content: flex-end; flex-wrap: nowrap; gap: 6px; }
   .site-header .founding-counter,
   .site-header .status-badge,
@@ -1142,7 +1142,7 @@ table.hub td { border-bottom-color: var(--border); }
 
 @media (max-width: 760px) {
   .site-header { min-height: 64px; }
-  .site-header .logo-img { height: 46px; max-width: 160px; object-fit: contain; }
+  .site-header .logo-img { height: 34px; max-width: 124px; object-fit: contain; }
   .mkt-hero { padding-top: 36px; }
   .mkt-hero h2 { font-size: clamp(28px, 8vw, 36px); }
   .mkt-hero::after { line-height: 1.6; }
