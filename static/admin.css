@@ -5,7 +5,7 @@ body.page-admin {
   --cmd-display: var(--font-display);
   --cmd-mono: var(--font-mono);
   --cmd-ink: var(--color-bg-base);
-  --cmd-panel: color-mix(in srgb, var(--color-bg-panel) 88%, #000);
+  --cmd-panel: color-mix(in srgb, var(--color-bg-panel) 88%, #2a2826);
   --cmd-line: var(--color-border-default);
   --cmd-accent: var(--color-accent-primary);
   --cmd-gold: var(--color-accent-secondary);
@@ -26,7 +26,7 @@ body.page-admin {
     radial-gradient(980px 540px at 78% -12%, color-mix(in srgb, var(--cmd-accent) 16%, transparent), transparent 58%),
     radial-gradient(720px 480px at 4% 18%, color-mix(in srgb, var(--cmd-gold) 8%, transparent), transparent 55%),
     radial-gradient(640px 420px at 90% 100%, color-mix(in srgb, var(--cmd-accent) 7%, transparent), transparent 50%),
-    linear-gradient(180deg, #0a1220 0%, #101a2e 42%, #0a1220 100%);
+    linear-gradient(180deg, #e4e0da 0%, #efebe6 42%, #e4e0da 100%);
 }
 .cmd-atmosphere::before {
   content: "";
@@ -44,7 +44,7 @@ body.page-admin {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, transparent 60%, rgba(0, 0, 0, 0.45)),
+    linear-gradient(180deg, transparent 60%, rgba(42, 40, 38, 0.45)),
     repeating-linear-gradient(
       0deg,
       transparent,
@@ -73,7 +73,7 @@ body.page-admin .site-header--admin {
   border-bottom: 1px solid color-mix(in srgb, var(--cmd-accent) 22%, transparent);
   background: color-mix(in srgb, var(--color-bg-base) 88%, transparent);
   backdrop-filter: blur(16px) saturate(1.2);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 18px 48px rgba(42, 40, 38, 0.28);
 }
 body.page-admin .site-header--admin::after {
   content: "";
@@ -93,7 +93,7 @@ body.page-admin .site-header--admin .brand {
 }
 body.page-admin .site-header--admin .logo-img {
   height: 48px;
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 8px 18px rgba(42, 40, 38, 0.45));
 }
 body.page-admin .cmd-brand-stack {
   display: flex;
@@ -111,7 +111,7 @@ body.page-admin .cmd-brand-mark {
 }
 body.page-admin .cmd-brand-mark span {
   color: var(--cmd-accent);
-  text-shadow: 0 0 18px rgba(46, 200, 255, 0.35);
+  text-shadow: 0 0 18px rgba(31, 111, 143, 0.35);
 }
 body.page-admin .cmd-title {
   margin: 0;
@@ -509,7 +509,7 @@ body.page-admin .tab-panel > .card h3 {
 body.page-admin .tbl-wrap {
   border-radius: 0;
   border-color: var(--cmd-line);
-  background: color-mix(in srgb, var(--color-bg-glass) 90%, #000);
+  background: color-mix(in srgb, var(--color-bg-glass) 90%, #2a2826);
   box-shadow: var(--shadow-sm);
 }
 body.page-admin table.hub th {
