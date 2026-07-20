@@ -369,6 +369,14 @@ def _answer_from_kb(session, conv, text, intake) -> dict:
 def _refund_reply(tone: str, result: dict) -> str:
     d = result.get("decision")
     order = result.get("order") or {}
+    refund = result.get("refund") or {}
+    if refund.get("ok") is False or "refund_failed_flag_review" in result.get("actions_taken", []):
+        return _tone(
+            tone if tone == "high_risk" else "frustrated",
+            f"I couldn't complete the refund on order #{order.get('id')}: "
+            f"{refund.get('error') or 'payment provider error'}. "
+            "I've flagged this for a human specialist.",
+        )
     if d == "deny":
         reason = (result.get("policy") or {}).get("reason") or "Not eligible under policy."
         return _tone(tone, f"I can't issue a refund on order #{order.get('id')}. {reason}")
@@ -377,7 +385,6 @@ def _refund_reply(tone: str, result: dict) -> str:
         return _tone(tone if tone == "high_risk" else "frustrated",
             f"I've escalated order #{order.get('id')} for human review. {reason} "
             "You'll get an update in Account notifications.")
-    refund = result.get("refund") or {}
     amt = refund.get("amount")
     bits = [f"Here's what I've done for you on order #{order.get('id')} ({order.get('title')}):"]
     if "create_return_label" in result.get("actions_taken", []):
@@ -385,9 +392,14 @@ def _refund_reply(tone: str, result: dict) -> str:
         bits.append(f"Created return label {label.get('label_id')} "
                     f"(tracking {label.get('tracking_number')}).")
     if amt is not None:
-        when = "You'll see the refund in 3–5 business days" if refund.get("status") == "stripe_refunded" \
-            else "Refund is recorded; Stripe payout timing applies once processing completes"
-        bits.append(f"Issued a ${amt:.2f} refund. {when}.")
+        st = refund.get("status") or ""
+        if st.startswith("stripe"):
+            when = "You'll see the refund in 3–5 business days"
+            bits.append(f"Issued a ${amt:.2f} refund via Stripe. {when}.")
+        elif st == "ledger_cancelled":
+            bits.append(f"Cancelled order for ${amt:.2f} (no card charge to reverse).")
+        else:
+            bits.append(f"Recorded ${amt:.2f} against order #{order.get('id')}.")
     if (result.get("policy") or {}).get("keep_item"):
         bits.append("You don't need to send the item back.")
     if "flag_for_review" in result.get("actions_taken", []):

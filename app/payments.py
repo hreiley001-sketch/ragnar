@@ -206,3 +206,59 @@ def construct_event(payload: bytes, sig_header: str):
     return stripe.Webhook.construct_event(
         payload, sig_header, settings.stripe_webhook_secret
     )
+
+
+def create_refund(
+    order,
+    amount_cents: int,
+    *,
+    reason: str = "",
+) -> dict:
+    """Create a Stripe Refund for an order paid via Checkout.
+
+    Returns ``{ok, refund_id, status, amount_cents, reason?}``. Does not mutate
+    the Order row — callers update local status to match Stripe.
+    """
+    from .models import Order  # local import avoids cycles at module load
+
+    if not isinstance(order, Order) and not hasattr(order, "stripe_session_id"):
+        return {"ok": False, "reason": "Invalid order"}
+    if not configured():
+        return {"ok": False, "reason": "Stripe is not configured"}
+    if not order.stripe_session_id:
+        return {"ok": False, "reason": "Order has no Stripe Checkout session to refund"}
+    amount_cents = int(amount_cents)
+    if amount_cents <= 0:
+        return {"ok": False, "reason": "Refund amount must be positive"}
+
+    try:
+        stripe = _stripe()
+        session_obj = stripe.checkout.Session.retrieve(order.stripe_session_id)
+        pi = session_obj.get("payment_intent")
+        if not pi:
+            return {"ok": False, "reason": "Checkout session has no payment_intent"}
+        pi_id = pi if isinstance(pi, str) else pi.get("id", pi)
+        refund = stripe.Refund.create(
+            payment_intent=pi_id,
+            amount=amount_cents,
+            reason="requested_by_customer",
+            metadata={
+                "ragnar_order_id": str(getattr(order, "id", "") or ""),
+                "support_reason": (reason or "")[:100],
+            },
+        )
+        return {
+            "ok": True,
+            "refund_id": refund.id,
+            "status": refund.status,  # pending | requires_action | succeeded | failed | canceled
+            "amount_cents": amount_cents,
+        }
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Stripe refund failed for order %s: %s", getattr(order, "id", None), exc)
+        return {"ok": False, "reason": str(exc)}
+
+
+def stripe_refund_status_ok(status: str | None) -> bool:
+    """True when Stripe considers the refund successful or in-flight to success."""
+    return (status or "") in {"succeeded", "pending"}
+

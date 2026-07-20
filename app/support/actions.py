@@ -85,20 +85,64 @@ def issue_refund(
     conversation: Optional[SupportConversation] = None,
     issued_by: str = "ai",
     kind: str = "full",
+    require_stripe: bool | None = None,
 ) -> dict:
-    """Record refund + attempt Stripe when possible. Always updates order state."""
+    """Issue a refund. Stripe-paid orders must succeed in Stripe before local status updates.
+
+    Offline/manual orders (no ``stripe_session_id``) may be cancelled locally with
+    status ``cancelled`` and SupportRefund status ``ledger_cancelled`` — never
+    labeled as a Stripe refund.
+    """
     total = order.price_cents + (order.shipping_cents or 0)
     amount_cents = max(0, min(amount_cents, total))
     kind = "partial" if amount_cents < total else kind
+    already = int(getattr(order, "refunded_cents", 0) or 0)
+    if already + amount_cents > total:
+        amount_cents = max(0, total - already)
+
+    has_stripe = bool(order.stripe_session_id)
+    if require_stripe is None:
+        require_stripe = has_stripe
 
     stripe_id = None
     status = "recorded"
-    stripe_result = payments_bridge.try_refund(order, amount_cents, reason=reason)
-    if stripe_result.get("ok"):
-        status = "stripe_refunded"
+    stripe_result: dict = {"ok": False}
+
+    if has_stripe:
+        stripe_result = payments_bridge.try_refund(order, amount_cents, reason=reason)
+        if not stripe_result.get("ok"):
+            return {
+                "ok": False,
+                "error": stripe_result.get("reason") or "Stripe refund failed",
+                "status": "failed",
+                "amount_cents": amount_cents,
+                "amount": round(amount_cents / 100, 2),
+                "stripe": stripe_result,
+                "order_status": order.status,
+            }
+        status = "stripe_refunded" if stripe_result.get("status") == "succeeded" else "stripe_pending"
+        if status == "stripe_pending" and stripe_result.get("status") == "pending":
+            status = "stripe_refunded"  # pending is accepted as in-flight success
         stripe_id = stripe_result.get("refund_id")
-    elif stripe_result.get("pending"):
-        status = "recorded"  # ledger entry; money movement pending Stripe config
+        order.stripe_refund_id = stripe_id
+        order.refunded_cents = already + amount_cents
+        if kind == "full" or order.refunded_cents >= total:
+            order.status = OrderStatus.refunded.value
+    else:
+        if require_stripe:
+            return {
+                "ok": False,
+                "error": "Order was not paid through Stripe — cannot issue a card refund.",
+                "status": "failed",
+                "amount_cents": amount_cents,
+                "amount": round(amount_cents / 100, 2),
+                "order_status": order.status,
+            }
+        # Manual/offline: cancel locally; do not claim a card refund.
+        status = "ledger_cancelled"
+        order.refunded_cents = already + amount_cents
+        if kind == "full" or order.refunded_cents >= total:
+            order.status = OrderStatus.cancelled.value
 
     row = SupportRefund(
         order_id=order.id,
@@ -111,32 +155,33 @@ def issue_refund(
         issued_by=issued_by,
     )
     session.add(row)
-
-    # Cancel/close the order on full refund; leave delivered on partial.
-    if kind == "full" or amount_cents >= total:
-        order.status = OrderStatus.cancelled.value
     order.updated_at = utcnow()
     session.add(order)
     session.commit()
     session.refresh(row)
     session.refresh(order)
 
+    label = (
+        f"${amount_cents/100:.2f} refunded via Stripe."
+        if status.startswith("stripe")
+        else f"${amount_cents/100:.2f} order cancelled (no card charge)."
+    )
     if order.buyer_user_id:
         notify(
             session, order.buyer_user_id, "refund_issued",
-            f"Refund issued — {order.title}",
-            body=f"${amount_cents/100:.2f} refund recorded"
-                 + (" via Stripe." if status == "stripe_refunded" else "."),
+            f"Refund — {order.title}",
+            body=label,
             link="/account#orders",
         )
     seller = session.get(Seller, order.seller_id) if order.seller_id else None
     notify_seller(
         session, seller, "refund_issued",
         f"Refund on order #{order.id}",
-        body=f"${amount_cents/100:.2f} — {reason[:120] if reason else 'support refund'}",
+        body=f"{label} — {reason[:120] if reason else 'support'}",
         link="/account#orders",
     )
     return {
+        "ok": True,
         "refund_id": row.id,
         "amount_cents": amount_cents,
         "amount": round(amount_cents / 100, 2),

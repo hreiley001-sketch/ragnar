@@ -287,7 +287,7 @@ async function disputesAction(e) {
   if (resolution == null) return;
   try {
     await api(`/api/admin/disputes/${id}/resolve`, { method: "POST", body: JSON.stringify({ status, resolution }) });
-    toast(rf ? "Dispute resolved — buyer refunded" : "Dispute denied");
+    toast(rf ? "Dispute resolved — refund processed" : "Dispute denied");
     loadDisputes();
   } catch (err) { toast(err.message); }
 }

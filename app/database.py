@@ -44,6 +44,10 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "image_public_id": "VARCHAR",
         "image_enhanced": "BOOLEAN DEFAULT 0",
     },
+    "order": {
+        "stripe_refund_id": "VARCHAR",
+        "refunded_cents": "INTEGER DEFAULT 0",
+    },
     "bid": {
         "bidder_user_id": "INTEGER",
     },
