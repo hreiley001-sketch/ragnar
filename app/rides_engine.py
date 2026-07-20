@@ -7,7 +7,7 @@ background worker is required) or on explicit Command-Hub control. Each phase
 entry runs its 'track' actions (the bound API segments):
   - showcase → market-data loop (TCG pricing) sets a live market reference
   - bidding  → opens bids
-  - cooldown/archive → payment drop (winner capture) + records a sold comp
+  - cooldown/archive → declare winner + emit payment_due (no fake capture)
 
 Adaptive tuning: a late bid inside the anti-snipe window extends bidding.
 """
@@ -21,7 +21,6 @@ from sqlmodel import Session, select
 from . import event_bus, payments, pricing
 from .config import settings
 from .models import Bid, Listing, Ride, RideStatus, Seller, utcnow
-from .services import record_sale
 
 logger = logging.getLogger("ragnar.rides")
 
@@ -150,6 +149,13 @@ def advance(session: Session, ride: Ride) -> Ride:
 
 
 def _finalize(session: Session, ride: Ride) -> None:
+    """Archive the ride and declare a provisional winner.
+
+    Launch safety: do **not** capture payment or mark the listing sold here.
+    Live checkout capture is not wired yet — claiming ``payment_captured`` /
+    calling ``record_sale`` would invent a paid sale. Emit ``payment_due`` so
+    the room UI stays honest until a real Checkout path exists.
+    """
     reserve_met = bool(ride.current_bidder) and ride.current_bid_cents >= ride.reserve_cents
     ride.winner = ride.current_bidder if reserve_met else None
     ride.status = RideStatus.archived.value
@@ -162,17 +168,32 @@ def _finalize(session: Session, ride: Ride) -> None:
     if ride.winner:
         seller = session.get(Seller, ride.seller_id) if ride.seller_id else None
         split = payments.compute_split(ride.current_bid_cents, seller)
-        # Payment drop (capture is a stub until a buyer payment method is on file).
         event_bus.emit(
-            session, "payment_captured",
-            {"winner": ride.winner, "amount": ride.current_bid_cents / 100, "payout": split.as_dict()},
+            session, "payment_due",
+            {
+                "winner": ride.winner,
+                "amount": ride.current_bid_cents / 100,
+                "payout_preview": split.as_dict(),
+                "message": "Winner declared — payment capture not enabled yet. Listing remains unsold until checkout.",
+            },
             ride.id,
         )
-        # Record the win as a sold comp (and mark the card sold).
+        # Pending order for ops visibility only — not paid, listing stays active.
         if ride.listing_id:
+            from .models import Order, OrderStatus
             listing = session.get(Listing, ride.listing_id)
-            if listing and listing.status != "sold":
-                record_sale(session, listing, ride.current_bid_cents, source="ride")
+            if listing:
+                order = Order(
+                    listing_id=listing.id,
+                    seller_id=listing.seller_id,
+                    buyer_name=ride.winner,
+                    title=listing.title,
+                    price_cents=ride.current_bid_cents,
+                    shipping_cents=listing.shipping_cents or 0,
+                    status=OrderStatus.pending.value,
+                    source="ride",
+                )
+                session.add(order)
                 session.commit()
 
     event_bus.emit(
@@ -181,6 +202,7 @@ def _finalize(session: Session, ride: Ride) -> None:
             "winner": ride.winner,
             "final_price": ride.current_bid_cents / 100,
             "market_price": (ride.market_price_cents or 0) / 100 or None,
+            "payment_status": "due" if ride.winner else "none",
         },
         ride.id,
     )

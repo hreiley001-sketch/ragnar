@@ -109,8 +109,9 @@ function addFeed(type, data, at) {
     market_price_fetched: `[MARKET] Estimate locked at ${money(data.market_price)}`,
     bidding_open: `[FLOOR] Bidding is open`,
     ride_tuned: `[SYSTEM] ${esc(data.reason)}${data.extended_sec ? ` · +${data.extended_sec}s` : ""}`,
-    payment_captured: `[SOLD] ${esc(data.winner)} · ${money(data.amount)}`,
-    ride_complete: data.winner ? `[FINAL] ${esc(data.winner)} · ${money(data.final_price)}` : `[FINAL] Reserve not met`,
+    payment_due: `[DUE] ${esc(data.winner)} won at ${money(data.amount)} — payment pending`,
+    payment_captured: `[PAID] ${esc(data.winner)} · ${money(data.amount)}`,
+    ride_complete: data.winner ? `[FINAL] ${esc(data.winner)} · ${money(data.final_price)} · payment pending` : `[FINAL] Reserve not met`,
     lobby_open: `[ROOM] Lobby open`,
     cooldown_open: `[SEQUENCE] Cooldown`,
   }[type] || `• ${esc(type)}`;
