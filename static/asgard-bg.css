@@ -60,16 +60,16 @@ html[data-asgard-realm="valhalla"] {
 
 /* ——— Loki / Forge — serpentine green + forge copper ——— */
 html[data-asgard-realm="forge"] {
-  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 70%, var(--color-warning) 18%, var(--color-success) 12%);
-  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 74%, var(--color-warning) 16%, var(--color-success) 10%);
-  --asgard-sky-c: color-mix(in srgb, var(--color-bg-base) 80%, var(--color-warning) 20%);
-  --asgard-aurora: rgba(138, 117, 96, 0.24);
-  --asgard-aurora-2: rgba(47, 138, 106, 0.22);
-  --asgard-loki: rgba(47, 138, 106, 0.28);
-  --asgard-iron: rgba(42, 40, 38, 0.14);
-  --asgard-gold: rgba(138, 117, 96, 0.34);
-  --asgard-rune: rgba(47, 100, 80, 0.14);
-  --asgard-mist: rgba(246, 243, 239, 0.36);
+  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 58%, var(--color-warning) 24%, var(--color-success) 18%);
+  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 60%, var(--color-warning) 22%, var(--color-success) 18%);
+  --asgard-sky-c: color-mix(in srgb, var(--color-bg-base) 65%, var(--color-warning) 35%);
+  --asgard-aurora: rgba(138, 117, 96, 0.32);
+  --asgard-aurora-2: rgba(47, 138, 106, 0.3);
+  --asgard-loki: rgba(47, 138, 106, 0.36);
+  --asgard-iron: rgba(42, 40, 38, 0.16);
+  --asgard-gold: rgba(138, 117, 96, 0.42);
+  --asgard-rune: rgba(47, 100, 80, 0.16);
+  --asgard-mist: rgba(246, 243, 239, 0.32);
 }
 
 /* ——— Mounted layer stack ——— */
@@ -483,9 +483,21 @@ body.arena-home .site-header {
   z-index: 2;
 }
 
-body.arena-home.asgard-active .arena-rays {
-  opacity: 0.5;
-  mix-blend-mode: multiply;
+body.arena-home.asgard-active .arena-frost {
+  opacity: 0.35;
+}
+
+body.arena-home.asgard-active .arena-noise {
+  opacity: 0.03;
+}
+
+html[data-asgard-god="loki"] .asgard-sigil {
+  place-items: start center;
+  padding-top: 12vh;
+}
+
+html[data-asgard-god="loki"] .asgard-sigil-name {
+  transform: translate3d(-12vw, 0, 0);
 }
 
 /* Let realm sky show through — vignette was locking to base fur and washing shifts */
