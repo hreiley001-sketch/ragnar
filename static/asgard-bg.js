@@ -79,6 +79,45 @@
     if (runeEl) runeEl.textContent = RUNE_BY_GOD[god] || "ᚱ ᚨ ᚷ ᚾ ᚨ ᚱ";
   }
 
+  function pickRealmFromSections(sections) {
+    if (!sections.length) return "bifrost";
+
+    const vh = window.innerHeight || 1;
+    const mid = vh * 0.42;
+    const maxScroll = Math.max(
+      0,
+      document.documentElement.scrollHeight - vh
+    );
+    const scrollY = window.scrollY || 0;
+
+    // Near page bottom — lock onto the forge / Loki chapter
+    if (maxScroll > 0 && scrollY / maxScroll > 0.88) {
+      const forge = sections.find(
+        (el) => el.getAttribute("data-asgard-realm") === "forge"
+      );
+      if (forge) return "forge";
+    }
+
+    // Near page top — stay with Bifrost / Odin
+    if (scrollY < vh * 0.35) {
+      return sections[0].getAttribute("data-asgard-realm") || "bifrost";
+    }
+
+    let best = sections[0];
+    let bestDist = Infinity;
+    sections.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > vh) return;
+      const center = rect.top + rect.height * 0.35;
+      const dist = Math.abs(center - mid);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = el;
+      }
+    });
+    return best.getAttribute("data-asgard-realm") || "bifrost";
+  }
+
   function initRealmObserver() {
     const sections = Array.from(document.querySelectorAll("[data-asgard-realm]"));
     if (!sections.length) {
@@ -86,36 +125,21 @@
       return;
     }
 
-    let active = sections[0].getAttribute("data-asgard-realm") || "bifrost";
-    setRealm(active);
+    setRealm(pickRealmFromSections(sections));
 
-    if (!("IntersectionObserver" in window)) return;
+    let ticking = false;
+    function update() {
+      ticking = false;
+      setRealm(pickRealmFromSections(sections));
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }
 
-    const ratios = new Map();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          ratios.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0);
-        });
-        let best = null;
-        let bestScore = -1;
-        sections.forEach((el) => {
-          const score = ratios.get(el) || 0;
-          if (score > bestScore) {
-            bestScore = score;
-            best = el;
-          }
-        });
-        if (best) setRealm(best.getAttribute("data-asgard-realm") || "bifrost");
-      },
-      {
-        root: null,
-        rootMargin: "-28% 0px -38% 0px",
-        threshold: [0, 0.15, 0.35, 0.55, 0.75, 1],
-      }
-    );
-
-    sections.forEach((el) => observer.observe(el));
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
   }
 
   function initScrollVars() {
@@ -144,10 +168,10 @@
       docEl.style.setProperty("--asgard-velocity", Math.max(-1, Math.min(1, smoothVel / 40)).toFixed(3));
       docEl.style.setProperty("--asgard-raven-phase", ravenPhase.toFixed(3));
 
-      // Thor storm intensity rises with Midgard scroll velocity
-      const storm = docEl.getAttribute("data-asgard-god") === "thor"
-        ? Math.min(1, 0.35 + Math.abs(smoothVel) / 55)
-        : Math.max(0, 0.15 - Math.abs(smoothVel) / 120);
+      const storm =
+        docEl.getAttribute("data-asgard-god") === "thor"
+          ? Math.min(1, 0.4 + Math.abs(smoothVel) / 50)
+          : Math.max(0, 0.12 - Math.abs(smoothVel) / 120);
       docEl.style.setProperty("--asgard-storm", storm.toFixed(3));
     }
 

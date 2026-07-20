@@ -35,35 +35,40 @@ html[data-asgard-realm="bifrost"] {
 
 /* ——— Thor / Midgard — living storm over the mortal floor ——— */
 html[data-asgard-realm="midgard"] {
-  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 88%, var(--color-live) 12%);
-  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 90%, var(--color-glacier) 10%);
-  --asgard-aurora: rgba(31, 122, 150, 0.2);
-  --asgard-aurora-2: rgba(47, 138, 106, 0.12);
-  --asgard-rune: rgba(28, 27, 25, 0.07);
-  --asgard-mist: rgba(246, 243, 239, 0.4);
-  --asgard-thunder: rgba(28, 100, 130, 0.28);
+  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 78%, var(--color-live) 22%);
+  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 82%, var(--color-glacier) 18%);
+  --asgard-sky-c: color-mix(in srgb, var(--color-bg-base) 90%, var(--color-live) 10%);
+  --asgard-aurora: rgba(31, 122, 150, 0.28);
+  --asgard-aurora-2: rgba(47, 138, 106, 0.16);
+  --asgard-rune: rgba(28, 27, 25, 0.08);
+  --asgard-mist: rgba(246, 243, 239, 0.38);
+  --asgard-thunder: rgba(28, 100, 130, 0.34);
 }
 
 /* ——— Valhalla — hall of ice, titanium + warm iron glory ——— */
 html[data-asgard-realm="valhalla"] {
-  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 86%, var(--color-titanium) 14%);
-  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 90%, #c4b8a8 10%);
-  --asgard-aurora: rgba(122, 117, 110, 0.14);
-  --asgard-aurora-2: rgba(138, 117, 96, 0.16);
-  --asgard-gold: rgba(138, 117, 96, 0.2);
-  --asgard-rune: rgba(42, 40, 38, 0.09);
+  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 72%, #c4b8a8 18%, var(--color-titanium) 10%);
+  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 78%, #b8a890 22%);
+  --asgard-sky-c: color-mix(in srgb, var(--color-bg-base) 85%, #a89880 15%);
+  --asgard-aurora: rgba(122, 117, 110, 0.2);
+  --asgard-aurora-2: rgba(138, 117, 96, 0.26);
+  --asgard-gold: rgba(138, 117, 96, 0.32);
+  --asgard-rune: rgba(42, 40, 38, 0.1);
+  --asgard-iron: rgba(138, 117, 96, 0.16);
 }
 
 /* ——— Loki / Forge — serpentine green + forge copper ——— */
 html[data-asgard-realm="forge"] {
-  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 82%, var(--color-warning) 12%, var(--color-success) 6%);
-  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 88%, var(--color-warning) 12%);
-  --asgard-aurora: rgba(138, 117, 96, 0.16);
-  --asgard-aurora-2: rgba(47, 138, 106, 0.14);
-  --asgard-loki: rgba(47, 138, 106, 0.18);
-  --asgard-iron: rgba(42, 40, 38, 0.12);
-  --asgard-gold: rgba(138, 117, 96, 0.22);
-  --asgard-rune: rgba(47, 100, 80, 0.1);
+  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 70%, var(--color-warning) 18%, var(--color-success) 12%);
+  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 74%, var(--color-warning) 16%, var(--color-success) 10%);
+  --asgard-sky-c: color-mix(in srgb, var(--color-bg-base) 80%, var(--color-warning) 20%);
+  --asgard-aurora: rgba(138, 117, 96, 0.24);
+  --asgard-aurora-2: rgba(47, 138, 106, 0.22);
+  --asgard-loki: rgba(47, 138, 106, 0.28);
+  --asgard-iron: rgba(42, 40, 38, 0.14);
+  --asgard-gold: rgba(138, 117, 96, 0.34);
+  --asgard-rune: rgba(47, 100, 80, 0.14);
+  --asgard-mist: rgba(246, 243, 239, 0.36);
 }
 
 /* ——— Mounted layer stack ——— */
@@ -253,12 +258,13 @@ html.asgard-thunder .asgard-sky {
 
 .asgard-raven {
   position: absolute;
-  width: 72px;
-  height: 28px;
+  width: 88px;
+  height: 34px;
   border-radius: 50% 40% 55% 45%;
-  background: rgba(42, 40, 38, 0.09);
-  filter: blur(1.5px);
+  background: rgba(42, 40, 38, 0.16);
+  filter: blur(0.8px);
   transform-origin: center;
+  box-shadow: 0 0 18px rgba(42, 40, 38, 0.08);
 }
 
 .asgard-raven::before,
@@ -266,9 +272,9 @@ html.asgard-thunder .asgard-sky {
   content: "";
   position: absolute;
   top: 2px;
-  width: 38px;
-  height: 18px;
-  background: rgba(42, 40, 38, 0.07);
+  width: 44px;
+  height: 20px;
+  background: rgba(42, 40, 38, 0.12);
   border-radius: 60% 20% 50% 40%;
 }
 
@@ -290,10 +296,10 @@ html.asgard-thunder .asgard-sky {
 }
 
 html[data-asgard-god="odin"] .asgard-ravens {
-  opacity: calc(0.7 - var(--asgard-scroll) * 0.2);
+  opacity: 0.85;
 }
 html[data-asgard-god="valhalla"] .asgard-ravens {
-  opacity: 0.28;
+  opacity: 0.35;
 }
 
 /* Layer 4 — aurora veil */
@@ -335,7 +341,7 @@ html[data-asgard-god="valhalla"] .asgard-aurora {
 }
 
 html[data-asgard-god="loki"] .asgard-embers {
-  opacity: calc(0.55 + var(--asgard-scroll) * 0.25);
+  opacity: 0.85;
   animation: asgardEmberRise 9s ease-in-out infinite alternate;
 }
 
@@ -346,7 +352,7 @@ html[data-asgard-god="loki"] .asgard-embers {
   inset: 0;
   display: grid;
   place-items: center;
-  opacity: calc(0.045 + var(--asgard-scroll) * 0.04);
+  opacity: 0.09;
   pointer-events: none;
 }
 
@@ -354,7 +360,7 @@ html[data-asgard-god="loki"] .asgard-embers {
   font-family: var(--font-display, "Germania One", serif);
   font-size: clamp(64px, 18vw, 220px);
   letter-spacing: 0.18em;
-  color: rgba(42, 40, 38, 0.55);
+  color: rgba(42, 40, 38, 0.7);
   text-transform: uppercase;
   white-space: nowrap;
   user-select: none;
@@ -363,13 +369,17 @@ html[data-asgard-god="loki"] .asgard-embers {
     calc(var(--asgard-parallax-y) * 0.15 + var(--asgard-scroll) * -4vh),
     0
   );
-  transition: opacity 0.7s ease;
+  transition: color 0.7s ease;
 }
 
-html[data-asgard-god="odin"] .asgard-sigil { opacity: 0.06; }
-html[data-asgard-god="thor"] .asgard-sigil { opacity: 0.055; }
-html[data-asgard-god="valhalla"] .asgard-sigil { opacity: 0.07; }
-html[data-asgard-god="loki"] .asgard-sigil { opacity: 0.065; }
+html[data-asgard-god="odin"] .asgard-sigil { opacity: 0.1; }
+html[data-asgard-god="odin"] .asgard-sigil-name { color: rgba(31, 111, 143, 0.55); }
+html[data-asgard-god="thor"] .asgard-sigil { opacity: 0.095; }
+html[data-asgard-god="thor"] .asgard-sigil-name { color: rgba(28, 100, 130, 0.55); }
+html[data-asgard-god="valhalla"] .asgard-sigil { opacity: 0.11; }
+html[data-asgard-god="valhalla"] .asgard-sigil-name { color: rgba(120, 100, 78, 0.6); }
+html[data-asgard-god="loki"] .asgard-sigil { opacity: 0.11; }
+html[data-asgard-god="loki"] .asgard-sigil-name { color: rgba(47, 110, 85, 0.58); }
 
 /* Soft iron horizon */
 .asgard-horizon {
@@ -476,12 +486,38 @@ body.arena-home.asgard-active .arena-rays {
   mix-blend-mode: multiply;
 }
 
+/* Let realm sky show through — vignette was locking to base fur and washing shifts */
+body.arena-home.asgard-active .arena-vignette {
+  background:
+    radial-gradient(circle at 50% 28%, transparent 0, rgba(42, 40, 38, 0.04) 52%, transparent 92%),
+    linear-gradient(90deg, color-mix(in srgb, var(--asgard-sky-c) 70%, transparent), transparent 16%, transparent 84%, color-mix(in srgb, var(--asgard-sky-c) 70%, transparent));
+  transition: background 1s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+body.arena-home.asgard-active,
+html[data-asgard-realm] {
+  background: var(--asgard-sky-c);
+  transition: background 1s var(--ease-premium, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
 html[data-asgard-god="thor"] body.arena-home.asgard-active .arena-rays {
-  opacity: 0.7;
+  opacity: 0.75;
+}
+
+html[data-asgard-god="valhalla"] body.arena-home.asgard-active .arena-rays {
+  opacity: 0.45;
+  background:
+    conic-gradient(from 200deg at 50% 10%, transparent 0deg, rgba(138, 117, 96, 0.16) 30deg, transparent 70deg),
+    conic-gradient(from 40deg at 28% 22%, transparent 0deg, rgba(122, 117, 110, 0.1) 22deg, transparent 50deg),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(138, 117, 96, 0.2), transparent 55%);
 }
 
 html[data-asgard-god="loki"] body.arena-home.asgard-active .arena-rays {
-  opacity: 0.4;
+  opacity: 0.55;
+  background:
+    conic-gradient(from 210deg at 70% 20%, transparent 0deg, rgba(47, 138, 106, 0.14) 28deg, transparent 62deg),
+    conic-gradient(from 50deg at 24% 30%, transparent 0deg, rgba(138, 117, 96, 0.14) 24deg, transparent 55deg),
+    radial-gradient(ellipse 70% 45% at 50% 100%, rgba(138, 117, 96, 0.18), transparent 55%);
 }
 
 @media (max-width: 720px) {
