@@ -861,15 +861,16 @@ select option { background: var(--panel-solid); color: var(--text); }
   border: 1px solid var(--color-border-default);
   background: var(--color-bg-panel-strong);
   color: var(--color-text-primary);
-  font-weight: 600; font-size: 13px; padding: 11px 16px; border-radius: var(--radius-pill);
+  font-weight: 650; font-size: 12px; padding: 11px 16px; border-radius: var(--radius-xs);
   cursor: pointer; box-shadow: var(--shadow-md);
-  transition: transform var(--duration-fast) var(--ease-premium), border-color var(--duration-fast), background var(--duration-fast);
+  letter-spacing: 0.02em;
+  transition: transform var(--duration-fast) var(--ease-premium), border-color var(--duration-fast), background var(--duration-fast), box-shadow var(--duration-medium);
 }
 .chat-fab:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   border-color: var(--color-border-strong);
   background: var(--color-bg-panel);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), var(--glow-ice);
 }
 .chat-fab.chat-fab-gold {
   background: var(--color-bg-panel-strong);

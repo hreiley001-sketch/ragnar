@@ -55,8 +55,8 @@ body.vault-page {
 .vault-brand {
   display: inline-flex;
   align-items: baseline;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 22px;
   animation: vaultRise 0.7s var(--ease-premium) both;
 }
 .vault-brand-mark {
@@ -304,6 +304,7 @@ body.vault-page {
 /* Catalog layout breathing room */
 .vault-page .layout {
   padding-top: 28px;
+  padding-bottom: 88px; /* clear floating Counsel / Advisor fabs */
   gap: 28px;
 }
 .vault-page .filters {

@@ -492,31 +492,32 @@ body.counsel-page .counsel-brand-name {
   left: 18px; right: auto; bottom: 18px;
   gap: 10px;
   padding: 11px 16px 11px 12px;
-  border-radius: 0;
-  border: 1px solid rgba(46, 200, 255, 0.4);
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(46, 200, 255, 0.45);
   background:
-    linear-gradient(135deg, rgba(46, 200, 255,0.14), transparent 50%),
-    rgba(10, 13, 16, 0.94);
+    linear-gradient(135deg, rgba(46, 200, 255,0.16), transparent 50%),
+    rgba(8, 14, 26, 0.94);
   color: var(--text);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 24px rgba(46, 200, 255, 0.12);
   font-weight: 700;
   letter-spacing: 0.01em;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
 }
 .chat-fab.chat-fab-support:hover {
   transform: translateY(-2px);
-  border-color: rgba(46, 200, 255, 0.7);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(46, 200, 255, 0.75);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 36px rgba(46, 200, 255, 0.22);
 }
 .chat-fab-support .fab-crest {
   width: 28px; height: 28px;
   display: grid; place-items: center;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  background: rgba(46, 200, 255, 0.18);
-  border: 1px solid rgba(46, 200, 255, 0.4);
+  background: rgba(46, 200, 255, 0.2);
+  border: 1px solid rgba(46, 200, 255, 0.5);
   font-family: var(--counsel-mono);
   font-size: 11px;
   color: var(--counsel-ice);
+  box-shadow: 0 0 12px rgba(46, 200, 255, 0.25);
 }
 .chat-fab-support .fab-copy {
   display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15;
