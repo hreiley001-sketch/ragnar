@@ -1008,7 +1008,7 @@ body:not(.arena-home):not(.premium-room) > div:not(.aurora):not(.nav-scrim):not(
   box-shadow: var(--shadow-focus);
 }
 .mkt-search .btn { border-radius: var(--radius-sm); }
-.trust-bar { padding-block: 14px; border-block: 1px solid var(--border); background: rgba(8,10,12,.5); }
+.trust-bar { padding-block: 14px; border-block: 1px solid var(--border); background: rgba(42, 40, 38, 0.04); }
 
 .hero-strip {
   position: relative; overflow: hidden; margin: 30px 0 26px; padding: clamp(32px,5vw,62px);
