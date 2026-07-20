@@ -27,7 +27,7 @@ body.premium-room {
 .room-atmosphere {
   background:
     radial-gradient(circle at 30% 18%, rgba(169,213,226,.08), transparent 30%),
-    radial-gradient(circle at 85% 68%, rgba(201,170,109,.04), transparent 30%),
+    radial-gradient(circle at 85% 68%, rgba(168,188,203,.04), transparent 30%),
     var(--color-surface-deep);
 }
 .room-beams {
@@ -89,7 +89,7 @@ body.premium-room {
 
 .room-winner {
   margin-bottom: 14px; padding: 20px; text-align: center;
-  border: 1px solid rgba(201,170,109,.32); background: rgba(201,170,109,.06);
+  border: 1px solid rgba(168,188,203,.32); background: rgba(168,188,203,.06);
   color: var(--room-gold); font-size: 20px; font-weight: 800;
 }
 .room-grid { display: grid; grid-template-columns: minmax(0,1fr) 370px; gap: 14px; align-items: start; }
@@ -210,7 +210,7 @@ body.premium-room {
 .giveaway-meta { display: block; color: var(--room-muted); font-size: 11px; }
 .giveaway-winner {
   margin-top: 12px; padding: 12px; color: var(--room-gold);
-  border: 1px solid rgba(201,170,109,.28);
+  border: 1px solid rgba(168,188,203,.28);
 }
 
 .room-feed-panel {

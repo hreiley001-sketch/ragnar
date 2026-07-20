@@ -56,8 +56,8 @@
   function midNavHtml() {
     if (document.body.classList.contains("arena-home")) {
       return `
-        <a href="#live">Live now</a>
-        <a href="#categories">Categories</a>
+        <a href="#live">Live</a>
+        <a href="#breakers">Breakers</a>
         <a href="#difference">Why RAGNAR</a>
         <a href="/marketplace">Marketplace</a>`;
     }
@@ -196,7 +196,7 @@
     const l = document.createElement("link");
     l.id = "ragnar-fonts";
     l.rel = "stylesheet";
-    l.href = "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap";
+    l.href = "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@500;600;700;800&display=swap";
     document.head.appendChild(l);
   })();
   function shade(hex, amt) {
@@ -447,10 +447,9 @@
   // cards by vibe (plain language, not exact keywords) and can restyle the
   // visitor's OWN view — local-only, never the real site or anyone else. ----
   const VIBES = [
-    [["ice", "frost", "arctic", "cool", "cold", "steel", "platinum"], "#9ec4d1"],
-    [["gold", "lux", "premium", "elite", "luxury", "grail", "champagne"], "#c4a86a"],
-    [["ember", "warm accent", "copper", "forge"], "#d4a574"],
-    [["live", "signal", "alert", "hot"], "#e85a5f"],
+    [["ice", "frost", "arctic", "cool", "cold", "steel", "platinum", "glacier", "crystal"], "#4eb6e8"],
+    [["gold", "lux", "premium", "elite", "luxury", "grail", "titanium", "silver"], "#a8bccb"],
+    [["live", "signal", "alert", "hot"], "#5ec8ef"],
     [["mint", "success", "emerald"], "#6ec9a8"],
   ];
   const PERSONAL_RE = /\b(my view|make it|make my|theme|background|colou?r|font|dark mode|light mode|high contrast|restyle|recolou?r|bigger text|darker|lighter|brighter)\b/i;
@@ -474,8 +473,8 @@
       const low = text.toLowerCase();
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
-      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#07090c";
-      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#12171d";
+      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#151c26";
+      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#2a3546";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);
       if (fm) theme.theme_font = fm[1].trim();
       if (/reset|default|normal|undo/.test(low)) {
@@ -602,7 +601,7 @@
 
     w.onFirstOpen(() => {
       w.msg("Studio previews locally, then publishes in one tap — colors, announcement, landing copy. Big swings welcome.");
-      w.chips(["Ice + champagne, quieter luxury", "Announce Friday live drop", "Bolder headline on beating eBay fees", "Midnight charcoal background"]);
+      w.chips(["Icy blue + titanium silver", "Announce Friday live drop", "Sellers keep 95% headline", "Obsidian ice vault background"]);
     });
   }
 

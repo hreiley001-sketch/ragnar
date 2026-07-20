@@ -23,7 +23,7 @@ SITE_FIELDS: list[dict] = [
         "type": "text",
         "group": "Global",
         "default": "",
-        "help": "Shown as a gold banner on every page. Leave blank to hide it.",
+        "help": "Shown as a frost banner on every page. Leave blank to hide it.",
     },
     {
         "key": "announcement_link",
@@ -38,7 +38,7 @@ SITE_FIELDS: list[dict] = [
         "label": "Landing headline",
         "type": "text",
         "group": "Landing page",
-        "default": "Be one of the 250 Founding Sellers.",
+        "default": "The future of sports card breaking.",
         "help": "Big headline on the front door.",
     },
     {
@@ -46,9 +46,8 @@ SITE_FIELDS: list[dict] = [
         "label": "Landing subtitle",
         "type": "textarea",
         "group": "Landing page",
-        "default": "RAGNAR is a trust-first marketplace for trading cards — built so "
-                   "sellers keep more and buyers stop getting burned. The first 250 "
-                   "sellers lock in founding status forever.",
+        "default": "Enter the most exclusive trading-card marketplace in the world. "
+                   "Sellers keep 95%. One flat 5% fee. Precision commerce, carved from ice.",
         "help": "Supporting sentence under the headline.",
     },
     {
@@ -73,10 +72,10 @@ SITE_FIELDS: list[dict] = [
         "default": "henry@ragnarips.com",
     },
     # --- Homepage perk cards (the four boxes under the hero) ---
-    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "Fees for 90 days"},
-    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "Pay only payment processing during your intro window — keep the rest."},
-    {"key": "perk2_title", "label": "Perk 2 title", "type": "text", "group": "Homepage perks", "default": "Permanent founding rate"},
-    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "A lower rate than everyone else, locked in for good — our thank-you for being early."},
+    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "Sellers keep 95%"},
+    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "A simple flat 5% seller fee. Premium. Easy to understand."},
+    {"key": "perk2_title", "label": "Perk 2 title", "type": "text", "group": "Homepage perks", "default": "5% flat seller fee"},
+    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "One transparent rate. No category maze. No surprise tiers."},
     {"key": "perk3_title", "label": "Perk 3 title", "type": "text", "group": "Homepage perks", "default": "Founding badge"},
     {"key": "perk3_desc", "label": "Perk 3 detail", "type": "text", "group": "Homepage perks", "default": "A permanent Founding Seller badge on your storefront. Status that never expires."},
     {"key": "perk4_title", "label": "Perk 4 title", "type": "text", "group": "Homepage perks", "default": "Your own store"},
@@ -87,29 +86,29 @@ SITE_FIELDS: list[dict] = [
         "label": "Accent color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#e8a045",
-        "help": "Primary highlight — buttons, links, prices. Default forge copper: #e8a045.",
+        "default": "#4eb6e8",
+        "help": "Primary highlight — buttons, links, prices. Default icy blue from the RAGNAR logo: #4eb6e8.",
     },
     {
         "key": "theme_gold",
-        "label": "Gold / badge color",
+        "label": "Titanium / badge color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#f5c06a",
+        "default": "#a8bccb",
     },
     {
         "key": "theme_bg",
         "label": "Background",
         "type": "color",
         "group": "Look & feel",
-        "default": "#0b0907",
+        "default": "#151c26",
     },
     {
         "key": "theme_text",
         "label": "Text color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#f5f0e6",
+        "default": "#f2f7fc",
     },
     {
         "key": "theme_font",
