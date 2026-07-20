@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/pages.css" />
   <link rel="stylesheet" href="/static/marketplace.css" />
+  <link rel="stylesheet" href="/static/ai-sites.css" />
 </head>
 <body class="page-marketplace vault-page">
   <div class="vault-atmosphere" aria-hidden="true"></div>
@@ -42,8 +43,25 @@
     <div class="vault-search mkt-search" role="search">
       <span class="vault-search-ico" aria-hidden="true"></span>
       <input id="heroSearch" type="search" placeholder="Charizard, Wembanyama, Black Lotus…" aria-label="Search cards" />
-      <button id="heroAiBtn" class="btn btn-ghost" type="button" title="Ask in plain English">Ask AI</button>
+      <button id="heroAiBtn" class="btn btn-ghost" type="button" title="Parse in plain English">Vault Advisor</button>
       <button id="heroSearchBtn" class="btn btn-primary" type="button">Search</button>
+    </div>
+    <div class="vault-prompt-row" id="vaultPrompts" aria-label="Example hunts">
+      <button type="button" class="vault-prompt" data-q="PSA 10 Charizard under $5000">PSA 10 Charizard ≤ $5k</button>
+      <button type="button" class="vault-prompt" data-q="graded basketball rookies under $50">Graded rookies under $50</button>
+      <button type="button" class="vault-prompt" data-q="Black Lotus MTG">Black Lotus</button>
+      <button type="button" class="vault-prompt" data-q="Wembanyama silver prizm">Wemby silver</button>
+    </div>
+    <div id="vaultAdvisor" class="vault-advisor" hidden>
+      <div class="vault-advisor-head">
+        <span class="vault-advisor-kicker">Vault Advisor</span>
+        <span class="vault-advisor-source" id="vaultAdvisorSource"></span>
+      </div>
+      <div class="vault-advisor-chips" id="vaultAdvisorChips"></div>
+      <div class="vault-advisor-actions">
+        <button type="button" class="btn btn-primary btn-sm" id="vaultAdvisorApply">Apply filters</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="vaultAdvisorDismiss">Dismiss</button>
+      </div>
     </div>
     <!-- Populated by app.js; visually suppressed in the first composition -->
     <div class="hero-stats" id="heroStats" hidden></div>
@@ -75,7 +93,7 @@
       <label class="field"><span>Search</span>
         <input id="f-q" type="search" placeholder="Charizard, Wembanyama, Black Lotus…" />
       </label>
-      <button id="aiSearchBtn" class="btn btn-ghost btn-sm w-full mb-12" type="button" title="Ask in plain English">AI search</button>
+      <button id="aiSearchBtn" class="btn btn-ghost btn-sm w-full mb-12" type="button" title="Parse in plain English">Vault Advisor</button>
       <label class="field"><span>Category</span>
         <select id="f-category"><option value="">All categories</option></select>
       </label>

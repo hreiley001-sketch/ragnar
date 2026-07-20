@@ -364,9 +364,17 @@
   // ---- Shared chat-widget factory: builds a FAB + slide-up panel with a
   // feed/chips/input, used by Concierge, Studio, and (via window.__ragnarChat)
   // the seller-facing Store Designer. One visual language, one place to tweak it. ----
+  (function loadAiSitesCss() {
+    if (document.getElementById("aiSitesCss")) return;
+    const l = document.createElement("link");
+    l.id = "aiSitesCss";
+    l.rel = "stylesheet";
+    l.href = "/static/ai-sites.css";
+    document.head.appendChild(l);
+  })();
   const escHtml = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   function createChatWidget(opts) {
-    const { key, icon, label, gold, publish, footNote, headSub, fabHtml, expandHref, headHtml } = opts;
+    const { key, icon, label, gold, publish, footNote, headSub, fabHtml, expandHref, headHtml, badges } = opts;
     const fab = mk("button", "chat-fab" + (gold ? " chat-fab-gold" : ""));
     fab.innerHTML = fabHtml || `${icon} ${label}`;
     fab.id = "fab-" + key;
@@ -374,10 +382,11 @@
 
     const panel = mk("div", "chat-panel");
     panel.id = "panel-" + key;
+    const badgeHtml = (badges || []).map((b) => `<span class="chat-badge ${escHtml(b.cls || "")}">${escHtml(b.label)}</span>`).join("");
     const titleHtml = headHtml || (
       headSub
-        ? `<span>${escHtml(label)}</span><span class="sub">${escHtml(headSub)}</span>`
-        : `${icon ? escHtml(icon) + " " : ""}${escHtml(label)}`
+        ? `<span>${escHtml(label)}</span><span class="sub">${escHtml(headSub)}</span>${badgeHtml ? `<div class="chat-head-badges">${badgeHtml}</div>` : ""}`
+        : `<span>${escHtml(label)}</span>${badgeHtml ? `<div class="chat-head-badges">${badgeHtml}</div>` : ""}`
     );
     panel.innerHTML = `
       <div class="chat-head">
@@ -393,7 +402,7 @@
       ${expandHref ? `<a class="chat-expand" href="${escHtml(expandHref)}">Open full Counsel →</a>` : ""}
       ${publish ? `<div class="chat-foot">
         <div class="chat-publish-row">
-          <button class="btn btn-ghost btn-sm chat-revert" type="button">Revert</button>
+          <button class="btn btn-ghost btn-sm chat-revert" type="button">Revert preview</button>
           <button class="btn btn-primary btn-sm chat-publish-btn" disabled type="button">Publish live</button>
         </div>
         <div class="chat-status"></div>
@@ -449,14 +458,11 @@
   // cards by vibe (plain language, not exact keywords) and can restyle the
   // visitor's OWN view — local-only, never the real site or anyone else. ----
   const VIBES = [
-    [["forge", "copper", "bronze", "molten", "conquest", "ember gold"], "#e8a045"],
-    [["gold", "lux", "premium", "elite", "luxury", "grail", "royal", "regal"], "#f0c674"],
-    [["ice", "frost", "blue", "arctic", "cool", "cold", "steel"], "#a9d5e2"],
-    [["fire", "red", "ember", "hot", "bold", "aggressive", "crimson", "blood"], "#ff6b5e"],
-    [["green", "mint", "emerald", "money", "forest"], "#6fe3b0"],
-    [["purple", "cosmic", "galaxy", "mystic", "magic", "violet"], "#b18cff"],
-    [["pink", "cute", "pastel", "soft", "kawaii"], "#ff9ecb"],
-    [["vintage", "retro", "classic", "warm", "cozy", "amber", "sepia"], "#e0a45e"],
+    [["ice", "frost", "arctic", "cool", "cold", "steel", "platinum"], "#9ec4d1"],
+    [["gold", "lux", "premium", "elite", "luxury", "grail", "champagne"], "#c4a86a"],
+    [["ember", "warm accent", "copper", "forge"], "#d4a574"],
+    [["live", "signal", "alert", "hot"], "#e85a5f"],
+    [["mint", "success", "emerald"], "#6ec9a8"],
   ];
   const PERSONAL_RE = /\b(my view|make it|make my|theme|background|colou?r|font|dark mode|light mode|high contrast|restyle|recolou?r|bigger text|darker|lighter|brighter)\b/i;
 
@@ -464,26 +470,35 @@
   function initConcierge() {
     if (conciergeBuilt) return;
     conciergeBuilt = true;
-    const w = createChatWidget({ key: "concierge", icon: "R", label: "Ask RAGNAR", footNote: "What are you hunting for?" });
+    const w = createChatWidget({
+      key: "concierge",
+      icon: "R",
+      label: "Vault Advisor",
+      headSub: "Hunt in plain English",
+      footNote: "What are you hunting for?",
+      badges: [{ label: "Local", cls: "" }],
+      fabHtml: `<span class="fab-crest">R</span><span class="fab-copy"><b>Advisor</b><small>Vault</small></span>`,
+    });
+    w.fab.classList.add("chat-fab-advisor");
 
     function personalize(text) {
       const low = text.toLowerCase();
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
-      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#0b0907";
-      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#1b1713";
+      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#07090c";
+      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#12171d";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);
       if (fm) theme.theme_font = fm[1].trim();
       if (/reset|default|normal|undo/.test(low)) {
         localStorage.removeItem("ragnar_personal_theme");
         window.__ragnarApplySite(window.__ragnarSite || {});
-        return "Reset — you're back to RAGNAR's normal look.";
+        return "Reset — back to RAGNAR's live look.";
       }
       if (!Object.keys(theme).length) return null;
       const merged = Object.assign(JSON.parse(localStorage.getItem("ragnar_personal_theme") || "{}"), theme);
       localStorage.setItem("ragnar_personal_theme", JSON.stringify(merged));
       applyTheme(merged);
-      return "Done — I restyled your view (just for you). Say “reset my view” to undo.";
+      return "Done — your view only. Say “reset my view” to undo.";
     }
 
     w.onSend(async () => {
@@ -495,22 +510,22 @@
         const r = personalize(text);
         if (r) { w.msg(r); return; }
       }
-      const thinking = w.msg("Searching…");
+      const thinking = w.msg("Reading your hunt…");
       try {
         const r = await fetch(`/api/ai/search?q=${encodeURIComponent(text)}`).then((x) => x.json());
         thinking.remove();
         const f = r.filters || {};
         const p = new URLSearchParams();
         Object.entries(f).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== "") p.set(k, v); });
-        const bits = [f.q, f.grading_company, f.category].filter(Boolean).join(" ");
-        w.msg(`Hunting for ${escHtml(bits || text)} — taking you to the results…`);
-        setTimeout(() => { location.href = "/marketplace?" + p.toString(); }, 700);
+        const bits = [f.q, f.grading_company, f.category, f.max_price != null ? `≤ $${f.max_price}` : null].filter(Boolean).join(" · ");
+        w.msg(`Parsed as <strong>${escHtml(bits || text)}</strong> — opening Vault results.`);
+        setTimeout(() => { location.href = "/marketplace?" + p.toString(); }, 650);
       } catch (e) { thinking.remove(); w.msg("Couldn't search just now — try again."); }
     });
 
     w.onFirstOpen(() => {
-      w.msg("Hey! Tell me what you're after — a card, a player, a vibe — and I'll find it. I can also restyle your view just for you. 🐺");
-      w.chips(["Vintage Charizard grails", "Cheap graded rookies under $50", "A gift for a Lakers fan", "Make my view dark & cozy"]);
+      w.msg("Tell me the card, player, or vibe — I'll parse it into Vault filters. I can also restyle your view locally.");
+      w.chips(["PSA 10 Charizard under $5k", "Graded rookies under $50", "Wembanyama silver", "Make my view ice & minimal"]);
     });
   }
 
@@ -521,20 +536,47 @@
     if (studioBuilt) return;
     studioBuilt = true;
     const pending = {};   // accumulated updates not yet published
-    const w = createChatWidget({ key: "studio", icon: "//", label: "Studio", gold: true, publish: true, footNote: "Tell me how to sculpt the site…" });
+    const w = createChatWidget({
+      key: "studio",
+      icon: "//",
+      label: "Studio",
+      headSub: "Preview console",
+      gold: true,
+      publish: true,
+      footNote: "Sculpt look + copy…",
+      badges: [
+        { label: "Preview", cls: "preview" },
+        { label: "Staff", cls: "live" },
+      ],
+      fabHtml: `<span class="fab-crest">//</span><span class="fab-copy"><b>Studio</b><small>Site</small></span>`,
+    });
 
     const setPublish = () => {
       const n = Object.keys(pending).length;
       w.publishBtn.disabled = n === 0;
       w.publishBtn.textContent = n === 0 ? "Publish live" : `Publish ${n} change${n === 1 ? "" : "s"}`;
+      const previewBadge = w.panel.querySelector(".chat-badge.preview");
+      if (previewBadge) previewBadge.textContent = n ? `Preview · ${n}` : "Preview";
     };
+
+    function diffHtml(updates) {
+      const keys = Object.keys(updates || {});
+      if (!keys.length) return "";
+      const rows = keys.slice(0, 8).map((k) => {
+        const val = String(updates[k] == null ? "" : updates[k]);
+        const short = val.length > 48 ? val.slice(0, 48) + "…" : val;
+        return `<div class="chat-diff-row"><span>${escHtml(k)}</span><strong>${escHtml(short || "—")}</strong></div>`;
+      }).join("");
+      const more = keys.length > 8 ? `<div class="chat-diff-row"><span>+${keys.length - 8} more</span><strong></strong></div>` : "";
+      return `<div class="chat-note">Not live yet — preview only</div><div class="chat-diff">${rows}${more}</div>`;
+    }
 
     w.onSend(async () => {
       const text = w.input.value.trim();
       if (!text) return;
       w.input.value = "";
       w.msg(escHtml(text), "me");
-      const thinking = w.msg("…");
+      const thinking = w.msg("Drafting preview…");
       try {
         const r = await fetch("/api/admin/studio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text }) }).then((x) => x.json());
         thinking.remove();
@@ -543,7 +585,7 @@
         if (keys.length) {
           Object.assign(pending, r.updates);
           window.__ragnarApplySite(Object.assign({}, window.__ragnarSite, pending));
-          w.msg(`<span class="chat-note">Previewing: ${keys.map(escHtml).join(", ")} — Publish to make it live.</span>`);
+          w.msg(diffHtml(pending));
           setPublish();
         }
         w.chips(r.ideas);
@@ -556,21 +598,22 @@
       try {
         const r = await fetch("/api/admin/site-config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ updates: pending }) }).then((x) => x.json());
         window.__ragnarSite = r.config || window.__ragnarSite;
+        const n = Object.keys(pending).length;
         for (const k in pending) delete pending[k];
         setPublish();
-        w.statusEl.textContent = `Published live ✓ (by ${r.by || "you"})`;
-        w.msg("Published — it's live on the site now. ✨");
+        w.statusEl.textContent = `Published live · ${r.by || "you"}`;
+        w.msg(`<span class="chat-note">Live on ragnarips.com — ${n} field${n === 1 ? "" : "s"} published</span>`);
       } catch (e) { w.statusEl.textContent = "Publish failed — check your access."; }
     });
     w.revertBtn.addEventListener("click", () => {
       for (const k in pending) delete pending[k];
       window.__ragnarApplySite(window.__ragnarSite);
-      setPublish(); w.statusEl.textContent = "Reverted to the live version.";
+      setPublish(); w.statusEl.textContent = "Reverted to live site.";
     });
 
     w.onFirstOpen(() => {
-      w.msg("Hey — I'm your Studio assistant. Tell me the vibe and I'll sculpt the whole site: colors, font, announcement, landing copy. Big swings welcome. 🐺");
-      w.chips(["Midnight forge: black + ember gold", "Icy, premium, minimal", "Announce our Friday live drop", "Bolder headline about beating eBay fees"]);
+      w.msg("Studio previews locally, then publishes in one tap — colors, announcement, landing copy. Big swings welcome.");
+      w.chips(["Ice + champagne, quieter luxury", "Announce Friday live drop", "Bolder headline on beating eBay fees", "Midnight charcoal background"]);
     });
   }
 

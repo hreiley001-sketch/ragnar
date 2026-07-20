@@ -1,0 +1,408 @@
+/* RAGNAR Intelligence chrome — Studio, Concierge, Vault Advisor, Hub AI.
+   Quiet luxury: charcoal glass, ice active, champagne for publish only. */
+
+/* Advisor FAB — right side, mirrors Counsel crest language */
+.chat-fab.chat-fab-advisor,
+.chat-fab#fab-studio {
+  gap: 10px;
+  padding: 11px 16px 11px 12px;
+  border-radius: 0;
+  font-weight: 700;
+}
+.chat-fab.chat-fab-advisor .fab-crest,
+.chat-fab#fab-studio .fab-crest {
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: color-mix(in srgb, var(--color-accent-primary) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-primary) 40%, transparent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-accent-primary);
+}
+.chat-fab#fab-studio .fab-crest {
+  background: color-mix(in srgb, var(--color-accent-secondary) 16%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent-secondary) 40%, transparent);
+  color: var(--color-accent-secondary);
+}
+.chat-fab.chat-fab-advisor .fab-copy,
+.chat-fab#fab-studio .fab-copy {
+  display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15;
+}
+.chat-fab.chat-fab-advisor .fab-copy b,
+.chat-fab#fab-studio .fab-copy b { font-size: 13px; }
+.chat-fab.chat-fab-advisor .fab-copy small,
+.chat-fab#fab-studio .fab-copy small {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* ——— Shared chat: Preview Console language ——— */
+.chat-fab {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+}
+.chat-fab#fab-concierge {
+  border-color: color-mix(in srgb, var(--color-accent-primary) 28%, transparent);
+}
+.chat-fab#fab-studio {
+  border-color: color-mix(in srgb, var(--color-accent-secondary) 40%, transparent);
+}
+.chat-panel {
+  border-radius: 0;
+  border-color: color-mix(in srgb, var(--color-accent-primary) 22%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-accent-primary) 6%, transparent), transparent 28%),
+    var(--color-bg-panel);
+  box-shadow: var(--shadow-lg), var(--glow-ice);
+}
+.chat-head {
+  padding: 14px 14px 12px;
+  border-bottom-color: var(--color-border-default);
+  background: color-mix(in srgb, var(--color-bg-base) 55%, transparent);
+}
+.chat-head-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: "Syne", var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.chat-head-title .sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent-primary);
+}
+.chat-head-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.chat-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-muted);
+}
+.chat-badge.live {
+  color: var(--color-success);
+  border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
+}
+.chat-badge.preview {
+  color: var(--color-accent-secondary);
+  border-color: color-mix(in srgb, var(--color-accent-secondary) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent-secondary) 8%, transparent);
+}
+.chat-msg {
+  border-radius: 2px 10px 10px 10px;
+  background: var(--color-bg-elevated);
+}
+.chat-msg.me {
+  border-radius: 10px 10px 2px 10px;
+}
+.chat-msg .chat-note {
+  display: block;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--color-accent-secondary) 35%, transparent);
+  background: color-mix(in srgb, var(--color-accent-secondary) 8%, transparent);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+.chat-msg .chat-diff {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+.chat-msg .chat-diff-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+.chat-msg .chat-diff-row strong {
+  color: var(--color-accent-primary);
+  font-weight: 700;
+}
+.chat-chip {
+  border-radius: 0;
+  background: color-mix(in srgb, var(--color-accent-primary) 7%, transparent);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+.chat-chip:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-text-primary);
+}
+.chat-input-row input {
+  border-radius: 0;
+  background: var(--color-bg-input);
+}
+.chat-send {
+  border-radius: 0;
+  letter-spacing: 0.06em;
+}
+.chat-foot {
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: 10px;
+  background: color-mix(in srgb, var(--color-bg-base) 40%, transparent);
+}
+.chat-publish-row .btn {
+  border-radius: 0;
+}
+.chat-status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Studio panel accent */
+#panel-studio .chat-head-title .sub { color: var(--color-accent-secondary); }
+#panel-studio {
+  border-color: color-mix(in srgb, var(--color-accent-secondary) 28%, transparent);
+}
+
+/* ——— Vault Advisor ——— */
+.vault-advisor {
+  width: min(640px, 100%);
+  margin: 14px auto 0;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--color-accent-primary) 28%, transparent);
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--color-accent-primary) 10%, transparent), transparent 55%),
+    var(--color-bg-glass);
+  box-shadow: var(--shadow-sm);
+  animation: vaultAdvisorIn 0.35s var(--ease-premium) both;
+}
+.vault-advisor[hidden] { display: none !important; }
+@keyframes vaultAdvisorIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.vault-advisor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.vault-advisor-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent-primary);
+}
+.vault-advisor-source {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+.vault-advisor-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.vault-advisor-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border: 1px solid var(--color-border-default);
+  background: rgba(255, 255, 255, 0.03);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+.vault-advisor-chip b {
+  color: var(--color-text-muted);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 9px;
+}
+.vault-advisor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.vault-advisor.loading .vault-advisor-chips::after {
+  content: "Reading your hunt…";
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  animation: vaultPulse 1.2s ease-in-out infinite;
+}
+@keyframes vaultPulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+.vault-prompt-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  animation: vaultAdvisorIn 0.55s var(--ease-premium) 0.15s both;
+}
+.vault-prompt {
+  appearance: none;
+  border: 1px solid var(--color-border-subtle);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: border-color var(--duration-fast), color var(--duration-fast), background var(--duration-fast);
+}
+.vault-prompt:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-accent-primary) 8%, transparent);
+}
+
+/* ——— Intelligence Console (Command Hub AI tab) ——— */
+.intel-console {
+  display: grid;
+  gap: 16px;
+}
+.intel-brief {
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid var(--color-border-default);
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--color-accent-primary) 12%, transparent), transparent 50%),
+    var(--color-bg-glass);
+}
+.intel-brief-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent-primary);
+  margin-bottom: 8px;
+}
+.intel-brief h2 {
+  margin: 0 0 8px;
+  font-family: "Syne", var(--font-display);
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+.intel-brief h2 em {
+  font-style: normal;
+  color: var(--color-accent-primary);
+}
+.intel-brief p {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+body.page-admin .ai-panel {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+}
+body.page-admin .ai-box {
+  position: relative;
+  padding: 18px 16px;
+  border-radius: 0;
+  overflow: hidden;
+}
+body.page-admin .ai-box::before {
+  content: attr(data-code);
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: color-mix(in srgb, var(--color-accent-primary) 55%, transparent);
+}
+body.page-admin .ai-box h3 {
+  font-family: "Syne", var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: none;
+  color: var(--color-text-primary);
+}
+body.page-admin .ai-out {
+  border-radius: 0;
+  min-height: 72px;
+}
+.intel-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.intel-filter {
+  padding: 5px 8px;
+  border: 1px solid var(--color-border-default);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.025);
+}
+.intel-filter b {
+  color: var(--color-accent-primary);
+  font-weight: 700;
+  margin-right: 4px;
+}
+.intel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.intel-copy {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+}
+.intel-meta {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 760px) {
+  body.page-admin .ai-panel { grid-template-columns: 1fr; }
+  .vault-prompt-row { justify-content: flex-start; }
+}

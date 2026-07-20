@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/static/support.css" />
   <link rel="stylesheet" href="/static/pages.css" />
   <link rel="stylesheet" href="/static/admin.css" />
+  <link rel="stylesheet" href="/static/ai-sites.css" />
 </head>
 <body class="page-admin">
   <div class="cmd-atmosphere" aria-hidden="true"></div>
@@ -52,7 +53,7 @@
           <div class="cmd-nav-label">Overview</div>
           <div class="tabs" role="tablist" aria-label="Overview">
             <button class="tab active" data-tab="dashboard" type="button" role="tab" aria-selected="true"><span class="tab-ico">01</span> Dashboard</button>
-            <button class="tab" data-tab="ai" type="button" role="tab"><span class="tab-ico">AI</span> Tools</button>
+            <button class="tab" data-tab="ai" type="button" role="tab"><span class="tab-ico">AI</span> Intelligence</button>
           </div>
         </div>
         <div class="cmd-nav-group">
@@ -238,7 +239,7 @@
       </div>
       <div class="card card-pad-14 mb-14">
         <div class="panel-bar panel-head-compact"><h3>Chat-driven editing</h3></div>
-        <p class="studio-hint">Use the <a href="#" id="openStudioLink">✨ Studio</a> chat button in the bottom-right corner of any page to sculpt the site's look and copy by chat — it previews live and publishes with one tap. The fields below are for precise manual edits.</p>
+        <p class="studio-hint">Open <a href="#" id="openStudioLink">Studio</a> — the preview console in the corner. It drafts look + copy locally, then publishes live in one tap. Fields below are for precise manual edits.</p>
       </div>
       <form id="siteForm">
         <div id="siteFields"><p class="muted">Loading…</p></div>
@@ -276,21 +277,28 @@
     </section>
 
     <section id="tab-ai" class="tab-panel" hidden>
-      <div class="ai-panel">
-        <div class="card ai-box">
-          <h3 class="no-top">Natural-language search</h3>
-          <p class="muted">e.g. "PSA 10 Charizards under $5k" — see the filters the AI extracts.</p>
-          <input id="nlQuery" type="text" placeholder="Ask in plain English…" />
-          <button id="nlBtn" class="btn btn-primary btn-sm mt-8" type="button">Parse → search</button>
-          <div id="nlOut" class="ai-out"></div>
+      <div class="intel-console">
+        <div class="intel-brief">
+          <div class="intel-brief-kicker">Intelligence console</div>
+          <h2>Parse hunts. <em>Draft copy.</em></h2>
+          <p>Staff tools for Vault search interpretation and listing language — same models that power Advisor and scan-to-list.</p>
         </div>
-        <div class="card ai-box">
-          <h3 class="no-top">AI description generator</h3>
-          <p class="muted">Generate a listing description from card details.</p>
-          <input id="descTitle" type="text" placeholder="Title (e.g. Charizard Base Set)" />
-          <input id="descExtra" class="mt-8" type="text" placeholder="Set / grade / details" />
-          <button id="descBtn" class="btn btn-primary btn-sm mt-8" type="button">Generate</button>
-          <div id="descOut" class="ai-out"></div>
+        <div class="ai-panel">
+          <div class="card ai-box" data-code="VQ">
+            <h3 class="no-top">Vault query parser</h3>
+            <p class="muted">Plain English → structured filters. Open results in the Vault.</p>
+            <input id="nlQuery" type="text" placeholder="PSA 10 Charizards under $5k" />
+            <button id="nlBtn" class="btn btn-primary btn-sm mt-8" type="button">Parse hunt</button>
+            <div id="nlOut" class="ai-out"></div>
+          </div>
+          <div class="card ai-box" data-code="LD">
+            <h3 class="no-top">Listing copy draft</h3>
+            <p class="muted">Generate collector-grade listing description from card details.</p>
+            <input id="descTitle" type="text" placeholder="Title (e.g. Charizard Base Set)" />
+            <input id="descExtra" class="mt-8" type="text" placeholder="Set / grade / details" />
+            <button id="descBtn" class="btn btn-primary btn-sm mt-8" type="button">Draft description</button>
+            <div id="descOut" class="ai-out"></div>
+          </div>
         </div>
       </div>
     </section>
