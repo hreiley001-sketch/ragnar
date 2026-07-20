@@ -62,6 +62,11 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
 }
 
 
+def _quote_ident(name: str) -> str:
+    """Quote a SQL identifier so reserved words like ``order`` / ``user`` work."""
+    return '"' + name.replace('"', '""') + '"'
+
+
 def _sqlite_add_missing_columns() -> None:
     if not settings.database_url.startswith("sqlite"):
         return
@@ -76,7 +81,11 @@ def _sqlite_add_missing_columns() -> None:
             existing = {c["name"] for c in inspector.get_columns(table)}
             for col, ddl in columns.items():
                 if col not in existing:
-                    conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}"))
+                    # Quote table name — SQLite rejects bare reserved words
+                    # (e.g. ALTER TABLE order … → syntax error near "order").
+                    conn.execute(
+                        text(f"ALTER TABLE {_quote_ident(table)} ADD COLUMN {_quote_ident(col)} {ddl}")
+                    )
 
 
 def init_db() -> None:
