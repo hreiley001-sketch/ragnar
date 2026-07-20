@@ -1,19 +1,19 @@
 /* RAGNAR Counsel — support UX.
-   Conquest forge chamber on shared tokens. */
+   Arctic vault chamber on shared tokens. */
 :root {
   --counsel-display: var(--font-display);
   --counsel-body: var(--font-body);
   --counsel-mono: var(--font-mono);
-  --counsel-ink: var(--color-bg-base, #07090c);
-  --counsel-panel: var(--color-bg-glass, rgba(12, 15, 19, 0.86));
-  --counsel-line: var(--color-border-subtle, rgba(230, 238, 244, 0.08));
-  --counsel-ice: var(--color-accent-primary, #9ec4d1);
-  --counsel-ice-dim: var(--color-hover-surface, rgba(169, 213, 226, 0.07));
-  --counsel-steel: var(--color-text-muted, #93a0ab);
-  --counsel-gold: var(--color-accent-secondary, #c4a86a);
-  --counsel-ok: var(--color-success, #7ecf9a);
-  --counsel-warn: var(--color-warning, #e8b45a);
-  --counsel-danger: var(--color-error, #ff6b66);
+  --counsel-ink: var(--color-bg-base, #03060b);
+  --counsel-panel: var(--color-bg-glass, rgba(8, 16, 28, 0.72));
+  --counsel-line: var(--color-border-subtle, rgba(184, 228, 247, 0.08));
+  --counsel-ice: var(--color-accent-primary, #4eb6e8);
+  --counsel-ice-dim: var(--color-hover-surface, rgba(78, 182, 232, 0.08));
+  --counsel-steel: var(--color-text-muted, #8396aa);
+  --counsel-gold: var(--color-accent-secondary, #a8bccb);
+  --counsel-ok: var(--color-success, #6ec9a8);
+  --counsel-warn: var(--color-warning, #a8bccb);
+  --counsel-danger: var(--color-error, #e87074);
 }
 
 /* ---------- Full-page counsel chamber ---------- */
@@ -76,7 +76,7 @@ body.counsel-page .counsel-brand-name {
   display: grid; place-items: center;
   border: 1px solid rgba(232, 160, 69, 0.5);
   background:
-    linear-gradient(145deg, rgba(232,160,69,0.2), transparent 55%),
+    linear-gradient(145deg, rgba(78,182,232,0.2), transparent 55%),
     rgba(10, 14, 18, 0.9);
   color: var(--counsel-ice);
   font-family: var(--counsel-mono);
@@ -142,7 +142,7 @@ body.counsel-page .counsel-brand-name {
   color: var(--text);
   border-color: var(--counsel-line);
 }
-.counsel-cta.ghost:hover { border-color: rgba(232,160,69,0.4); background: rgba(232,160,69,0.08); }
+.counsel-cta.ghost:hover { border-color: rgba(78,182,232,0.4); background: rgba(78,182,232,0.08); }
 .counsel-cta .arrow { font-family: var(--counsel-mono); opacity: 0.7; }
 
 /* Workspace — conversation is the interaction, not a card grid */
@@ -163,7 +163,7 @@ body.counsel-page .counsel-brand-name {
   display: flex; flex-direction: column;
   border: 1px solid var(--counsel-line);
   background:
-    linear-gradient(180deg, rgba(232,160,69,0.05), transparent 28%),
+    linear-gradient(180deg, rgba(78,182,232,0.05), transparent 28%),
     var(--counsel-panel);
   backdrop-filter: blur(14px);
   overflow: hidden;
@@ -339,7 +339,7 @@ body.counsel-page .counsel-brand-name {
 }
 .counsel-intent:hover,
 .counsel-intent:focus-visible {
-  border-color: rgba(232,160,69,0.5);
+  border-color: rgba(78,182,232,0.5);
   color: var(--counsel-ice);
   background: var(--counsel-ice-dim);
   outline: none;
@@ -485,7 +485,7 @@ body.counsel-page .counsel-brand-name {
   border-radius: 0;
   border: 1px solid rgba(232, 160, 69, 0.4);
   background:
-    linear-gradient(135deg, rgba(232,160,69,0.14), transparent 50%),
+    linear-gradient(135deg, rgba(78,182,232,0.14), transparent 50%),
     rgba(10, 13, 16, 0.94);
   color: var(--text);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
@@ -528,7 +528,7 @@ body.counsel-page .counsel-brand-name {
   border-radius: 0;
   border: 1px solid rgba(232, 160, 69, 0.28);
   background:
-    linear-gradient(180deg, rgba(232,160,69,0.06), transparent 24%),
+    linear-gradient(180deg, rgba(78,182,232,0.06), transparent 24%),
     rgba(10, 13, 16, 0.97);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(16px);
@@ -569,7 +569,7 @@ body.counsel-page .counsel-brand-name {
   padding: 14px;
   gap: 12px;
   background:
-    radial-gradient(500px 200px at 10% 0%, rgba(232,160,69,0.05), transparent 60%);
+    radial-gradient(500px 200px at 10% 0%, rgba(78,182,232,0.05), transparent 60%);
 }
 .chat-panel-support .chat-msg {
   border-radius: 0;
@@ -595,7 +595,7 @@ body.counsel-page .counsel-brand-name {
   transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
 }
 .chat-panel-support .chat-chip:hover {
-  border-color: rgba(232,160,69,0.5);
+  border-color: rgba(78,182,232,0.5);
   color: var(--counsel-ice);
   background: var(--counsel-ice-dim);
 }
@@ -628,7 +628,7 @@ body.counsel-page .counsel-brand-name {
 }
 .chat-panel-support .chat-expand:hover {
   color: var(--counsel-ice);
-  border-color: rgba(232,160,69,0.4);
+  border-color: rgba(78,182,232,0.4);
   text-decoration: none;
 }
 
@@ -661,7 +661,7 @@ body.counsel-page .counsel-brand-name {
 .support-desk-detail {
   border: 1px solid var(--border);
   background:
-    linear-gradient(180deg, rgba(232,160,69,0.05), transparent 30%),
+    linear-gradient(180deg, rgba(78,182,232,0.05), transparent 30%),
     rgba(12, 15, 18, 0.7);
   padding: 16px;
   min-height: 420px;

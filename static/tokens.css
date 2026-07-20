@@ -1,57 +1,63 @@
-/* RAGNAR design tokens — single source of truth.
-   Quiet charcoal surfaces, near-white type, one ice accent, one champagne gold.
-   Benchmark: Stripe / Linear / Apple / StockX — never neon, never gaming. */
+/* RAGNAR design tokens — sourced from the wolf/raven logo.
+   Arctic luxury: icy blue, glacier, frost white, titanium silver, crystal.
+   Think: ice vault · precision titanium · elite technology — never warm, never RGB. */
 
 :root {
   color-scheme: dark;
 
-  /* ——— Surfaces (charcoal ladder) ——— */
-  --color-bg-base: #07090c;
-  --color-bg-elevated: #0c0f13;
-  --color-bg-panel: #12171d;
-  --color-bg-panel-strong: #181e26;
-  --color-bg-glass: rgba(12, 15, 19, 0.86);
-  --color-bg-glass-soft: rgba(18, 23, 29, 0.72);
-  --color-bg-input: #0e1319;
-  --color-bg-overlay: rgba(4, 6, 9, 0.78);
-  --color-surface-deep: #05070a;
+  /* ——— Surfaces (obsidian ice vault) ——— */
+  --color-bg-base: #03060b;
+  --color-bg-elevated: #070d16;
+  --color-bg-panel: #0b1420;
+  --color-bg-panel-strong: #101c2c;
+  --color-bg-glass: rgba(8, 16, 28, 0.72);
+  --color-bg-glass-soft: rgba(12, 22, 36, 0.58);
+  --color-bg-input: #081018;
+  --color-bg-overlay: rgba(2, 5, 10, 0.82);
+  --color-surface-deep: #010308;
 
   /* ——— Text ——— */
-  --color-text-primary: #f4f6f8;
-  --color-text-secondary: #c2CAD2;
-  --color-text-muted: #93a0ab;
-  --color-text-subtle: #7a8792;
-  --color-text-disabled: #5f6b75;
-  --color-on-accent: #071015;
+  --color-text-primary: #f2f7fc;
+  --color-text-secondary: #b7c7d6;
+  --color-text-muted: #8396aa;
+  --color-text-subtle: #65788c;
+  --color-text-disabled: #4d5d6e;
+  --color-on-accent: #031018;
   --color-on-danger: #1a0808;
 
-  /* ——— Brand ——— */
-  /* Primary: refined platinum ice — quiet fintech, not neon */
-  --color-accent-primary: #9ec4d1;
-  --color-accent-primary-strong: #b9d7e2;
-  /* Secondary: champagne gold — Founding 250 / rare moments only */
-  --color-accent-secondary: #c4a86a;
-  --color-accent-fallback: #7a9bb0;
+  /* ——— Brand (logo palette) ——— */
+  /* Primary: electric icy blue — wolf/raven eye glow */
+  --color-accent-primary: #4eb6e8;
+  --color-accent-primary-strong: #7dcef2;
+  /* Secondary: titanium silver — metallic wing plates */
+  --color-accent-secondary: #a8bccb;
+  --color-accent-fallback: #6a93b0;
+  /* Crystal / glacier helpers */
+  --color-glacier: #6ea8c9;
+  --color-frost: #e8f4fc;
+  --color-titanium: #9aafbf;
+  --color-crystal: #b8e4f7;
+  --color-midnight: #0a1628;
 
-  /* ——— Status (restrained) ——— */
-  --color-live: #e85a5f;
+  /* ——— Status (cold, restrained) ——— */
+  --color-live: #5ec8ef;
   --color-success: #6ec9a8;
-  --color-warning: #d4b06a;
+  --color-warning: #a8bccb;
   --color-error: #e87074;
-  --color-info: #8fc4d6;
+  --color-info: #7dcef2;
 
   /* ——— Lines & interaction ——— */
-  --color-border-subtle: rgba(230, 238, 244, 0.08);
-  --color-border-default: rgba(230, 238, 244, 0.14);
-  --color-border-strong: rgba(230, 238, 244, 0.22);
+  --color-border-subtle: rgba(184, 228, 247, 0.08);
+  --color-border-default: rgba(184, 228, 247, 0.14);
+  --color-border-strong: rgba(184, 228, 247, 0.26);
   --color-focus: var(--color-accent-primary-strong);
-  --color-hover-surface: rgba(169, 213, 226, 0.07);
-  --color-active-surface: rgba(169, 213, 226, 0.12);
+  --color-hover-surface: rgba(78, 182, 232, 0.08);
+  --color-active-surface: rgba(78, 182, 232, 0.14);
   --color-disabled-surface: rgba(255, 255, 255, 0.03);
 
-  /* ——— Typography (Nordic: Space Grotesk + Manrope + Space Mono) ——— */
-  --font-display: "Space Grotesk", "Manrope", "Helvetica Neue", Arial, sans-serif;
-  --font-body: "Manrope", "Helvetica Neue", Arial, system-ui, -apple-system, sans-serif;
+  /* ——— Typography (precision + Nordic presence) ——— */
+  --font-display: "Syne", "Space Grotesk", "Manrope", "Helvetica Neue", sans-serif;
+  --font-body: "Manrope", "Helvetica Neue", system-ui, -apple-system, sans-serif;
   --font-mono: "Space Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
 
   --text-xs: 11px;
@@ -66,8 +72,8 @@
   --leading-snug: 1.3;
   --leading-body: 1.55;
   --tracking-tight: -0.03em;
-  --tracking-display: -0.035em;
-  --tracking-label: 0.1em;
+  --tracking-display: -0.04em;
+  --tracking-label: 0.14em;
 
   /* ——— Spacing ——— */
   --space-1: 4px;
@@ -90,23 +96,24 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-pill: 999px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.18);
-  --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.32);
-  --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.48);
-  --shadow-focus: 0 0 0 3px rgba(169, 213, 226, 0.28);
-  --glow-ice: 0 0 24px rgba(169, 213, 226, 0.10);
-  --glow-gold: 0 0 24px rgba(201, 170, 109, 0.10);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 8, 20, 0.28);
+  --shadow-md: 0 12px 36px rgba(0, 6, 18, 0.45);
+  --shadow-lg: 0 28px 80px rgba(0, 4, 14, 0.62);
+  --shadow-focus: 0 0 0 3px rgba(78, 182, 232, 0.32);
+  --glow-ice: 0 0 32px rgba(78, 182, 232, 0.18);
+  --glow-crystal: 0 0 48px rgba(184, 228, 247, 0.14);
+  --glow-gold: var(--glow-ice);
 
   /* ——— Motion ——— */
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 120ms;
-  --duration-medium: 200ms;
-  --duration-slow: 420ms;
+  --duration-medium: 220ms;
+  --duration-slow: 480ms;
 
   /* Dynamic media / crest (store themes may override) */
-  --crest-primary: #8fa3b2;
+  --crest-primary: #7a9bb0;
   --crest-accent: var(--color-accent-primary);
-  --moment-fallback: linear-gradient(145deg, #2a241c, #0a0c0f 72%);
+  --moment-fallback: linear-gradient(145deg, #122032, #050a12 72%);
   --store-accent: var(--color-accent-primary);
 
   /* ——— Compatibility aliases ——— */

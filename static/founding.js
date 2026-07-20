@@ -1,4 +1,4 @@
-// RAGNAR — cinematic live-commerce homepage.
+// RAGNAR — arctic vault homepage with scroll-driven camera.
 "use strict";
 
 const $ = (id) => document.getElementById(id);
@@ -142,8 +142,8 @@ function renderLive(streams, rides) {
       <div class="arena-empty">
         <div>
           <span class="section-label">Between main events</span>
-          <strong>The next room is being forged.</strong>
-          <span>Explore scheduled breaks or enter the marketplace while the arena resets.</span>
+          <strong>The next room is forming.</strong>
+          <span>Explore scheduled breaks or enter the marketplace while the vault resets.</span>
           <div style="margin-top:22px"><a class="arena-btn small" href="/stores">View the lineup <span class="arrow">→</span></a></div>
         </div>
       </div>`;
@@ -204,12 +204,30 @@ function renderBreaks(streams, rides) {
 
 function renderBreakers(stores) {
   const items = (stores || []).slice(0, 4);
-  if ($("breakerCount")) $("breakerCount").textContent = String((stores || []).length || "—");
+  const strip = $("breakerStrip");
+  if (strip) {
+    const top = (stores || []).slice(0, 5);
+    if (!top.length) {
+      strip.innerHTML = `<a class="breaker-chip" href="#apply"><span class="breaker-chip-av">R</span><div><strong>Claim the floor</strong><span>Applications open</span></div></a>`;
+    } else {
+      strip.innerHTML = top.map((store) => `
+        <a class="breaker-chip" href="/store/${encodeURIComponent(store.handle)}">
+          <span class="breaker-chip-av">${store.avatar_optimized || store.avatar_url
+            ? `<img src="${esc(store.avatar_optimized || store.avatar_url)}" alt="" loading="lazy" />`
+            : esc(initial(store.display_name))}</span>
+          <div>
+            <strong>${esc(store.display_name)}</strong>
+            <span>${store.is_live ? "Live now" : (store.is_founding ? `Founding #${store.founding_number || "—"}` : `@${esc(store.handle)}`)}</span>
+          </div>
+        </a>`).join("");
+    }
+  }
+
   if (!items.length) {
     $("breakerGrid").innerHTML = `
       <a class="breaker-card" data-rank="01" href="#apply">
         <div class="breaker-avatar-lg">R</div>
-        <div class="breaker-card-body"><span class="section-label">Founding roster</span><h3>Your room could lead the arena.</h3><p>Applications for the first breaker class are open.</p></div>
+        <div class="breaker-card-body"><span class="section-label">Founding roster</span><h3>Your room could lead the vault.</h3><p>Applications for elite sellers are open.</p></div>
       </a>`;
     return;
   }
@@ -223,7 +241,7 @@ function renderBreakers(stores) {
         <span class="section-label">${store.is_founding ? `Founding // ${String(store.founding_number || 0).padStart(3, "0")}` : `@${esc(store.handle)}`}</span>
         <h3>${esc(store.display_name)}</h3>
         <p>${esc(store.tagline || "Collect. Break. Conquer.")}</p>
-        <div class="breaker-stats"><div><b>${Number(store.listing_count || 0).toLocaleString()}</b><span>Vault items</span></div><div><b>${store.is_live ? "On" : "Ready"}</b><span>Arena status</span></div></div>
+        <div class="breaker-stats"><div><b>${Number(store.listing_count || 0).toLocaleString()}</b><span>Vault items</span></div><div><b>${store.is_live ? "On" : "Ready"}</b><span>Status</span></div></div>
       </div>
     </a>`).join("");
 }
@@ -231,19 +249,29 @@ function renderBreakers(stores) {
 function renderMoment(listings) {
   const item = (listings || [])[0];
   if (!item) return;
-  $("momentTitle").textContent = item.title;
-  $("momentDescription").textContent = "A chase-worthy card currently inside the RAGNAR vault. Soon, verified live pulls will preserve the room, reaction, and ownership story here.";
-  $("momentCategory").textContent = item.category || "Collectible";
-  $("momentGrade").textContent = item.grading_company
-    ? `${item.grading_company} ${item.grade || ""}`.trim()
-    : (item.condition || "Raw");
-  $("momentValue").textContent = money(item.price);
-  const image = safeMediaUrl(item.image_optimized || item.image_url);
-  if (image) {
-    const card = $("momentCard");
-    card.style.background = `center / contain no-repeat url("${image.replaceAll('"', "%22")}"), var(--moment-fallback)`;
-    card.classList.add("with-image");
-  }
+  const apply = (titleId, descId, catId, gradeId, valueId, cardId) => {
+    const t = $(titleId); if (t) t.textContent = item.title;
+    const d = $(descId);
+    if (d) {
+      d.textContent = "A chase-worthy card currently inside the RAGNAR vault. Verified live pulls will preserve the room, reaction, and ownership story here.";
+    }
+    const c = $(catId); if (c) c.textContent = item.category || "Collectible";
+    const g = $(gradeId);
+    if (g) {
+      g.textContent = item.grading_company
+        ? `${item.grading_company} ${item.grade || ""}`.trim()
+        : (item.condition || "Raw");
+    }
+    const v = $(valueId); if (v) v.textContent = money(item.price);
+    const image = safeMediaUrl(item.image_optimized || item.image_url);
+    const card = $(cardId);
+    if (card && image) {
+      card.style.background = `center / contain no-repeat url("${image.replaceAll('"', "%22")}"), var(--moment-fallback)`;
+      card.classList.add("with-image");
+    }
+  };
+  apply("momentTitle", "momentDescription", "momentCategory", "momentGrade", "momentValue", "momentCard");
+  apply("momentTitleLarge", "momentDescriptionLarge", "momentCategoryLarge", "momentGradeLarge", "momentValueLarge", "momentCardLarge");
 }
 
 function renderPulse(streams, rides, listings, stores) {
@@ -269,10 +297,12 @@ function renderPulse(streams, rides, listings, stores) {
   if (!visible.length) {
     visible.push({
       code: "RG", time: "now", title: "RAGNAR systems online",
-      detail: "Waiting for the next signal from the arena", value: "Armed",
+      detail: "Waiting for the next signal from the vault", value: "Armed",
     });
   }
-  $("pulseList").innerHTML = visible.map((event) => `
+  const list = $("pulseList");
+  if (!list) return;
+  list.innerHTML = visible.map((event) => `
     <div class="pulse-item">
       <div class="pulse-time">${esc(event.time)}</div>
       <div class="pulse-event"><span class="pulse-icon">${esc(event.code)}</span><div><strong>${esc(event.title)}</strong><span>${esc(event.detail)}</span></div></div>
@@ -380,21 +410,55 @@ function initReveal() {
   elements.forEach((element) => observer.observe(element));
 }
 
-function initCardTilt() {
-  const stage = $("arenaStage");
-  const stack = $("holoStack");
-  if (!stage || !stack || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  stage.addEventListener("pointermove", (event) => {
-    const bounds = stage.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    stack.style.setProperty("--ry", `${x * 24 - 9}deg`);
-    stack.style.setProperty("--rx", `${y * -16 - 4}deg`);
+function initVaultCamera() {
+  const world = $("vaultWorld");
+  const hero = $("vaultHero");
+  if (!world || !hero || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  let ticking = false;
+  let pointerX = 0;
+  let pointerY = 0;
+
+  function apply() {
+    ticking = false;
+    const rect = hero.getBoundingClientRect();
+    const viewH = window.innerHeight || 1;
+    // 0 at top of hero in view → 1 when hero has scrolled fully past
+    const progress = Math.min(1, Math.max(0, -rect.top / Math.max(rect.height * 0.85, 1)));
+    const depth = progress * 220;
+    const lift = progress * -80;
+    const pitch = progress * 8 + pointerY * 3;
+    const yaw = pointerX * 6 - progress * 4;
+    world.style.setProperty("--cam-z", `${depth}px`);
+    world.style.setProperty("--cam-y", `${lift}px`);
+    world.style.setProperty("--cam-rx", `${pitch}deg`);
+    world.style.setProperty("--cam-ry", `${yaw}deg`);
+    // Soft fade of hero copy as camera enters vault
+    const copy = hero.querySelector(".vault-hero-copy");
+    if (copy) copy.style.opacity = String(1 - progress * 0.85);
+    void viewH;
+  }
+
+  function requestApply() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(apply);
+  }
+
+  window.addEventListener("scroll", requestApply, { passive: true });
+  window.addEventListener("resize", requestApply, { passive: true });
+  hero.addEventListener("pointermove", (event) => {
+    const bounds = hero.getBoundingClientRect();
+    pointerX = (event.clientX - bounds.left) / bounds.width - 0.5;
+    pointerY = (event.clientY - bounds.top) / bounds.height - 0.5;
+    requestApply();
   });
-  stage.addEventListener("pointerleave", () => {
-    stack.style.setProperty("--ry", "-12deg");
-    stack.style.setProperty("--rx", "-5deg");
+  hero.addEventListener("pointerleave", () => {
+    pointerX = 0;
+    pointerY = 0;
+    requestApply();
   });
+  apply();
 }
 
 function initArenaCanvas() {
@@ -407,6 +471,7 @@ function initArenaCanvas() {
   let frame = 0;
   let active = true;
   const points = [];
+  const shards = [];
 
   function resize() {
     const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -418,14 +483,25 @@ function initArenaCanvas() {
     canvas.style.height = `${height}px`;
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     points.length = 0;
-    const count = Math.min(74, Math.max(34, Math.floor(width / 22)));
+    shards.length = 0;
+    const count = Math.min(90, Math.max(40, Math.floor(width / 18)));
     for (let index = 0; index < count; index += 1) {
       points.push({
         x: Math.random() * width,
         y: Math.random() * height,
         z: Math.random() * 1 + 0.2,
-        speed: Math.random() * 0.18 + 0.04,
-        size: Math.random() * 1.2 + 0.25,
+        speed: Math.random() * 0.22 + 0.05,
+        size: Math.random() * 1.4 + 0.3,
+      });
+    }
+    for (let i = 0; i < 12; i += 1) {
+      shards.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        len: 40 + Math.random() * 120,
+        ang: -0.4 + Math.random() * 0.2,
+        alpha: 0.03 + Math.random() * 0.05,
+        drift: 0.08 + Math.random() * 0.12,
       });
     }
   }
@@ -433,16 +509,33 @@ function initArenaCanvas() {
   function draw() {
     if (!active) return;
     context.clearRect(0, 0, width, height);
-    context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#e8a045";
+
+    // Soft light rays
+    shards.forEach((s) => {
+      s.y -= s.drift;
+      if (s.y < -s.len) { s.y = height + s.len; s.x = Math.random() * width; }
+      context.save();
+      context.translate(s.x, s.y);
+      context.rotate(s.ang);
+      const grad = context.createLinearGradient(0, 0, 0, s.len);
+      grad.addColorStop(0, `rgba(184,228,247,0)`);
+      grad.addColorStop(0.45, `rgba(125,206,242,${s.alpha})`);
+      grad.addColorStop(1, `rgba(78,182,232,0)`);
+      context.fillStyle = grad;
+      context.fillRect(-1.2, 0, 2.4, s.len);
+      context.restore();
+    });
+
+    const ice = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#4eb6e8";
+    context.fillStyle = ice;
     points.forEach((point) => {
       point.y -= point.speed * point.z;
-      point.x += Math.sin((point.y + point.z * 100) * 0.005) * 0.035;
+      point.x += Math.sin((point.y + point.z * 100) * 0.004) * 0.04;
       if (point.y < -10) {
         point.y = height + 10;
         point.x = Math.random() * width;
       }
-      const alpha = 0.12 + point.z * 0.28;
-      context.globalAlpha = alpha;
+      context.globalAlpha = 0.1 + point.z * 0.32;
       context.beginPath();
       context.arc(point.x, point.y, point.size * point.z, 0, Math.PI * 2);
       context.fill();
@@ -463,7 +556,7 @@ function initArenaCanvas() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initReveal();
-  initCardTilt();
+  initVaultCamera();
   initArenaCanvas();
   loadArena();
   loadFoundingStatus();

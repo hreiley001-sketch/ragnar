@@ -222,10 +222,10 @@
     $("sellerState").hidden = false;
     if (s.is_founding) {
       $("sellerState").className = "seller-state founding";
-      $("sellerState").innerHTML = `★ <strong>Founding Seller #${s.founding_number}</strong> · ${s.intro_active ? `0% intro fee — ${s.intro_days_left} days & ${money(s.intro_sales_remaining)} left` : `permanent ${(s.effective_rate * 100).toFixed(0)}% rate`}`;
+      $("sellerState").innerHTML = `★ <strong>Founding Seller #${s.founding_number}</strong> · flat ${(s.effective_rate * 100).toFixed(0)}% fee · keep ${((1 - s.effective_rate) * 100).toFixed(0)}%`;
     } else {
       $("sellerState").className = "seller-state";
-      $("sellerState").innerHTML = `Standard seller · ${(s.effective_rate * 100).toFixed(0)}% fee`;
+      $("sellerState").innerHTML = `Seller · flat ${(s.effective_rate * 100).toFixed(0)}% fee · keep ${((1 - s.effective_rate) * 100).toFixed(0)}%`;
     }
     $("sellerState").dataset.founding = s.is_founding ? "1" : "0";
   }
@@ -242,8 +242,8 @@
     const el = $("feePreview");
     if (!price || price <= 0) { el.innerHTML = "Enter a price to see what you keep on RAGNAR vs eBay."; return; }
     const founding = sellerIsFounding();
-    const { keep, savings, rate } = keepInfo(price, founding);
-    el.innerHTML = `On a ${money(price)} sale you keep <strong>${money(keep)}</strong> (${(rate * 100).toFixed(0)}% platform fee${founding ? ", Founding" : ""}). <span class="vs">≈ ${money(savings)} more than eBay.</span>`;
+    const { keep, savings } = keepInfo(price, founding);
+    el.innerHTML = `On a ${money(price)} sale you keep <strong>${money(keep)}</strong> (5% flat seller fee). <span class="vs">≈ ${money(savings)} more than eBay.</span>`;
   }
 
   function syncGradedFields() {
@@ -436,7 +436,7 @@
       });
       showSellerState(s);
       updateFeePreview();
-      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! 0% fees during your intro window.` : "Seller created (Founding slots full — standard rate).");
+      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! Flat 5% fee — you keep 95%.` : "Seller created (Founding slots full — standard flat 5%).");
     } catch (err) {
       if (String(err.message).includes("already taken")) {
         try { const s = await api(`/api/sellers/${encodeURIComponent(handle)}`); showSellerState(s); updateFeePreview(); toast("Welcome back — seller loaded."); return; } catch (_) {}

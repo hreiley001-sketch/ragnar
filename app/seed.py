@@ -21,19 +21,19 @@ logger = logging.getLogger("ragnar.seed")
 _SELLERS = [
     ("yggdrasil", "Yggdrasil Cards", True, {
         "tagline": "Roots of the hobby.",
-        "accent_color": "#e8a045",
+        "accent_color": "#4eb6e8",
         "bio": "Vintage Pokémon & Lorcana, graded and raw. Founding Seller since day one.",
         "store_edit_token": "demo-yggdrasil-token",
     }),
     ("fenrir", "Fenrir Vault", True, {
         "tagline": "Unleash the grails.",
-        "accent_color": "#f0a35e",
+        "accent_color": "#7dcef2",
         "bio": "High-end vintage and modern grails. Every card slabbed and verified.",
         "store_edit_token": "demo-fenrir-token",
     }),
     ("muninn", "Muninn Collectibles", False, {
         "tagline": "Memory of every card.",
-        "accent_color": "#9be7c4",
+        "accent_color": "#a8bccb",
         "bio": "Sports and TCG singles for every collector. Fair prices, fast shipping.",
         "store_edit_token": "demo-muninn-token",
     }),

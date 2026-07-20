@@ -1,8 +1,8 @@
 """Fee math — the heart of RAGNAR's pitch.
 
-A seller keeps more here than on eBay, and the Founding 250 keep everything but
-payment processing during their intro window. Every number the storefront shows
-comes from here so the comparison stays honest and in one place.
+Sellers keep 95% with a flat 5% platform fee. Founding Seller rate ladders still
+exist in config for legacy accounts; every number the storefront shows comes
+from here so the comparison stays honest and in one place.
 """
 from __future__ import annotations
 

@@ -10,9 +10,9 @@ body.vault-page {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
     radial-gradient(1100px 620px at 72% -10%, color-mix(in srgb, var(--color-accent-primary) 18%, transparent), transparent 58%),
-    radial-gradient(900px 520px at 6% 20%, color-mix(in srgb, var(--color-accent-secondary) 8%, transparent), transparent 55%),
-    radial-gradient(700px 420px at 88% 95%, color-mix(in srgb, var(--color-accent-primary) 8%, transparent), transparent 50%),
-    linear-gradient(180deg, #05070a 0%, #0c0f13 45%, #07090c 100%);
+    radial-gradient(900px 520px at 6% 20%, color-mix(in srgb, var(--color-accent-secondary) 10%, transparent), transparent 55%),
+    radial-gradient(700px 420px at 88% 95%, color-mix(in srgb, var(--color-accent-primary) 10%, transparent), transparent 50%),
+    linear-gradient(180deg, #03060b 0%, #070d16 45%, #03060b 100%);
 }
 .vault-atmosphere::before {
   content: "";
