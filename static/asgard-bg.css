@@ -47,14 +47,15 @@ html[data-asgard-realm="midgard"] {
 
 /* ——— Valhalla — hall of ice, titanium + warm iron glory ——— */
 html[data-asgard-realm="valhalla"] {
-  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 72%, #c4b8a8 18%, var(--color-titanium) 10%);
-  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 78%, #b8a890 22%);
-  --asgard-sky-c: color-mix(in srgb, var(--color-bg-base) 85%, #a89880 15%);
-  --asgard-aurora: rgba(122, 117, 110, 0.2);
-  --asgard-aurora-2: rgba(138, 117, 96, 0.26);
-  --asgard-gold: rgba(138, 117, 96, 0.32);
-  --asgard-rune: rgba(42, 40, 38, 0.1);
-  --asgard-iron: rgba(138, 117, 96, 0.16);
+  --asgard-sky-a: color-mix(in srgb, var(--color-bg-base) 65%, #c9b89a 25%, var(--color-titanium) 10%);
+  --asgard-sky-b: color-mix(in srgb, var(--color-bg-elevated) 68%, #bba888 32%);
+  --asgard-sky-c: color-mix(in srgb, var(--color-bg-base) 75%, #b09a78 25%);
+  --asgard-aurora: rgba(138, 117, 96, 0.28);
+  --asgard-aurora-2: rgba(160, 130, 95, 0.3);
+  --asgard-gold: rgba(150, 125, 95, 0.4);
+  --asgard-rune: rgba(90, 70, 50, 0.12);
+  --asgard-iron: rgba(138, 117, 96, 0.22);
+  --asgard-mist: rgba(246, 240, 230, 0.42);
 }
 
 /* ——— Loki / Forge — serpentine green + forge copper ——— */
