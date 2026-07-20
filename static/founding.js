@@ -596,7 +596,7 @@ function initArenaCanvas() {
       const grad = context.createLinearGradient(0, 0, 0, s.len);
       grad.addColorStop(0, `rgba(184,240,255,0)`);
       grad.addColorStop(0.45, `rgba(143,232,255,${s.alpha})`);
-      grad.addColorStop(1, `rgba(62,208,255,0)`);
+      grad.addColorStop(1, `rgba(46,200,255,0)`);
       context.fillStyle = grad;
       context.fillRect(-1.2, 0, 2.4, s.len);
       context.restore();

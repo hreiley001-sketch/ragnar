@@ -1,58 +1,59 @@
 /* RAGNAR design tokens — sourced from the wolf/raven logo.
    Arctic luxury: icy blue, glacier, frost white, titanium silver, crystal.
-   Think: ice vault · precision titanium · elite technology — never warm, never RGB. */
+   Think: ice vault · precision titanium · elite technology — never warm, never RGB.
+   Sleek & fierce: deeper midnight, electric ice, razor edges. */
 
 :root {
   color-scheme: dark;
 
-  /* ——— Surfaces (cooler, bluer titanium ice vault) ——— */
-  --color-bg-base: #101a2c;
-  --color-bg-elevated: #16223a;
-  --color-bg-panel: #1c2b46;
-  --color-bg-panel-strong: #243656;
-  --color-bg-glass: rgba(20, 32, 54, 0.78);
-  --color-bg-glass-soft: rgba(26, 40, 66, 0.62);
-  --color-bg-input: #16233c;
-  --color-bg-overlay: rgba(8, 14, 26, 0.74);
-  --color-surface-deep: #0a1220;
+  /* ——— Surfaces (deeper midnight vault) ——— */
+  --color-bg-base: #0a1220;
+  --color-bg-elevated: #101a2e;
+  --color-bg-panel: #16233c;
+  --color-bg-panel-strong: #1e2f4c;
+  --color-bg-glass: rgba(14, 24, 42, 0.82);
+  --color-bg-glass-soft: rgba(18, 30, 52, 0.68);
+  --color-bg-input: #101c34;
+  --color-bg-overlay: rgba(4, 10, 20, 0.78);
+  --color-surface-deep: #060d18;
 
   /* ——— Text ——— */
-  --color-text-primary: #f2f7fc;
-  --color-text-secondary: #b7c7d6;
-  --color-text-muted: #8396aa;
-  --color-text-subtle: #65788c;
-  --color-text-disabled: #4d5d6e;
-  --color-on-accent: #031018;
+  --color-text-primary: #f4f9fd;
+  --color-text-secondary: #b3c5d6;
+  --color-text-muted: #7e93a8;
+  --color-text-subtle: #5f7388;
+  --color-text-disabled: #465868;
+  --color-on-accent: #021018;
   --color-on-danger: #1a0808;
 
   /* ——— Brand (logo palette) ——— */
-  /* Primary: electric icy blue — wolf/raven eye glow, pushed brighter/colder */
-  --color-accent-primary: #3ed0ff;
-  --color-accent-primary-strong: #8fe8ff;
+  /* Primary: electric icy blue — wolf/raven eye glow, fierce & cold */
+  --color-accent-primary: #2ec8ff;
+  --color-accent-primary-strong: #8aecff;
   /* Secondary: titanium silver — metallic wing plates */
-  --color-accent-secondary: #aec6d8;
-  --color-accent-fallback: #5fa8cf;
+  --color-accent-secondary: #a8c2d6;
+  --color-accent-fallback: #4fb0d8;
   /* Crystal / glacier helpers */
-  --color-glacier: #52c2f0;
-  --color-frost: #eefbff;
-  --color-titanium: #a0b8cc;
-  --color-crystal: #b8f0ff;
-  --color-midnight: #060e1c;
+  --color-glacier: #48c0f0;
+  --color-frost: #f0fcff;
+  --color-titanium: #9ab4c8;
+  --color-crystal: #b4f0ff;
+  --color-midnight: #040a14;
 
   /* ——— Status (cold, restrained) ——— */
-  --color-live: #5ec8ef;
-  --color-success: #6ec9a8;
-  --color-warning: #aec6d8;
+  --color-live: #4ec4ef;
+  --color-success: #68c8a4;
+  --color-warning: #a8c2d6;
   --color-error: #e87074;
-  --color-info: #8fe8ff;
+  --color-info: #8aecff;
 
   /* ——— Lines & interaction ——— */
-  --color-border-subtle: rgba(184, 240, 255, 0.08);
-  --color-border-default: rgba(184, 240, 255, 0.14);
-  --color-border-strong: rgba(184, 240, 255, 0.26);
+  --color-border-subtle: rgba(180, 240, 255, 0.07);
+  --color-border-default: rgba(180, 240, 255, 0.14);
+  --color-border-strong: rgba(180, 240, 255, 0.28);
   --color-focus: var(--color-accent-primary-strong);
-  --color-hover-surface: rgba(62, 208, 255, 0.08);
-  --color-active-surface: rgba(62, 208, 255, 0.14);
+  --color-hover-surface: rgba(46, 200, 255, 0.09);
+  --color-active-surface: rgba(46, 200, 255, 0.16);
   --color-disabled-surface: rgba(255, 255, 255, 0.03);
 
   /* ——— Typography (precision + Nordic presence) ——— */
@@ -68,12 +69,12 @@
   --text-2xl: 28px;
   --text-3xl: 40px;
   --text-4xl: 56px;
-  --leading-tight: 1.12;
-  --leading-snug: 1.3;
+  --leading-tight: 1.1;
+  --leading-snug: 1.28;
   --leading-body: 1.55;
-  --tracking-tight: -0.03em;
-  --tracking-display: -0.04em;
-  --tracking-label: 0.14em;
+  --tracking-tight: -0.032em;
+  --tracking-display: -0.045em;
+  --tracking-label: 0.15em;
 
   /* ——— Spacing ——— */
   --space-1: 4px;
@@ -90,30 +91,30 @@
   --content-max: 1200px;
   --content-narrow: 720px;
 
-  /* ——— Shape & depth ——— */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* ——— Shape & depth (razor-sleek, not soft) ——— */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --radius-pill: 999px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 8, 20, 0.28);
-  --shadow-md: 0 12px 36px rgba(0, 6, 18, 0.45);
-  --shadow-lg: 0 28px 80px rgba(0, 4, 14, 0.62);
-  --shadow-focus: 0 0 0 3px rgba(62, 208, 255, 0.36);
-  --glow-ice: 0 0 36px rgba(62, 208, 255, 0.22);
-  --glow-crystal: 0 0 56px rgba(184, 240, 255, 0.18);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 18px rgba(0, 6, 18, 0.32);
+  --shadow-md: 0 14px 40px rgba(0, 4, 16, 0.5);
+  --shadow-lg: 0 32px 90px rgba(0, 2, 12, 0.68);
+  --shadow-focus: 0 0 0 3px rgba(46, 200, 255, 0.38);
+  --glow-ice: 0 0 40px rgba(46, 200, 255, 0.28);
+  --glow-crystal: 0 0 64px rgba(180, 240, 255, 0.2);
   --glow-gold: var(--glow-ice);
 
   /* ——— Motion ——— */
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast: 120ms;
+  --duration-fast: 110ms;
   --duration-medium: 220ms;
   --duration-slow: 480ms;
 
   /* Dynamic media / crest (store themes may override) */
   --crest-primary: #7a9bb0;
   --crest-accent: var(--color-accent-primary);
-  --moment-fallback: linear-gradient(145deg, #243447, #101a2c 72%);
+  --moment-fallback: linear-gradient(145deg, #1e3048, #0a1220 72%);
   --store-accent: var(--color-accent-primary);
 
   /* ——— Compatibility aliases ——— */

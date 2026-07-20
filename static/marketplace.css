@@ -1,5 +1,6 @@
 /* RAGNAR Vault — marketplace visual system.
-   Brand-first chamber: one composition, then the catalog. */
+   Brand-first chamber: one composition, then the catalog.
+   Sleek & fierce: electric ice, razor edges, deep midnight. */
 
 body.vault-page {
   font-family: var(--font-body);
@@ -9,26 +10,34 @@ body.vault-page {
 .vault-atmosphere {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(1100px 620px at 72% -10%, color-mix(in srgb, var(--color-accent-primary) 18%, transparent), transparent 58%),
-    radial-gradient(900px 520px at 6% 20%, color-mix(in srgb, var(--color-accent-secondary) 10%, transparent), transparent 55%),
-    radial-gradient(700px 420px at 88% 95%, color-mix(in srgb, var(--color-accent-primary) 10%, transparent), transparent 50%),
-    linear-gradient(180deg, #101a2c 0%, #16223a 45%, #101a2c 100%);
+    radial-gradient(1200px 680px at 74% -8%, color-mix(in srgb, var(--color-accent-primary) 22%, transparent), transparent 58%),
+    radial-gradient(900px 520px at 4% 18%, color-mix(in srgb, var(--color-crystal) 8%, transparent), transparent 55%),
+    radial-gradient(700px 420px at 90% 98%, color-mix(in srgb, var(--color-accent-primary) 12%, transparent), transparent 50%),
+    linear-gradient(180deg, #0a1220 0%, #101a2e 42%, #0a1220 100%);
 }
 .vault-atmosphere::before {
   content: "";
   position: absolute; inset: 0;
-  opacity: 0.2;
+  opacity: 0.22;
   background-image:
-    linear-gradient(rgba(230,238,244,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(230,238,244,0.05) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse at 50% 20%, #000 15%, transparent 72%);
+    linear-gradient(rgba(240, 252, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240, 252, 255, 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse at 50% 18%, #000 12%, transparent 70%);
+}
+.vault-atmosphere::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(115deg, transparent 40%, rgba(180, 240, 255, 0.03) 50%, transparent 60%);
+  animation: vaultSheen 9s ease-in-out infinite;
+  pointer-events: none;
 }
 
 /* First viewport — one composition only */
 .vault-hero {
   position: relative;
-  min-height: min(72vh, 720px);
+  min-height: min(74vh, 740px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -39,26 +48,29 @@ body.vault-page {
 }
 .vault-hero::after {
   content: "";
-  position: absolute; left: 10%; right: 10%; bottom: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(158, 196, 209, 0.45), transparent);
+  position: absolute; left: 8%; right: 8%; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(46, 200, 255, 0.55), transparent);
+  box-shadow: 0 0 20px rgba(46, 200, 255, 0.25);
 }
 .vault-brand {
   display: inline-flex;
   align-items: baseline;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 20px;
   animation: vaultRise 0.7s var(--ease-premium) both;
 }
 .vault-brand-mark {
   font-family: var(--font-display);
-  font-size: clamp(34px, 5vw, 52px);
-  font-weight: 700;
+  font-size: clamp(44px, 7vw, 72px);
+  font-weight: 800;
   letter-spacing: var(--tracking-display);
-  line-height: 1;
-  color: var(--color-text-primary);
+  line-height: 0.92;
+  color: var(--color-frost);
+  text-shadow: 0 0 48px rgba(46, 200, 255, 0.25);
 }
 .vault-brand-mark span {
   color: var(--color-accent-primary);
+  text-shadow: 0 0 32px rgba(46, 200, 255, 0.45);
 }
 .vault-brand-runes {
   font-family: var(--font-mono);
@@ -67,28 +79,32 @@ body.vault-page {
   text-transform: uppercase;
   color: var(--color-text-muted);
   align-self: center;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-default);
+  background: rgba(46, 200, 255, 0.04);
 }
 .vault-hero h1 {
   margin: 0 0 14px;
-  max-width: 14ch;
+  max-width: 16ch;
   font-family: var(--font-display);
-  font-size: clamp(40px, 7vw, 72px);
-  font-weight: 700;
-  letter-spacing: var(--tracking-display);
-  line-height: 0.98;
-  color: var(--color-text-primary);
+  font-size: clamp(28px, 4.2vw, 44px);
+  font-weight: 650;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.05;
+  color: var(--color-text-secondary);
   animation: vaultRise 0.8s var(--ease-premium) 0.06s both;
 }
 .vault-hero h1 em {
   font-style: normal;
-  color: var(--color-accent-primary);
+  color: var(--color-frost);
+  font-weight: 750;
 }
 .vault-hero-sub {
   margin: 0 auto 28px;
-  max-width: 38ch;
-  font-size: clamp(15px, 1.8vw, 18px);
-  line-height: 1.5;
-  color: var(--color-text-secondary);
+  max-width: 40ch;
+  font-size: clamp(14px, 1.6vw, 17px);
+  line-height: 1.55;
+  color: var(--color-text-muted);
   animation: vaultRise 0.85s var(--ease-premium) 0.12s both;
 }
 
@@ -96,31 +112,33 @@ body.vault-page {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: min(640px, 100%);
-  padding: 8px 8px 8px 18px;
-  border: 1px solid var(--color-border-default);
-  background: rgba(20, 17, 14, 0.78);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-md);
+  width: min(660px, 100%);
+  padding: 7px 7px 7px 18px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xs);
+  background: rgba(8, 16, 30, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(180, 240, 255, 0.08);
   animation: vaultRise 0.9s var(--ease-premium) 0.18s both;
   transition: border-color var(--duration-fast), box-shadow var(--duration-medium);
 }
 .vault-search:focus-within {
-  border-color: rgba(158, 196, 209, 0.55);
-  box-shadow: var(--shadow-md), var(--shadow-focus);
+  border-color: var(--color-accent-primary);
+  box-shadow: var(--shadow-md), var(--shadow-focus), var(--glow-ice);
 }
 .vault-search-ico {
-  width: 18px; height: 18px; flex: none;
-  border: 2px solid var(--color-text-muted);
+  width: 16px; height: 16px; flex: none;
+  border: 2px solid var(--color-accent-primary);
   border-radius: 50%;
   position: relative;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 .vault-search-ico::after {
   content: "";
   position: absolute;
   width: 7px; height: 2px;
-  background: var(--color-text-muted);
+  background: var(--color-accent-primary);
   right: -5px; bottom: -2px;
   transform: rotate(45deg);
 }
@@ -131,7 +149,7 @@ body.vault-page {
   outline: none !important;
   background: transparent !important;
   padding: 12px 6px;
-  font-size: 16px;
+  font-size: 15px;
   color: var(--color-text-primary);
 }
 .vault-search .btn {
@@ -143,6 +161,66 @@ body.vault-page {
 .vault-search .btn-ghost {
   color: var(--color-accent-primary);
   border-color: var(--color-border-default);
+}
+.vault-search .btn-primary {
+  box-shadow: 0 0 28px rgba(46, 200, 255, 0.3);
+}
+
+.vault-prompt-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 18px;
+  max-width: 640px;
+  animation: vaultRise 0.95s var(--ease-premium) 0.24s both;
+}
+.vault-prompt {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  padding: 7px 12px;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-muted);
+  transition:
+    color var(--duration-fast),
+    border-color var(--duration-fast),
+    background var(--duration-fast),
+    transform var(--duration-fast);
+}
+.vault-prompt:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-hover-surface);
+  transform: translateY(-1px);
+}
+
+.vault-advisor {
+  margin-top: 18px;
+  width: min(640px, 100%);
+  padding: 14px 16px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xs);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  text-align: left;
+  animation: vaultRise 0.4s var(--ease-premium) both;
+}
+.vault-advisor-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.vault-advisor-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-accent-primary);
 }
 
 /* Below-fold discovery band — not competing with hero */
@@ -169,8 +247,9 @@ body.vault-page {
 }
 .cat-chip {
   font: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
   cursor: pointer;
   padding: 9px 14px;
   border-radius: var(--radius-xs);
@@ -181,7 +260,8 @@ body.vault-page {
     transform var(--duration-fast) var(--ease-premium),
     background var(--duration-fast),
     color var(--duration-fast),
-    border-color var(--duration-fast);
+    border-color var(--duration-fast),
+    box-shadow var(--duration-medium);
 }
 .cat-chip:hover {
   transform: translateY(-1px);
@@ -193,6 +273,7 @@ body.vault-page {
   background: var(--color-accent-primary);
   border-color: var(--color-accent-primary);
   color: var(--color-on-accent);
+  box-shadow: 0 0 24px rgba(46, 200, 255, 0.28);
 }
 
 .trust-bar {
@@ -211,7 +292,7 @@ body.vault-page {
 }
 .trust-bar b {
   color: var(--color-text-primary);
-  font-weight: 600;
+  font-weight: 650;
 }
 .trust-bar .tb-num {
   font-family: var(--font-mono);
@@ -229,20 +310,22 @@ body.vault-page {
   border-radius: var(--radius-xs);
   border: 1px solid var(--color-border-default);
   background:
-    linear-gradient(160deg, rgba(158,196,209,0.07), transparent 40%),
+    linear-gradient(160deg, rgba(46, 200, 255, 0.06), transparent 40%),
     var(--color-bg-glass);
   box-shadow: none;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
 }
 .vault-page .filters-head h3 {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent-primary);
 }
 
 /* Listings — calmer, sharper product presence */
 .vault-page .grid {
-  gap: 20px;
+  gap: 18px;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 }
 .vault-page .listing {
@@ -256,14 +339,14 @@ body.vault-page {
     box-shadow var(--duration-medium);
 }
 .vault-page .listing:hover {
-  transform: translateY(-4px);
+  transform: translateY(-5px);
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md), 0 0 28px rgba(46, 200, 255, 0.1);
 }
 .vault-page .listing-img {
   background:
-    radial-gradient(circle at 50% 30%, rgba(158,196,209,0.1), transparent 55%),
-    linear-gradient(165deg, #221c16, #0e0b08);
+    radial-gradient(circle at 50% 28%, rgba(46, 200, 255, 0.12), transparent 55%),
+    linear-gradient(165deg, #1a2a42, #060d18);
 }
 .vault-page .listing-title {
   font-family: var(--font-display);
@@ -274,6 +357,7 @@ body.vault-page {
   font-family: var(--font-display);
   font-size: 22px;
   letter-spacing: var(--tracking-tight);
+  color: var(--color-frost);
 }
 .vault-page .badge {
   border-radius: var(--radius-xs);
@@ -284,6 +368,16 @@ body.vault-page {
 }
 .vault-page .preset-btn {
   border-radius: var(--radius-xs);
+  border: 1px solid var(--color-border-default);
+  background: transparent;
+  color: var(--color-text-secondary);
+  transition: border-color var(--duration-fast), color var(--duration-fast), background var(--duration-fast);
+}
+.vault-page .preset-btn:hover,
+.vault-page .preset-btn.active {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+  background: var(--color-hover-surface);
 }
 .vault-page .quick-presets {
   margin-bottom: 16px;
@@ -297,15 +391,21 @@ body.vault-page {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes vaultSheen {
+  0%, 100% { opacity: 0.4; transform: translateX(-4%); }
+  50% { opacity: 1; transform: translateX(4%); }
+}
 
 @media (max-width: 900px) {
   .vault-hero { min-height: auto; padding-top: 36px; padding-bottom: 40px; }
+  .vault-brand-mark { font-size: clamp(36px, 11vw, 52px); }
   .vault-page .layout { grid-template-columns: 1fr; }
   .vault-page .filters { position: static; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vault-brand, .vault-hero h1, .vault-hero-sub, .vault-search {
+  .vault-brand, .vault-hero h1, .vault-hero-sub, .vault-search, .vault-prompt-row, .vault-advisor {
     animation: none !important;
   }
+  .vault-atmosphere::after { animation: none !important; }
 }
