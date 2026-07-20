@@ -468,5 +468,6 @@ document.addEventListener("DOMContentLoaded", () => {
   loadArena();
   loadFoundingStatus();
   reflectAccount();
-  $("applyForm").addEventListener("submit", submitApplication);
+  const form = $("applyForm");
+  if (form) form.addEventListener("submit", submitApplication);
 });
