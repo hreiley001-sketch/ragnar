@@ -152,7 +152,7 @@ html[data-asgard-realm="forge"] {
 }
 
 html[data-asgard-god="odin"] .asgard-bifrost {
-  opacity: calc(0.85 - var(--asgard-scroll) * 0.35);
+  opacity: 0.95;
 }
 html[data-asgard-god="thor"] .asgard-bifrost { opacity: 0.18; }
 html[data-asgard-god="valhalla"] .asgard-bifrost { opacity: 0.08; }
@@ -328,16 +328,17 @@ html[data-asgard-god="valhalla"] .asgard-aurora {
   --asgard-depth-x: 0.45;
   opacity: 0;
   inset: auto 0 0 0;
-  height: 55vh;
+  height: 60vh;
   background:
-    radial-gradient(circle 3px at 18% 70%, rgba(138, 117, 96, 0.35), transparent 70%),
-    radial-gradient(circle 2px at 32% 55%, rgba(47, 138, 106, 0.28), transparent 70%),
-    radial-gradient(circle 2.5px at 48% 78%, rgba(138, 117, 96, 0.3), transparent 70%),
-    radial-gradient(circle 2px at 64% 60%, rgba(47, 138, 106, 0.22), transparent 70%),
-    radial-gradient(circle 3px at 78% 82%, rgba(138, 117, 96, 0.32), transparent 70%),
-    radial-gradient(circle 2px at 88% 52%, rgba(122, 117, 110, 0.2), transparent 70%),
-    linear-gradient(to top, rgba(138, 117, 96, 0.12), transparent 65%);
-  filter: blur(1px);
+    radial-gradient(circle 5px at 14% 72%, rgba(138, 117, 96, 0.55), transparent 70%),
+    radial-gradient(circle 3px at 28% 52%, rgba(47, 138, 106, 0.45), transparent 70%),
+    radial-gradient(circle 4px at 42% 80%, rgba(138, 117, 96, 0.5), transparent 70%),
+    radial-gradient(circle 3px at 58% 58%, rgba(47, 138, 106, 0.4), transparent 70%),
+    radial-gradient(circle 5px at 72% 84%, rgba(138, 117, 96, 0.52), transparent 70%),
+    radial-gradient(circle 3px at 86% 48%, rgba(122, 117, 110, 0.35), transparent 70%),
+    radial-gradient(circle 4px at 50% 66%, rgba(47, 138, 106, 0.32), transparent 70%),
+    linear-gradient(to top, rgba(138, 117, 96, 0.2), rgba(47, 138, 106, 0.08), transparent 70%);
+  filter: blur(0.5px);
 }
 
 html[data-asgard-god="loki"] .asgard-embers {
