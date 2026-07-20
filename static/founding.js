@@ -410,33 +410,38 @@ function initReveal() {
   elements.forEach((element) => observer.observe(element));
 }
 
-function initVaultCamera() {
-  const world = $("vaultWorld");
-  const hero = $("vaultHero");
-  if (!world || !hero || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+// The vault hero (logo + slabs) is a static composition on purpose — it does
+// not track scroll or pointer position. All camera/depth motion below is
+// handled by initSectionDepth() and initMomentDrama().
+
+// A continuous scroll "camera" for everything under the hero: each section's
+// content drifts in depth (translateZ) and tilts slightly (rotateX) based on
+// how far it is from the center of the viewport, so the whole page keeps
+// feeling like it's moving through a 3D space, not just fading in once.
+function initSectionDepth() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  // :not(.reveal) avoids clobbering elements that already own their own
+  // reveal transform (inline style would win over the .reveal.in class rule).
+  const targets = Array.from(document.querySelectorAll(
+    ".section .arena-shell:not(.reveal), .vault-activity-band .vault-activity-grid:not(.reveal)"
+  ));
+  if (!targets.length) return;
 
   let ticking = false;
-  let pointerX = 0;
-  let pointerY = 0;
 
   function apply() {
     ticking = false;
-    const rect = hero.getBoundingClientRect();
     const viewH = window.innerHeight || 1;
-    // 0 at top of hero in view → 1 when hero has scrolled fully past
-    const progress = Math.min(1, Math.max(0, -rect.top / Math.max(rect.height * 0.85, 1)));
-    const depth = progress * 320;
-    const lift = progress * -120;
-    const pitch = progress * 12 + pointerY * 6;
-    const yaw = pointerX * 11 - progress * 7;
-    world.style.setProperty("--cam-z", `${depth}px`);
-    world.style.setProperty("--cam-y", `${lift}px`);
-    world.style.setProperty("--cam-rx", `${pitch}deg`);
-    world.style.setProperty("--cam-ry", `${yaw}deg`);
-    // Soft fade of hero copy as camera enters vault
-    const copy = hero.querySelector(".vault-hero-copy");
-    if (copy) copy.style.opacity = String(1 - progress * 0.85);
-    void viewH;
+    const center = viewH / 2;
+    targets.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const elCenter = rect.top + rect.height / 2;
+      // -1 (below viewport) .. 0 (centered) .. 1 (above viewport)
+      const offset = Math.max(-1, Math.min(1, (elCenter - center) / (viewH * 0.9)));
+      const depth = Math.abs(offset) * -60; // recede in Z the farther from center
+      const tilt = offset * -3.2; // gentle camera tilt as it passes through
+      el.style.transform = `translateZ(${depth.toFixed(1)}px) rotateX(${tilt.toFixed(2)}deg)`;
+    });
   }
 
   function requestApply() {
@@ -447,18 +452,7 @@ function initVaultCamera() {
 
   window.addEventListener("scroll", requestApply, { passive: true });
   window.addEventListener("resize", requestApply, { passive: true });
-  hero.addEventListener("pointermove", (event) => {
-    const bounds = hero.getBoundingClientRect();
-    pointerX = (event.clientX - bounds.left) / bounds.width - 0.5;
-    pointerY = (event.clientY - bounds.top) / bounds.height - 0.5;
-    requestApply();
-  });
-  hero.addEventListener("pointerleave", () => {
-    pointerX = 0;
-    pointerY = 0;
-    requestApply();
-  });
-  apply();
+  requestApply();
 }
 
 // The "hall of thunder" chase-card: idle floating motion running constantly,
@@ -632,7 +626,9 @@ function initArenaCanvas() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initReveal();
-  initVaultCamera();
+  initSectionDepth();
+  // The vault hero (logo + slabs) is intentionally static — no scroll/pointer
+  // camera. All the scroll-driven 3D motion lives below it.
   initMomentDrama();
   initArenaCanvas();
   loadArena();
