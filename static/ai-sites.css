@@ -35,7 +35,7 @@
 .chat-fab#fab-studio .fab-copy small {
   font-family: var(--font-mono);
   font-size: 9px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-text-muted);
   font-weight: 400;
@@ -71,16 +71,16 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-family: "Syne", var(--font-display);
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
 }
 .chat-head-title .sub {
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-accent-primary);
 }
@@ -211,7 +211,7 @@
 .vault-advisor-kicker {
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-accent-primary);
 }
@@ -304,17 +304,17 @@
 .intel-brief-kicker {
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-accent-primary);
   margin-bottom: 8px;
 }
 .intel-brief h2 {
   margin: 0 0 8px;
-  font-family: "Syne", var(--font-display);
+  font-family: var(--font-display);
   font-size: clamp(26px, 3.5vw, 38px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
   line-height: 0.95;
 }
 .intel-brief h2 em {
@@ -349,10 +349,10 @@ body.page-admin .ai-box::before {
   color: color-mix(in srgb, var(--color-accent-primary) 55%, transparent);
 }
 body.page-admin .ai-box h3 {
-  font-family: "Syne", var(--font-display);
+  font-family: var(--font-display);
   font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
   text-transform: none;
   color: var(--color-text-primary);
 }

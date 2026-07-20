@@ -47,7 +47,7 @@ body.premium-room {
 }
 .room-eyebrow {
   display: flex; align-items: center; gap: 9px; color: var(--room-ice);
-  font: 8px/1 var(--room-mono); letter-spacing: .16em; text-transform: uppercase;
+  font: 8px/1 var(--room-mono); letter-spacing: var(--tracking-label); text-transform: uppercase;
 }
 .room-live-dot {
   width: 7px; height: 7px; border-radius: 50%;
@@ -57,7 +57,7 @@ body.premium-room {
 }
 .room-title {
   margin: 10px 0 0; font-size: clamp(31px,4vw,64px); line-height: .94;
-  letter-spacing: -.055em; text-transform: uppercase; font-weight: 800;
+  letter-spacing: var(--tracking-display); text-transform: uppercase; font-weight: 800;
 }
 .room-phase { text-align: right; }
 .room-phase span:first-child {
@@ -113,7 +113,7 @@ body.premium-room {
 }
 .showcase-frame::after {
   content: "RAGNAR // LIVE ROOM"; position: absolute; top: 24px; left: 26px;
-  color: var(--room-subtle); font: 7px/1 var(--room-mono); letter-spacing: .18em;
+  color: var(--room-subtle); font: 7px/1 var(--room-mono); letter-spacing: var(--tracking-label);
 }
 .showcase-card {
   position: relative; z-index: 1; width: min(41%, 330px); aspect-ratio: .72;
@@ -141,11 +141,11 @@ body.premium-room {
 .card-identity { max-width: 60%; }
 .card-identity .label {
   color: var(--room-ice); font: 7px/1 var(--room-mono);
-  letter-spacing: .16em; text-transform: uppercase;
+  letter-spacing: var(--tracking-label); text-transform: uppercase;
 }
 .card-identity h3 {
   margin: 7px 0 5px; font-size: clamp(23px,3vw,43px); line-height: .98;
-  letter-spacing: -.045em; color: var(--color-text-primary);
+  letter-spacing: var(--tracking-display); color: var(--color-text-primary);
 }
 .card-identity p { margin: 0; color: var(--color-text-secondary); font-size: 12px; }
 .broadcast-metrics { display: flex; text-align: right; gap: 28px; }
@@ -155,7 +155,7 @@ body.premium-room {
 }
 .broadcast-metrics strong {
   display: block; margin-top: 5px; font-size: clamp(25px,3vw,44px);
-  line-height: 1; letter-spacing: -.045em;
+  line-height: 1; letter-spacing: var(--tracking-display);
 }
 .broadcast-metrics .timer { color: var(--room-ice); font-family: var(--room-mono); }
 
@@ -173,8 +173,8 @@ body.premium-room {
   letter-spacing: .15em; text-transform: uppercase;
 }
 .bid-value {
-  margin: 10px 0 2px; font-size: 49px; line-height: 1; font-weight: 900;
-  letter-spacing: -.055em; color: var(--color-text-primary);
+  margin: 10px 0 2px; font-size: 49px; line-height: 1; font-weight: 700;
+  letter-spacing: var(--tracking-display); color: var(--color-text-primary);
 }
 .bidder-line { min-height: 22px; margin: 0 0 18px; color: var(--color-text-secondary); font-size: 12px; }
 .room-panel .field { margin-bottom: 10px; }

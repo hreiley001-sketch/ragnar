@@ -1,6 +1,5 @@
 /* RAGNAR Vault — marketplace visual system.
    Brand-first chamber: one composition, then the catalog. */
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap");
 
 body.vault-page {
   font-family: var(--font-body);
@@ -53,8 +52,8 @@ body.vault-page {
 .vault-brand-mark {
   font-family: var(--font-display);
   font-size: clamp(34px, 5vw, 52px);
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
   line-height: 1;
   color: var(--color-text-primary);
 }
@@ -64,7 +63,7 @@ body.vault-page {
 .vault-brand-runes {
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.22em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-text-muted);
   align-self: center;
@@ -74,9 +73,9 @@ body.vault-page {
   max-width: 14ch;
   font-family: var(--font-display);
   font-size: clamp(40px, 7vw, 72px);
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 0.95;
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+  line-height: 0.98;
   color: var(--color-text-primary);
   animation: vaultRise 0.8s var(--ease-premium) 0.06s both;
 }
@@ -154,7 +153,7 @@ body.vault-page {
 .vault-band-label {
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-text-muted);
   text-align: center;
@@ -269,18 +268,18 @@ body.vault-page {
 .vault-page .listing-title {
   font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-tight);
 }
 .vault-page .listing-price {
   font-family: var(--font-display);
   font-size: 22px;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-tight);
 }
 .vault-page .badge {
   border-radius: var(--radius-xs);
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
 }
 .vault-page .preset-btn {

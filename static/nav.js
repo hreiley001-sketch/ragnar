@@ -191,13 +191,12 @@
       encodeURIComponent(family).replace(/%20/g, "+") + ":wght@400;600;700&display=swap";
     document.head.appendChild(l);
   }
-  loadWebFont("Inter Tight");
   (function loadCoreFonts() {
     if (document.getElementById("ragnar-fonts")) return;
     const l = document.createElement("link");
     l.id = "ragnar-fonts";
     l.rel = "stylesheet";
-    l.href = "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap";
+    l.href = "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap";
     document.head.appendChild(l);
   })();
   function shade(hex, amt) {
@@ -340,16 +339,6 @@
       initConcierge();   // logged-out visitors get the shopper concierge too
     }
   }).catch(() => { initConcierge(); });
-
-  // Ensure display font (Syne) is available on every page that uses nav.
-  (function loadDisplayFont() {
-    if (document.getElementById("ragnar-display-font")) return;
-    const l = document.createElement("link");
-    l.id = "ragnar-display-font";
-    l.rel = "stylesheet";
-    l.href = "https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap";
-    document.head.appendChild(l);
-  })();
 
   // Ensure Counsel design tokens load on every page (floating widget).
   (function loadCounselCss() {
