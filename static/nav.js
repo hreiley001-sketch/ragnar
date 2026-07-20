@@ -302,7 +302,7 @@
         if (lbl) lbl.textContent = "My account"; else a.textContent = "My account";
         a.href = "/account";
       });
-      if (d.user.is_staff) { hub.hidden = false; hub.querySelector(".lbl").textContent = "Command Hub (staff)"; initStudio(); }
+      if (d.user.is_staff) { hub.hidden = false; hub.querySelector(".lbl").textContent = "Command Hub"; initStudio(); }
       else initConcierge();
 
       // "Verify your email" banner for unverified accounts (site-wide reminder).

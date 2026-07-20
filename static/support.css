@@ -3,13 +3,13 @@
 :root {
   --counsel-display: var(--font-display, "Syne", "Inter Tight", sans-serif);
   --counsel-mono: var(--font-mono, "Space Mono", Consolas, monospace);
-  --counsel-ink: var(--color-bg-base, #0b0907);
-  --counsel-panel: var(--color-bg-glass, rgba(28, 24, 19, 0.88));
-  --counsel-line: var(--color-border-subtle, rgba(245, 240, 230, 0.1));
-  --counsel-ice: var(--color-accent-primary, #e8a045);
-  --counsel-ice-dim: var(--color-hover-surface, rgba(232, 160, 69, 0.12));
-  --counsel-steel: var(--color-text-muted, #9a9083);
-  --counsel-gold: var(--color-accent-primary, #e8a045);
+  --counsel-ink: var(--color-bg-base, #07090c);
+  --counsel-panel: var(--color-bg-glass, rgba(12, 15, 19, 0.86));
+  --counsel-line: var(--color-border-subtle, rgba(230, 238, 244, 0.08));
+  --counsel-ice: var(--color-accent-primary, #9ec4d1);
+  --counsel-ice-dim: var(--color-hover-surface, rgba(169, 213, 226, 0.07));
+  --counsel-steel: var(--color-text-muted, #93a0ab);
+  --counsel-gold: var(--color-accent-secondary, #c4a86a);
   --counsel-ok: var(--color-success, #7ecf9a);
   --counsel-warn: var(--color-warning, #e8b45a);
   --counsel-danger: var(--color-error, #ff6b66);
@@ -26,10 +26,10 @@ body.counsel-page {
 .counsel-atmosphere {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(1100px 620px at 78% -10%, rgba(232, 160, 69, 0.16), transparent 58%),
-    radial-gradient(900px 520px at 8% 10%, rgba(126, 184, 201, 0.07), transparent 55%),
-    radial-gradient(700px 400px at 50% 110%, rgba(232, 160, 69, 0.06), transparent 50%),
-    linear-gradient(180deg, #0b0907 0%, #15110d 45%, #0b0907 100%);
+    radial-gradient(1100px 620px at 78% -10%, color-mix(in srgb, var(--counsel-ice) 16%, transparent), transparent 58%),
+    radial-gradient(900px 520px at 8% 10%, color-mix(in srgb, var(--counsel-gold) 8%, transparent), transparent 55%),
+    radial-gradient(700px 400px at 50% 110%, color-mix(in srgb, var(--counsel-ice) 6%, transparent), transparent 50%),
+    linear-gradient(180deg, #05070a 0%, #0c0f13 45%, #07090c 100%);
 }
 .counsel-atmosphere::before {
   content: "";

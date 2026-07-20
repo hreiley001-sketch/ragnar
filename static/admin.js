@@ -35,6 +35,31 @@ const PILL_CLASS = {
 const pill = (s) => `<span class="pill ${PILL_CLASS[s] || ""}">${esc(String(s || "—").replace(/_/g, " "))}</span>`;
 
 /* ---------- auth ---------- */
+function tickCmdClock() {
+  const el = $("cmdClock");
+  if (!el) return;
+  const now = new Date();
+  el.textContent = now.toLocaleString(undefined, {
+    weekday: "short", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+  });
+}
+
+let _cmdClockTimer = null;
+function startCmdChrome() {
+  const pulse = $("cmdPulse");
+  if (pulse) pulse.hidden = false;
+  tickCmdClock();
+  clearInterval(_cmdClockTimer);
+  _cmdClockTimer = setInterval(tickCmdClock, 1000);
+}
+
+function stopCmdChrome() {
+  const pulse = $("cmdPulse");
+  if (pulse) pulse.hidden = true;
+  clearInterval(_cmdClockTimer);
+  _cmdClockTimer = null;
+}
+
 async function tryLogin(token) {
   TOKEN = token;
   await api("/api/admin/check");           // throws if bad
@@ -42,12 +67,14 @@ async function tryLogin(token) {
   $("loginGate").hidden = true;
   $("hub").hidden = false;
   $("logoutBtn").hidden = false;
+  startCmdChrome();
   loadDashboard();
 }
 
 function logout() {
   localStorage.removeItem("ragnar_admin_token");
   TOKEN = "";
+  stopCmdChrome();
   $("hub").hidden = true; $("logoutBtn").hidden = true; $("loginGate").hidden = false;
 }
 
@@ -92,7 +119,11 @@ function renderIntegrations(i) {
     const label = k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, " ");
     return [label, on, note];
   });
-  $("intList").innerHTML = [...known, ...extras].map(([label, on, note]) => `<span class="int-item">${dot(on)}${esc(label)} <span class="muted">(${esc(note)})</span></span>`).join("");
+  const rows = [...known, ...extras];
+  const online = rows.filter(([, on]) => on).length;
+  const meta = $("cmdSystemsMeta");
+  if (meta) meta.textContent = `${online}/${rows.length} online`;
+  $("intList").innerHTML = rows.map(([label, on, note]) => `<span class="int-item">${dot(on)}${esc(label)} <span class="muted">(${esc(note)})</span></span>`).join("");
 }
 
 /* ---------- listings ---------- */
@@ -728,6 +759,10 @@ document.addEventListener("DOMContentLoaded", () => {
   $("teamRefresh").addEventListener("click", loadTeam);
   $("usersBody").addEventListener("click", teamAction);
   $("userSearch").addEventListener("input", () => { clearTimeout(window._us); window._us = setTimeout(loadTeam, 300); });
+  document.querySelectorAll("[data-jump]").forEach((btn) => {
+    btn.addEventListener("click", () => switchTab(btn.getAttribute("data-jump")));
+  });
+  tickCmdClock();
 
   // Token login if stored; with no token this still lets a staff session (cookie) through.
   tryLogin(TOKEN).catch(() => { /* stale token or not signed in; show gate */ });
