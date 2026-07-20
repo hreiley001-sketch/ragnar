@@ -37,7 +37,26 @@
         <label class="check-row" id="termsRow" hidden style="margin-bottom:10px;"><input type="checkbox" id="terms" /> <span style="font-size:13px;">I agree to RAGNAR's Terms &amp; buyer/seller conduct.</span></label>
         <label class="check-row" id="mktRow" hidden style="margin-bottom:12px;"><input type="checkbox" id="mkt" /> <span style="font-size:13px;color:var(--muted);">Email me drop alerts &amp; news (optional).</span></label>
         <button type="submit" class="btn btn-primary" style="width:100%;">Continue</button>
+        <p id="forgotWrap" style="margin:10px 0 0;text-align:center;">
+          <button type="button" id="forgotLink" class="btn btn-ghost btn-sm">Forgot password?</button>
+        </p>
         <p id="authStatus" class="form-status"></p>
+      </form>
+
+      <form id="forgotForm" hidden>
+        <p class="muted" style="font-size:14px;margin:0 0 14px;">Enter your account email and we’ll send a reset link if it exists.</p>
+        <label class="field"><span>Email</span><input name="email" type="email" required placeholder="you@example.com" /></label>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Send reset link</button>
+        <p style="margin:10px 0 0;text-align:center;"><button type="button" id="forgotBack" class="btn btn-ghost btn-sm">← Back to log in</button></p>
+        <p id="forgotStatus" class="form-status"></p>
+      </form>
+
+      <form id="resetForm" hidden>
+        <p class="muted" style="font-size:14px;margin:0 0 14px;">Choose a new password for your account.</p>
+        <label class="field"><span>New password</span><input name="password" type="password" required minlength="8" placeholder="At least 8 characters" /></label>
+        <label class="field"><span>Confirm password</span><input name="confirm" type="password" required minlength="8" placeholder="Re-enter password" /></label>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Update password</button>
+        <p id="resetStatus" class="form-status"></p>
       </form>
 
       <div id="verifySent" class="card" style="padding:18px;margin-top:6px;text-align:center;" hidden>

@@ -47,8 +47,26 @@ free TLS, the repo includes a `render.yaml` blueprint). ~20 minutes.
 ## 3. Final config
 - Confirm `ALLOWED_ORIGINS` and `PUBLIC_BASE_URL` = your real domain (already set in
   `render.yaml`). PUBLIC_BASE_URL matters for Stripe redirect/onboarding links.
-- If you wired Stripe, add a webhook in the Stripe dashboard pointing to
-  `https://ragnarips.com/api/payments/webhook` and set `STRIPE_WEBHOOK_SECRET`.
+
+### Turn on Stripe (required for real checkout)
+Production currently reports `configured: false` until these Render env vars are set.
+Use **test** keys first (`sk_test_…` / `pk_test_…`); leave `PAYMENTS_LIVE=false`.
+
+1. Stripe Dashboard → **Developers → API keys** → copy Secret + Publishable keys.
+2. Render → your `ragnar` service → **Environment** → set:
+   - `STRIPE_SECRET_KEY` = `sk_test_…`
+   - `STRIPE_PUBLISHABLE_KEY` = `pk_test_…`
+3. Stripe → **Developers → Webhooks → Add endpoint**
+   - URL: `https://ragnarips.com/api/payments/webhook`
+   - Events: `checkout.session.completed`, `checkout.session.expired`
+   - Copy signing secret → Render `STRIPE_WEBHOOK_SECRET` = `whsec_…`
+4. Save / redeploy. Confirm: `GET https://ragnarips.com/api/payments/status`
+   should show `"configured": true` (and `"webhook_configured": true`).
+5. Only after a successful test-card purchase, switch to live keys and set
+   `PAYMENTS_LIVE=true`.
+
+Optional but recommended for password-reset / verification emails:
+`RESEND_API_KEY` + verified `EMAIL_FROM`.
 
 ## Alternatives
 - **Railway / Fly.io** — same app; use the `Procfile` (Railway) or `fly launch` with the

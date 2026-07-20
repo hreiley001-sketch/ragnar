@@ -81,15 +81,15 @@ def status() -> dict:
         "webhook_configured": bool(settings.stripe_webhook_secret),
         "currency": settings.platform_currency,
         "note": None if configured() else
-        "Set STRIPE_SECRET_KEY (test key sk_test_… is fine) to enable payments.",
+        "Set STRIPE_SECRET_KEY in Render Environment (sk_test_… is fine) to enable payments.",
     }
 
 
 def _stripe():
     if not configured():
         raise PaymentsError(
-            "Stripe is not configured. Add STRIPE_SECRET_KEY to your .env "
-            "(a test key sk_test_… works for end-to-end testing)."
+            "Stripe is not configured. Add STRIPE_SECRET_KEY in Render "
+            "(Environment) or local .env — a test key sk_test_… is fine to start."
         )
     import stripe  # imported lazily so the app runs without the key
 
