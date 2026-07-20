@@ -142,6 +142,25 @@ def test_api_start_and_chat_fees():
     assert "fee" in body["reply"].lower() or "5%" in body["reply"] or "Founding" in body["reply"]
 
 
+def test_ensure_knowledge_recovers_missing_tables(tmp_path, monkeypatch):
+    """Old DBs without Support tables should self-heal via ensure_knowledge."""
+    import app.database as db
+    from sqlmodel import Session as S
+    from app.support import knowledge as kb
+
+    fresh = tmp_path / "heal.db"
+    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{fresh}")
+    # Rebuild engine against empty file (no tables).
+    from sqlmodel import create_engine as ce
+    new_engine = ce(f"sqlite:///{fresh}", connect_args={"check_same_thread": False})
+    monkeypatch.setattr(db, "engine", new_engine)
+    # create_all not called yet — ensure_knowledge must recover.
+    with S(new_engine) as s:
+        kb.ensure_knowledge(s)
+        hits = kb.search(s, "refund")
+        assert hits
+
+
 def test_api_track_requires_auth_for_privacy():
     _user_id, order_id = _seed_buyer_order(status=OrderStatus.shipped.value)
     client = TestClient(app)

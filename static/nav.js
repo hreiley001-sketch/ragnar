@@ -321,7 +321,7 @@
   // the seller-facing Store Designer. One visual language, one place to tweak it. ----
   const escHtml = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   function createChatWidget(opts) {
-    const { key, icon, label, gold, publish, footNote, headSub, fabHtml, expandHref } = opts;
+    const { key, icon, label, gold, publish, footNote, headSub, fabHtml, expandHref, headHtml } = opts;
     const fab = mk("button", "chat-fab" + (gold ? " chat-fab-gold" : ""));
     fab.innerHTML = fabHtml || `${icon} ${label}`;
     fab.id = "fab-" + key;
@@ -329,9 +329,14 @@
 
     const panel = mk("div", "chat-panel");
     panel.id = "panel-" + key;
+    const titleHtml = headHtml || (
+      headSub
+        ? `<span>${escHtml(label)}</span><span class="sub">${escHtml(headSub)}</span>`
+        : `${icon ? escHtml(icon) + " " : ""}${escHtml(label)}`
+    );
     panel.innerHTML = `
       <div class="chat-head">
-        <div class="chat-head-title">${icon} ${label}${headSub ? `<span class="sub">${escHtml(headSub)}</span>` : ""}</div>
+        <div class="chat-head-title">${titleHtml}</div>
         <button class="chat-close" aria-label="Close">✕</button>
       </div>
       <div class="chat-feed"></div>

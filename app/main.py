@@ -62,6 +62,16 @@ async def lifespan(app: FastAPI):
     init_db()
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     seed_if_empty()
+    # Seed Counsel knowledge base so support chat works on first request.
+    try:
+        from sqlmodel import Session
+        from .database import engine
+        from .support import knowledge as support_knowledge
+
+        with Session(engine) as session:
+            support_knowledge.ensure_knowledge(session)
+    except Exception:  # noqa: BLE001
+        logger.exception("Support knowledge seed skipped")
     logger.info("%s v%s ready.", settings.app_name, settings.version)
     yield
 

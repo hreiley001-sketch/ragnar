@@ -176,7 +176,16 @@ def seed_knowledge(session: Session) -> int:
 
 
 def ensure_knowledge(session: Session) -> None:
-    if session.exec(select(KnowledgeArticle.id).limit(1)).first() is None:
+    """Ensure support tables exist (old DBs) and seed articles."""
+    try:
+        has_any = session.exec(select(KnowledgeArticle.id).limit(1)).first() is not None
+    except Exception:  # noqa: BLE001 — missing table on pre-Support deploys
+        session.rollback()
+        from ..database import init_db
+
+        init_db()
+        has_any = session.exec(select(KnowledgeArticle.id).limit(1)).first() is not None
+    if not has_any:
         seed_knowledge(session)
     else:
         # Fill any new seed slugs added in later deploys.

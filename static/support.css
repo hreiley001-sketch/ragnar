@@ -1,20 +1,18 @@
 /* RAGNAR Counsel — support UX.
-   Steel chamber, ice light, decisive motion. Extends marketplace tokens. */
-@import url("https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap");
-
+   Steel chamber on top of the shared token system (tokens.css). */
 :root {
-  --counsel-display: "Inter Tight", "Arial Narrow", "Helvetica Neue", sans-serif;
-  --counsel-mono: "Space Mono", "SFMono-Regular", Consolas, monospace;
-  --counsel-ink: #07090b;
-  --counsel-panel: rgba(12, 15, 18, 0.88);
-  --counsel-line: rgba(224, 232, 240, 0.12);
-  --counsel-ice: #b7e6f4;
-  --counsel-ice-dim: rgba(169, 219, 234, 0.14);
-  --counsel-steel: #8a959d;
-  --counsel-gold: #c8a86b;
-  --counsel-ok: #71d6ad;
-  --counsel-warn: #e0b46a;
-  --counsel-danger: #ff7a7a;
+  --counsel-display: var(--font-display, "Inter Tight", "Arial Narrow", sans-serif);
+  --counsel-mono: var(--font-mono, "Space Mono", Consolas, monospace);
+  --counsel-ink: var(--color-bg-base, #07090b);
+  --counsel-panel: var(--color-bg-glass, rgba(12, 15, 18, 0.88));
+  --counsel-line: var(--color-border-subtle, rgba(224, 232, 240, 0.12));
+  --counsel-ice: var(--color-accent-primary, #b7e6f4);
+  --counsel-ice-dim: var(--color-hover-surface, rgba(169, 219, 234, 0.14));
+  --counsel-steel: var(--color-text-muted, #8a959d);
+  --counsel-gold: var(--color-accent-secondary, #c8a86b);
+  --counsel-ok: var(--color-success, #71d6ad);
+  --counsel-warn: var(--color-warning, #e0b46a);
+  --counsel-danger: var(--color-error, #ff7a7a);
 }
 
 /* ---------- Full-page counsel chamber ---------- */
