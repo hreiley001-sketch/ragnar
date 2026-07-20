@@ -1,9 +1,10 @@
 """Fee math — the heart of RAGNAR's pitch.
 
-Standard fee: 5% for every seller. Introductory offer: 4% on a seller's first
-$250 in sales, then 5% forever after — no time window, no founding requirement.
-Every number the storefront shows comes from here so the comparison against
-eBay stays honest and lives in one place.
+Standard fee: 5% for every seller. Founders program: the first 250 sellers
+get a 4% introductory rate on their first $250 in sales, then 5% like
+everyone else — no time window, just the dollar cap. Every number the
+storefront shows comes from here so the comparison against eBay stays honest
+and lives in one place.
 """
 from __future__ import annotations
 
@@ -16,11 +17,12 @@ def _money(value: float) -> float:
 
 
 def platform_rate_for(is_founding: bool, founding_intro: bool) -> float:
-    """The RAGNAR platform take rate: the 4% introductory rate while
-    ``founding_intro`` is True (first $250 in sales), else the flat 5%
-    standard rate. ``is_founding`` no longer changes the rate — Founding 250
-    is a permanent badge, not a fee discount."""
-    return settings.founding_rate if founding_intro else settings.standard_rate
+    """The RAGNAR platform take rate: the 4% founders-program rate only when
+    the seller is Founding *and* still within their first $250 in sales,
+    else the flat 5% standard rate."""
+    if is_founding and founding_intro:
+        return settings.founding_rate
+    return settings.standard_rate
 
 
 def quote(

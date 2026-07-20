@@ -237,8 +237,9 @@
   });
 
   function sellerIntroActive() {
-    const v = $("sellerState").dataset.introActive;
-    return v === undefined ? true : v === "1"; // no seller yet → preview the new-seller intro rate
+    // Only Founding 250 sellers get the 4% introductory rate; default to the
+    // standard rate until we know this seller actually holds founding status.
+    return $("sellerState").dataset.introActive === "1";
   }
 
   function updateFeePreview() {
@@ -248,7 +249,7 @@
     if (!price || price <= 0) { el.innerHTML = "Enter a price to see what you keep on RAGNAR vs eBay."; return; }
     const introActive = sellerIntroActive();
     const { keep, savings, rate } = keepInfo(price, introActive);
-    el.innerHTML = `On a ${money(price)} sale you keep <strong>${money(keep)}</strong> (${(rate * 100).toFixed(0)}% platform fee${introActive ? " — intro rate" : ""}). <span class="vs">≈ ${money(savings)} more than eBay.</span>`;
+    el.innerHTML = `On a ${money(price)} sale you keep <strong>${money(keep)}</strong> (${(rate * 100).toFixed(0)}% platform fee${introActive ? " — Founding 250 rate" : ""}). <span class="vs">≈ ${money(savings)} more than eBay.</span>`;
   }
 
   function syncGradedFields() {
@@ -441,7 +442,7 @@
       });
       showSellerState(s);
       updateFeePreview();
-      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! You start at 4% on your first $250 in sales.` : "Seller created — you start at 4% on your first $250 in sales.");
+      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! You start at 4% on your first $250 in sales.` : "Seller created (Founding slots full — standard 5% rate).");
     } catch (err) {
       if (String(err.message).includes("already taken")) {
         try { const s = await api(`/api/sellers/${encodeURIComponent(handle)}`); showSellerState(s); updateFeePreview(); toast("Welcome back — seller loaded."); return; } catch (_) {}

@@ -1,6 +1,6 @@
-"""Business logic shared across routers: Founding-250 badge state, the
-universal introductory fee offer (4% on a seller's first $250 in sales, then
-5% flat forever), and sold-comp matching/aggregation for sales history.
+"""Business logic shared across routers: Founding-250 state (the founders
+program's 4% introductory fee on a seller's first $250 in sales, then 5%
+standard), and sold-comp matching/aggregation for sales history.
 """
 from __future__ import annotations
 
@@ -19,18 +19,18 @@ from .models import Listing, ListingStatus, Sale, Seller, utcnow
 
 
 def founding_intro_active(seller: Optional[Seller]) -> bool:
-    """True while this seller is still within their introductory offer: the
-    first ``founding_intro_sales_cap`` dollars of sales, for every seller
-    (founding badge or not) — no time window."""
-    if not seller:
+    """True while this Founding Seller is still within the founders program's
+    introductory offer: the first ``founding_intro_sales_cap`` dollars of
+    sales. Not available to non-founding sellers. No time window."""
+    if not seller or not seller.is_founding:
         return False
     return seller.founding_intro_sales_cents < settings.founding_intro_sales_cap_cents
 
 
 def effective_platform_rate(seller: Optional[Seller]) -> float:
-    """The platform take rate for this seller right now: the introductory
-    rate on their first ``founding_intro_sales_cap`` dollars in sales, then
-    the flat standard rate for everyone, forever after."""
+    """The platform take rate for this seller right now: the Founding 250
+    introductory rate on their first ``founding_intro_sales_cap`` dollars in
+    sales, then the standard rate — for everyone else, always standard."""
     if founding_intro_active(seller):
         return settings.founding_rate
     return settings.standard_rate

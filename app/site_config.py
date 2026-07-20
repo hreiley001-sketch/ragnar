@@ -73,10 +73,10 @@ SITE_FIELDS: list[dict] = [
         "default": "henry@ragnarips.com",
     },
     # --- Homepage perk cards (the four boxes under the hero) ---
-    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "4% intro rate"},
-    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "Every new seller starts at 4% on their first $250 in sales."},
+    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "4% founders rate"},
+    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "Founding 250 sellers pay just 4% on their first $250 in sales."},
     {"key": "perk2_title", "label": "Perk 2 title", "type": "text", "group": "Homepage perks", "default": "5% standard fee"},
-    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "One flat rate after your intro cap — no tiers, no surprises, no fine print."},
+    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "One flat rate for every seller after that — no tiers, no surprises, no fine print."},
     {"key": "perk3_title", "label": "Perk 3 title", "type": "text", "group": "Homepage perks", "default": "Founding badge"},
     {"key": "perk3_desc", "label": "Perk 3 detail", "type": "text", "group": "Homepage perks", "default": "A permanent Founding Seller badge on your storefront. Status that never expires."},
     {"key": "perk4_title", "label": "Perk 4 title", "type": "text", "group": "Homepage perks", "default": "Your own store"},

@@ -36,10 +36,10 @@ class Settings:
     log_level: str = os.getenv("LOG_LEVEL", "INFO").upper()
 
     # --- Fee model (the core value proposition) ---
-    # Standard platform take rate for every seller, forever.
+    # Standard platform take rate for every seller.
     standard_rate: float = float(os.getenv("RAGNAR_STANDARD_RATE", "0.05"))
-    # Introductory rate: applies to every seller's first `founding_intro_sales_cap`
-    # dollars in sales (see below), regardless of Founding-badge status.
+    # Founders program introductory rate: only for Founding 250 sellers, on
+    # their first `founding_intro_sales_cap` dollars in sales (see below).
     founding_rate: float = float(os.getenv("RAGNAR_FOUNDING_RATE", "0.04"))
     # Pass-through payment processing (Stripe-style).
     processing_rate: float = float(os.getenv("PROCESSING_RATE", "0.029"))
@@ -51,10 +51,10 @@ class Settings:
     ebay_rate: float = float(os.getenv("EBAY_FEE_RATE", "0.1325"))
     ebay_flat: float = float(os.getenv("EBAY_FLAT_FEE", "0.30"))
 
-    # Founding 250 — a permanent recognition badge for the first 250 sellers.
-    # Not tied to the fee: every seller, founding or not, gets `founding_rate`
-    # on their first `founding_intro_sales_cap` dollars in sales, then
-    # `standard_rate` flat forever after. No time window.
+    # Founding 250 — our founders program. The first 250 sellers get a 4%
+    # (`founding_rate`) introductory fee on their first `founding_intro_sales_cap`
+    # dollars in sales, then the `standard_rate` (5%) like everyone else. No
+    # time window — just the dollar cap. Non-founding sellers always pay standard.
     founding_cap: int = int(os.getenv("FOUNDING_SELLER_CAP", "250"))
     founding_intro_days: int = int(os.getenv("FOUNDING_INTRO_DAYS", "90"))
     founding_intro_sales_cap: float = float(os.getenv("FOUNDING_INTRO_SALES_CAP", "250"))

@@ -96,10 +96,9 @@ class UserSession(SQLModel, table=True):
 
 
 class Seller(SQLModel, table=True):
-    """A seller account. Every seller gets a 4% introductory rate on their
-    first $250 in sales, then the flat 5% standard rate forever after.
-    Founding Sellers additionally get a permanent status badge — the badge
-    doesn't change the fee."""
+    """A seller account. Founding Sellers (the first 250) get a 4%
+    introductory rate on their first $250 in sales, then the standard 5%
+    like everyone else. Non-founding sellers always pay the standard rate."""
 
     id: Optional[int] = Field(default=None, primary_key=True)
     handle: str = Field(index=True, unique=True, max_length=40)
@@ -110,8 +109,8 @@ class Seller(SQLModel, table=True):
     founding_number: Optional[int] = Field(default=None, index=True)  # 1..cap
     founding_activated_at: Optional[datetime] = Field(default=None)
     founding_intro_ends_at: Optional[datetime] = Field(default=None)
-    # Cumulative sales (cents) counted toward the universal introductory-rate
-    # cap (first `founding_intro_sales_cap` dollars, any seller).
+    # Cumulative sales (cents) counted toward the Founding-250 introductory
+    # rate cap (first `founding_intro_sales_cap` dollars).
     founding_intro_sales_cents: int = Field(default=0)
 
     # Stripe Connect (Express) — seller's connected account for payouts.
