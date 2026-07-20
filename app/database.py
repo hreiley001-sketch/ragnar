@@ -80,8 +80,18 @@ def _sqlite_add_missing_columns() -> None:
 
 
 def init_db() -> None:
-    """Create tables + apply lightweight in-place migrations."""
+    """Create tables (dev) or rely on Alembic (production).
+
+    Production: set ``ENVIRONMENT=production`` (or ``SCHEMA_BOOTSTRAP=alembic``)
+    and run ``alembic upgrade head`` before starting the app. ``create_all`` is
+    disabled in that mode so schema drift cannot silently invent tables.
+    """
     from . import models  # noqa: F401  (side effect: registers tables)
+
+    if not settings.use_create_all:
+        # Still apply SQLite column backfills only when create_all is on.
+        # Production Postgres is owned entirely by Alembic revisions.
+        return
 
     # Create brand-new tables first (e.g. support OS), then backfill columns on
     # pre-existing tables. Order matters so deploys with an old DB pick up the

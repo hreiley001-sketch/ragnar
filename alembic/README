@@ -1,0 +1,17 @@
+Generic single-database configuration for Alembic.
+
+RAGNAR migration strategy
+-------------------------
+* Development (default): ``init_db()`` uses SQLModel ``create_all`` + SQLite
+  ALTER backfills. Alembic is optional.
+* Production: set ``ENVIRONMENT=production`` (or ``SCHEMA_BOOTSTRAP=alembic``).
+  ``create_all`` is disabled. Before starting the app:
+
+      alembic upgrade head
+
+* New schema changes: edit SQLModel models, then:
+
+      alembic revision --autogenerate -m "describe_change"
+      alembic upgrade head
+
+Never wipe production data to "fix" schema drift.
