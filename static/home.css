@@ -1,19 +1,19 @@
 /* RAGNAR homepage — cinematic live-commerce arena. */
 :root {
-  --arena-black: #050607;
-  --arena-ink: #090b0e;
-  --arena-panel: rgba(15, 18, 22, 0.78);
-  --arena-panel-solid: #101318;
-  --arena-line: rgba(224, 232, 240, 0.13);
-  --arena-line-hot: rgba(186, 221, 239, 0.36);
-  --arena-white: #f4f7f8;
-  --arena-silver: #a5b0ba;
-  --arena-ice: #b8e8f7;
-  --arena-blue: #69bbd7;
-  --arena-gold: #c8a86b;
-  --arena-red: #ff4d4d;
-  --arena-display: "Inter Tight", "Arial Narrow", "Helvetica Neue", sans-serif;
-  --arena-mono: "Space Mono", "SFMono-Regular", Consolas, monospace;
+  --arena-black: var(--color-bg-base);
+  --arena-ink: var(--color-bg-elevated);
+  --arena-panel: var(--color-bg-glass-soft);
+  --arena-panel-solid: var(--color-bg-panel);
+  --arena-line: var(--color-border-default);
+  --arena-line-hot: var(--color-border-strong);
+  --arena-white: var(--color-text-primary);
+  --arena-silver: var(--color-text-secondary);
+  --arena-ice: var(--color-accent-primary);
+  --arena-blue: var(--color-info);
+  --arena-gold: var(--color-accent-secondary);
+  --arena-red: var(--color-live);
+  --arena-display: var(--font-display);
+  --arena-mono: var(--font-mono);
 }
 
 html { scroll-behavior: smooth; background: var(--arena-black); }
@@ -640,4 +640,91 @@ body.arena-home {
   .live-signal { animation: none !important; }
   .holo-card.front::after { animation: none !important; display: none; }
   .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Semantic readability and flagship polish */
+.arena-home { --arena-silver: var(--color-text-secondary); }
+.arena-home .arena-skip { color: var(--color-on-accent); }
+.arena-proof-item span,
+.section-head p,
+.break-row p,
+.break-feature p,
+.breaker-card p,
+.breaker-stats span,
+.moment-copy p,
+.pulse-intro p,
+.pulse-detail,
+.market-gateway p,
+.breaker-copy > p,
+.arena-footer p,
+.arena-status { color: var(--color-text-secondary); }
+.section-label,
+.eyebrow,
+.pulse-time,
+.holo-top,
+.stage-index,
+.difference-card > span,
+.arena-footer,
+.arena-footer-meta { color: var(--color-text-muted); }
+
+.live-card,
+.breaker-card,
+.moment,
+.pulse-list,
+.break-list,
+.difference-card,
+.apply-panel,
+.market-gateway { border-color: var(--color-border-default); }
+.live-card {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.04), transparent 42%),
+    var(--color-bg-glass);
+  box-shadow: var(--shadow-sm);
+}
+.live-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(112deg, transparent 24%, rgba(183,231,244,.08) 46%, transparent 66%);
+  transform: translateX(-120%);
+  transition: transform 760ms var(--ease-premium);
+}
+.live-card:hover::after { transform: translateX(120%); }
+.live-card:hover { box-shadow: var(--shadow-lg), var(--glow-ice); }
+
+.moment {
+  position: relative;
+  background:
+    radial-gradient(680px 420px at 18% 48%, rgba(183,231,244,.09), transparent 65%),
+    radial-gradient(620px 360px at 88% 20%, rgba(201,170,109,.07), transparent 65%),
+    var(--color-bg-glass);
+  box-shadow: var(--shadow-lg);
+}
+.moment::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid rgba(255,255,255,.035);
+  background: linear-gradient(120deg, transparent 28%, rgba(255,255,255,.045) 48%, transparent 68%);
+}
+.moment-card {
+  background:
+    linear-gradient(125deg, rgba(183,231,244,.08), transparent 42%),
+    var(--moment-fallback);
+  box-shadow: 0 36px 80px rgba(0,0,0,.62), 0 0 46px rgba(183,231,244,.09);
+}
+.pulse-list {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,.025), transparent 42%),
+    rgba(9,13,17,.82);
+  box-shadow: var(--shadow-md);
+}
+.pulse-item:hover { background: var(--color-hover-surface); }
+.difference-card,
+.apply-panel { background-color: var(--color-bg-glass); }
+
+@media (max-width: 580px) {
+  .section { padding-block: 84px; }
 }

@@ -21,8 +21,8 @@ async function api(p, o = {}) {
 }
 
 function accentGrad(color) {
-  const c = color || "#6f93b4";
-  return `linear-gradient(135deg, ${c}33, #0a0d12), radial-gradient(circle at 30% 20%, ${c}55, transparent 60%)`;
+  const c = color || "var(--color-accent-fallback)";
+  return `linear-gradient(135deg, color-mix(in srgb, ${c} 24%, transparent), var(--color-bg-base)), radial-gradient(circle at 30% 20%, color-mix(in srgb, ${c} 38%, transparent), transparent 60%)`;
 }
 function initial(name) { return (name || "?").trim()[0].toUpperCase(); }
 
@@ -59,8 +59,8 @@ function bindCardLinkBehavior(nodes, onOpen) {
 function renderLive(streams) {
   const row = $("liveRow");
   if (!streams.length) {
-    $("liveTitle").style.opacity = ".6";
-    row.innerHTML = `<p class="muted" style="grid-column:1/-1;">No live streams right now. Sellers can go live from their store — real broadcasting turns on once a video provider is connected.</p>`;
+    $("liveTitle").classList.add("is-quiet");
+    row.innerHTML = `<p class="muted live-empty">No live streams right now. Sellers can go live from their store — real broadcasting turns on once a video provider is connected.</p>`;
     return;
   }
   row.innerHTML = streams.map((s) => {
@@ -72,10 +72,10 @@ function renderLive(streams) {
     return `<div class="live-card" data-handle="${esc(s.seller_handle)}" role="link" tabindex="0" aria-label="Open ${esc(s.seller_name)} store">
       <div class="live-thumb" style="background:${accentGrad(s.accent_color)}">
         <span class="live-badge ${live ? "" : "sched"}">${live ? "● LIVE" : "SCHEDULED"}</span>
-        ${live ? `<span class="live-views">👁 ${s.viewer_count}</span>` : ""}
-        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" style="opacity:.85"><circle cx="12" cy="12" r="11" stroke="#eaf3fb" stroke-width="1.2"/><path d="M10 8l6 4-6 4V8z" fill="#eaf3fb"/></svg>
+        ${live ? `<span class="live-views">${s.viewer_count} watching</span>` : ""}
+        <svg class="live-play-icon" width="46" height="46" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.2"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg>
       </div>
-      <div class="live-meta"><div class="lt">${esc(s.title)}</div><div class="ls"><span>${esc(s.seller_name)}</span><span>${live ? "Join stream →" : "View store →"}</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">${count}${notify}</div></div>
+      <div class="live-meta"><div class="lt">${esc(s.title)}</div><div class="ls"><span>${esc(s.seller_name)}</span><span>${live ? "Join stream →" : "View store →"}</span></div><div class="live-meta-actions">${count}${notify}</div></div>
     </div>`;
   }).join("");
 
@@ -132,7 +132,7 @@ async function loadStores(q) {
     grid.innerHTML = stores.map((s) => `
       <div class="store-card" data-handle="${esc(s.handle)}" role="link" tabindex="0" aria-label="Open ${esc(s.display_name)} store">
         <div class="store-banner" style="background:${s.banner_url ? `center/cover url('${esc(s.banner_optimized || s.banner_url)}')` : accentGrad(s.accent_color)}">
-          <div class="store-avatar" style="background:${s.avatar_url ? `center/cover url('${esc(s.avatar_optimized || s.avatar_url)}')` : (s.accent_color || "#6f93b4")}">${s.avatar_url ? "" : initial(s.display_name)}</div>
+          <div class="store-avatar" style="background:${s.avatar_url ? `center/cover url('${esc(s.avatar_optimized || s.avatar_url)}')` : `linear-gradient(rgba(3,8,12,.38),rgba(3,8,12,.38)), ${s.accent_color || "var(--color-accent-fallback)"}`}">${s.avatar_url ? "" : initial(s.display_name)}</div>
         </div>
         <div class="store-body">
           <div class="store-name">${esc(s.display_name)} ${s.is_live ? '<span class="live-dot"></span>' : ""} ${s.is_founding ? `<span class="badge founding">★ #${s.founding_number}</span>` : ""}</div>

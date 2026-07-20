@@ -12,7 +12,7 @@
       border: 1px solid var(--border-strong);
       border-radius: 16px;
       padding: 16px;
-      background: radial-gradient(1200px 280px at -10% -120%, rgba(37,99,235,.30), transparent 50%), #fff;
+      background: radial-gradient(1200px 280px at -10% -120%, rgba(183,231,244,.12), transparent 50%), var(--color-bg-panel);
       margin-bottom: 16px;
     }
     .hero-strip h2 { margin: 0 0 6px; font-size: clamp(20px, 3vw, 28px); }
@@ -32,7 +32,7 @@
     .live-meta { padding:10px 12px; }
     .live-meta .lt { font-weight:700; font-size:14px; }
     .live-meta .ls { font-size:12px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .live-chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border-strong); border-radius:999px; padding:3px 8px; font-size:11px; color:var(--text-soft); background:#fff; }
+    .live-chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border-strong); border-radius:999px; padding:3px 8px; font-size:11px; color:var(--text-soft); background:var(--color-bg-elevated); }
     .notify-btn { border:1px solid var(--border-strong); background:var(--bg-2); color:var(--text-soft); border-radius:999px; padding:4px 10px; font-size:11px; cursor:pointer; }
     .notify-btn.on { background:rgba(55,189,255,.14); color:var(--text); border-color:var(--ice); }
     .store-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
@@ -45,8 +45,9 @@
     .store-tag { font-size:12px; color:var(--muted); margin-top:2px; }
     .store-foot { display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:12px; color:var(--text-soft); }
     .store-metrics { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .metric-chip { border:1px solid var(--border-strong); background:#fff; border-radius:999px; padding:2px 8px; font-size:11px; color:var(--text-soft); }
+    .metric-chip { border:1px solid var(--border-strong); background:var(--color-bg-elevated); border-radius:999px; padding:2px 8px; font-size:11px; color:var(--text-soft); }
   </style>
+  <link rel="stylesheet" href="/static/pages.css" />
 </head>
 <body>
   <div class="aurora"></div>

@@ -204,7 +204,7 @@ function renderBreaks(streams, rides) {
 
 function renderBreakers(stores) {
   const items = (stores || []).slice(0, 4);
-  $("breakerCount").textContent = String((stores || []).length || "—");
+  if ($("breakerCount")) $("breakerCount").textContent = String((stores || []).length || "—");
   if (!items.length) {
     $("breakerGrid").innerHTML = `
       <a class="breaker-card" data-rank="01" href="#apply">
@@ -241,7 +241,7 @@ function renderMoment(listings) {
   const image = safeMediaUrl(item.image_optimized || item.image_url);
   if (image) {
     const card = $("momentCard");
-    card.style.background = `center / contain no-repeat url("${image.replaceAll('"', "%22")}"), linear-gradient(145deg, #2a241a, #0b0b0a 70%)`;
+    card.style.background = `center / contain no-repeat url("${image.replaceAll('"', "%22")}"), var(--moment-fallback)`;
     card.classList.add("with-image");
   }
 }
@@ -281,18 +281,26 @@ function renderPulse(streams, rides, listings, stores) {
 }
 
 async function loadArena() {
-  const [streamsResult, ridesResult, recentResult] = await Promise.allSettled([
+  const [streamsResult, ridesResult, storesResult, featuredResult, recentResult] = await Promise.allSettled([
     api("/api/streams"),
     api("/api/rides"),
+    api("/api/stores"),
+    api("/api/listings?featured=true&page_size=8"),
     api("/api/listings?page_size=8&sort=newest"),
   ]);
   const streams = streamsResult.status === "fulfilled" ? streamsResult.value : [];
   const rides = ridesResult.status === "fulfilled" ? ridesResult.value : { items: [] };
+  const stores = storesResult.status === "fulfilled" ? storesResult.value : [];
+  const featured = featuredResult.status === "fulfilled" ? featuredResult.value.items : [];
   const recentData = recentResult.status === "fulfilled" ? recentResult.value : { items: [], total: 0 };
+  const recent = recentData.items || [];
 
   $("vaultCount").textContent = Number(recentData.total || 0).toLocaleString();
   renderLive(streams, rides);
   renderBreaks(streams, rides);
+  renderBreakers(stores);
+  renderMoment(featured.length ? featured : recent);
+  renderPulse(streams, rides, recent, stores);
 }
 
 async function loadFoundingStatus() {
@@ -422,6 +430,7 @@ function initArenaCanvas() {
   function draw() {
     if (!active) return;
     context.clearRect(0, 0, width, height);
+    context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#b7e7f4";
     points.forEach((point) => {
       point.y -= point.speed * point.z;
       point.x += Math.sin((point.y + point.z * 100) * 0.005) * 0.035;
@@ -430,11 +439,12 @@ function initArenaCanvas() {
         point.x = Math.random() * width;
       }
       const alpha = 0.12 + point.z * 0.28;
-      context.fillStyle = `rgba(184, 232, 247, ${alpha})`;
+      context.globalAlpha = alpha;
       context.beginPath();
       context.arc(point.x, point.y, point.size * point.z, 0, Math.PI * 2);
       context.fill();
     });
+    context.globalAlpha = 1;
     frame = requestAnimationFrame(draw);
   }
 

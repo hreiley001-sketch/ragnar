@@ -1,0 +1,93 @@
+/* RAGNAR semantic design tokens.
+   Every surface is paired with a readable foreground. Page themes may tune
+   atmosphere, but component contrast must continue to use these roles. */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --color-bg-base: #050608;
+  --color-bg-elevated: #0a0d11;
+  --color-bg-panel: #10151b;
+  --color-bg-panel-strong: #151b22;
+  --color-bg-glass: rgba(15, 20, 26, 0.86);
+  --color-bg-glass-soft: rgba(18, 24, 31, 0.66);
+  --color-bg-input: #0c1117;
+  --color-bg-overlay: rgba(2, 4, 7, 0.82);
+
+  /* Text */
+  --color-text-primary: #f6f8fa;
+  --color-text-secondary: #bcc6ce;
+  --color-text-muted: #8f9ba5;
+  --color-text-subtle: #74818b;
+  --color-text-disabled: #818d97;
+  --color-on-accent: #061016;
+  --color-on-danger: #190707;
+
+  /* Brand and status */
+  --color-accent-primary: #b7e7f4;
+  --color-accent-primary-strong: #dff7fc;
+  --color-accent-secondary: #c9aa6d;
+  --color-live: #ff5e64;
+  --color-success: #79ddb4;
+  --color-warning: #e7bd70;
+  --color-error: #ff7a7f;
+  --color-info: #8fd2e8;
+
+  /* Lines and states */
+  --color-border-subtle: rgba(224, 235, 242, 0.11);
+  --color-border-default: rgba(224, 235, 242, 0.18);
+  --color-border-strong: rgba(224, 235, 242, 0.30);
+  --color-focus: #dff7fc;
+  --color-hover-surface: rgba(183, 231, 244, 0.08);
+  --color-active-surface: rgba(183, 231, 244, 0.14);
+  --color-disabled-surface: rgba(255, 255, 255, 0.035);
+
+  /* Typography */
+  --font-display: "Inter Tight", "Inter", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --font-body: "Inter Tight", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "Space Mono", "SFMono-Regular", Consolas, monospace;
+
+  /* Shape and depth */
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 18px 52px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 32px 96px rgba(0, 0, 0, 0.54);
+  --shadow-focus: 0 0 0 3px rgba(183, 231, 244, 0.22);
+  --glow-ice: 0 0 36px rgba(183, 231, 244, 0.14);
+  --glow-gold: 0 0 36px rgba(201, 170, 109, 0.12);
+
+  /* Motion */
+  --ease-premium: cubic-bezier(.2, .8, .2, 1);
+  --duration-fast: 140ms;
+  --duration-medium: 240ms;
+  --duration-slow: 520ms;
+
+  /* Dynamic media fallbacks */
+  --color-accent-fallback: #6f93b4;
+  --color-surface-deep: #080b0f;
+  --crest-primary: #91a8b8;
+  --crest-accent: var(--color-accent-primary);
+  --moment-fallback: linear-gradient(145deg, #2b251b, #0a0c0f 70%);
+
+  /* Compatibility aliases used by the existing frontend and site editor. */
+  --bg: var(--color-bg-base);
+  --bg-2: var(--color-bg-elevated);
+  --panel: var(--color-bg-glass);
+  --panel-solid: var(--color-bg-panel);
+  --border: var(--color-border-subtle);
+  --border-strong: var(--color-border-default);
+  --text: var(--color-text-primary);
+  --text-soft: var(--color-text-secondary);
+  --muted: var(--color-text-muted);
+  --steel: var(--color-text-secondary);
+  --ice: var(--color-accent-primary);
+  --ice-strong: var(--color-accent-primary-strong);
+  --gold: var(--color-accent-secondary);
+  --danger: var(--color-error);
+  --ok: var(--color-success);
+  --shadow: var(--shadow-md);
+  --radius: var(--radius-md);
+}

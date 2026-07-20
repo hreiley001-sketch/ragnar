@@ -36,9 +36,7 @@ function paintMeter() {
   if (mode !== "signup") return;
   const s = scorePw($("pw").value);
   const bar = $("pwBar");
-  const pct = [8, 33, 55, 78, 100][s];
-  const col = ["#ff5a5a", "#ff8a5a", "#f0c674", "#9be7c4", "#6fe3b0"][s];
-  bar.style.width = pct + "%"; bar.style.background = col;
+  bar.className = `pw-bar pw-strength-${s}`;
 }
 
 async function submit(e) {
