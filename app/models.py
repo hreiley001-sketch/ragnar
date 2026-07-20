@@ -78,6 +78,8 @@ class User(SQLModel, table=True):
     email_verified: bool = Field(default=False)
     verify_token: Optional[str] = Field(default=None, index=True, max_length=64)
     verify_sent_at: Optional[datetime] = Field(default=None)
+    reset_token: Optional[str] = Field(default=None, index=True, max_length=64)
+    reset_sent_at: Optional[datetime] = Field(default=None)
     pending_email: Optional[str] = Field(default=None, max_length=160)
     role: str = Field(default=UserRole.user.value, index=True)
     seller_handle: Optional[str] = Field(default=None, index=True, max_length=40)

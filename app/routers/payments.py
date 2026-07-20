@@ -75,6 +75,7 @@ def connect_status(
 @router.post("/checkout/{listing_id}")
 def checkout(
     listing_id: int,
+    request: Request,
     payload: dict | None = None,
     session: Session = Depends(get_session),
     user: User = Depends(require_user),
@@ -84,6 +85,18 @@ def checkout(
     Pass {"offer_id": N} to pay an accepted Best Offer price instead of the
     listing price. Reserves inventory until the session expires or pays.
     """
+    from .. import ratelimit
+    ip = ratelimit.client_ip(request)
+    ratelimit.limiter.hit(
+        f"checkout:user:{user.id}",
+        limit=ratelimit.CHECKOUT_LIMIT,
+        window_seconds=ratelimit.CHECKOUT_WINDOW,
+    )
+    ratelimit.limiter.hit(
+        f"checkout:ip:{ip}",
+        limit=ratelimit.CHECKOUT_LIMIT,
+        window_seconds=ratelimit.CHECKOUT_WINDOW,
+    )
     listing = session.get(Listing, listing_id)
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")
