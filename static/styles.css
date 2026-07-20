@@ -57,7 +57,7 @@ code { background: rgba(255,255,255,0.07); padding: 1px 6px; border-radius: 5px;
   display: flex; align-items: center; gap: clamp(16px, 2.5vw, 36px);
   min-height: 72px;
   padding: 0 clamp(18px, 3.5vw, 40px);
-  background: linear-gradient(180deg, rgba(8, 16, 28, 0.82), rgba(3, 6, 11, 0.68));
+  background: linear-gradient(180deg, rgba(34, 44, 59, 0.82), rgba(27, 36, 49, 0.72));
   backdrop-filter: saturate(1.35) blur(22px);
   -webkit-backdrop-filter: saturate(1.35) blur(22px);
   border-bottom: 1px solid rgba(184, 228, 247, 0.1);
@@ -169,7 +169,7 @@ code { background: rgba(255,255,255,0.07); padding: 1px 6px; border-radius: 5px;
 
 /* Page-specific header atmosphere (shared chrome; no parallel nav) */
 .site-header--arena {
-  background: linear-gradient(180deg, rgba(3, 6, 11, 0.35), rgba(3, 6, 11, 0.18));
+  background: linear-gradient(180deg, rgba(21, 28, 38, 0.35), rgba(21, 28, 38, 0.18));
   border-bottom-color: rgba(184, 228, 247, 0.06);
   backdrop-filter: saturate(1.2) blur(24px);
   -webkit-backdrop-filter: saturate(1.2) blur(24px);
@@ -194,7 +194,7 @@ code { background: rgba(255,255,255,0.07); padding: 1px 6px; border-radius: 5px;
   color: var(--color-text-muted);
 }
 .site-header--room {
-  background: rgba(3, 6, 11, 0.78);
+  background: rgba(21, 28, 38, 0.78);
   border-bottom-color: var(--color-border-subtle);
   backdrop-filter: saturate(1.25) blur(18px);
   -webkit-backdrop-filter: saturate(1.25) blur(18px);

@@ -101,7 +101,7 @@ SITE_FIELDS: list[dict] = [
         "label": "Background",
         "type": "color",
         "group": "Look & feel",
-        "default": "#03060b",
+        "default": "#151c26",
     },
     {
         "key": "theme_text",

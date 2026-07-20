@@ -4,7 +4,7 @@
   --counsel-display: var(--font-display);
   --counsel-body: var(--font-body);
   --counsel-mono: var(--font-mono);
-  --counsel-ink: var(--color-bg-base, #03060b);
+  --counsel-ink: var(--color-bg-base, #151c26);
   --counsel-panel: var(--color-bg-glass, rgba(8, 16, 28, 0.72));
   --counsel-line: var(--color-border-subtle, rgba(184, 228, 247, 0.08));
   --counsel-ice: var(--color-accent-primary, #4eb6e8);
@@ -36,7 +36,7 @@ body.counsel-page .counsel-brand-name {
     radial-gradient(1100px 620px at 78% -10%, color-mix(in srgb, var(--counsel-ice) 16%, transparent), transparent 58%),
     radial-gradient(900px 520px at 8% 10%, color-mix(in srgb, var(--counsel-gold) 8%, transparent), transparent 55%),
     radial-gradient(700px 400px at 50% 110%, color-mix(in srgb, var(--counsel-ice) 6%, transparent), transparent 50%),
-    linear-gradient(180deg, #05070a 0%, #0c0f13 45%, #07090c 100%);
+    linear-gradient(180deg, #151c26 0%, #1b2431 45%, #151c26 100%);
 }
 .counsel-atmosphere::before {
   content: "";

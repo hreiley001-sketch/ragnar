@@ -5,16 +5,16 @@
 :root {
   color-scheme: dark;
 
-  /* ——— Surfaces (obsidian ice vault) ——— */
-  --color-bg-base: #03060b;
-  --color-bg-elevated: #070d16;
-  --color-bg-panel: #0b1420;
-  --color-bg-panel-strong: #101c2c;
-  --color-bg-glass: rgba(8, 16, 28, 0.72);
-  --color-bg-glass-soft: rgba(12, 22, 36, 0.58);
-  --color-bg-input: #081018;
-  --color-bg-overlay: rgba(2, 5, 10, 0.82);
-  --color-surface-deep: #010308;
+  /* ——— Surfaces (lighter titanium ice vault) ——— */
+  --color-bg-base: #151c26;
+  --color-bg-elevated: #1b2431;
+  --color-bg-panel: #222c3b;
+  --color-bg-panel-strong: #2a3546;
+  --color-bg-glass: rgba(28, 38, 52, 0.78);
+  --color-bg-glass-soft: rgba(34, 44, 59, 0.62);
+  --color-bg-input: #1a2330;
+  --color-bg-overlay: rgba(12, 18, 28, 0.72);
+  --color-surface-deep: #10161f;
 
   /* ——— Text ——— */
   --color-text-primary: #f2f7fc;
@@ -113,7 +113,7 @@
   /* Dynamic media / crest (store themes may override) */
   --crest-primary: #7a9bb0;
   --crest-accent: var(--color-accent-primary);
-  --moment-fallback: linear-gradient(145deg, #122032, #050a12 72%);
+  --moment-fallback: linear-gradient(145deg, #243447, #151c26 72%);
   --store-accent: var(--color-accent-primary);
 
   /* ——— Compatibility aliases ——— */
