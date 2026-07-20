@@ -82,6 +82,34 @@ function attachBackgrounds(root = document) {
   });
 }
 
+function liveCategory(title, explicitCategory) {
+  const text = `${explicitCategory || ""} ${title || ""}`.toLowerCase();
+  if (text.includes("basketball") || text.includes("nba")) return "basketball";
+  if (text.includes("football") || text.includes("nfl")) return "football";
+  if (text.includes("baseball") || text.includes("mlb")) return "baseball";
+  if (text.includes("soccer") || text.includes("football club")) return "soccer";
+  if (text.includes("pokémon") || text.includes("pokemon")) return "pokemon";
+  if (["magic", "mtg", "yu-gi", "yugioh", "one piece", "lorcana", "tcg"].some((term) => text.includes(term))) return "tcg";
+  return "other";
+}
+
+function initCategoryFilters() {
+  const buttons = document.querySelectorAll("[data-live-category]");
+  const cards = document.querySelectorAll("#liveArena .live-card");
+  const empty = $("categoryEmpty");
+  buttons.forEach((button) => button.addEventListener("click", () => {
+    const selected = button.dataset.liveCategory;
+    let visible = 0;
+    buttons.forEach((item) => item.classList.toggle("active", item === button));
+    cards.forEach((card) => {
+      const show = selected === "all" || card.dataset.category === selected;
+      card.hidden = !show;
+      if (show) visible += 1;
+    });
+    if (empty) empty.hidden = visible > 0;
+  }));
+}
+
 function renderLive(streams, rides) {
   const liveStreams = (streams || []).filter((stream) => stream.status === "live").map((stream) => ({
     href: `/store/${encodeURIComponent(stream.seller_handle)}`,
@@ -91,6 +119,7 @@ function renderLive(streams, rides) {
     viewers: stream.viewer_count || 0,
     image: stream.thumbnail_url,
     code: "LIVE",
+    category: liveCategory(stream.title),
   }));
   const liveRides = ((rides && rides.items) || [])
     .filter((ride) => !["idle", "archived"].includes(ride.status))
@@ -103,6 +132,7 @@ function renderLive(streams, rides) {
       image: ride.listing && ride.listing.image_url,
       code: String(ride.current_phase || "ride").slice(0, 4).toUpperCase(),
       detail: ride.current_bid != null ? `${money(ride.current_bid)} high bid` : "Live auction",
+      category: liveCategory(ride.title, ride.listing && ride.listing.category),
     }));
   const items = [...liveRides, ...liveStreams].slice(0, 6);
   $("liveCount").textContent = String(items.length);
@@ -121,7 +151,7 @@ function renderLive(streams, rides) {
   }
 
   $("liveArena").innerHTML = items.map((item) => `
-    <a class="live-card" href="${esc(item.href)}">
+    <a class="live-card" data-category="${esc(item.category)}" href="${esc(item.href)}">
       <div class="live-card-media" data-bg="${esc(item.image || "")}"></div>
       <div class="live-card-code">${esc(item.code)}</div>
       <div class="live-card-top">
@@ -138,6 +168,7 @@ function renderLive(streams, rides) {
       </div>
     </a>`).join("");
   attachBackgrounds($("liveArena"));
+  initCategoryFilters();
 }
 
 function renderBreaks(streams, rides) {
@@ -145,7 +176,7 @@ function renderBreaks(streams, rides) {
     href: `/store/${encodeURIComponent(stream.seller_handle)}`,
     when: scheduleLabel(stream.scheduled_at),
     title: stream.title,
-    detail: `${stream.seller_name} · Scheduled live break`,
+    detail: `${stream.seller_name} · Scheduled live room`,
   }));
   const waitingRides = ((rides && rides.items) || []).filter((ride) => ride.status === "idle").map((ride) => ({
     href: `/ride/${ride.id}`,
@@ -250,26 +281,18 @@ function renderPulse(streams, rides, listings, stores) {
 }
 
 async function loadArena() {
-  const [streamsResult, ridesResult, storesResult, featuredResult, recentResult] = await Promise.allSettled([
+  const [streamsResult, ridesResult, recentResult] = await Promise.allSettled([
     api("/api/streams"),
     api("/api/rides"),
-    api("/api/stores"),
-    api("/api/listings?featured=true&page_size=8"),
     api("/api/listings?page_size=8&sort=newest"),
   ]);
   const streams = streamsResult.status === "fulfilled" ? streamsResult.value : [];
   const rides = ridesResult.status === "fulfilled" ? ridesResult.value : { items: [] };
-  const stores = storesResult.status === "fulfilled" ? storesResult.value : [];
-  const featured = featuredResult.status === "fulfilled" ? featuredResult.value.items : [];
   const recentData = recentResult.status === "fulfilled" ? recentResult.value : { items: [], total: 0 };
-  const recent = recentData.items || [];
 
-  $("vaultCount").textContent = Number(recentData.total || featured.length || 0).toLocaleString();
+  $("vaultCount").textContent = Number(recentData.total || 0).toLocaleString();
   renderLive(streams, rides);
   renderBreaks(streams, rides);
-  renderBreakers(stores);
-  renderMoment(featured.length ? featured : recent);
-  renderPulse(streams, rides, recent, stores);
 }
 
 async function loadFoundingStatus() {

@@ -524,12 +524,6 @@ function applyFilters(f) {
 }
 
 /* ---------------- category browse chips ---------------- */
-const CAT_EMOJI = [
-  [/pok/i, "⚡"], [/magic|mtg/i, "🔮"], [/yu-?gi/i, "🐉"], [/one piece/i, "🏴‍☠️"],
-  [/lorcana/i, "🏰"], [/basketball/i, "🏀"], [/baseball/i, "⚾"], [/football/i, "🏈"],
-  [/soccer|fifa/i, "⚽"], [/hockey/i, "🏒"], [/sport/i, "🏅"],
-];
-function catEmoji(c) { for (const [re, e] of CAT_EMOJI) if (re.test(c)) return e; return "🃏"; }
 function catLabel(c) {
   if (c.includes("—")) return c.split("—").pop().trim();
   if (c.includes(":")) return c.split(":")[0].trim();
@@ -552,7 +546,7 @@ async function loadLiveRail() {
       return `<a class="lr-card" href="/store/${encodeURIComponent(s.seller_handle)}">
         <div class="lr-thumb" style="background:${bg}">
           <span class="lr-badge">● LIVE</span>
-          <span class="lr-views">👁 ${s.viewer_count || 0}</span>
+          <span class="lr-views">${s.viewer_count || 0} watching</span>
         </div>
         <div class="lr-body">
           <div class="lr-title">${escapeHtml(s.title)}</div>
@@ -573,8 +567,8 @@ function buildCatChips() {
     return b;
   };
   box.innerHTML = "";
-  box.appendChild(mkChip("", "🗂️ All"));
-  (META.categories || []).forEach((c) => box.appendChild(mkChip(c, `${catEmoji(c)} ${catLabel(c)}`)));
+  box.appendChild(mkChip("", "All"));
+  (META.categories || []).forEach((c) => box.appendChild(mkChip(c, catLabel(c)));
   syncCatChips();
 }
 

@@ -8,7 +8,7 @@
   <meta name="description" content="Enter RAGNAR: a premium live-commerce arena for sports cards, TCG breaks, collectors, and the breakers defining what comes next." />
   <meta name="keywords" content="live card breaks, sports card breaks, TCG live breaks, trading card marketplace, live commerce, card breakers" />
   <link rel="canonical" href="https://ragnarips.com/" />
-  <link rel="icon" href="/static/logo.svg" />
+  <link rel="icon" href="/static/logo.png" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="RAGNAR" />
   <meta property="og:title" content="RAGNAR — The Arena for Live Collectibles" />
@@ -33,22 +33,17 @@
 
   <header class="arena-nav">
     <a class="arena-brand" href="/" aria-label="RAGNAR home">
-      <svg class="arena-mark" viewBox="0 0 42 50" fill="none" aria-hidden="true">
-        <path d="M5 3h22l10 10v10L27 33l10 14H25L15 34v13H5V3Z" stroke="currentColor" stroke-width="2"/>
-        <path d="M15 13h10l3 3v4l-5 5h-8V13Z" fill="currentColor"/>
-      </svg>
-      <span>RAGNAR<small>Live commerce arena</small></span>
+      <img src="/static/logo.png" alt="RAGNAR" />
     </a>
     <nav class="arena-primary-nav" aria-label="Primary navigation">
       <a href="#live">Live now</a>
-      <a href="#breaks">Breaks</a>
-      <a href="#breakers">Breakers</a>
+      <a href="#categories">Categories</a>
+      <a href="#difference">Why RAGNAR</a>
       <a href="/marketplace">Marketplace</a>
-      <a href="#pulse">Pulse</a>
     </nav>
     <div class="header-actions">
       <a id="acctLink" class="arena-nav-link" href="/login">Sign in</a>
-      <a class="arena-nav-cta" href="#apply">Become a breaker</a>
+      <a class="arena-nav-cta" href="#apply">Sell on RAGNAR</a>
     </div>
   </header>
 
@@ -61,16 +56,16 @@
           <span class="outline">the</span>
           <span class="cut">expected.</span>
         </h1>
-        <p id="arenaSubtitle" class="arena-hero-sub">Live breaks engineered like main events. The best breakers, the biggest pulls, and a marketplace built for collectors who refuse ordinary.</p>
+        <p id="arenaSubtitle" class="arena-hero-sub">The live floor for breakers, singles sellers, and collectors. Every stream feels like a main event. Every seller keeps more.</p>
         <div class="arena-hero-actions">
           <a class="arena-btn primary" href="#live">Enter the arena <span class="arrow">↗</span></a>
           <a class="arena-btn" href="/marketplace">Explore the vault <span class="arrow">→</span></a>
         </div>
         <div class="arena-proof" aria-label="Platform activity">
           <div class="arena-proof-item"><strong id="liveCount">0</strong><span>Live rooms</span></div>
-          <div class="arena-proof-item"><strong id="breakerCount">—</strong><span>Elite breakers</span></div>
           <div class="arena-proof-item"><strong id="vaultCount">—</strong><span>Vault listings</span></div>
-          <div class="arena-proof-item"><strong>24/7</strong><span>Arena access</span></div>
+          <div class="arena-proof-item hot"><strong>4%</strong><span>Founding 250 rate</span></div>
+          <div class="arena-proof-item"><strong>5%</strong><span>Standard flat rate</span></div>
         </div>
       </div>
 
@@ -101,29 +96,39 @@
       <div class="arena-shell">
         <div class="section-head reveal">
           <div><span class="section-label">01 / Live now</span><h2>The floor<br>is live.</h2></div>
-          <p>Every room is a main event. Enter live breaks, watch the reveal, and own the moment in real time.</p>
+          <p>Breaks, singles, slabs, and chase cards—organized by what you collect, not by how a seller chooses to sell it.</p>
           <a class="section-link" href="/stores">View all live rooms →</a>
+        </div>
+        <div id="categories" class="arena-categories reveal" role="group" aria-label="Filter live streams by category">
+          <button class="arena-category active" type="button" data-live-category="all">All live</button>
+          <button class="arena-category" type="button" data-live-category="basketball">Basketball</button>
+          <button class="arena-category" type="button" data-live-category="football">Football</button>
+          <button class="arena-category" type="button" data-live-category="baseball">Baseball</button>
+          <button class="arena-category" type="button" data-live-category="soccer">Soccer</button>
+          <button class="arena-category" type="button" data-live-category="pokemon">Pokémon</button>
+          <button class="arena-category" type="button" data-live-category="tcg">TCG</button>
         </div>
         <div id="liveArena" class="live-grid reveal" aria-live="polite">
           <div class="arena-empty"><div><strong>Scanning the arena…</strong><span>Loading live rooms and active rides.</span></div></div>
         </div>
+        <div id="categoryEmpty" class="category-empty" hidden>No rooms in this category are live right now. The full arena is one click away.</div>
       </div>
     </section>
 
     <section id="breaks" class="section">
       <div class="arena-shell">
         <div class="section-head reveal">
-          <div><span class="section-label">02 / The lineup</span><h2>Featured<br>breaks.</h2></div>
-          <p>Chase product, premium rooms, and scheduled drops worth setting an alarm for.</p>
+          <div><span class="section-label">02 / Coming up</span><h2>Next on<br>the floor.</h2></div>
+          <p>Upcoming rooms from breakers and singles sellers. Follow the category, enter the room, and decide how you want to collect.</p>
         </div>
         <div class="break-grid reveal">
           <div id="breakList" class="break-list" aria-live="polite"></div>
           <aside class="break-feature">
             <div class="number">250</div>
             <div>
-              <span class="section-label">Founding class</span>
-              <h3>Built for the breakers building culture.</h3>
-              <p>The first 250 breakers receive permanent founding status, a lower lifetime platform rate, and priority access to what comes next.</p>
+              <span class="section-label">Founding 250</span>
+              <h3>Keep 96% before processing.</h3>
+              <p>The first 250 approved sellers lock in a flat 4% RAGNAR platform fee. Every seller after them pays a simple 5%. No category penalties. No confusing tiers.</p>
               <a class="arena-btn small" href="#apply">Claim your place <span class="arrow">→</span></a>
             </div>
           </aside>
@@ -131,51 +136,20 @@
       </div>
     </section>
 
-    <section id="breakers" class="section">
-      <div class="arena-shell">
-        <div class="section-head reveal">
-          <div><span class="section-label">03 / Ranked talent</span><h2>Top<br>breakers.</h2></div>
-          <p>The personalities, operators, and collectors turning every broadcast into an event.</p>
-          <a class="section-link" href="/stores">Meet every breaker →</a>
+    <section id="difference" class="section">
+      <div class="arena-shell difference-layout reveal">
+        <div class="difference-copy">
+          <span class="section-label">03 / The RAGNAR difference</span>
+          <h2>Built to keep<br>sellers powerful.</h2>
+          <p>Most platforms make scale expensive and trust invisible. RAGNAR makes the economics obvious and gives every card a better information trail.</p>
+          <a class="arena-btn small" href="#apply">Join the Founding 250 <span class="arrow">→</span></a>
         </div>
-        <div id="breakerGrid" class="breaker-grid reveal" aria-live="polite"></div>
-      </div>
-    </section>
-
-    <section id="pulls" class="section">
-      <div class="arena-shell">
-        <div class="section-head reveal">
-          <div><span class="section-label">04 / Biggest pulls</span><h2>The hall.</h2></div>
-          <p>Every monster hit deserves a permanent place in RAGNAR history.</p>
+        <div class="difference-grid">
+          <article class="difference-card fee-card"><span>Founding 250</span><strong>4%</strong><p>Flat platform fee, locked in permanently after the founding intro.</p></article>
+          <article class="difference-card"><span>Every seller after</span><strong>5%</strong><p>One transparent standard rate. No category maze and no surprise platform tiers.</p></article>
+          <article class="difference-card"><span>Know the card</span><strong>AI scan</strong><p>Scan-to-list, grading-aware details, live pricing, and real sold-price history.</p></article>
+          <article class="difference-card"><span>Trade with confidence</span><strong>Trust</strong><p>Structured listings, buyer protection, seller identity, offers, orders, and disputes.</p></article>
         </div>
-        <article class="moment reveal">
-          <div class="moment-visual">
-            <div class="moment-ring"></div>
-            <div id="momentCard" class="moment-card"></div>
-          </div>
-          <div class="moment-copy">
-            <span class="eyebrow">Verified pull archive // opening soon</span>
-            <h3 id="momentTitle">Legends need a stage.</h3>
-            <p id="momentDescription">RAGNAR will capture the room, the reaction, the breaker, and the card—turning every once-in-a-lifetime hit into a permanent cinematic moment.</p>
-            <div class="moment-meta">
-              <div><b id="momentCategory">1 / 1</b><span>Moment class</span></div>
-              <div><b id="momentGrade">Verified</b><span>Pull status</span></div>
-              <div><b id="momentValue">Live</b><span>Arena capture</span></div>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section id="pulse" class="section">
-      <div class="arena-shell pulse-layout">
-        <div class="pulse-intro reveal">
-          <span class="section-label">05 / RAGNAR Pulse</span>
-          <h2>The market<br>has a pulse.</h2>
-          <p>Live rooms, fresh inventory, rising bids, and breaker activity—one real-time signal from across the entire arena.</p>
-          <a class="arena-btn small" href="/marketplace">Open marketplace <span class="arrow">→</span></a>
-        </div>
-        <div id="pulseList" class="pulse-list reveal" aria-live="polite"></div>
       </div>
     </section>
 
@@ -183,7 +157,7 @@
       <div class="arena-shell">
         <div class="market-gateway reveal">
           <div>
-            <span class="section-label">Beyond the broadcast</span>
+            <span class="section-label">04 / Beyond the broadcast</span>
             <h2>The vault never closes.</h2>
             <p>Search graded cards, compare comps, scan inventory, make offers, and buy from trusted sellers across the RAGNAR marketplace.</p>
           </div>
@@ -195,9 +169,9 @@
     <section id="apply" class="section">
       <div class="arena-shell breaker-cta">
         <div class="breaker-copy reveal">
-          <span class="section-label">06 / Enter the inner circle</span>
-          <h2>Become a<br>breaker.</h2>
-          <p>Bring your audience. Build your room. Own your business. RAGNAR gives serious breakers the stage and economics they deserve.</p>
+          <span class="section-label">05 / Enter the inner circle</span>
+          <h2>Own the<br>floor.</h2>
+          <p>Run high-volume breaks or sell singles live. Bring your audience, build your room, and keep the economics of your business.</p>
           <div id="counter" class="founding-counter-premium"><span><span id="claimed">—</span> / <span id="cap">250</span> founding positions claimed</span></div>
           <div class="breaker-benefits">
             <div><b id="perkIntro">0%</b><span id="perk1Title">Intro platform fee</span></div>
@@ -213,15 +187,15 @@
 
         <div>
           <div class="apply-panel reveal">
-            <h3>Apply for founding access</h3>
-            <p>Applications are reviewed by hand. Tell us what you break and where you are taking it.</p>
+            <h3>Apply for founding seller access</h3>
+            <p>Applications are reviewed by hand. Tell us what you sell, what you break, and where you are taking it.</p>
             <form id="applyForm">
               <div class="arena-form-grid">
                 <label class="arena-field"><span>Name *</span><input name="name" required minlength="2" maxlength="120" autocomplete="name" placeholder="Your name" /></label>
                 <label class="arena-field"><span>Email *</span><input name="email" type="email" required maxlength="160" autocomplete="email" placeholder="you@example.com" /></label>
-                <label class="arena-field"><span>Breaker handle</span><input name="handle_wanted" maxlength="40" placeholder="@yourbreakroom" /></label>
+                <label class="arena-field"><span>Seller / breaker handle</span><input name="handle_wanted" maxlength="40" placeholder="@yourlivestore" /></label>
                 <label class="arena-field"><span>Monthly volume</span><input name="monthly_volume" maxlength="80" placeholder="$10,000 / month" /></label>
-                <label class="arena-field full"><span>What do you break?</span><input name="categories" maxlength="300" placeholder="High-end football, basketball, Pokémon, One Piece…" /></label>
+                <label class="arena-field full"><span>What do you sell or break?</span><input name="categories" maxlength="300" placeholder="High-end football, basketball, Pokémon, One Piece…" /></label>
                 <label class="arena-field full"><span>Where do you sell now?</span><input name="current_platforms" maxlength="300" placeholder="Whatnot, Fanatics Live, eBay, your social channels…" /></label>
                 <label class="arena-field full"><span>Why RAGNAR?</span><textarea name="message" maxlength="2000" placeholder="Tell us about your audience, operation, and vision."></textarea></label>
               </div>
@@ -244,7 +218,7 @@
 
   <footer class="arena-footer">
     <div><div class="arena-footer-brand">RAGNAR</div><p>Live commerce, forged different.</p></div>
-    <div class="arena-footer-links"><a href="/stores">Live</a><a href="/marketplace">Marketplace</a><a href="/login">Account</a><a href="#apply">Breakers</a></div>
+    <div class="arena-footer-links"><a href="/stores">Live</a><a href="/marketplace">Marketplace</a><a href="/login">Account</a><a href="#apply">Sellers</a></div>
     <div class="arena-footer-meta">RAGNAR // 2026<br>Guided by counsel. Driven by conquest.</div>
   </footer>
 

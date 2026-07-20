@@ -6,11 +6,11 @@
   const path = (location.pathname.replace(/\/+$/, "") || "/");
 
   const ITEMS = [
-    { icon: "🏠", label: "Home", href: "/" },
-    { icon: "🛒", label: "Marketplace", href: "/marketplace" },
-    { icon: "🏪", label: "Stores", href: "/stores" },
-    { icon: "🎢", label: "Live Rides", href: "/rides" },
-    { icon: "⭐", label: "Become a Seller", href: "/#apply" },
+    { icon: "01", label: "Home", href: "/" },
+    { icon: "02", label: "Marketplace", href: "/marketplace" },
+    { icon: "03", label: "Live Sellers", href: "/stores" },
+    { icon: "04", label: "Live Rooms", href: "/rides" },
+    { icon: "05", label: "Sell on RAGNAR", href: "/#apply" },
   ];
 
   const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
@@ -34,7 +34,7 @@
       return `<span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding —</span><span id="backendStatus" class="status-badge checking">connecting…</span>`;
     }
     if (path.startsWith("/ride/")) {
-      return `<span id="viewers" class="status-badge">👁 0</span>`;
+      return `<span id="viewers" class="status-badge">0 watching</span>`;
     }
     if (path === "/account") {
       return `<button id="logoutBtn" class="btn btn-ghost btn-sm" type="button">Log out</button>`;
@@ -48,17 +48,17 @@
     const light = path === "/login" || path === "/verify";
     if (light) {
       header.innerHTML = `
-        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
+        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
         <div class="header-actions"></div>`;
       return;
     }
     header.innerHTML = `
-      <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
+      <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
         <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
         <a class="btn btn-ghost btn-sm" href="/stores">Stores</a>
-        <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
+        <button class="btn btn-primary btn-sm" type="button" data-open-sell>Sell</button>
         <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
       </div>`;
     acctLinks.push(header.querySelector("#headerAcctLink"));
@@ -76,7 +76,7 @@
   const drawer = mk("div", "nav-drawer");
   drawer.innerHTML = `
     <div class="nav-head">
-      <a href="/" style="display:inline-flex"><img src="/static/logo.svg" alt="RAGNAR" /></a>
+      <a href="/" style="display:inline-flex"><img src="/static/logo.png" alt="RAGNAR" /></a>
       <button class="nav-close" aria-label="Close menu">✕</button>
     </div>
     <nav class="nav-links" id="navLinks"></nav>
@@ -85,10 +85,10 @@
   ITEMS.forEach((it) => links.appendChild(navLink(it)));
   links.appendChild(mk("div", "nav-div"));
   const userLine = mk("div", "nav-user"); userLine.id = "navUser"; userLine.hidden = true; links.appendChild(userLine);
-  const acct = navLink({ icon: "👤", label: "Sign in", href: "/login" }); links.appendChild(acct);
+  const acct = navLink({ icon: "ID", label: "Sign in", href: "/login" }); links.appendChild(acct);
   acctLinks.push(acct);
   // Command Hub is staff-only — hidden until we confirm the user is staff.
-  const hub = navLink({ icon: "⚙️", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
+  const hub = navLink({ icon: "//", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
 
   document.body.appendChild(scrim);
   document.body.appendChild(drawer);
@@ -324,7 +324,7 @@
   function initConcierge() {
     if (conciergeBuilt) return;
     conciergeBuilt = true;
-    const w = createChatWidget({ key: "concierge", icon: "💬", label: "Ask RAGNAR", footNote: "What are you hunting for?" });
+    const w = createChatWidget({ key: "concierge", icon: "R", label: "Ask RAGNAR", footNote: "What are you hunting for?" });
 
     function personalize(text) {
       const low = text.toLowerCase();
@@ -381,7 +381,7 @@
     if (studioBuilt) return;
     studioBuilt = true;
     const pending = {};   // accumulated updates not yet published
-    const w = createChatWidget({ key: "studio", icon: "✨", label: "Studio", gold: true, publish: true, footNote: "Tell me how to sculpt the site…" });
+    const w = createChatWidget({ key: "studio", icon: "//", label: "Studio", gold: true, publish: true, footNote: "Tell me how to sculpt the site…" });
 
     const setPublish = () => {
       const n = Object.keys(pending).length;
