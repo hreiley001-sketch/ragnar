@@ -507,8 +507,8 @@
       const low = text.toLowerCase();
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
-      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#2a2826";
-      else if (/\b(light|lighter|bright|brighter|white|day|ice|arctic)\b/.test(low)) theme.theme_bg = "#eef5f9";
+      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#060d15";
+      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#eef5f9";
       if (/\b(light|brighter|day|fur)\b/.test(low)) theme.theme_text = "#1c1b19";
       else if (/\b(dark|midnight|night)\b/.test(low)) theme.theme_text = "#f2f7fc";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);
