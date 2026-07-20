@@ -41,17 +41,8 @@
   box-shadow: var(--shadow-md);
 }
 .hero-strip::before {
-  content: "LIVE COMMERCE";
-  position: absolute;
-  right: -12px;
-  bottom: -26px;
-  color: rgba(255,255,255,.035);
-  font-family: var(--font-display);
-  font-size: clamp(70px, 13vw, 178px);
-  font-weight: 900;
-  line-height: .75;
-  letter-spacing: -.07em;
-  white-space: nowrap;
+  content: "";
+  display: none;
 }
 .hero-strip h2 {
   position: relative;
@@ -59,10 +50,11 @@
   max-width: 850px;
   margin: 0 0 14px;
   color: var(--color-text-primary);
-  font-size: clamp(38px, 6vw, 82px);
-  line-height: .9;
-  letter-spacing: -.055em;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6vw, 72px);
+  line-height: .92;
+  letter-spacing: -.045em;
+  text-transform: none;
 }
 .hero-strip p {
   position: relative;

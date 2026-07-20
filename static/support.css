@@ -1,18 +1,18 @@
 /* RAGNAR Counsel — support UX.
-   Steel chamber on top of the shared token system (tokens.css). */
+   Conquest forge chamber on shared tokens. */
 :root {
-  --counsel-display: var(--font-display, "Inter Tight", "Arial Narrow", sans-serif);
+  --counsel-display: var(--font-display, "Syne", "Inter Tight", sans-serif);
   --counsel-mono: var(--font-mono, "Space Mono", Consolas, monospace);
-  --counsel-ink: var(--color-bg-base, #07090b);
-  --counsel-panel: var(--color-bg-glass, rgba(12, 15, 18, 0.88));
-  --counsel-line: var(--color-border-subtle, rgba(224, 232, 240, 0.12));
-  --counsel-ice: var(--color-accent-primary, #b7e6f4);
-  --counsel-ice-dim: var(--color-hover-surface, rgba(169, 219, 234, 0.14));
-  --counsel-steel: var(--color-text-muted, #8a959d);
-  --counsel-gold: var(--color-accent-secondary, #c8a86b);
-  --counsel-ok: var(--color-success, #71d6ad);
-  --counsel-warn: var(--color-warning, #e0b46a);
-  --counsel-danger: var(--color-error, #ff7a7a);
+  --counsel-ink: var(--color-bg-base, #0b0907);
+  --counsel-panel: var(--color-bg-glass, rgba(28, 24, 19, 0.88));
+  --counsel-line: var(--color-border-subtle, rgba(245, 240, 230, 0.1));
+  --counsel-ice: var(--color-accent-primary, #e8a045);
+  --counsel-ice-dim: var(--color-hover-surface, rgba(232, 160, 69, 0.12));
+  --counsel-steel: var(--color-text-muted, #9a9083);
+  --counsel-gold: var(--color-accent-primary, #e8a045);
+  --counsel-ok: var(--color-success, #7ecf9a);
+  --counsel-warn: var(--color-warning, #e8b45a);
+  --counsel-danger: var(--color-error, #ff6b66);
 }
 
 /* ---------- Full-page counsel chamber ---------- */
@@ -26,10 +26,10 @@ body.counsel-page {
 .counsel-atmosphere {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(1100px 620px at 78% -10%, rgba(169, 219, 234, 0.13), transparent 58%),
-    radial-gradient(900px 520px at 8% 10%, rgba(200, 168, 107, 0.07), transparent 55%),
-    radial-gradient(700px 400px at 50% 110%, rgba(169, 219, 234, 0.05), transparent 50%),
-    linear-gradient(180deg, #060809 0%, #0a0d10 45%, #07090b 100%);
+    radial-gradient(1100px 620px at 78% -10%, rgba(232, 160, 69, 0.16), transparent 58%),
+    radial-gradient(900px 520px at 8% 10%, rgba(126, 184, 201, 0.07), transparent 55%),
+    radial-gradient(700px 400px at 50% 110%, rgba(232, 160, 69, 0.06), transparent 50%),
+    linear-gradient(180deg, #0b0907 0%, #15110d 45%, #0b0907 100%);
 }
 .counsel-atmosphere::before {
   content: "";
@@ -67,9 +67,9 @@ body.counsel-page {
 .counsel-crest {
   width: 44px; height: 44px;
   display: grid; place-items: center;
-  border: 1px solid rgba(169, 219, 234, 0.45);
+  border: 1px solid rgba(232, 160, 69, 0.5);
   background:
-    linear-gradient(145deg, rgba(169,219,234,0.18), transparent 55%),
+    linear-gradient(145deg, rgba(232,160,69,0.2), transparent 55%),
     rgba(10, 14, 18, 0.9);
   color: var(--counsel-ice);
   font-family: var(--counsel-mono);
@@ -122,9 +122,9 @@ body.counsel-page {
 .counsel-cta {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 12px 18px;
-  border: 1px solid rgba(169, 219, 234, 0.55);
+  border: 1px solid rgba(232, 160, 69, 0.6);
   background: var(--counsel-ice);
-  color: #061014;
+  color: var(--color-on-accent);
   font-weight: 700; font-size: 14px;
   cursor: pointer;
   transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
@@ -135,7 +135,7 @@ body.counsel-page {
   color: var(--text);
   border-color: var(--counsel-line);
 }
-.counsel-cta.ghost:hover { border-color: rgba(169,219,234,0.4); background: rgba(169,219,234,0.06); }
+.counsel-cta.ghost:hover { border-color: rgba(232,160,69,0.4); background: rgba(232,160,69,0.08); }
 .counsel-cta .arrow { font-family: var(--counsel-mono); opacity: 0.7; }
 
 /* Workspace — conversation is the interaction, not a card grid */
@@ -156,7 +156,7 @@ body.counsel-page {
   display: flex; flex-direction: column;
   border: 1px solid var(--counsel-line);
   background:
-    linear-gradient(180deg, rgba(169,219,234,0.04), transparent 28%),
+    linear-gradient(180deg, rgba(232,160,69,0.05), transparent 28%),
     var(--counsel-panel);
   backdrop-filter: blur(14px);
   overflow: hidden;
@@ -222,10 +222,10 @@ body.counsel-page {
   color: var(--text-soft);
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--counsel-line);
-  border-left: 2px solid rgba(169, 219, 234, 0.35);
+  border-left: 2px solid rgba(232, 160, 69, 0.4);
 }
 .cx-msg.me .cx-bubble {
-  color: #061014;
+  color: var(--color-on-accent);
   background: var(--counsel-ice);
   border: none;
   border-left: none;
@@ -245,7 +245,7 @@ body.counsel-page {
 .cx-receipt {
   margin-top: 10px;
   padding: 12px 12px 10px;
-  border: 1px solid rgba(169, 219, 234, 0.22);
+  border: 1px solid rgba(232, 160, 69, 0.28);
   background: rgba(6, 10, 14, 0.55);
 }
 .cx-receipt-label {
@@ -332,7 +332,7 @@ body.counsel-page {
 }
 .counsel-intent:hover,
 .counsel-intent:focus-visible {
-  border-color: rgba(169,219,234,0.45);
+  border-color: rgba(232,160,69,0.5);
   color: var(--counsel-ice);
   background: var(--counsel-ice-dim);
   outline: none;
@@ -353,15 +353,15 @@ body.counsel-page {
 }
 .counsel-input-row input:focus {
   outline: none;
-  border-color: rgba(169, 219, 234, 0.5);
-  box-shadow: 0 0 0 3px rgba(169, 219, 234, 0.1);
+  border-color: rgba(232, 160, 69, 0.55);
+  box-shadow: 0 0 0 3px rgba(232, 160, 69, 0.14);
 }
 .counsel-input-row input::placeholder { color: var(--muted); }
 .counsel-send {
   padding: 0 18px;
-  border: 1px solid rgba(169, 219, 234, 0.5);
+  border: 1px solid rgba(232, 160, 69, 0.55);
   background: var(--counsel-ice);
-  color: #061014;
+  color: var(--color-on-accent);
   font-weight: 700;
   cursor: pointer;
   transition: background 140ms ease, transform 120ms ease;
@@ -438,8 +438,8 @@ body.counsel-page {
   transition: border-color 150ms ease, background 150ms ease, transform 140ms ease;
 }
 .counsel-lane:hover {
-  border-color: rgba(169, 219, 234, 0.4);
-  background: rgba(169, 219, 234, 0.05);
+  border-color: rgba(232, 160, 69, 0.4);
+  background: rgba(232, 160, 69, 0.06);
   transform: translateX(2px);
 }
 .counsel-lane-idx {
@@ -476,9 +476,9 @@ body.counsel-page {
   gap: 10px;
   padding: 11px 16px 11px 12px;
   border-radius: 0;
-  border: 1px solid rgba(169, 219, 234, 0.4);
+  border: 1px solid rgba(232, 160, 69, 0.4);
   background:
-    linear-gradient(135deg, rgba(169,219,234,0.12), transparent 50%),
+    linear-gradient(135deg, rgba(232,160,69,0.14), transparent 50%),
     rgba(10, 13, 16, 0.94);
   color: var(--text);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
@@ -488,15 +488,15 @@ body.counsel-page {
 }
 .chat-fab.chat-fab-support:hover {
   transform: translateY(-2px);
-  border-color: rgba(169, 219, 234, 0.65);
+  border-color: rgba(232, 160, 69, 0.7);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
 }
 .chat-fab-support .fab-crest {
   width: 28px; height: 28px;
   display: grid; place-items: center;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  background: rgba(169, 219, 234, 0.18);
-  border: 1px solid rgba(169, 219, 234, 0.35);
+  background: rgba(232, 160, 69, 0.18);
+  border: 1px solid rgba(232, 160, 69, 0.4);
   font-family: var(--counsel-mono);
   font-size: 11px;
   color: var(--counsel-ice);
@@ -519,9 +519,9 @@ body.counsel-page {
   width: min(400px, calc(100vw - 28px));
   height: min(620px, calc(100vh - 110px));
   border-radius: 0;
-  border: 1px solid rgba(169, 219, 234, 0.22);
+  border: 1px solid rgba(232, 160, 69, 0.28);
   background:
-    linear-gradient(180deg, rgba(169,219,234,0.05), transparent 24%),
+    linear-gradient(180deg, rgba(232,160,69,0.06), transparent 24%),
     rgba(10, 13, 16, 0.97);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(16px);
@@ -562,18 +562,18 @@ body.counsel-page {
   padding: 14px;
   gap: 12px;
   background:
-    radial-gradient(500px 200px at 10% 0%, rgba(169,219,234,0.04), transparent 60%);
+    radial-gradient(500px 200px at 10% 0%, rgba(232,160,69,0.05), transparent 60%);
 }
 .chat-panel-support .chat-msg {
   border-radius: 0;
-  border-left: 2px solid rgba(169, 219, 234, 0.3);
+  border-left: 2px solid rgba(232, 160, 69, 0.35);
   background: rgba(255,255,255,0.03);
   animation: counselMsgIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .chat-panel-support .chat-msg.me {
   border-left: none;
   background: var(--counsel-ice);
-  color: #061014;
+  color: var(--color-on-accent);
 }
 .chat-panel-support .chat-chips {
   padding: 0 12px 10px;
@@ -588,7 +588,7 @@ body.counsel-page {
   transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
 }
 .chat-panel-support .chat-chip:hover {
-  border-color: rgba(169,219,234,0.45);
+  border-color: rgba(232,160,69,0.5);
   color: var(--counsel-ice);
   background: var(--counsel-ice-dim);
 }
@@ -605,7 +605,7 @@ body.counsel-page {
 .chat-panel-support .chat-send {
   border-radius: 0;
   background: var(--counsel-ice);
-  color: #061014;
+  color: var(--color-on-accent);
   min-width: 48px;
 }
 .chat-panel-support .chat-expand {
@@ -621,7 +621,7 @@ body.counsel-page {
 }
 .chat-panel-support .chat-expand:hover {
   color: var(--counsel-ice);
-  border-color: rgba(169,219,234,0.4);
+  border-color: rgba(232,160,69,0.4);
   text-decoration: none;
 }
 
@@ -654,7 +654,7 @@ body.counsel-page {
 .support-desk-detail {
   border: 1px solid var(--border);
   background:
-    linear-gradient(180deg, rgba(169,219,234,0.04), transparent 30%),
+    linear-gradient(180deg, rgba(232,160,69,0.05), transparent 30%),
     rgba(12, 15, 18, 0.7);
   padding: 16px;
   min-height: 420px;

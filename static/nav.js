@@ -177,46 +177,72 @@
   }
   function readableOn(hex) {
     const m = /^#([0-9a-fA-F]{6})$/.exec(hex || "");
-    if (!m) return "#061016";
+    if (!m) return "#1a1208";
     const n = parseInt(m[1], 16);
     const channels = [n >> 16, (n >> 8) & 255, n & 255].map((v) => {
       const c = v / 255;
       return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4);
     });
     return (.2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2]) > .42
-      ? "#061016"
-      : "#f6f8fa";
+      ? "#1a1208"
+      : "#f5f0e6";
+  }
+  // Legacy ice/blue + light-shell defaults → Conquest Forge palette.
+  // Stored site_config often still holds the old blues; without this remap
+  // CSS tokens never reach the page.
+  const FORGE_LEGACY = {
+    "#2563eb": "#e8a045",
+    "#3b82f6": "#e8a045",
+    "#6fd6ff": "#e8a045",
+    "#b7e7f4": "#e8a045",
+    "#38bdf8": "#e8a045",
+    "#0ea5e9": "#e8a045",
+    "#b8791a": "#f5c06a",
+    "#f5f7fa": "#0b0907",
+    "#ffffff": "#0b0907",
+    "#fff": "#0b0907",
+    "#131a24": "#f5f0e6",
+    "#0f172a": "#f5f0e6",
+  };
+  function forgeHex(hex) {
+    if (!hex) return hex;
+    const key = String(hex).trim().toLowerCase();
+    return FORGE_LEGACY[key] || hex;
   }
   function applyTheme(c) {
     if (!c) return;
     const s = document.documentElement.style;
-    if (c.theme_accent) {
-      const strong = shade(c.theme_accent, 22);
-      s.setProperty("--color-accent-primary", c.theme_accent);
+    const accent = forgeHex(c.theme_accent);
+    const gold = forgeHex(c.theme_gold);
+    const bg = forgeHex(c.theme_bg);
+    const text = forgeHex(c.theme_text);
+    if (accent) {
+      const strong = shade(accent, 22);
+      s.setProperty("--color-accent-primary", accent);
       s.setProperty("--color-accent-primary-strong", strong);
-      s.setProperty("--color-on-accent", readableOn(c.theme_accent));
-      s.setProperty("--ice", c.theme_accent);
+      s.setProperty("--color-on-accent", readableOn(accent));
+      s.setProperty("--ice", accent);
       s.setProperty("--ice-strong", strong);
     }
-    if (c.theme_gold) {
-      s.setProperty("--color-accent-secondary", c.theme_gold);
-      s.setProperty("--gold", c.theme_gold);
+    if (gold) {
+      s.setProperty("--color-accent-secondary", gold);
+      s.setProperty("--gold", gold);
     }
-    if (c.theme_bg) {
-      const elevated = shade(c.theme_bg, 12);
-      const panel = shade(c.theme_bg, 18);
-      s.setProperty("--color-bg-base", c.theme_bg);
+    if (bg) {
+      const elevated = shade(bg, 12);
+      const panel = shade(bg, 18);
+      s.setProperty("--color-bg-base", bg);
       s.setProperty("--color-bg-elevated", elevated);
       s.setProperty("--color-bg-panel", panel);
-      s.setProperty("--bg", c.theme_bg);
+      s.setProperty("--bg", bg);
       s.setProperty("--bg-2", elevated);
       s.setProperty("--panel-solid", panel);
     }
-    if (c.theme_text) {
-      s.setProperty("--color-text-primary", c.theme_text);
-      s.setProperty("--color-text-secondary", shade(c.theme_text, 34));
-      s.setProperty("--text", c.theme_text);
-      s.setProperty("--text-soft", shade(c.theme_text, 34));
+    if (text) {
+      s.setProperty("--color-text-primary", text);
+      s.setProperty("--color-text-secondary", shade(text, 34));
+      s.setProperty("--text", text);
+      s.setProperty("--text-soft", shade(text, 34));
     }
     if (c.theme_font) { loadWebFont(c.theme_font); document.body.style.fontFamily = "'" + c.theme_font + "', system-ui, sans-serif"; }
   }
@@ -305,6 +331,16 @@
       initConcierge();   // logged-out visitors get the shopper concierge too
     }
   }).catch(() => { initConcierge(); });
+
+  // Ensure display font (Syne) is available on every page that uses nav.
+  (function loadDisplayFont() {
+    if (document.getElementById("ragnar-display-font")) return;
+    const l = document.createElement("link");
+    l.id = "ragnar-display-font";
+    l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&display=swap";
+    document.head.appendChild(l);
+  })();
 
   // Ensure Counsel design tokens load on every page (floating widget).
   (function loadCounselCss() {
@@ -404,6 +440,7 @@
   // cards by vibe (plain language, not exact keywords) and can restyle the
   // visitor's OWN view — local-only, never the real site or anyone else. ----
   const VIBES = [
+    [["forge", "copper", "bronze", "molten", "conquest", "ember gold"], "#e8a045"],
     [["gold", "lux", "premium", "elite", "luxury", "grail", "royal", "regal"], "#f0c674"],
     [["ice", "frost", "blue", "arctic", "cool", "cold", "steel"], "#6fd6ff"],
     [["fire", "red", "ember", "hot", "bold", "aggressive", "crimson", "blood"], "#ff6b5e"],
@@ -424,8 +461,8 @@
       const low = text.toLowerCase();
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
-      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#05070b";
-      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#12161d";
+      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#0b0907";
+      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#1b1713";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);
       if (fm) theme.theme_font = fm[1].trim();
       if (/reset|default|normal|undo/.test(low)) {

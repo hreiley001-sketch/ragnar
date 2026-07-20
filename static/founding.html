@@ -17,7 +17,8 @@
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/tokens.css" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/home.css" />
   <script type="application/ld+json">
@@ -50,7 +51,7 @@
   <main id="main" class="arena-main">
     <section class="arena-hero arena-shell">
       <div class="arena-hero-copy">
-        <div class="arena-kicker"><span class="live-signal"></span> The arena is open</div>
+        <div class="arena-kicker"><span class="live-signal"></span> RAGNAR</div>
         <h1 id="arenaHeadline" aria-label="Break the expected">
           <span>Break</span>
           <span class="outline">the</span>
@@ -60,12 +61,6 @@
         <div class="arena-hero-actions">
           <a class="arena-btn primary" href="#live">Enter the arena <span class="arrow">↗</span></a>
           <a class="arena-btn" href="/marketplace">Explore the vault <span class="arrow">→</span></a>
-        </div>
-        <div class="arena-proof" aria-label="Platform activity">
-          <div class="arena-proof-item"><strong id="liveCount">0</strong><span>Live rooms</span></div>
-          <div class="arena-proof-item"><strong id="vaultCount">—</strong><span>Vault listings</span></div>
-          <div class="arena-proof-item hot"><strong>4%</strong><span>Founding 250 rate</span></div>
-          <div class="arena-proof-item"><strong>5%</strong><span>Standard flat rate</span></div>
         </div>
       </div>
 
@@ -83,6 +78,15 @@
           </div>
         </div>
         <div class="stage-index"><span>Current protocol</span><strong>LIVE // 01</strong><span>Encrypted access granted</span></div>
+      </div>
+    </section>
+
+    <section class="arena-metrics arena-shell" aria-label="Platform activity">
+      <div class="arena-proof">
+        <div class="arena-proof-item"><strong id="liveCount">0</strong><span>Live rooms</span></div>
+        <div class="arena-proof-item"><strong id="vaultCount">—</strong><span>Vault listings</span></div>
+        <div class="arena-proof-item hot"><strong>4%</strong><span>Founding 250 rate</span></div>
+        <div class="arena-proof-item"><strong>5%</strong><span>Standard flat rate</span></div>
       </div>
     </section>
 
