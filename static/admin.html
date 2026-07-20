@@ -7,95 +7,18 @@
   <link rel="icon" href="/static/logo.png" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/support.css" />
-  <style>
-    .hub-main { padding: 20px clamp(16px, 4vw, 40px) 60px; }
-    .login-wrap { max-width: 420px; margin: 12vh auto; padding: 26px; }
-    .login-wrap h2 { margin-top: 0; }
-    .cmd-title { font-size: 18px; letter-spacing: .2em; }
-    .muted-xs { font-size: 12px; }
-    .muted-sm { font-size: 13px; }
-    .no-top { margin-top: 0; }
-    .row-inline { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .max-280 { max-width: 280px; }
-    .w-auto { width: auto; }
-    .card-pad-14 { padding: 14px; }
-    .card-pad-16 { padding: 16px; }
-    .mb-14 { margin-bottom: 14px; }
-    .mb-18 { margin-bottom: 18px; }
-    .mt-14 { margin-top: 14px; }
-    .mt-8 { margin-top: 8px; }
-    .panel-head-compact { margin-bottom: 8px; }
-    .site-actions { display: flex; gap: 10px; align-items: center; margin-top: 14px; }
-    .scroll-x { margin-top: 10px; overflow: auto; }
-    .tabs { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 20px; padding-bottom: 4px; }
-    .tab { padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; }
-    .tab { white-space: nowrap; }
-    .tab.active { background: var(--ice); color: var(--color-on-accent); border-color: var(--ice); font-weight: 600; }
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 14px; margin-bottom: 22px; }
-    .kpi { padding: 16px 18px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
-    .kpi .k-num { font-size: 26px; font-weight: 800; color: var(--text); }
-    .kpi .k-num.hot { color: var(--ice); text-shadow: 0 0 16px rgba(232,160,69,0.4); }
-    .kpi .k-num.gold { color: var(--gold); }
-    .kpi .k-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 3px; }
-    .kpi .k-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
-    table.hub { width: 100%; border-collapse: collapse; font-size: 13px; }
-    table.hub th { text-align: left; color: var(--steel); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 8px 10px; border-bottom: 1px solid var(--border); }
-    table.hub td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    table.hub tr:hover td { background: rgba(232,160,69,0.05); }
-    .tbl-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel); }
-    .pill { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-strong); white-space: nowrap; }
-    .pill.sold { color: var(--muted); }
-    .pill.active { color: var(--ok); border-color: rgba(120,230,180,0.4); }
-    .pill.gold { color: var(--gold); border-color: rgba(240,198,116,0.5); }
-    .pill.ok { color: var(--ok); border-color: rgba(120,230,180,0.4); }
-    .pill.warn { color: var(--gold); border-color: rgba(240,198,116,0.5); }
-    .pill.bad { color: var(--danger); border-color: rgba(255,138,138,0.4); }
-    .pill.info { color: var(--ice); border-color: rgba(111,214,255,0.5); }
-    .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-    .btn-danger { color: var(--danger); border-color: rgba(255,138,138,0.45); }
-    .btn-danger:hover { background: rgba(255,138,138,0.12); border-color: var(--danger); }
-    .ai-panel { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; }
-    .ai-box { padding: 16px; }
-    .ai-out { margin-top: 10px; padding: 10px; border-radius: 8px; background: var(--bg-2); border: 1px solid var(--border); font-size: 13px; white-space: pre-wrap; min-height: 24px; }
-    .studio-hint { padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--border-strong); background: rgba(184,121,26,0.06); font-size: 13px; color: var(--text-soft); }
-    .studio-hint a { font-weight: 700; }
-    .collab-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .collab-table th, .collab-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
-    .collab-table th { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
-    .int-list { display: flex; flex-wrap: wrap; gap: 10px 18px; }
-    .int-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-soft); }
-    .wrap-cell { max-width: 260px; white-space: normal; }
-    .panel-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-    .panel-bar h3 { margin: 0; color: var(--steel); font-size: 14px; text-transform: uppercase; letter-spacing: .05em; }
-    .ride-form { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
-    .ride-form .field { margin-bottom: 0; }
-    @media (max-width: 860px){ .ride-form { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 720px){ .ai-panel { grid-template-columns: 1fr; } }
-    @media (max-width: 640px){
-      .hub-main { padding: 16px 12px 40px; }
-      .login-wrap { margin: 6vh auto; padding: 18px; }
-      .tab { padding: 8px 12px; }
-      .ride-form { grid-template-columns: 1fr; }
-      .site-actions { flex-direction: column; align-items: stretch; }
-      .site-actions .btn { width: 100%; }
-      .row-inline { align-items: stretch; }
-      .row-inline .btn { width: 100%; }
-      .max-280 { max-width: 100%; }
-      .ai-box { padding: 12px; }
-    }
-  </style>
   <link rel="stylesheet" href="/static/pages.css" />
 </head>
-<body>
+<body class="page-admin">
   <div class="aurora"></div>
 
-  <header class="site-header">
+  <header id="siteHeader" class="site-header site-header--admin">
     <div class="brand">
       <a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR Command Hub" class="logo-img" /></a>
-      <div class="brand-word"><h1 class="cmd-title">COMMAND HUB</h1></div>
+      <div class="brand-word"><h1 class="cmd-title">Command Hub</h1></div>
     </div>
     <div class="header-actions">
-      <a class="btn btn-ghost btn-sm" href="/">← Storefront</a>
+      <a class="btn btn-ghost btn-sm" href="/">Storefront</a>
       <button id="logoutBtn" class="btn btn-ghost btn-sm" type="button" hidden>Log out</button>
     </div>
   </header>

@@ -84,6 +84,7 @@ async function resend() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  setMode("login");
   document.querySelectorAll(".auth-tab").forEach((t) => t.addEventListener("click", () => setMode(t.dataset.mode)));
   $("authForm").addEventListener("submit", submit);
   $("pw").addEventListener("input", paintMeter);

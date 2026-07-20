@@ -320,8 +320,11 @@ async function reflectAccount() {
   try {
     const me = await api("/api/auth/me");
     if (!me.user) return;
-    const link = $("acctLink");
-    link.textContent = me.user.is_staff ? "Command hub" : "My account";
+    const link = $("headerAcctLink") || $("acctLink");
+    if (!link) return;
+    const lbl = link.querySelector(".lbl");
+    const text = me.user.is_staff ? "Command hub" : "My account";
+    if (lbl) lbl.textContent = text; else link.textContent = text;
     link.href = me.user.is_staff ? "/admin" : "/account";
   } catch (_) {
     // Anonymous homepage remains fully usable.

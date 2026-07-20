@@ -6,57 +6,16 @@
   <title>RAGNAR — Stores & Live</title>
   <link rel="icon" href="/static/logo.png" />
   <link rel="stylesheet" href="/static/styles.css" />
-  <style>
-    .hub-main { padding: 20px clamp(16px,4vw,40px) 60px; }
-    .hero-strip {
-      border: 1px solid var(--border-strong);
-      border-radius: 16px;
-      padding: 16px;
-      background: radial-gradient(1200px 280px at -10% -120%, rgba(183,231,244,.12), transparent 50%), var(--color-bg-panel);
-      margin-bottom: 16px;
-    }
-    .hero-strip h2 { margin: 0 0 6px; font-size: clamp(20px, 3vw, 28px); }
-    .hero-strip p { margin: 0; color: var(--text-soft); }
-    .section-title-row { justify-content: space-between; }
-    .store-search { max-width: 260px; }
-    .section-title { font-size: 15px; text-transform: uppercase; letter-spacing:.06em; color: var(--steel); margin: 20px 0 10px; display:flex; align-items:center; gap:10px; }
-    .live-dot { width:9px;height:9px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;animation:pulse 1.4s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-    .live-row { display:grid; grid-template-columns: repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
-    .live-card { border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); background:var(--panel); cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; position:relative; }
-    .live-card:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(20,30,55,.14); }
-    .live-thumb { aspect-ratio:16/9; display:grid; place-items:center; position:relative; }
-    .live-badge { position:absolute; top:8px; left:8px; background:#c81e1e; color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px; letter-spacing:.05em; }
-    .live-badge.sched { background:rgba(8,12,18,.8); border:1px solid var(--border-strong); color:var(--text-soft); }
-    .live-views { position:absolute; bottom:8px; right:8px; background:rgba(8,12,18,.75); font-size:11px; padding:2px 8px; border-radius:6px; }
-    .live-meta { padding:10px 12px; }
-    .live-meta .lt { font-weight:700; font-size:14px; }
-    .live-meta .ls { font-size:12px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .live-chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border-strong); border-radius:999px; padding:3px 8px; font-size:11px; color:var(--text-soft); background:var(--color-bg-elevated); }
-    .notify-btn { border:1px solid var(--border-strong); background:var(--bg-2); color:var(--text-soft); border-radius:999px; padding:4px 10px; font-size:11px; cursor:pointer; }
-    .notify-btn.on { background:rgba(232,160,69,.14); color:var(--text); border-color:var(--ice); }
-    .store-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
-    .store-card { border-radius:var(--radius); overflow:hidden; border:1px solid var(--border); background:var(--panel); cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
-    .store-card:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(20,30,55,.14); border-color:var(--border-strong); }
-    .store-banner { height:84px; position:relative; }
-    .store-avatar { width:52px;height:52px;border-radius:14px; border:2px solid var(--bg); position:absolute; left:14px; bottom:-22px; display:grid; place-items:center; font-weight:800; font-size:20px; color:#fff; }
-    .store-body { padding:30px 14px 14px; }
-    .store-name { font-weight:700; display:flex; align-items:center; gap:8px; }
-    .store-tag { font-size:12px; color:var(--muted); margin-top:2px; }
-    .store-foot { display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:12px; color:var(--text-soft); }
-    .store-metrics { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
-    .metric-chip { border:1px solid var(--border-strong); background:var(--color-bg-elevated); border-radius:999px; padding:2px 8px; font-size:11px; color:var(--text-soft); }
-  </style>
   <link rel="stylesheet" href="/static/pages.css" />
 </head>
-<body>
+<body class="page-stores">
   <div class="aurora"></div>
   <header id="siteHeader"></header>
 
   <main class="hub-main">
     <section class="hero-strip">
-      <h2>Live-first card commerce, forged for RAGNAR.</h2>
-      <p>Discover live breaks, seller storefronts, and buy-now inventory in one place.</p>
+      <h2>Live sellers & breaks</h2>
+      <p>Discover live rooms, seller storefronts, and buy-now inventory in one place.</p>
     </section>
 
     <div class="section-title" id="liveTitle"><span class="live-dot"></span> Live now</div>

@@ -15,12 +15,12 @@
   }
 
   const ITEMS = [
-    { icon: "01", label: "Home", href: "/" },
-    { icon: "02", label: "Marketplace", href: "/marketplace" },
-    { icon: "03", label: "Live Sellers", href: "/stores" },
-    { icon: "04", label: "Live Rooms", href: "/rides" },
-    { icon: "05", label: "Counsel", href: "/support" },
-    { icon: "06", label: "Sell on RAGNAR", href: "/#apply" },
+    { icon: "", label: "Home", href: "/" },
+    { icon: "", label: "Marketplace", href: "/marketplace" },
+    { icon: "", label: "Live Sellers", href: "/stores" },
+    { icon: "", label: "Live Rooms", href: "/rides" },
+    { icon: "", label: "Counsel", href: "/support" },
+    { icon: "", label: "Sell on RAGNAR", href: "/#apply" },
   ];
 
   const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
@@ -28,7 +28,9 @@
     const a = document.createElement("a");
     a.className = "nav-link" + (it.cls ? " " + it.cls : "");
     a.href = it.href;
-    a.innerHTML = `<span class="ico">${it.icon}</span><span class="lbl">${it.label}</span>`;
+    a.innerHTML = it.icon
+      ? `<span class="ico">${it.icon}</span><span class="lbl">${it.label}</span>`
+      : `<span class="lbl">${it.label}</span>`;
     return a;
   }
 
@@ -41,43 +43,68 @@
   let headerSellBtn = null;
   function headerExtrasHtml() {
     if (path === "/marketplace") {
-      return `<span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding —</span><span id="backendStatus" class="status-badge checking">connecting…</span>`;
+      return `<span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding</span>`;
     }
     if (path.startsWith("/ride/")) {
-      return `<span id="viewers" class="status-badge">0 watching</span>`;
+      return `<span id="viewers" class="status-badge">0 watching</span><a class="btn btn-ghost btn-sm" href="/rides">All rooms</a>`;
     }
     if (path === "/account") {
       return `<button id="logoutBtn" class="btn btn-ghost btn-sm" type="button">Log out</button>`;
     }
     return "";
   }
+  function midNavHtml() {
+    if (document.body.classList.contains("arena-home")) {
+      return `
+        <a href="#live">Live now</a>
+        <a href="#categories">Categories</a>
+        <a href="#difference">Why RAGNAR</a>
+        <a href="/marketplace">Marketplace</a>`;
+    }
+    const links = [
+      { href: "/marketplace", label: "Marketplace" },
+      { href: "/stores", label: "Sellers" },
+      { href: "/rides", label: "Live" },
+    ];
+    return links.map((l) => {
+      const active = path === l.href || (l.href !== "/" && path.startsWith(l.href));
+      return `<a href="${l.href}" class="${active ? "is-active" : ""}">${l.label}</a>`;
+    }).join("");
+  }
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
-    header.className = "site-header";
+    header.className = header.className || "site-header";
+    if (!header.classList.contains("site-header")) header.classList.add("site-header");
+    // Admin ships its own chrome; only ensure class + leave markup alone.
+    if (document.body.classList.contains("page-admin") && header.querySelector(".cmd-title")) {
+      return;
+    }
+    if (document.body.classList.contains("arena-home")) header.classList.add("site-header--arena");
+    if (document.body.classList.contains("premium-room")) header.classList.add("site-header--room");
     const light = path === "/login" || path === "/verify";
     if (light) {
+      header.classList.add("site-header--light");
       header.innerHTML = `
         <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
         <div class="header-actions"></div>`;
       return;
     }
+    const sellLabel = document.body.classList.contains("arena-home") ? "Sell on RAGNAR" : "Sell";
+    const sellHref = document.body.classList.contains("arena-home") ? "#apply" : null;
+    const sellCtrl = sellHref
+      ? `<a class="btn btn-primary btn-sm" href="${sellHref}">${sellLabel}</a>`
+      : `<button class="btn btn-primary btn-sm" type="button" data-open-sell>${sellLabel}</button>`;
     header.innerHTML = `
       <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+      <nav class="site-nav" aria-label="Primary">${midNavHtml()}</nav>
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
-        <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
-        <a class="btn btn-ghost btn-sm" href="/stores">Stores</a>
-        <button class="btn btn-primary btn-sm" type="button" data-open-sell>Sell</button>
+        ${sellCtrl}
         <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
       </div>`;
     acctLinks.push(header.querySelector("#headerAcctLink"));
     headerSellBtn = header.querySelector("[data-open-sell]");
-    if (path.startsWith("/ride/")) {
-      const link = document.createElement("a");
-      link.className = "btn btn-ghost btn-sm"; link.href = "/rides"; link.textContent = "All rides";
-      header.querySelector(".header-actions").insertBefore(link, header.querySelector(".header-extra").nextSibling);
-    }
   }
   buildHeader();
 
@@ -100,10 +127,10 @@
   ITEMS.forEach((it) => links.appendChild(navLink(it)));
   links.appendChild(mk("div", "nav-div"));
   const userLine = mk("div", "nav-user"); userLine.id = "navUser"; userLine.hidden = true; links.appendChild(userLine);
-  const acct = navLink({ icon: "ID", label: "Sign in", href: "/login" }); links.appendChild(acct);
+  const acct = navLink({ icon: "", label: "Sign in", href: "/login" }); links.appendChild(acct);
   acctLinks.push(acct);
   // Command Hub is staff-only — hidden until we confirm the user is staff.
-  const hub = navLink({ icon: "//", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
+  const hub = navLink({ icon: "", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
 
   document.body.appendChild(scrim);
   document.body.appendChild(drawer);
@@ -165,6 +192,14 @@
     document.head.appendChild(l);
   }
   loadWebFont("Inter Tight");
+  (function loadCoreFonts() {
+    if (document.getElementById("ragnar-fonts")) return;
+    const l = document.createElement("link");
+    l.id = "ragnar-fonts";
+    l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap";
+    document.head.appendChild(l);
+  })();
   function shade(hex, amt) {
     // Lightens dark colors and darkens light ones, so --bg-2 always has gentle
     // contrast against --bg whether the theme is light or dark.
@@ -177,72 +212,46 @@
   }
   function readableOn(hex) {
     const m = /^#([0-9a-fA-F]{6})$/.exec(hex || "");
-    if (!m) return "#1a1208";
+    if (!m) return "#061016";
     const n = parseInt(m[1], 16);
     const channels = [n >> 16, (n >> 8) & 255, n & 255].map((v) => {
       const c = v / 255;
       return c <= .03928 ? c / 12.92 : Math.pow((c + .055) / 1.055, 2.4);
     });
     return (.2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2]) > .42
-      ? "#1a1208"
-      : "#f5f0e6";
-  }
-  // Legacy ice/blue + light-shell defaults → Conquest Forge palette.
-  // Stored site_config often still holds the old blues; without this remap
-  // CSS tokens never reach the page.
-  const FORGE_LEGACY = {
-    "#2563eb": "#e8a045",
-    "#3b82f6": "#e8a045",
-    "#6fd6ff": "#e8a045",
-    "#b7e7f4": "#e8a045",
-    "#38bdf8": "#e8a045",
-    "#0ea5e9": "#e8a045",
-    "#b8791a": "#f5c06a",
-    "#f5f7fa": "#0b0907",
-    "#ffffff": "#0b0907",
-    "#fff": "#0b0907",
-    "#131a24": "#f5f0e6",
-    "#0f172a": "#f5f0e6",
-  };
-  function forgeHex(hex) {
-    if (!hex) return hex;
-    const key = String(hex).trim().toLowerCase();
-    return FORGE_LEGACY[key] || hex;
+      ? "#061016"
+      : "#f6f8fa";
   }
   function applyTheme(c) {
     if (!c) return;
     const s = document.documentElement.style;
-    const accent = forgeHex(c.theme_accent);
-    const gold = forgeHex(c.theme_gold);
-    const bg = forgeHex(c.theme_bg);
-    const text = forgeHex(c.theme_text);
-    if (accent) {
-      const strong = shade(accent, 22);
-      s.setProperty("--color-accent-primary", accent);
+    if (c.theme_accent) {
+      const strong = shade(c.theme_accent, 22);
+      s.setProperty("--color-accent-primary", c.theme_accent);
       s.setProperty("--color-accent-primary-strong", strong);
-      s.setProperty("--color-on-accent", readableOn(accent));
-      s.setProperty("--ice", accent);
+      s.setProperty("--color-on-accent", readableOn(c.theme_accent));
+      s.setProperty("--ice", c.theme_accent);
       s.setProperty("--ice-strong", strong);
     }
-    if (gold) {
-      s.setProperty("--color-accent-secondary", gold);
-      s.setProperty("--gold", gold);
+    if (c.theme_gold) {
+      s.setProperty("--color-accent-secondary", c.theme_gold);
+      s.setProperty("--gold", c.theme_gold);
     }
-    if (bg) {
-      const elevated = shade(bg, 12);
-      const panel = shade(bg, 18);
-      s.setProperty("--color-bg-base", bg);
+    if (c.theme_bg) {
+      const elevated = shade(c.theme_bg, 12);
+      const panel = shade(c.theme_bg, 18);
+      s.setProperty("--color-bg-base", c.theme_bg);
       s.setProperty("--color-bg-elevated", elevated);
       s.setProperty("--color-bg-panel", panel);
-      s.setProperty("--bg", bg);
+      s.setProperty("--bg", c.theme_bg);
       s.setProperty("--bg-2", elevated);
       s.setProperty("--panel-solid", panel);
     }
-    if (text) {
-      s.setProperty("--color-text-primary", text);
-      s.setProperty("--color-text-secondary", shade(text, 34));
-      s.setProperty("--text", text);
-      s.setProperty("--text-soft", shade(text, 34));
+    if (c.theme_text) {
+      s.setProperty("--color-text-primary", c.theme_text);
+      s.setProperty("--color-text-secondary", shade(c.theme_text, 34));
+      s.setProperty("--text", c.theme_text);
+      s.setProperty("--text-soft", shade(c.theme_text, 34));
     }
     if (c.theme_font) { loadWebFont(c.theme_font); document.body.style.fontFamily = "'" + c.theme_font + "', system-ui, sans-serif"; }
   }
@@ -442,7 +451,7 @@
   const VIBES = [
     [["forge", "copper", "bronze", "molten", "conquest", "ember gold"], "#e8a045"],
     [["gold", "lux", "premium", "elite", "luxury", "grail", "royal", "regal"], "#f0c674"],
-    [["ice", "frost", "blue", "arctic", "cool", "cold", "steel"], "#6fd6ff"],
+    [["ice", "frost", "blue", "arctic", "cool", "cold", "steel"], "#a9d5e2"],
     [["fire", "red", "ember", "hot", "bold", "aggressive", "crimson", "blood"], "#ff6b5e"],
     [["green", "mint", "emerald", "money", "forest"], "#6fe3b0"],
     [["purple", "cosmic", "galaxy", "mystic", "magic", "violet"], "#b18cff"],

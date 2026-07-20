@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="/static/pages.css" />
   <link rel="stylesheet" href="/static/marketplace.css" />
 </head>
-<body class="vault-page">
+<body class="page-marketplace vault-page">
   <div class="vault-atmosphere" aria-hidden="true"></div>
 
   <header id="siteHeader"></header>
@@ -54,11 +54,11 @@
     <div id="catChips" class="cat-chips"></div>
   </div>
 
-  <div class="trust-bar" aria-label="Why RAGNAR">
-    <span><span class="tb-num">01</span> <b>Buyer protection</b> on every order</span>
-    <span><span class="tb-num">02</span> <b>Real sold-price</b> history</span>
-    <span><span class="tb-num">03</span> <b>Flat low fees</b> — keep more</span>
-    <span><span class="tb-num">04</span> <b>Grading-aware</b> listings</span>
+  <div class="trust-bar">
+    <span><b>Buyer protection</b> on every order</span>
+    <span><b>Real sold-price</b> history</span>
+    <span><b>Flat low fees</b> — keep more</span>
+    <span><b>Grading-aware</b> listings</span>
   </div>
 
   <div id="liveRailWrap" class="live-rail-wrap" hidden>
@@ -69,7 +69,7 @@
   <main class="layout">
     <aside class="filters card">
       <div class="filters-head">
-        <h3>Search the vault</h3>
+        <h3>Filters</h3>
         <button id="resetFilters" class="btn btn-ghost btn-sm" type="button">Reset</button>
       </div>
       <label class="field"><span>Search</span>
@@ -139,6 +139,12 @@
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <footer class="site-footer">
+    <p>RAGNAR · <span class="runes">ᚱᚨᚷᚾᚨᚱ</span> · a trust-first trading-card marketplace</p>
+    <p id="integrations" class="muted integrations">integrations: —</p>
+  </footer>
+
   <script src="/static/nav.js"></script>
   <script src="/static/app.js"></script>
   <script src="/static/sell.js"></script>
