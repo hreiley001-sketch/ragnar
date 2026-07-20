@@ -407,7 +407,6 @@ function initScrollDepth() {
     const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height)));
     stage.style.transform = `translateY(${progress * 46}px) scale(${1 - progress * 0.08}) translateZ(0)`;
     stage.style.opacity = String(1 - progress * 0.55);
-    document.documentElement.style.setProperty("--scroll-depth", progress.toFixed(3));
     ticking = false;
   }
   window.addEventListener("scroll", () => {

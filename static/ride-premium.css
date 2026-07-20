@@ -52,7 +52,7 @@ body.premium-room {
 .room-live-dot {
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--room-red);
-  box-shadow: 0 0 8px rgba(232,90,95,.35);
+  box-shadow: 0 0 8px rgba(255, 95, 122,.35);
   animation: roomPulse 1.8s ease infinite;
 }
 .room-title {
@@ -255,7 +255,7 @@ body.premium-room {
 }
 
 @keyframes roomPulse {
-  50% { opacity: .42; box-shadow: 0 0 0 6px rgba(232,90,95,0); }
+  50% { opacity: .42; box-shadow: 0 0 0 6px rgba(255, 95, 122,0); }
 }
 @media (max-width: 1040px) {
   .room-grid { grid-template-columns: minmax(0,1fr) 320px; }
