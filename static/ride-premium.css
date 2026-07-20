@@ -26,13 +26,13 @@ body.premium-room {
 .room-noise { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
 .room-atmosphere {
   background:
-    radial-gradient(circle at 30% 18%, rgba(169,213,226,.08), transparent 30%),
-    radial-gradient(circle at 85% 68%, rgba(174, 198, 216,.04), transparent 30%),
+    radial-gradient(circle at 30% 18%, rgba(46,200,255,.12), transparent 32%),
+    radial-gradient(circle at 85% 68%, rgba(180, 240, 255,.05), transparent 30%),
     var(--color-surface-deep);
 }
 .room-beams {
-  opacity: .14;
-  background: repeating-linear-gradient(112deg, transparent 0 140px, rgba(169,213,226,.04) 141px 142px, transparent 143px 280px);
+  opacity: .16;
+  background: repeating-linear-gradient(112deg, transparent 0 140px, rgba(46,200,255,.05) 141px 142px, transparent 143px 280px);
   -webkit-mask-image: linear-gradient(to bottom, #000, transparent 75%);
   mask-image: linear-gradient(to bottom, #000, transparent 75%);
 }
@@ -56,8 +56,9 @@ body.premium-room {
   animation: roomPulse 1.8s ease infinite;
 }
 .room-title {
-  margin: 10px 0 0; font-size: clamp(31px,4vw,64px); line-height: .94;
+  margin: 10px 0 0; font-size: clamp(31px,4vw,64px); line-height: .92;
   letter-spacing: var(--tracking-display); text-transform: uppercase; font-weight: 800;
+  text-shadow: 0 0 40px rgba(46, 200, 255, 0.15);
 }
 .room-phase { text-align: right; }
 .room-phase span:first-child {
@@ -84,7 +85,7 @@ body.premium-room {
 .room-track .stop .cart { display: none; }
 .room-track .stop.active::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
-  background: var(--color-text-primary); box-shadow: 0 0 10px rgba(169,213,226,.28);
+  background: var(--color-text-primary); box-shadow: 0 0 10px rgba(46,200,255,.28);
 }
 
 .room-winner {
@@ -98,7 +99,7 @@ body.premium-room {
   position: relative; min-height: min(70vh, 780px); overflow: hidden;
   border: 1px solid var(--color-border-default);
   background:
-    radial-gradient(700px 520px at 50% 45%, rgba(169,213,226,.055), transparent 64%),
+    radial-gradient(700px 520px at 50% 45%, rgba(46,200,255,.055), transparent 64%),
     var(--color-surface-deep);
   box-shadow: var(--shadow-lg);
 }
@@ -108,8 +109,8 @@ body.premium-room {
 .showcase-frame { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
 .showcase-frame::before {
   content: ""; position: absolute; width: min(70%, 680px); aspect-ratio: 1;
-  border: 1px solid rgba(169,213,226,.08); border-radius: 50%;
-  box-shadow: inset 0 0 90px rgba(169,213,226,.04);
+  border: 1px solid rgba(46,200,255,.08); border-radius: 50%;
+  box-shadow: inset 0 0 90px rgba(46,200,255,.04);
 }
 .showcase-frame::after {
   content: "RAGNAR // LIVE ROOM"; position: absolute; top: 24px; left: 26px;
@@ -121,7 +122,7 @@ body.premium-room {
 }
 .showcase-card::before {
   content: ""; position: absolute; inset: -22px; z-index: -1;
-  border: 1px solid rgba(169,213,226,.1); transform: rotate(4deg);
+  border: 1px solid rgba(46,200,255,.1); transform: rotate(4deg);
 }
 .showcase-card img {
   width: 100%; height: 100%; object-fit: contain; border-radius: var(--radius-sm);
@@ -162,19 +163,21 @@ body.premium-room {
 .room-sidebar { display: grid; gap: 14px; }
 .room-panel {
   padding: 20px; border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-xs);
   background:
-    linear-gradient(145deg, rgba(255,255,255,.028), transparent 42%),
+    linear-gradient(145deg, rgba(180, 240, 255,.04), transparent 42%),
     var(--color-bg-glass);
   backdrop-filter: blur(16px);
   box-shadow: var(--shadow-md);
 }
 .panel-label {
-  color: var(--room-muted); font: 7px/1 var(--room-mono);
+  color: var(--room-ice); font: 7px/1 var(--room-mono);
   letter-spacing: .15em; text-transform: uppercase;
 }
 .bid-value {
-  margin: 10px 0 2px; font-size: 49px; line-height: 1; font-weight: 700;
-  letter-spacing: var(--tracking-display); color: var(--color-text-primary);
+  margin: 10px 0 2px; font-size: 49px; line-height: 1; font-weight: 800;
+  letter-spacing: var(--tracking-display); color: var(--color-frost);
+  text-shadow: 0 0 32px rgba(46, 200, 255, 0.2);
 }
 .bidder-line { min-height: 22px; margin: 0 0 18px; color: var(--color-text-secondary); font-size: 12px; }
 .room-panel .field { margin-bottom: 10px; }
@@ -191,12 +194,13 @@ body.premium-room {
 }
 .room-panel .btn-primary {
   width: 100%; min-height: 48px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   text-transform: uppercase; letter-spacing: .1em;
-  font: 650 9px/1 var(--room-mono);
+  font: 700 10px/1 var(--room-mono);
   color: var(--color-on-accent);
   background: var(--color-accent-primary);
   border-color: var(--color-accent-primary);
+  box-shadow: 0 0 28px rgba(46, 200, 255, 0.3);
 }
 .min-bid-line {
   display: flex; justify-content: space-between; margin: 12px 0 9px;

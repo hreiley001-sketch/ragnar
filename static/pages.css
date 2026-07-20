@@ -46,10 +46,10 @@
 .rcard {
   overflow: hidden;
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   color: var(--color-text-primary);
   background:
-    linear-gradient(145deg, rgba(255,255,255,.032), transparent 46%),
+    linear-gradient(145deg, rgba(180, 240, 255,.045), transparent 46%),
     var(--color-bg-glass);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
@@ -61,7 +61,7 @@
 .live-card:hover,
 .store-card:hover,
 .rcard:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: var(--color-border-strong);
   box-shadow: var(--shadow-md), var(--glow-ice);
   text-decoration: none;
@@ -168,11 +168,11 @@ body.page-stores .hero-strip {
   padding: clamp(28px, 4vw, 48px);
   overflow: hidden;
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   background:
-    radial-gradient(700px 280px at 8% 0, color-mix(in srgb, var(--color-accent-primary) 10%, transparent), transparent 60%),
+    radial-gradient(700px 280px at 8% 0, color-mix(in srgb, var(--color-accent-primary) 14%, transparent), transparent 60%),
     var(--color-bg-panel);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(180, 240, 255, 0.06);
 }
 body.page-stores .hero-strip::before { content: none; }
 body.page-stores .hero-strip h2 {
@@ -682,38 +682,47 @@ body.page-rides .rcard-viewers { color: var(--color-text-secondary); font-size: 
 body.page-login .auth-wrap {
   max-width: 400px;
   margin: 10vh auto;
-  padding: 36px 32px 28px;
+  padding: 40px 34px 30px;
   color: var(--color-text-primary);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-panel);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-xs);
+  background:
+    linear-gradient(160deg, rgba(46, 200, 255, 0.06), transparent 42%),
+    var(--color-bg-panel);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(180, 240, 255, 0.08);
 }
 body.page-login .auth-wrap .muted {
   color: var(--color-text-muted);
   line-height: 1.45;
 }
-body.page-login .auth-tabs { display: flex; gap: 6px; margin-bottom: 18px; padding: 4px; border-radius: var(--radius-sm); background: var(--color-bg-elevated); border: 1px solid var(--color-border-subtle); }
+body.page-login .auth-tabs {
+  display: flex; gap: 4px; margin-bottom: 18px; padding: 4px;
+  border-radius: var(--radius-xs);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+}
 body.page-login .auth-tab {
   flex: 1;
   text-align: center;
   padding: 9px 10px;
-  border-radius: 6px;
+  border-radius: 3px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--color-text-muted);
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 550;
-  transition: background var(--duration-fast), color var(--duration-fast);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
 }
 body.page-login .auth-tab:hover { color: var(--color-text-primary); }
 body.page-login .auth-tab.active {
-  color: var(--color-text-primary);
-  background: var(--color-bg-panel-strong);
-  border-color: var(--color-border-subtle);
-  font-weight: 600;
-  box-shadow: var(--shadow-sm);
+  color: var(--color-on-accent);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(46, 200, 255, 0.25);
 }
 body.page-login .gbtn {
   display: flex;
@@ -765,9 +774,13 @@ body.page-verify .vwrap img {
 }
 body.page-login .auth-wrap > .btn-primary,
 body.page-login #authForm .btn-primary {
-  min-height: 44px;
-  border-radius: var(--radius-sm);
-  font-weight: 650;
+  min-height: 46px;
+  border-radius: var(--radius-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 12px;
+  box-shadow: 0 0 28px rgba(46, 200, 255, 0.28);
 }
 body.page-login .staff-note {
   font-size: 12px;
