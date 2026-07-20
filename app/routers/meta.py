@@ -82,7 +82,7 @@ def fees_quote(
     price: float = Query(..., gt=0, le=1_000_000, description="Sale price in dollars"),
     founding: bool = Query(False, description="Seller is a Founding Seller"),
     founding_intro: bool = Query(
-        False, description="Within the Founding intro (0% platform) window"
+        False, description="Deprecated — ignored; the platform fee is flat for everyone"
     ),
 ) -> dict:
     return quote(price, is_founding=founding, founding_intro=founding_intro)

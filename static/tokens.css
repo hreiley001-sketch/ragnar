@@ -1,52 +1,53 @@
 /* RAGNAR design tokens — single source of truth.
-   Quiet charcoal surfaces, near-white type, one ice accent, one champagne gold.
-   Benchmark: Stripe / Linear / Apple / StockX — never neon, never gaming. */
+   Arctic luxury: titanium surfaces, frost white type, glacier-blue crystal accent.
+   Sourced from the RAGNARIPS wolf-and-raven mark. Cold, powerful, precise —
+   never warm, never neon, never generic dark mode. */
 
 :root {
   color-scheme: dark;
 
-  /* ——— Surfaces (charcoal ladder) ——— */
-  --color-bg-base: #07090c;
-  --color-bg-elevated: #0c0f13;
-  --color-bg-panel: #12171d;
-  --color-bg-panel-strong: #181e26;
-  --color-bg-glass: rgba(12, 15, 19, 0.86);
-  --color-bg-glass-soft: rgba(18, 23, 29, 0.72);
-  --color-bg-input: #0e1319;
-  --color-bg-overlay: rgba(4, 6, 9, 0.78);
-  --color-surface-deep: #05070a;
+  /* ——— Surfaces (titanium / deep glacier ladder) ——— */
+  --color-bg-base: #050a12;
+  --color-bg-elevated: #081019;
+  --color-bg-panel: #0d1826;
+  --color-bg-panel-strong: #12212f;
+  --color-bg-glass: rgba(10, 18, 28, 0.86);
+  --color-bg-glass-soft: rgba(15, 26, 38, 0.72);
+  --color-bg-input: #0a1420;
+  --color-bg-overlay: rgba(3, 7, 12, 0.78);
+  --color-surface-deep: #03060a;
 
   /* ——— Text ——— */
-  --color-text-primary: #f4f6f8;
-  --color-text-secondary: #c2CAD2;
-  --color-text-muted: #93a0ab;
-  --color-text-subtle: #7a8792;
-  --color-text-disabled: #5f6b75;
-  --color-on-accent: #071015;
+  --color-text-primary: #f3f8fc;
+  --color-text-secondary: #c3d3de;
+  --color-text-muted: #92a8b6;
+  --color-text-subtle: #75899a;
+  --color-text-disabled: #4c5f6d;
+  --color-on-accent: #01141c;
   --color-on-danger: #1a0808;
 
   /* ——— Brand ——— */
-  /* Primary: refined platinum ice — quiet fintech, not neon */
-  --color-accent-primary: #9ec4d1;
-  --color-accent-primary-strong: #b9d7e2;
-  /* Secondary: champagne gold — Founding 250 / rare moments only */
-  --color-accent-secondary: #c4a86a;
-  --color-accent-fallback: #7a9bb0;
+  /* Primary: glacier / electric ice — the wolf's eyes. The one hot color on the site. */
+  --color-accent-primary: #5fd4ff;
+  --color-accent-primary-strong: #9fe6ff;
+  /* Secondary: titanium silver — Founding 250 / rare moments only */
+  --color-accent-secondary: #c9d6e0;
+  --color-accent-fallback: #6fa8c2;
 
   /* ——— Status (restrained) ——— */
-  --color-live: #e85a5f;
-  --color-success: #6ec9a8;
-  --color-warning: #d4b06a;
-  --color-error: #e87074;
-  --color-info: #8fc4d6;
+  --color-live: #ff5f7a;
+  --color-success: #5fe0b8;
+  --color-warning: #e0c25f;
+  --color-error: #ff6b6f;
+  --color-info: #7fd4f0;
 
   /* ——— Lines & interaction ——— */
-  --color-border-subtle: rgba(230, 238, 244, 0.08);
-  --color-border-default: rgba(230, 238, 244, 0.14);
-  --color-border-strong: rgba(230, 238, 244, 0.22);
+  --color-border-subtle: rgba(210, 235, 248, 0.08);
+  --color-border-default: rgba(210, 235, 248, 0.14);
+  --color-border-strong: rgba(210, 235, 248, 0.24);
   --color-focus: var(--color-accent-primary-strong);
-  --color-hover-surface: rgba(169, 213, 226, 0.07);
-  --color-active-surface: rgba(169, 213, 226, 0.12);
+  --color-hover-surface: rgba(95, 212, 255, 0.07);
+  --color-active-surface: rgba(95, 212, 255, 0.13);
   --color-disabled-surface: rgba(255, 255, 255, 0.03);
 
   /* ——— Typography (Nordic: Space Grotesk + Manrope + Space Mono) ——— */
@@ -93,9 +94,15 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28), 0 4px 12px rgba(0, 0, 0, 0.18);
   --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.32);
   --shadow-lg: 0 24px 64px rgba(0, 0, 0, 0.48);
-  --shadow-focus: 0 0 0 3px rgba(169, 213, 226, 0.28);
-  --glow-ice: 0 0 24px rgba(169, 213, 226, 0.10);
-  --glow-gold: 0 0 24px rgba(201, 170, 109, 0.10);
+  --shadow-focus: 0 0 0 3px rgba(95, 212, 255, 0.3);
+  --glow-ice: 0 0 28px rgba(95, 212, 255, 0.16);
+  --glow-gold: 0 0 24px rgba(201, 214, 224, 0.12);
+
+  /* ——— Frost / glass surface effects ——— */
+  --frost-blur: 22px;
+  --frost-surface: linear-gradient(155deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015) 40%, rgba(95, 212, 255, 0.03) 100%);
+  --frost-border: 1px solid rgba(220, 240, 250, 0.14);
+  --crystal-sheen: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.16) 46%, rgba(159, 230, 255, 0.22) 50%, transparent 62%);
 
   /* ——— Motion ——— */
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
@@ -104,9 +111,9 @@
   --duration-slow: 420ms;
 
   /* Dynamic media / crest (store themes may override) */
-  --crest-primary: #8fa3b2;
+  --crest-primary: #7fa8bd;
   --crest-accent: var(--color-accent-primary);
-  --moment-fallback: linear-gradient(145deg, #2a241c, #0a0c0f 72%);
+  --moment-fallback: linear-gradient(145deg, #142433, #050a12 72%);
   --store-accent: var(--color-accent-primary);
 
   /* ——— Compatibility aliases ——— */

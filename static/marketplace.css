@@ -40,7 +40,7 @@ body.vault-page {
 .vault-hero::after {
   content: "";
   position: absolute; left: 10%; right: 10%; bottom: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(158, 196, 209, 0.45), transparent);
+  background: linear-gradient(90deg, transparent, rgba(95, 212, 255, 0.45), transparent);
 }
 .vault-brand {
   display: inline-flex;
@@ -106,7 +106,7 @@ body.vault-page {
   transition: border-color var(--duration-fast), box-shadow var(--duration-medium);
 }
 .vault-search:focus-within {
-  border-color: rgba(158, 196, 209, 0.55);
+  border-color: rgba(95, 212, 255, 0.55);
   box-shadow: var(--shadow-md), var(--shadow-focus);
 }
 .vault-search-ico {
@@ -229,7 +229,7 @@ body.vault-page {
   border-radius: var(--radius-xs);
   border: 1px solid var(--color-border-default);
   background:
-    linear-gradient(160deg, rgba(158,196,209,0.07), transparent 40%),
+    linear-gradient(160deg, rgba(95, 212, 255,0.07), transparent 40%),
     var(--color-bg-glass);
   box-shadow: none;
   backdrop-filter: blur(10px);
@@ -262,7 +262,7 @@ body.vault-page {
 }
 .vault-page .listing-img {
   background:
-    radial-gradient(circle at 50% 30%, rgba(158,196,209,0.1), transparent 55%),
+    radial-gradient(circle at 50% 30%, rgba(95, 212, 255,0.1), transparent 55%),
     linear-gradient(165deg, #221c16, #0e0b08);
 }
 .vault-page .listing-title {

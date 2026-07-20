@@ -144,10 +144,11 @@ function renderHero() {
   const el = $("heroStats");
   if (!el || !META.fees) return;
   const f = META.fees;
+  const keepPct = (100 - f.standard_rate * 100).toFixed(0);
   el.innerHTML = `
-    <div class="stat hot"><div class="stat-num">0%</div><div class="stat-label">Founding ${f.founding_cap} fee</div></div>
-    <div class="stat"><div class="stat-num">${(f.founding_rate * 100).toFixed(0)}%</div><div class="stat-label">Founding rate after</div></div>
-    <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Standard fee</div></div>`;
+    <div class="stat hot"><div class="stat-num">${keepPct}%</div><div class="stat-label">Sellers keep</div></div>
+    <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Flat platform fee</div></div>
+    <div class="stat"><div class="stat-num">★</div><div class="stat-label">Founding ${f.founding_cap} badge</div></div>`;
 }
 
 function renderIntegrations() {
@@ -164,8 +165,8 @@ function renderIntegrations() {
 async function refreshFoundingCounter() {
   try {
     const s = await api("/api/sellers/founding-status");
-    $("foundingCounter").textContent = `Founding ${s.claimed}/${s.cap}`;
-    $("foundingCounter").title = `${s.remaining} Founding Seller slots left`;
+    $("foundingCounter").textContent = `Founding ${s.claimed}/${s.cap} · sellers keep 95%`;
+    $("foundingCounter").title = `${s.remaining} Founding Seller badges left — flat 5% fee for every seller`;
   } catch (_) {}
 }
 

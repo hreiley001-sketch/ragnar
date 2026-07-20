@@ -1,8 +1,8 @@
 """Fee math — the heart of RAGNAR's pitch.
 
-A seller keeps more here than on eBay, and the Founding 250 keep everything but
-payment processing during their intro window. Every number the storefront shows
-comes from here so the comparison stays honest and in one place.
+One flat platform fee for every seller: sellers keep 95%. Every number the
+storefront shows comes from here so the comparison against eBay stays honest
+and lives in one place.
 """
 from __future__ import annotations
 
@@ -15,11 +15,7 @@ def _money(value: float) -> float:
 
 
 def platform_rate_for(is_founding: bool, founding_intro: bool) -> float:
-    """The RAGNAR platform take rate for a given seller/state."""
-    if is_founding and founding_intro:
-        return 0.0
-    if is_founding:
-        return settings.founding_rate
+    """The RAGNAR platform take rate — flat 5% for every seller, founding or not."""
     return settings.standard_rate
 
 

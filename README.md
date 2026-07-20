@@ -4,10 +4,10 @@
 *Guided by counsel, driven by conquest.*
 
 RAGNAR is a marketplace built to beat eBay and Whatnot on the two things
-collectors care about most: **fees** (a flat 5% — 0% for the Founding 250, then a
-permanent 4%) and **trust** (structured, grading-aware listings and real buyer
-protection). This repo is the **MVP: the structured listings + search core** plus
-a branded storefront.
+collectors care about most: **fees** (one flat 5% platform fee — sellers keep 95%,
+no tiers, no promos) and **trust** (structured, grading-aware listings and real
+buyer protection). This repo is the **MVP: the structured listings + search core**
+plus a branded storefront.
 
 ## What's here
 
@@ -21,9 +21,9 @@ a branded storefront.
 - **Branded storefront** — wolf-and-raven steel/ice theme, search vault, sell drawer.
 
 **Slice 2 — sellers, scan-to-post, sold history**
-- **Seller accounts + Founding 250 lifecycle** — `apply` (auto-grants Founding # while
-  slots remain), the 90-day / $2,500 intro window, server-side effective fee rate
-  (0% intro → 4% Founding → 5% standard), and a live Founding counter.
+- **Seller accounts + Founding 250 badge** — `apply` (auto-grants Founding # while
+  slots remain) grants a permanent status badge; the platform fee stays a flat 5%
+  for every seller, server-side, with no tier discount. Live Founding counter.
 - **Scan-to-post** — upload your own photo; `/api/scan` auto-identifies the card
   (pluggable: OpenAI vision if configured, filename/heuristic fallback), pre-fills the
   listing, and returns the card's sold history in one call.
@@ -110,7 +110,7 @@ The database (SQLite) is created and seeded with sample listings on first run.
 | `/api/listings/{id}/sell` | POST | Mark sold → records a comp + accrues Founding sales |
 | `/api/sellers/apply` | POST | Register a seller; auto-grants Founding # if slots remain |
 | `/api/sellers/founding-status` | GET | Founding 250 counter (claimed / cap / remaining) |
-| `/api/sellers/{handle}` | GET | Seller profile + effective rate + intro window |
+| `/api/sellers/{handle}` | GET | Seller profile + effective (flat) fee rate |
 | `/api/scan` | POST | Upload a photo → recognized fields + image URL + sold history + live price |
 | `/api/sales/history` | GET | Sold comps for a card identity (avg/median/range/series) |
 | `/api/pricing/search` | GET | Live market price for a card (TCG API; 503 if no key) |

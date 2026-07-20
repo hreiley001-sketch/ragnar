@@ -21,7 +21,7 @@ logger = logging.getLogger("ragnar.seed")
 _SELLERS = [
     ("yggdrasil", "Yggdrasil Cards", True, {
         "tagline": "Roots of the hobby.",
-        "accent_color": "#e8a045",
+        "accent_color": "#5fd4ff",
         "bio": "Vintage Pokémon & Lorcana, graded and raw. Founding Seller since day one.",
         "store_edit_token": "demo-yggdrasil-token",
     }),

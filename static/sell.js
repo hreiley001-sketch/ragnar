@@ -222,7 +222,7 @@
     $("sellerState").hidden = false;
     if (s.is_founding) {
       $("sellerState").className = "seller-state founding";
-      $("sellerState").innerHTML = `★ <strong>Founding Seller #${s.founding_number}</strong> · ${s.intro_active ? `0% intro fee — ${s.intro_days_left} days & ${money(s.intro_sales_remaining)} left` : `permanent ${(s.effective_rate * 100).toFixed(0)}% rate`}`;
+      $("sellerState").innerHTML = `★ <strong>Founding Seller #${s.founding_number}</strong> · flat ${(s.effective_rate * 100).toFixed(0)}% platform fee, same as everyone`;
     } else {
       $("sellerState").className = "seller-state";
       $("sellerState").innerHTML = `Standard seller · ${(s.effective_rate * 100).toFixed(0)}% fee`;
@@ -243,7 +243,7 @@
     if (!price || price <= 0) { el.innerHTML = "Enter a price to see what you keep on RAGNAR vs eBay."; return; }
     const founding = sellerIsFounding();
     const { keep, savings, rate } = keepInfo(price, founding);
-    el.innerHTML = `On a ${money(price)} sale you keep <strong>${money(keep)}</strong> (${(rate * 100).toFixed(0)}% platform fee${founding ? ", Founding" : ""}). <span class="vs">≈ ${money(savings)} more than eBay.</span>`;
+    el.innerHTML = `On a ${money(price)} sale you keep <strong>${money(keep)}</strong> (${(rate * 100).toFixed(0)}% flat platform fee). <span class="vs">≈ ${money(savings)} more than eBay.</span>`;
   }
 
   function syncGradedFields() {
@@ -436,7 +436,7 @@
       });
       showSellerState(s);
       updateFeePreview();
-      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! 0% fees during your intro window.` : "Seller created (Founding slots full — standard rate).");
+      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! You keep 95% on every sale.` : "Seller created — you keep 95% on every sale.");
     } catch (err) {
       if (String(err.message).includes("already taken")) {
         try { const s = await api(`/api/sellers/${encodeURIComponent(handle)}`); showSellerState(s); updateFeePreview(); toast("Welcome back — seller loaded."); return; } catch (_) {}

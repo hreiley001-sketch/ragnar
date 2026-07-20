@@ -18,25 +18,13 @@ from .models import Listing, ListingStatus, Sale, Seller, utcnow
 
 
 def founding_intro_active(seller: Optional[Seller]) -> bool:
-    """True while a Founding Seller is still inside the 0% window (by both time
-    and the dollar cap)."""
-    if not seller or not seller.is_founding:
-        return False
-    if not seller.founding_intro_ends_at:
-        return False
-    if utcnow() >= seller.founding_intro_ends_at:
-        return False
-    if seller.founding_intro_sales_cents >= settings.founding_intro_sales_cap_cents:
-        return False
-    return True
+    """Retained for schema/back-compat — the fee is flat for everyone now, so
+    there is no intro window that changes the rate. Always False."""
+    return False
 
 
 def effective_platform_rate(seller: Optional[Seller]) -> float:
-    """The platform take rate that applies to this seller right now."""
-    if founding_intro_active(seller):
-        return 0.0
-    if seller and seller.is_founding:
-        return settings.founding_rate
+    """The platform take rate that applies to this seller — flat 5% for all."""
     return settings.standard_rate
 
 

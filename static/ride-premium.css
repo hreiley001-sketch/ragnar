@@ -26,13 +26,13 @@ body.premium-room {
 .room-noise { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
 .room-atmosphere {
   background:
-    radial-gradient(circle at 30% 18%, rgba(169,213,226,.08), transparent 30%),
-    radial-gradient(circle at 85% 68%, rgba(201,170,109,.04), transparent 30%),
+    radial-gradient(circle at 30% 18%, rgba(95, 212, 255,.08), transparent 30%),
+    radial-gradient(circle at 85% 68%, rgba(201, 214, 224,.04), transparent 30%),
     var(--color-surface-deep);
 }
 .room-beams {
   opacity: .14;
-  background: repeating-linear-gradient(112deg, transparent 0 140px, rgba(169,213,226,.04) 141px 142px, transparent 143px 280px);
+  background: repeating-linear-gradient(112deg, transparent 0 140px, rgba(95, 212, 255,.04) 141px 142px, transparent 143px 280px);
   -webkit-mask-image: linear-gradient(to bottom, #000, transparent 75%);
   mask-image: linear-gradient(to bottom, #000, transparent 75%);
 }
@@ -84,12 +84,12 @@ body.premium-room {
 .room-track .stop .cart { display: none; }
 .room-track .stop.active::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
-  background: var(--color-text-primary); box-shadow: 0 0 10px rgba(169,213,226,.28);
+  background: var(--color-text-primary); box-shadow: 0 0 10px rgba(95, 212, 255,.28);
 }
 
 .room-winner {
   margin-bottom: 14px; padding: 20px; text-align: center;
-  border: 1px solid rgba(201,170,109,.32); background: rgba(201,170,109,.06);
+  border: 1px solid rgba(201, 214, 224,.32); background: rgba(201, 214, 224,.06);
   color: var(--room-gold); font-size: 20px; font-weight: 800;
 }
 .room-grid { display: grid; grid-template-columns: minmax(0,1fr) 370px; gap: 14px; align-items: start; }
@@ -98,7 +98,7 @@ body.premium-room {
   position: relative; min-height: min(70vh, 780px); overflow: hidden;
   border: 1px solid var(--color-border-default);
   background:
-    radial-gradient(700px 520px at 50% 45%, rgba(169,213,226,.055), transparent 64%),
+    radial-gradient(700px 520px at 50% 45%, rgba(95, 212, 255,.055), transparent 64%),
     var(--color-surface-deep);
   box-shadow: var(--shadow-lg);
 }
@@ -108,8 +108,8 @@ body.premium-room {
 .showcase-frame { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
 .showcase-frame::before {
   content: ""; position: absolute; width: min(70%, 680px); aspect-ratio: 1;
-  border: 1px solid rgba(169,213,226,.08); border-radius: 50%;
-  box-shadow: inset 0 0 90px rgba(169,213,226,.04);
+  border: 1px solid rgba(95, 212, 255,.08); border-radius: 50%;
+  box-shadow: inset 0 0 90px rgba(95, 212, 255,.04);
 }
 .showcase-frame::after {
   content: "RAGNAR // LIVE ROOM"; position: absolute; top: 24px; left: 26px;
@@ -121,7 +121,7 @@ body.premium-room {
 }
 .showcase-card::before {
   content: ""; position: absolute; inset: -22px; z-index: -1;
-  border: 1px solid rgba(169,213,226,.1); transform: rotate(4deg);
+  border: 1px solid rgba(95, 212, 255,.1); transform: rotate(4deg);
 }
 .showcase-card img {
   width: 100%; height: 100%; object-fit: contain; border-radius: var(--radius-sm);
@@ -210,7 +210,7 @@ body.premium-room {
 .giveaway-meta { display: block; color: var(--room-muted); font-size: 11px; }
 .giveaway-winner {
   margin-top: 12px; padding: 12px; color: var(--room-gold);
-  border: 1px solid rgba(201,170,109,.28);
+  border: 1px solid rgba(201, 214, 224,.28);
 }
 
 .room-feed-panel {
