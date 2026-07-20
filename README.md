@@ -37,9 +37,9 @@ a branded storefront.
 Not yet built (next slices): bulk CSV import from eBay/TCGplayer, and (with keys)
 validating the recognition/comps adapters against live APIs.
 
-**AI Support OS** — AI owns intake → policy → action → resolution (humans only for
-edge cases). Web chat widget on every page; Command Hub → AI Support for the review
-queue. See `/api/support/*` and `/api/admin/support/*`.
+**AI Support OS (Counsel)** — AI owns intake → policy → action → resolution.
+Full counsel chamber at `/support`; floating Counsel portal on every other page;
+Command Hub → Counsel for the human review desk. APIs: `/api/support/*`.
 
 ### Turning on Stripe payments
 1. Create a Stripe account and grab **test** keys at

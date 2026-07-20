@@ -192,6 +192,14 @@ def listing_page(listing_id: int):
     return {"error": "listing UI not found"}
 
 
+@app.get("/support", include_in_schema=False)
+def support_page():
+    page = STATIC_DIR / "support.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "support UI not found"}
+
+
 @app.get("/rides", include_in_schema=False)
 def rides_page():
     page = STATIC_DIR / "rides.html"

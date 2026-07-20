@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR Counsel — Support</title>
+  <meta name="description" content="RAGNAR Counsel resolves refunds, returns, and tracking automatically — humans only when it matters." />
+  <link rel="icon" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/support.css" />
+</head>
+<body class="counsel-page">
+  <div class="counsel-atmosphere" aria-hidden="true"></div>
+  <header id="siteHeader"></header>
+
+  <main class="counsel-shell">
+    <section class="counsel-hero">
+      <div class="counsel-brand">
+        <div class="counsel-crest" aria-hidden="true">R</div>
+        <div class="counsel-brand-text">
+          <div class="counsel-brand-name">RAGNAR <span>Counsel</span></div>
+          <div class="counsel-brand-runes">Guided by counsel</div>
+        </div>
+      </div>
+      <h1>Resolution without the <em>helpdesk</em>.</h1>
+      <p class="counsel-hero-sub">
+        Track an order, start a refund, or open a return. Counsel decides what’s allowed,
+        acts when it’s clear, and escalates only the edge cases.
+      </p>
+      <div class="counsel-cta-row">
+        <button class="counsel-cta" id="counselStart" type="button">
+          Open Counsel <span class="arrow">→</span>
+        </button>
+        <button class="counsel-cta ghost" id="counselTrack" type="button">
+          Track an order
+        </button>
+      </div>
+    </section>
+
+    <section class="counsel-workspace" aria-label="Counsel workspace">
+      <div class="counsel-stage" id="counselStage">
+        <div class="counsel-stage-head">
+          <div class="counsel-stage-title">
+            <span class="counsel-live"><span class="counsel-live-dot" aria-hidden="true"></span> Live</span>
+            Counsel session
+          </div>
+          <div class="counsel-case-id" id="counselCaseId">—</div>
+        </div>
+        <div class="counsel-feed" id="counselFeed" role="log" aria-live="polite"></div>
+        <div class="counsel-composer">
+          <div class="counsel-intents" id="counselIntents" aria-label="Quick intents"></div>
+          <div class="counsel-input-row">
+            <input id="counselInput" type="text" maxlength="2000"
+              placeholder="Describe the issue — include order # if you have it"
+              aria-label="Message to Counsel" autocomplete="off" />
+            <button class="counsel-send" id="counselSend" type="button">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="counsel-rail" aria-label="Case status">
+        <div class="counsel-rail-block">
+          <div class="counsel-rail-kicker">Case state</div>
+          <h3 id="railHeadline">Ready when you are</h3>
+          <p id="railCopy">Counsel owns intake, policy, and action. You’ll see every decision here.</p>
+          <div class="counsel-status-grid">
+            <div class="counsel-status-item">
+              <span>Status</span>
+              <strong id="railStatus" class="listening">listening</strong>
+            </div>
+            <div class="counsel-status-item">
+              <span>Intent</span>
+              <strong id="railIntent">—</strong>
+            </div>
+            <div class="counsel-status-item">
+              <span>Confidence</span>
+              <strong id="railConf">—</strong>
+            </div>
+            <div class="counsel-status-item">
+              <span>Order</span>
+              <strong id="railOrder">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="counsel-rail-block">
+          <div class="counsel-rail-kicker">Start here</div>
+          <div class="counsel-lanes" id="counselLanes">
+            <button class="counsel-lane" type="button" data-prompt="Track my order">
+              <span class="counsel-lane-idx">01</span>
+              <div>
+                <strong>Track an order</strong>
+                <span>Status, carrier, and next steps</span>
+              </div>
+            </button>
+            <button class="counsel-lane" type="button" data-prompt="I need a refund">
+              <span class="counsel-lane-idx">02</span>
+              <div>
+                <strong>Request a refund</strong>
+                <span>Policy-checked, often resolved instantly</span>
+              </div>
+            </button>
+            <button class="counsel-lane" type="button" data-prompt="I want to return an item">
+              <span class="counsel-lane-idx">03</span>
+              <div>
+                <strong>Start a return</strong>
+                <span>Label or keep-item when eligible</span>
+              </div>
+            </button>
+            <button class="counsel-lane" type="button" data-prompt="What are RAGNAR fees?">
+              <span class="counsel-lane-idx">04</span>
+              <div>
+                <strong>Fees &amp; selling</strong>
+                <span>Flat rates, Founding, payouts</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <p class="counsel-footnote">
+      High-risk, legal, and high-value cases route to a human queue.
+      Signed-in buyers get full order access —
+      <a href="/login">sign in</a> or manage cases in
+      <a href="/account">Account</a>.
+    </p>
+  </main>
+
+  <script src="/static/nav.js"></script>
+  <script src="/static/support.js"></script>
+</body>
+</html>
