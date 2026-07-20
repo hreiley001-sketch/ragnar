@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="/static/tokens.css" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/home.css" />
+  <link rel="stylesheet" href="/static/asgard-bg.css" />
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","description":"Premium live-commerce marketplace for trading cards. Standard 5% seller fee; the first 250 sellers to sign up lock in a flat 4% forever."}
   </script>
@@ -40,7 +41,7 @@
 
   <main id="main" class="arena-main">
     <!-- Hero: one composition — brand, headline, line, CTAs, full-bleed vault -->
-    <section class="vault-hero-scene" id="vaultHero" aria-label="RAGNAR vault entrance">
+    <section class="vault-hero-scene" id="vaultHero" data-asgard-realm="bifrost" aria-label="RAGNAR vault entrance">
       <div class="vault-world" id="vaultWorld" aria-hidden="true">
         <div class="vault-depth vault-depth-far"></div>
         <div class="vault-depth vault-depth-mid"></div>
@@ -72,7 +73,7 @@
     </section>
 
     <!-- Scroll chapter: live activity floats in as camera advances -->
-    <section class="vault-activity-band" id="vaultPulse" aria-label="Live marketplace activity">
+    <section class="vault-activity-band" id="vaultPulse" data-asgard-realm="bifrost" aria-label="Live marketplace activity">
       <div class="arena-shell vault-activity-grid">
         <aside class="activity-rail reveal" id="activityFeed" aria-live="polite">
           <div class="activity-rail-head"><span class="live-signal"></span> Live marketplace</div>
@@ -96,7 +97,7 @@
       </div>
     </section>
 
-    <section class="arena-metrics arena-shell" aria-label="Platform economics">
+    <section class="arena-metrics arena-shell" data-asgard-realm="bifrost" aria-label="Platform economics">
       <div class="arena-proof">
         <div class="arena-proof-item hot"><strong>4%</strong><span>Founding 250 rate, forever</span></div>
         <div class="arena-proof-item"><strong>5%</strong><span>Standard seller fee</span></div>
@@ -105,7 +106,7 @@
       </div>
     </section>
 
-    <section id="live" class="section">
+    <section id="live" class="section" data-asgard-realm="midgard">
       <div class="live-marquee" aria-hidden="true">
         <div class="live-marquee-track">
           <span><i class="signal-dot"></i>Live now</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span>
@@ -134,7 +135,7 @@
       </div>
     </section>
 
-    <section id="breaks" class="section">
+    <section id="breaks" class="section" data-asgard-realm="midgard">
       <div class="arena-shell">
         <div class="section-head reveal">
           <div><span class="section-label">02 / Coming up</span><h2>Next on<br>the floor.</h2></div>
@@ -155,7 +156,7 @@
       </div>
     </section>
 
-    <section id="breakers" class="section">
+    <section id="breakers" class="section" data-asgard-realm="midgard">
       <div class="arena-shell">
         <div class="section-head reveal">
           <div><span class="section-label">03 / Top sellers</span><h2>People worth<br>watching.</h2></div>
@@ -166,7 +167,7 @@
       </div>
     </section>
 
-    <section id="pulls" class="section">
+    <section id="pulls" class="section" data-asgard-realm="valhalla">
       <div class="arena-shell">
         <div class="section-head reveal">
           <div><span class="section-label">04 / Biggest pulls</span><h2>The hall<br>of ice.</h2></div>
@@ -191,7 +192,7 @@
       </div>
     </section>
 
-    <section id="difference" class="section">
+    <section id="difference" class="section" data-asgard-realm="valhalla">
       <div class="arena-shell difference-layout reveal">
         <div class="difference-copy">
           <span class="section-label">05 / The RAGNAR difference</span>
@@ -215,7 +216,7 @@
       </div>
     </section>
 
-    <section class="section section-tight">
+    <section class="section section-tight" data-asgard-realm="valhalla">
       <div class="arena-shell">
         <div class="market-gateway reveal">
           <div>
@@ -228,7 +229,7 @@
       </div>
     </section>
 
-    <section id="apply" class="section">
+    <section id="apply" class="section" data-asgard-realm="forge">
       <div class="arena-shell breaker-cta">
         <div class="breaker-copy reveal">
           <span class="section-label">07 / Sell on RAGNAR</span>
@@ -285,6 +286,7 @@
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/asgard-bg.js"></script>
   <script src="/static/founding.js"></script>
   <script src="/static/nav.js"></script>
   <script src="/static/sell.js"></script>
