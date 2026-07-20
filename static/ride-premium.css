@@ -71,7 +71,7 @@ body.premium-room { background: var(--room-bg); }
 }
 .room-track .stop:last-child { border-right: 0; }
 .room-track .stop.done { color: #879198; background: rgba(255,255,255,.025); }
-.room-track .stop.active { color: #071014; background: var(--room-ice); }
+.room-track .stop.active { color: var(--color-on-accent); background: var(--room-ice); }
 .room-track .stop .cart { display: none; }
 .room-track .stop.active::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;

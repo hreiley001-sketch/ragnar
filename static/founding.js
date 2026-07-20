@@ -430,7 +430,7 @@ function initArenaCanvas() {
   function draw() {
     if (!active) return;
     context.clearRect(0, 0, width, height);
-    context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#b7e7f4";
+    context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#e8a045";
     points.forEach((point) => {
       point.y -= point.speed * point.z;
       point.x += Math.sin((point.y + point.z * 100) * 0.005) * 0.035;
