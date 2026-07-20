@@ -78,6 +78,8 @@ class User(SQLModel, table=True):
     email_verified: bool = Field(default=False)
     verify_token: Optional[str] = Field(default=None, index=True, max_length=64)
     verify_sent_at: Optional[datetime] = Field(default=None)
+    reset_token: Optional[str] = Field(default=None, index=True, max_length=64)
+    reset_sent_at: Optional[datetime] = Field(default=None)
     pending_email: Optional[str] = Field(default=None, max_length=160)
     role: str = Field(default=UserRole.user.value, index=True)
     seller_handle: Optional[str] = Field(default=None, index=True, max_length=40)
@@ -206,6 +208,7 @@ class OrderStatus(str, Enum):
     delivered = "delivered"
     cancelled = "cancelled"
     disputed = "disputed"
+    refunded = "refunded"      # money returned via Stripe (or full ledger cancel for non-Stripe)
 
 
 class Order(SQLModel, table=True):
@@ -225,9 +228,36 @@ class Order(SQLModel, table=True):
     tracking_number: Optional[str] = Field(default=None, max_length=80)
     carrier: Optional[str] = Field(default=None, max_length=40)
     stripe_session_id: Optional[str] = Field(default=None, index=True, max_length=120)
+    stripe_refund_id: Optional[str] = Field(default=None, index=True, max_length=120)
+    refunded_cents: int = Field(default=0)
     source: str = Field(default="manual")  # stripe | offer | manual | ride
     created_at: datetime = Field(default_factory=utcnow, index=True)
     updated_at: datetime = Field(default_factory=utcnow)
+
+
+class ProcessedStripeEvent(SQLModel, table=True):
+    """Idempotency ledger for Stripe webhooks — event_id is unique."""
+
+    event_id: str = Field(primary_key=True, max_length=120)
+    event_type: str = Field(max_length=80)
+    processed_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class InventoryHold(SQLModel, table=True):
+    """Temporary reservation created at Checkout Session creation.
+
+    Available units = listing.quantity - active (unreleased, unconverted, unexpired) holds.
+    """
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    listing_id: int = Field(foreign_key="listing.id", index=True)
+    buyer_user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    stripe_session_id: str = Field(index=True, unique=True, max_length=120)
+    quantity: int = Field(default=1)
+    expires_at: datetime = Field(index=True)
+    released: bool = Field(default=False, index=True)
+    converted: bool = Field(default=False, index=True)
+    created_at: datetime = Field(default_factory=utcnow)
 
 
 class OfferStatus(str, Enum):

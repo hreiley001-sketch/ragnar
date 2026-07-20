@@ -209,10 +209,165 @@ class Settings:
     support_ai_max_refund_cents: int = int(os.getenv("SUPPORT_AI_MAX_REFUND_CENTS", "50000"))
 
     debug: bool = _flag("DEBUG", False)
+    # development | production — drives CORS hardening and schema bootstrap mode.
+    environment: str = os.getenv("ENVIRONMENT", "development").strip().lower()
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment in {"production", "prod"}
+
+    @property
+    def use_create_all(self) -> bool:
+        """Whether init_db may call SQLModel.create_all (dev convenience only).
+
+        Production must use Alembic (`alembic upgrade head`). Override with
+        SCHEMA_BOOTSTRAP=create_all|alembic.
+        """
+        mode = os.getenv("SCHEMA_BOOTSTRAP", "").strip().lower()
+        if mode == "create_all":
+            return True
+        if mode == "alembic":
+            return False
+        return not self.is_production
+
+    @property
+    def cors_allow_origins(self) -> list[str]:
+        """Origins safe to use with allow_credentials=True.
+
+        Never returns ``*`` in production (browsers reject credentialed ``*``
+        anyway, and it is unsafe). Falls back to SITE_URL / PUBLIC_BASE_URL.
+        """
+        raw = [o for o in self.allowed_origins if o and o != "*"]
+        if raw:
+            return raw
+        if self.is_production:
+            base = (self.site_url or self.public_base_url or "").rstrip("/")
+            return [base] if base else []
+        # Local/dev: reflect common localhost origins instead of ``*`` + credentials.
+        if self.allowed_origins == ["*"] or not self.allowed_origins:
+            return [
+                "http://127.0.0.1:8000",
+                "http://localhost:8000",
+                "http://127.0.0.1:8010",
+                "http://localhost:8010",
+                self.public_base_url,
+            ]
+        return self.allowed_origins
 
     @property
     def founding_intro_sales_cap_cents(self) -> int:
         return int(self.founding_intro_sales_cap * 100)
+
+
+def validate_launch_config() -> dict:
+    """Audit production-critical env vars. Returns {ok, errors, warnings, checks}."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    checks: dict[str, str] = {}
+
+    def _ok(name: str, detail: str = "ok") -> None:
+        checks[name] = detail
+
+    def _warn(name: str, msg: str) -> None:
+        checks[name] = f"warn: {msg}"
+        warnings.append(f"{name}: {msg}")
+
+    def _err(name: str, msg: str) -> None:
+        checks[name] = f"error: {msg}"
+        errors.append(f"{name}: {msg}")
+
+    # CORS
+    if "*" in settings.allowed_origins:
+        if settings.is_production:
+            _err("ALLOWED_ORIGINS", "must not include * in production (credentials incompatible)")
+        else:
+            _warn("ALLOWED_ORIGINS", "* allowed only in development; using localhost fallbacks")
+    else:
+        _ok("ALLOWED_ORIGINS", ",".join(settings.cors_allow_origins) or "(empty)")
+
+    # Public URLs
+    site = (settings.site_url or settings.public_base_url or "").rstrip("/")
+    if settings.is_production:
+        if not site.startswith("https://"):
+            _err("SITE_URL/PUBLIC_BASE_URL", "must be https in production")
+        else:
+            _ok("SITE_URL", site)
+    else:
+        _ok("SITE_URL", site or "(unset)")
+
+    # Stripe — hard-required only when money is supposed to move (PAYMENTS_LIVE).
+    sk = settings.stripe_secret_key
+    if not sk:
+        if settings.payments_live:
+            _err("STRIPE_SECRET_KEY", "required when PAYMENTS_LIVE=true")
+        elif settings.is_production:
+            _warn("STRIPE_SECRET_KEY", "unset — checkout disabled until you add sk_test_/sk_live_ in Render")
+        else:
+            _warn("STRIPE_SECRET_KEY", "unset — checkout disabled")
+    else:
+        if settings.payments_live and not sk.startswith("sk_live_"):
+            _err("STRIPE_SECRET_KEY", "PAYMENTS_LIVE=true requires sk_live_… key")
+        elif not settings.payments_live and sk.startswith("sk_live_"):
+            _warn("STRIPE_SECRET_KEY", "live key with PAYMENTS_LIVE=false")
+        else:
+            _ok("STRIPE_SECRET_KEY", "sk_live_…" if sk.startswith("sk_live_") else "sk_test_…")
+
+    if not settings.stripe_publishable_key:
+        if settings.payments_live:
+            _err("STRIPE_PUBLISHABLE_KEY", "required when PAYMENTS_LIVE=true")
+        elif settings.is_production:
+            _warn("STRIPE_PUBLISHABLE_KEY", "unset — add pk_test_/pk_live_ in Render")
+        else:
+            _warn("STRIPE_PUBLISHABLE_KEY", "unset")
+    else:
+        pk = settings.stripe_publishable_key
+        if settings.payments_live and not pk.startswith("pk_live_"):
+            _err("STRIPE_PUBLISHABLE_KEY", "PAYMENTS_LIVE requires pk_live_…")
+        else:
+            _ok("STRIPE_PUBLISHABLE_KEY", "set")
+
+    if not settings.stripe_webhook_secret:
+        if settings.payments_live:
+            _err("STRIPE_WEBHOOK_SECRET", "required when PAYMENTS_LIVE=true")
+        elif settings.is_production:
+            _warn("STRIPE_WEBHOOK_SECRET", "unset — orders won't finalize until webhook is configured")
+        else:
+            _warn("STRIPE_WEBHOOK_SECRET", "unset — webhooks will 503")
+    else:
+        _ok("STRIPE_WEBHOOK_SECRET", "set")
+
+    # Email (Resend) — warn in production; don't brick the site if unset
+    if not settings.resend_api_key:
+        if settings.is_production:
+            _warn("RESEND_API_KEY", "unset — verification/reset emails will not send")
+        else:
+            _warn("RESEND_API_KEY", "unset — auth emails will not send")
+    else:
+        _ok("RESEND_API_KEY", "set")
+    if "example.com" in settings.email_from.lower() or not settings.email_from:
+        _warn("EMAIL_FROM", "verify sending domain in Resend")
+    else:
+        _ok("EMAIL_FROM", settings.email_from)
+
+    # Schema — SQLite on Render still uses create_all + ALTER unless forced to alembic
+    if settings.is_production and settings.use_create_all:
+        _warn(
+            "SCHEMA_BOOTSTRAP",
+            "using create_all (OK for SQLite disk). Set SCHEMA_BOOTSTRAP=alembic after Postgres.",
+        )
+    else:
+        _ok("SCHEMA_BOOTSTRAP", "create_all" if settings.use_create_all else "alembic")
+
+    if settings.seed_demo and settings.is_production:
+        _err("SEED_DEMO", "must be false in production")
+
+    return {
+        "ok": len(errors) == 0,
+        "environment": settings.environment,
+        "errors": errors,
+        "warnings": warnings,
+        "checks": checks,
+    }
 
 
 settings = Settings()

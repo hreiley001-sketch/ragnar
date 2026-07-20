@@ -12,8 +12,10 @@ from sqlmodel import Session, select
 from .. import auth
 from ..config import settings
 from ..database import get_session
-from ..emailer import send_verification_email
+from ..emailer import send_password_reset_email, send_verification_email
 from ..models import User, UserRole, UserSession, utcnow
+from .. import ratelimit
+from datetime import timedelta
 
 def _base_url() -> str:
     return (settings.site_url or settings.public_base_url).rstrip("/")
@@ -51,7 +53,13 @@ def _set_session_cookie(response: Response, token: str) -> None:
 
 
 @router.post("/signup")
-def signup(payload: dict, response: Response, session: Session = Depends(get_session)) -> dict:
+def signup(payload: dict, request: Request, response: Response, session: Session = Depends(get_session)) -> dict:
+    ip = ratelimit.client_ip(request)
+    ratelimit.limiter.hit(
+        f"signup:ip:{ip}",
+        limit=ratelimit.SIGNUP_IP_LIMIT,
+        window_seconds=ratelimit.SIGNUP_IP_WINDOW,
+    )
     email = (payload.get("email") or "").strip().lower()
     password = payload.get("password") or ""
     name = (payload.get("name") or "").strip() or None
@@ -132,14 +140,81 @@ def resend_verification(session: Session = Depends(get_session), user=Depends(au
 
 
 @router.post("/login")
-def login(payload: dict, response: Response, session: Session = Depends(get_session)) -> dict:
+def login(payload: dict, request: Request, response: Response, session: Session = Depends(get_session)) -> dict:
+    ip = ratelimit.client_ip(request)
     email = (payload.get("email") or "").strip().lower()
     password = payload.get("password") or ""
+    ratelimit.limiter.hit(
+        f"login:ip:{ip}",
+        limit=ratelimit.LOGIN_IP_LIMIT,
+        window_seconds=ratelimit.LOGIN_IP_WINDOW,
+    )
+    if email:
+        ratelimit.limiter.hit(
+            f"login:email:{email}",
+            limit=ratelimit.LOGIN_EMAIL_LIMIT,
+            window_seconds=ratelimit.LOGIN_EMAIL_WINDOW,
+        )
     user = session.exec(select(User).where(User.email == email)).first()
     if not user or not auth.verify_password(password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
     _set_session_cookie(response, auth.create_session(session, user))
     return auth.public_user(user)
+
+
+@router.post("/forgot-password")
+def forgot_password(payload: dict, request: Request, session: Session = Depends(get_session)) -> dict:
+    """Always returns a generic success message to avoid email enumeration."""
+    ip = ratelimit.client_ip(request)
+    ratelimit.limiter.hit(
+        f"forgot:ip:{ip}",
+        limit=ratelimit.FORGOT_IP_LIMIT,
+        window_seconds=ratelimit.FORGOT_IP_WINDOW,
+    )
+    email = (payload.get("email") or "").strip().lower()
+    generic = {
+        "status": "ok",
+        "message": "If an account exists for that email, a reset link has been sent.",
+    }
+    if not _EMAIL_RE.match(email):
+        return generic
+    user = session.exec(select(User).where(User.email == email)).first()
+    if user and user.password_hash:
+        user.reset_token = secrets.token_urlsafe(24)
+        user.reset_sent_at = utcnow()
+        session.add(user)
+        session.commit()
+        link = f"{_base_url()}/login?reset={user.reset_token}"
+        send_password_reset_email(user.email, user.name or "", link)
+    return generic
+
+
+@router.post("/reset-password")
+def reset_password(payload: dict, response: Response, session: Session = Depends(get_session)) -> dict:
+    token = (payload.get("token") or "").strip()
+    new_password = payload.get("password") or ""
+    if not token:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing reset token.")
+    if len(new_password) < 8:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must be at least 8 characters.")
+    user = session.exec(select(User).where(User.reset_token == token)).first()
+    if not user or not user.reset_sent_at:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="This reset link is invalid or has already been used.")
+    if utcnow() - user.reset_sent_at > timedelta(hours=1):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="This reset link has expired. Request a new one.")
+    user.password_hash = auth.hash_password(new_password)
+    user.reset_token = None
+    user.reset_sent_at = None
+    session.add(user)
+    # Invalidate all existing sessions after a reset.
+    for us in session.exec(select(UserSession).where(UserSession.user_id == user.id)).all():
+        session.delete(us)
+    session.commit()
+    session.refresh(user)
+    _set_session_cookie(response, auth.create_session(session, user))
+    return {"status": "password_reset", "user": auth.public_user(user)}
 
 
 @router.post("/logout")

@@ -118,6 +118,18 @@ def run_refund(
         kind="partial" if decision.decision == "partial" else "full",
     )
     result["refund"] = refund
+    if not refund.get("ok", True):
+        actions.flag_human_review(
+            session, conv,
+            reason=refund.get("error") or "Stripe refund failed — needs human",
+        )
+        result["actions_taken"].append("refund_failed_flag_review")
+        result["decision"] = "escalate"
+        governance.escalate_conversation(
+            session, conv, queue="payments",
+            reason=refund.get("error") or "Refund failed",
+        )
+        return result
     result["actions_taken"].append(
         "issue_partial_refund" if decision.decision == "partial" else "issue_refund"
     )
@@ -183,6 +195,11 @@ def run_return(
             conversation=conv,
         )
         result["refund"] = refund
+        if not refund.get("ok", True):
+            actions.flag_human_review(session, conv, reason=refund.get("error") or "Refund failed")
+            result["actions_taken"].append("refund_failed_flag_review")
+            result["decision"] = "escalate"
+            return result
         result["actions_taken"].append("issue_refund")
     else:
         label = actions.create_return_label(session, order)
@@ -239,6 +256,11 @@ def run_cancel(
         conversation=conv,
     )
     result["refund"] = refund
+    if not refund.get("ok", True):
+        actions.flag_human_review(session, conv, reason=refund.get("error") or "Refund failed")
+        result["actions_taken"].append("refund_failed_flag_review")
+        result["decision"] = "escalate"
+        return result
     result["actions_taken"].append("issue_refund")
     result["order"] = actions.order_summary(session, order)
     conv.status = SupportCaseStatus.resolved.value

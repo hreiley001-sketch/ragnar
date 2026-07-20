@@ -59,6 +59,19 @@ UPLOAD_DIR = PROJECT_ROOT / settings.upload_dir
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    from .config import validate_launch_config
+
+    report = validate_launch_config()
+    for w in report["warnings"]:
+        logger.warning("Config: %s", w)
+    for e in report["errors"]:
+        logger.error("Config: %s", e)
+    if settings.is_production and not report["ok"]:
+        raise RuntimeError(
+            "Production config invalid — fix ENVIRONMENT variables before serving traffic: "
+            + "; ".join(report["errors"])
+        )
+
     init_db()
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     seed_if_empty()
@@ -72,7 +85,7 @@ async def lifespan(app: FastAPI):
             support_knowledge.ensure_knowledge(session)
     except Exception:  # noqa: BLE001
         logger.exception("Support knowledge seed skipped")
-    logger.info("%s v%s ready.", settings.app_name, settings.version)
+    logger.info("%s v%s ready (%s).", settings.app_name, settings.version, settings.environment)
     yield
 
 
@@ -88,7 +101,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=settings.cors_allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -92,6 +92,22 @@ def send_verification_email(to: str, name: str, link: str, *, is_staff_domain: b
     return send_email(to, "Verify your RAGNAR account", _brand_wrap(inner))
 
 
+def send_password_reset_email(to: str, name: str, link: str) -> bool:
+    greeting = f"Hi {name}," if name else "Hi,"
+    inner = (
+        f'<p>{greeting}</p>'
+        '<p>We received a request to reset your RAGNAR password.</p>'
+        f'<p style="margin:24px 0;"><a href="{link}" '
+        'style="background:#2a8fc4;color:#f2fbff;text-decoration:none;padding:12px 22px;'
+        'border-radius:10px;font-weight:600;display:inline-block;">Reset password</a></p>'
+        f'<p style="color:#9fb2c6;font-size:13px;">Or paste this link:<br>'
+        f'<a href="{link}" style="color:#6fd6ff;">{link}</a></p>'
+        '<p style="color:#6c8199;font-size:12px;">This link expires in 1 hour. '
+        "If you didn't request a reset, you can ignore this email.</p>"
+    )
+    return send_email(to, "Reset your RAGNAR password", _brand_wrap(inner))
+
+
 def ops_alert(subject: str, body: str = "") -> None:
     """Best-effort alert to the admin emails + Discord ops channel."""
     if settings.admin_emails:

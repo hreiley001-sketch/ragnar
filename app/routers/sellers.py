@@ -6,7 +6,7 @@ import secrets
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlmodel import Session, select
 
-from ..auth import get_current_user
+from ..auth import get_current_user, require_user
 from ..database import get_session
 from ..models import Seller
 from ..schemas import FoundingStatus, SellerApply, SellerApplyResult, SellerState
@@ -26,7 +26,7 @@ def get_founding_status(session: Session = Depends(get_session)) -> FoundingStat
 
 @router.post("/apply", response_model=SellerApplyResult, status_code=status.HTTP_201_CREATED)
 def apply(payload: SellerApply, session: Session = Depends(get_session),
-          user=Depends(get_current_user)) -> SellerApplyResult:
+          user=Depends(require_user)) -> SellerApplyResult:
     handle = payload.handle.strip().lower()
     existing = session.exec(select(Seller).where(Seller.handle == handle)).first()
     if existing:
@@ -34,11 +34,16 @@ def apply(payload: SellerApply, session: Session = Depends(get_session),
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Handle '{handle}' is already taken.",
         )
+    if user.seller_handle and user.seller_handle != handle:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Your account is already linked to store '{user.seller_handle}'.",
+        )
 
     seller = Seller(
         handle=handle,
         display_name=payload.display_name.strip(),
-        email=(payload.email or "").strip() or None,
+        email=(payload.email or "").strip() or user.email or None,
         store_edit_token=secrets.token_urlsafe(16),
     )
     if payload.apply_for_founding:
@@ -46,7 +51,7 @@ def apply(payload: SellerApply, session: Session = Depends(get_session),
 
     session.add(seller)
     # Signed-in applicants own their store automatically (no token juggling).
-    if user and not user.seller_handle:
+    if not user.seller_handle:
         user.seller_handle = handle
         session.add(user)
     session.commit()

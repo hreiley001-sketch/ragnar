@@ -8,6 +8,7 @@ services:
     runtime: python
     plan: starter
     buildCommand: pip install -r requirements.txt
+    # create_all stays enabled for the SQLite disk (see SCHEMA_BOOTSTRAP).
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     autoDeploy: true
@@ -17,7 +18,14 @@ services:
       sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.6
+        value: "3.12.6"
+      - key: ENVIRONMENT
+        value: production
+      # Keep create_all for SQLite persistent disk until Postgres + Alembic cutover.
+      - key: SCHEMA_BOOTSTRAP
+        value: create_all
+      - key: SEED_DEMO
+        value: "false"
       - key: DATABASE_URL
         value: sqlite:////var/data/ragnar.db
       - key: UPLOAD_DIR
@@ -26,9 +34,19 @@ services:
         value: https://ragnarips.com,https://www.ragnarips.com
       - key: PUBLIC_BASE_URL
         value: https://ragnarips.com
-      # Secrets — set these in the Render dashboard, not in this file:
+      - key: SITE_URL
+        value: https://ragnarips.com
+      - key: PAYMENTS_LIVE
+        value: "false"
+      # Secrets — set in the Render dashboard (Environment → Edit):
+      # Stripe Dashboard → Developers → API keys (use TEST keys first):
       - key: STRIPE_SECRET_KEY
         sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      # Stripe Dashboard → Developers → Webhooks → Add endpoint
+      #   URL: https://ragnarips.com/api/payments/webhook
+      #   Events: checkout.session.completed, checkout.session.expired
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
       - key: TCG_API_KEY
@@ -39,26 +57,27 @@ services:
         sync: false
       - key: COMPS_PROVIDER_KEY
         sync: false
-      # Email verification / notifications (Resend) — needed for the
-      # "sign up with @ragnarips.com -> verify -> Command Hub" email flow:
       - key: RESEND_API_KEY
         sync: false
       - key: EMAIL_FROM
         sync: false
-      # Media pipeline (Cloudinary) — transform-CDN + AI background removal:
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
-      # AI image enhancement + dedicated background removal:
       - key: REPLICATE_API_TOKEN
         sync: false
       - key: REMOVEBG_API_KEY
         sync: false
-      # Web extraction (Firecrawl) + Google Fonts (typography picker):
       - key: FIRECRAWL_API_KEY
         sync: false
       - key: GOOGLE_FONTS_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: ADMIN_TOKEN
         sync: false

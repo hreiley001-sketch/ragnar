@@ -1,13 +1,16 @@
 """Customer-facing stores: browse everyone's stores + self-serve customization."""
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy import func
 from sqlmodel import Session, select
 
+from ..auth import get_current_user, require_can_act_for_seller
 from ..config import settings
 from ..database import get_session
-from ..models import Listing, ListingStatus, LiveStream, Seller
+from ..models import Listing, ListingStatus, LiveStream, Seller, User
 from ..schemas import ListingRead, StoreProfile, StoreSummary, StoreUpdate
 
 router = APIRouter(prefix="/api/stores", tags=["stores"])
@@ -102,16 +105,16 @@ def update_store(
     handle: str,
     payload: StoreUpdate,
     session: Session = Depends(get_session),
+    user: Optional[User] = Depends(get_current_user),
     x_store_token: str = Header(default=""),
     x_admin_token: str = Header(default=""),
 ) -> StoreProfile:
     s = _seller_or_404(handle, session)
     is_admin = bool(settings.admin_token) and x_admin_token == settings.admin_token
-    is_owner = bool(s.store_edit_token) and x_store_token == s.store_edit_token
-    if not (is_admin or is_owner):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Provide your store edit token (X-Store-Token) to customize this store.",
+    if not is_admin:
+        require_can_act_for_seller(
+            user, s, x_store_token,
+            detail="Sign in as the store owner or provide X-Store-Token to customize this store.",
         )
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(s, field, value)

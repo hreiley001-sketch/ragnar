@@ -60,6 +60,27 @@ class ListingCreate(BaseModel):
         return self
 
 
+class ListingUpdate(BaseModel):
+    """Seller-editable listing fields. Seller identity cannot be reassigned."""
+
+    title: Optional[str] = Field(default=None, min_length=2, max_length=140)
+    category: Optional[Category] = None
+    set_name: Optional[str] = Field(default=None, max_length=120)
+    card_number: Optional[str] = Field(default=None, max_length=40)
+    player_or_character: Optional[str] = Field(default=None, max_length=120)
+    year: Optional[int] = Field(default=None, ge=1900, le=2100)
+    is_graded: Optional[bool] = None
+    condition: Optional[Condition] = None
+    grading_company: Optional[GradingCompany] = None
+    grade: Optional[float] = Field(default=None, ge=1, le=10)
+    price: Optional[float] = Field(default=None, gt=0, le=1_000_000)
+    shipping: Optional[float] = Field(default=None, ge=0, le=10_000)
+    quantity: Optional[int] = Field(default=None, ge=1, le=100_000)
+    image_url: Optional[str] = Field(default=None, max_length=500)
+    description: Optional[str] = Field(default=None, max_length=2000)
+    status: Optional[str] = Field(default=None, pattern=r"^(active|sold|draft)$")
+
+
 class ListingRead(BaseModel):
     id: int
     title: str

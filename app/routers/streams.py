@@ -34,14 +34,20 @@ def _read(stream: LiveStream, seller: Seller) -> LiveStreamRead:
     )
 
 
-def _authz(seller: Seller, x_store_token: str, x_admin_token: str) -> None:
-    is_admin = bool(settings.admin_token) and x_admin_token == settings.admin_token
-    is_owner = bool(seller.store_edit_token) and x_store_token == seller.store_edit_token
-    if not (is_admin or is_owner):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Provide your store token (X-Store-Token) to manage streams.",
-        )
+def _authz(
+    seller: Seller,
+    user: User | None = None,
+    x_store_token: str = "",
+    x_admin_token: str = "",
+) -> None:
+    if settings.admin_token and x_admin_token and x_admin_token == settings.admin_token:
+        return
+    auth.require_can_act_for_seller(
+        user,
+        seller,
+        x_store_token,
+        detail="Sign in as the store owner or provide X-Store-Token to manage streams.",
+    )
 
 
 @router.get("", response_model=list[LiveStreamRead])
@@ -113,13 +119,14 @@ def create_stream(
     handle: str,
     payload: LiveStreamCreate,
     session: Session = Depends(get_session),
+    user: User | None = Depends(auth.get_current_user),
     x_store_token: str = Header(default=""),
     x_admin_token: str = Header(default=""),
 ) -> LiveStreamRead:
     seller = session.exec(select(Seller).where(Seller.handle == handle.strip().lower())).first()
     if not seller:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Store not found")
-    _authz(seller, x_store_token, x_admin_token)
+    _authz(seller, user, x_store_token, x_admin_token)
     stream = LiveStream(
         seller_id=seller.id,
         title=payload.title.strip(),
@@ -140,6 +147,7 @@ def update_stream(
     stream_id: int,
     payload: LiveStreamUpdate,
     session: Session = Depends(get_session),
+    user: User | None = Depends(auth.get_current_user),
     x_store_token: str = Header(default=""),
     x_admin_token: str = Header(default=""),
 ) -> LiveStreamRead:
@@ -147,7 +155,7 @@ def update_stream(
     if not stream:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Stream not found")
     seller = session.get(Seller, stream.seller_id)
-    _authz(seller, x_store_token, x_admin_token)
+    _authz(seller, user, x_store_token, x_admin_token)
     data = payload.model_dump(exclude_unset=True)
     if data.get("status") == "live" and not stream.started_at:
         stream.started_at = utcnow()

@@ -1,7 +1,7 @@
 """BirdmanOS event bus.
 
 Every meaningful thing emits an event: user_joined_ride, bid_placed,
-ride_phase_changed, payment_captured, ride_complete, ride_tuned, stream_error…
+ride_phase_changed, payment_due, payment_captured, ride_complete, ride_tuned, stream_error…
 Events are persisted (so the Command Hub can read them) and mirrored to the
 'analytics observatory' (PostHog) when configured.
 """

@@ -370,23 +370,64 @@ def resolve_dispute(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="status must be 'resolved_refund' or 'resolved_denied'.",
         )
+
+    order = session.get(Order, dispute.order_id)
+    refund_info = None
+
+    if payload.status == "resolved_refund":
+        if not order:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Dispute has no order to refund.",
+            )
+        from ..support import actions as support_actions
+        amount = order.price_cents + (order.shipping_cents or 0) - int(order.refunded_cents or 0)
+        if amount <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Order is already fully refunded.",
+            )
+        # Stripe-paid orders must refund through Stripe; manual sales cancel locally only.
+        result = support_actions.issue_refund(
+            session, order,
+            amount_cents=amount,
+            reason=(payload.resolution or "").strip() or "Admin dispute resolution",
+            issued_by="admin",
+            kind="full",
+            require_stripe=bool(order.stripe_session_id),
+        )
+        if not result.get("ok"):
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=result.get("error") or "Refund failed — dispute left open.",
+            )
+        refund_info = result
+        # Refresh order after issue_refund committed.
+        session.refresh(order)
+
     dispute.status = payload.status
     dispute.resolution = (payload.resolution or "").strip() or None
     dispute.resolved_at = utcnow()
     session.add(dispute)
 
-    order = session.get(Order, dispute.order_id)
-    if order:
-        order.status = (
-            OrderStatus.cancelled.value if payload.status == "resolved_refund"
-            else OrderStatus.delivered.value
-        )
-        order.updated_at = utcnow()
-        session.add(order)
+    if order and payload.status == "resolved_denied":
+        # Return to delivered (or paid) — dispute closed without money movement.
+        if order.status == OrderStatus.disputed.value:
+            order.status = OrderStatus.delivered.value
+            order.updated_at = utcnow()
+            session.add(order)
+
     session.commit()
     session.refresh(dispute)
 
-    outcome = "refund issued" if payload.status == "resolved_refund" else "dispute denied"
+    if payload.status == "resolved_refund":
+        outcome = (
+            "buyer refunded via Stripe"
+            if refund_info and str(refund_info.get("status", "")).startswith("stripe")
+            else "order cancelled (no Stripe charge)"
+        )
+    else:
+        outcome = "dispute denied"
     if order:
         if order.buyer_user_id:
             notify(
@@ -402,4 +443,12 @@ def resolve_dispute(
             body=dispute.resolution or f"Order: {order.title}",
             link="/account#orders",
         )
-    return _dispute_dict(session, dispute)
+    out = _dispute_dict(session, dispute)
+    if refund_info:
+        out["refund"] = {
+            "status": refund_info.get("status"),
+            "amount": refund_info.get("amount"),
+            "stripe_refund_id": refund_info.get("stripe_refund_id"),
+            "order_status": refund_info.get("order_status"),
+        }
+    return out
