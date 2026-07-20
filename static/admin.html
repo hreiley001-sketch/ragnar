@@ -4,55 +4,106 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RAGNAR — Command Hub</title>
+  <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" href="/static/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/tokens.css" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/support.css" />
   <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/admin.css" />
 </head>
 <body class="page-admin">
-  <div class="aurora"></div>
+  <div class="cmd-atmosphere" aria-hidden="true"></div>
 
   <header id="siteHeader" class="site-header site-header--admin">
     <div class="brand">
-      <a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR Command Hub" class="logo-img" /></a>
-      <div class="brand-word"><h1 class="cmd-title">Command Hub</h1></div>
+      <a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a>
+      <div class="cmd-brand-stack">
+        <div class="cmd-brand-mark">RAGNAR <span>Command</span></div>
+        <h1 class="cmd-title">Command Hub // Staff</h1>
+      </div>
     </div>
-    <div class="header-actions">
+    <div class="header-actions cmd-mast-meta">
+      <span class="cmd-pulse" id="cmdPulse" hidden>Systems live</span>
+      <span class="cmd-clock" id="cmdClock" aria-live="polite"></span>
       <a class="btn btn-ghost btn-sm" href="/">Storefront</a>
+      <a class="btn btn-ghost btn-sm" href="/support">Counsel</a>
       <button id="logoutBtn" class="btn btn-ghost btn-sm" type="button" hidden>Log out</button>
     </div>
   </header>
 
-  <!-- Login gate -->
   <div id="loginGate" class="card login-wrap">
-    <h2>Command Hub access</h2>
-    <p class="muted">Enter your admin token (the <code>ADMIN_TOKEN</code> you set in the environment).</p>
-    <label class="field"><span>Admin token</span><input id="tokenInput" type="password" placeholder="paste ADMIN_TOKEN" /></label>
-    <button id="loginBtn" class="btn btn-primary" type="button">Enter</button>
+    <p class="login-kicker">Authorized personnel</p>
+    <h2>Enter the hub</h2>
+    <p class="muted">Paste your <code>ADMIN_TOKEN</code>, or sign in with a staff account.</p>
+    <label class="field"><span>Admin token</span><input id="tokenInput" type="password" placeholder="paste ADMIN_TOKEN" autocomplete="current-password" /></label>
+    <button id="loginBtn" class="btn btn-primary" type="button">Unlock Command Hub</button>
     <p id="loginErr" class="form-status error"></p>
-    <p class="muted muted-xs">Staff account? <a href="/login">Sign in</a> and this page unlocks automatically.</p>
+    <p class="muted muted-xs">Staff account? <a href="/login">Sign in</a> — this page unlocks automatically.</p>
   </div>
 
   <main id="hub" class="hub-main" hidden>
-    <div class="tabs" role="tablist" aria-label="Command Hub sections">
-      <button class="tab active" data-tab="dashboard" type="button" role="tab">Dashboard</button>
-      <button class="tab" data-tab="listings" type="button" role="tab">Listings</button>
-      <button class="tab" data-tab="sellers" type="button" role="tab">Sellers</button>
-      <button class="tab" data-tab="sales" type="button" role="tab">Sales</button>
-      <button class="tab" data-tab="apps" type="button" role="tab">Applications</button>
-      <button class="tab" data-tab="orders" type="button" role="tab">Orders</button>
-      <button class="tab" data-tab="disputes" type="button" role="tab">Disputes</button>
-      <button class="tab" data-tab="support" type="button" role="tab">Counsel</button>
-      <button class="tab" data-tab="rides" type="button" role="tab">Rides</button>
-      <button class="tab" data-tab="team" type="button" role="tab">Team</button>
-      <button class="tab" data-tab="site" type="button" role="tab">Site</button>
-      <button class="tab" data-tab="ai" type="button" role="tab">AI Tools</button>
-    </div>
+    <nav class="cmd-nav" aria-label="Command Hub modules">
+      <div class="cmd-nav-groups">
+        <div class="cmd-nav-group">
+          <div class="cmd-nav-label">Overview</div>
+          <div class="tabs" role="tablist" aria-label="Overview">
+            <button class="tab active" data-tab="dashboard" type="button" role="tab" aria-selected="true"><span class="tab-ico">01</span> Dashboard</button>
+            <button class="tab" data-tab="ai" type="button" role="tab"><span class="tab-ico">AI</span> Tools</button>
+          </div>
+        </div>
+        <div class="cmd-nav-group">
+          <div class="cmd-nav-label">Commerce</div>
+          <div class="tabs" role="tablist" aria-label="Commerce">
+            <button class="tab" data-tab="listings" type="button" role="tab"><span class="tab-ico">LS</span> Listings</button>
+            <button class="tab" data-tab="sellers" type="button" role="tab"><span class="tab-ico">SL</span> Sellers</button>
+            <button class="tab" data-tab="sales" type="button" role="tab"><span class="tab-ico">$$</span> Sales</button>
+            <button class="tab" data-tab="orders" type="button" role="tab"><span class="tab-ico">OR</span> Orders</button>
+            <button class="tab" data-tab="apps" type="button" role="tab"><span class="tab-ico">FS</span> Applications</button>
+            <button class="tab" data-tab="rides" type="button" role="tab"><span class="tab-ico">RD</span> Rides</button>
+          </div>
+        </div>
+        <div class="cmd-nav-group">
+          <div class="cmd-nav-label">Trust</div>
+          <div class="tabs" role="tablist" aria-label="Trust">
+            <button class="tab" data-tab="support" type="button" role="tab"><span class="tab-ico">CX</span> Counsel</button>
+            <button class="tab" data-tab="disputes" type="button" role="tab"><span class="tab-ico">DP</span> Disputes</button>
+            <button class="tab" data-tab="team" type="button" role="tab"><span class="tab-ico">TM</span> Team</button>
+          </div>
+        </div>
+        <div class="cmd-nav-group">
+          <div class="cmd-nav-label">Build</div>
+          <div class="tabs" role="tablist" aria-label="Build">
+            <button class="tab" data-tab="site" type="button" role="tab"><span class="tab-ico">ST</span> Site</button>
+          </div>
+        </div>
+      </div>
+    </nav>
 
     <section id="tab-dashboard" class="tab-panel">
+      <div class="cmd-brief">
+        <div>
+          <div class="cmd-brief-kicker">Mission brief</div>
+          <h2>Run the <em>marketplace.</em></h2>
+          <p>Live commerce, trust queues, and site control in one bridge. Jump to what needs you — AI handles the rest.</p>
+        </div>
+        <div class="cmd-brief-actions">
+          <button type="button" class="cmd-jump hot" data-jump="support">Counsel queue</button>
+          <button type="button" class="cmd-jump" data-jump="orders">Orders</button>
+          <button type="button" class="cmd-jump" data-jump="rides">Launch ride</button>
+          <button type="button" class="cmd-jump" data-jump="site">Site editor</button>
+          <button type="button" class="cmd-jump" data-jump="listings">Listings</button>
+        </div>
+      </div>
       <div id="kpiGrid" class="kpi-grid"></div>
-      <div class="card card-pad-16">
-        <h3 class="no-top" style="color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Integrations</h3>
+      <div class="cmd-systems">
+        <div class="cmd-systems-head">
+          <h3>Systems board</h3>
+          <span id="cmdSystemsMeta">Integrations</span>
+        </div>
         <div id="intList" class="int-list"></div>
       </div>
     </section>
@@ -100,7 +151,7 @@
     <section id="tab-support" class="tab-panel" hidden>
       <div class="panel-bar">
         <h3>Counsel — human review desk</h3>
-        <div style="display:flex;gap:8px;align-items:center;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <select id="supportQueueFilter" class="w-auto">
             <option value="">All queues</option>
             <option value="general">General</option>
@@ -110,6 +161,7 @@
             <option value="fraud">Fraud</option>
           </select>
           <button id="supportRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+          <a class="btn btn-ghost btn-sm" href="/support">Open chamber →</a>
         </div>
       </div>
       <p class="muted muted-xs mb-12">AI resolves most cases alone. This desk is for escalations and post-action review — governors, not frontline.</p>
@@ -140,7 +192,7 @@
 
     <section id="tab-rides" class="tab-panel" hidden>
       <div class="card card-pad-16 mb-18">
-        <h3 class="no-top" style="color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Launch a ride</h3>
+        <h3 class="no-top">Launch a ride</h3>
         <div class="ride-form">
           <label class="field"><span>Title</span><input id="rideTitle" type="text" placeholder="e.g. Friday Night Breaks" /></label>
           <label class="field"><span>Listing ID (optional)</span><input id="rideListingId" type="number" min="1" placeholder="—" /></label>

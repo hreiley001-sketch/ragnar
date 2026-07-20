@@ -50,7 +50,7 @@
   --color-disabled-surface: rgba(255, 255, 255, 0.03);
 
   /* ——— Typography ——— */
-  --font-display: "Inter Tight", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Syne", "Inter Tight", "Inter", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Inter Tight", "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
   --font-mono: "Space Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
 
@@ -121,7 +121,7 @@
   --steel: var(--color-text-secondary);
   --ice: var(--color-accent-primary);
   --ice-strong: var(--color-accent-primary-strong);
-  --gold: var(--color-accent-primary);
+  --gold: var(--color-accent-secondary);
   --danger: var(--color-error);
   --ok: var(--color-success);
   --shadow: var(--shadow-md);
