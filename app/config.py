@@ -200,6 +200,14 @@ class Settings:
     # Off by default so production stays clean.
     seed_demo: bool = _flag("SEED_DEMO", False)
 
+    # --- AI Support OS governance thresholds ---
+    # > support_conf_autonomous + low risk → AI resolves alone
+    # support_conf_review .. autonomous or medium risk → act + flag for review
+    # < support_conf_review or high risk → human queue
+    support_conf_autonomous: float = float(os.getenv("SUPPORT_CONF_AUTONOMOUS", "0.90"))
+    support_conf_review: float = float(os.getenv("SUPPORT_CONF_REVIEW", "0.70"))
+    support_ai_max_refund_cents: int = int(os.getenv("SUPPORT_AI_MAX_REFUND_CENTS", "50000"))
+
     debug: bool = _flag("DEBUG", False)
 
     @property

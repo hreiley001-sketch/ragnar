@@ -509,3 +509,122 @@ class SiteCollaborator(SQLModel, table=True):
     added_by: Optional[str] = Field(default=None, max_length=160)
     created_at: datetime = Field(default_factory=utcnow)
     updated_at: datetime = Field(default_factory=utcnow)
+
+
+# --------------------------------------------------------------------------- #
+# AI Support OS — conversations, knowledge, audit, human review queues
+# --------------------------------------------------------------------------- #
+
+
+class SupportChannel(str, Enum):
+    web = "web"
+    in_app = "in_app"
+    email = "email"
+    social = "social"
+    sms = "sms"
+
+
+class SupportCaseStatus(str, Enum):
+    open = "open"
+    awaiting_user = "awaiting_user"
+    in_workflow = "in_workflow"
+    pending_review = "pending_review"
+    escalated = "escalated"
+    resolved = "resolved"
+    closed = "closed"
+
+
+class SupportQueue(str, Enum):
+    """Human review queues — AI routes here only for edge cases."""
+
+    general = "general"
+    legal = "legal"
+    high_value = "high_value"
+    chargeback = "chargeback"
+    fraud = "fraud"
+
+
+class SupportConversation(SQLModel, table=True):
+    """A support thread owned by the AI Support OS (not seller DMs)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    public_id: str = Field(index=True, unique=True, max_length=32)
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    channel: str = Field(default=SupportChannel.web.value, index=True, max_length=20)
+    status: str = Field(default=SupportCaseStatus.open.value, index=True, max_length=32)
+    intent: Optional[str] = Field(default=None, index=True, max_length=64)
+    confidence: Optional[float] = Field(default=None)
+    tone: str = Field(default="normal", max_length=24)  # normal | frustrated | high_risk
+    queue: Optional[str] = Field(default=None, index=True, max_length=32)
+    order_id: Optional[int] = Field(default=None, foreign_key="order.id", index=True)
+    workflow: Optional[str] = Field(default=None, max_length=64)
+    workflow_step: Optional[str] = Field(default=None, max_length=64)
+    entities: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    context: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    resolved_at: Optional[datetime] = Field(default=None)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    updated_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class SupportMessage(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    conversation_id: int = Field(foreign_key="supportconversation.id", index=True)
+    role: str = Field(max_length=16)  # user | assistant | system | human
+    body: str = Field(max_length=4000)
+    meta: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class SupportAuditLog(SQLModel, table=True):
+    """Immutable trail of AI decisions, policy refs, and actions taken."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    conversation_id: Optional[int] = Field(
+        default=None, foreign_key="supportconversation.id", index=True
+    )
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    order_id: Optional[int] = Field(default=None, foreign_key="order.id", index=True)
+    actor: str = Field(default="ai", max_length=24)  # ai | human | system
+    intent: Optional[str] = Field(default=None, max_length=64)
+    decision: Optional[str] = Field(default=None, max_length=64)
+    actions: list = Field(default_factory=list, sa_column=Column(JSON))
+    policy_refs: list = Field(default_factory=list, sa_column=Column(JSON))
+    confidence: Optional[float] = Field(default=None)
+    risk: Optional[str] = Field(default=None, max_length=24)
+    reason: Optional[str] = Field(default=None, max_length=2000)
+    detail: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class KnowledgeArticle(SQLModel, table=True):
+    """Searchable marketplace policies, FAQs, seller rules, and playbooks."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    slug: str = Field(index=True, unique=True, max_length=80)
+    title: str = Field(max_length=160)
+    category: str = Field(index=True, max_length=40)  # policy | faq | seller | playbook
+    tags: list = Field(default_factory=list, sa_column=Column(JSON))
+    body: str = Field(max_length=8000)
+    # Machine-readable rules attached to the article (optional).
+    rules: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    active: bool = Field(default=True, index=True)
+    updated_at: datetime = Field(default_factory=utcnow)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class SupportRefund(SQLModel, table=True):
+    """Record of a refund (or store-credit) issued by AI or humans."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    order_id: int = Field(foreign_key="order.id", index=True)
+    conversation_id: Optional[int] = Field(
+        default=None, foreign_key="supportconversation.id", index=True
+    )
+    amount_cents: int = Field(default=0)
+    kind: str = Field(default="full", max_length=24)  # full | partial | store_credit
+    status: str = Field(default="recorded", index=True, max_length=32)
+    # recorded | stripe_refunded | pending_review | denied
+    stripe_refund_id: Optional[str] = Field(default=None, max_length=120)
+    reason: Optional[str] = Field(default=None, max_length=500)
+    issued_by: str = Field(default="ai", max_length=24)
+    created_at: datetime = Field(default_factory=utcnow, index=True)

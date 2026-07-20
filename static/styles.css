@@ -659,6 +659,17 @@ select option { background: var(--panel-solid); color: var(--text); }
 }
 .chat-fab:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(37,99,235,0.36); }
 .chat-fab.chat-fab-gold { background: var(--gold); border-color: var(--gold); box-shadow: 0 10px 26px rgba(184,121,26,0.30); }
+.chat-fab.chat-fab-support {
+  left: 18px; right: auto;
+  background: var(--panel-solid); color: var(--text); border-color: var(--border-strong);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.25);
+}
+.chat-fab.chat-fab-support:hover { box-shadow: 0 14px 30px rgba(0,0,0,0.32); }
+.chat-panel.chat-panel-support { left: 18px; right: auto; }
+@media (max-width: 520px) {
+  .chat-fab.chat-fab-support { left: 12px; bottom: 76px; }
+  .chat-panel.chat-panel-support { left: 12px; right: 12px; width: auto; }
+}
 .chat-panel {
   position: fixed; right: 18px; bottom: 76px; z-index: 91;
   width: min(380px, calc(100vw - 36px)); height: min(560px, calc(100vh - 130px));

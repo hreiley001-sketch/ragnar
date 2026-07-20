@@ -40,6 +40,7 @@ from .routers import (
     social,
     stores,
     streams,
+    support,
     watch,
 )
 from .seed import seed_if_empty
@@ -105,6 +106,8 @@ app.include_router(notifications.router)
 app.include_router(offers.router)
 app.include_router(orders.router)
 app.include_router(orders.admin_router)
+app.include_router(support.router)
+app.include_router(support.admin_router)
 app.include_router(watch.router)
 app.include_router(social.router)
 app.include_router(media.router)

@@ -118,6 +118,7 @@
       <button class="tab" data-tab="apps" type="button" role="tab">Applications</button>
       <button class="tab" data-tab="orders" type="button" role="tab">Orders</button>
       <button class="tab" data-tab="disputes" type="button" role="tab">Disputes</button>
+      <button class="tab" data-tab="support" type="button" role="tab">AI Support</button>
       <button class="tab" data-tab="rides" type="button" role="tab">Rides</button>
       <button class="tab" data-tab="team" type="button" role="tab">Team</button>
       <button class="tab" data-tab="site" type="button" role="tab">Site</button>
@@ -170,6 +171,34 @@
         <button id="disputesRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
       </div>
       <div class="tbl-wrap"><table class="hub"><thead><tr><th>ID</th><th>Order</th><th>Reason</th><th>Status</th><th>Resolution</th><th>Opened</th><th>Actions</th></tr></thead><tbody id="disputesBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-support" class="tab-panel" hidden>
+      <div class="panel-bar">
+        <h3>AI Support — human review queue</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select id="supportQueueFilter" class="w-auto">
+            <option value="">All queues</option>
+            <option value="general">General</option>
+            <option value="legal">Legal</option>
+            <option value="high_value">High value</option>
+            <option value="chargeback">Chargeback</option>
+            <option value="fraud">Fraud</option>
+          </select>
+          <button id="supportRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+        </div>
+      </div>
+      <p class="muted muted-xs mb-12">AI resolves most cases alone. This queue is for escalations and post-action review flags — governors, not frontline.</p>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>Case</th><th>Intent</th><th>Conf</th><th>Queue</th><th>Status</th><th>Order</th><th>Updated</th><th>Actions</th></tr></thead><tbody id="supportBody"></tbody></table></div>
+      <div id="supportDetail" class="card card-pad-16 mt-18" hidden>
+        <h3 class="no-top" style="color:var(--steel);font-size:14px;text-transform:uppercase;letter-spacing:.05em;">Case detail</h3>
+        <div id="supportThread" class="chat-feed" style="max-height:280px;margin:12px 0;border:1px solid var(--border);border-radius:12px;"></div>
+        <div id="supportAudit" class="muted muted-xs mb-12"></div>
+        <div class="ride-form">
+          <label class="field"><span>Resolution note</span><input id="supportResolveNote" type="text" placeholder="What you decided…" /></label>
+          <button id="supportResolveBtn" class="btn btn-primary" type="button">Mark resolved</button>
+        </div>
+      </div>
     </section>
 
     <section id="tab-rides" class="tab-panel" hidden>
