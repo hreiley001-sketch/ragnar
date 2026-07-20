@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#e4e0da" />
+  <meta name="theme-color" content="#eef5f9" />
   <title>RAGNAR — The Future of Sports Card Breaking</title>
   <meta name="description" content="Enter RAGNAR: the most exclusive trading-card marketplace in the world. Standard fee: 5%. The first 250 sellers to join lock in a flat 4% forever. Live breaks, elite sellers, precision commerce." />
   <meta name="keywords" content="live card breaks, sports card breaks, TCG live breaks, trading card marketplace, live commerce, card breakers, RAGNAR" />
@@ -19,76 +19,65 @@
   <meta name="twitter:image" content="https://ragnarips.com/static/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Germania+One&family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/tokens.css" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/home.css" />
-  <link rel="stylesheet" href="/static/asgard-bg.css" />
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","description":"Premium live-commerce marketplace for trading cards. Standard 5% seller fee; the first 250 sellers to sign up lock in a flat 4% forever."}
   </script>
 </head>
-<body class="arena-home">
+<body class="arena-home" data-vault-stage="1">
   <a class="arena-skip" href="#main">Skip to content</a>
-  <canvas id="arenaCanvas" aria-hidden="true"></canvas>
-  <div class="arena-rays" aria-hidden="true"></div>
-  <div class="arena-frost" aria-hidden="true"></div>
-  <div class="arena-grid" aria-hidden="true"></div>
-  <div class="arena-noise" aria-hidden="true"></div>
-  <div class="arena-vignette" aria-hidden="true"></div>
+
+  <!-- Continuous vault environment — one world for the entire scroll journey -->
+  <div class="vault-env" id="vaultEnv" aria-hidden="true">
+    <div class="vault-env-sky"></div>
+    <div class="vault-env-depth vault-env-far"></div>
+    <div class="vault-env-depth vault-env-mid"></div>
+    <div class="vault-env-arch vault-env-arch-l"></div>
+    <div class="vault-env-arch vault-env-arch-r"></div>
+    <div class="vault-env-glass vault-env-glass-l"></div>
+    <div class="vault-env-glass vault-env-glass-r"></div>
+    <div class="vault-env-ice"></div>
+    <div class="vault-env-light"></div>
+    <div class="vault-env-haze"></div>
+  </div>
 
   <header id="siteHeader" class="site-header site-header--arena"></header>
 
   <main id="main" class="arena-main">
-    <!-- Hero: one composition — brand, headline, line, CTAs, full-bleed vault -->
-    <section class="vault-hero-scene" id="vaultHero" data-asgard-realm="bifrost" aria-label="RAGNAR vault entrance">
-      <div class="vault-world" id="vaultWorld" aria-hidden="true">
-        <div class="vault-depth vault-depth-far"></div>
-        <div class="vault-depth vault-depth-mid"></div>
-        <div class="vault-orbit" id="vaultOrbit">
-          <div class="vault-slab vault-slab-a"></div>
-          <div class="vault-slab vault-slab-b"></div>
-          <div class="vault-slab vault-slab-c"></div>
-          <div class="vault-core">
-            <img src="/static/logo.png" alt="RAGNAR" class="vault-core-logo" />
-            <div class="vault-core-ring"></div>
-            <div class="vault-core-ring vault-core-ring-2"></div>
-          </div>
-        </div>
-        <div class="vault-glass-panel vault-glass-left"></div>
-        <div class="vault-glass-panel vault-glass-right"></div>
-      </div>
-
-      <div class="vault-hero-copy arena-shell">
-        <h1 id="heroHeadline">The future of<br /><em>sports card breaking.</em></h1>
+    <!-- Stage 1 — Arrival -->
+    <section class="vault-stage vault-stage-arrival" id="vaultHero" data-stage="1" aria-label="RAGNAR vault entrance">
+      <div class="arena-shell vault-arrival-copy">
+        <p class="vault-kicker">RAGNAR</p>
+        <h1 id="heroHeadline">Live breaks.<br /><em>Elite marketplace.</em></h1>
         <p id="heroSubtitle" class="vault-hero-sub">
-          Enter the most exclusive trading-card marketplace in the world. Standard fee: 5%. The first 250 sellers to join lock in a flat 4% forever.
+          The premium platform for sports card collectors. Standard fee: 5%. The first 250 sellers lock in a flat 4% forever.
         </p>
         <div class="arena-hero-actions">
-          <a class="arena-btn primary" href="#live">Enter the vault <span class="arrow">↗</span></a>
+          <a class="arena-btn primary" href="#live">Enter live rooms <span class="arrow">↗</span></a>
           <a class="arena-btn" href="/marketplace">Explore marketplace <span class="arrow">→</span></a>
         </div>
-        <div class="vault-scroll-cue" aria-hidden="true"><span></span> Scroll into the vault</div>
+        <div class="vault-scroll-cue" aria-hidden="true"><span></span> Continue into the vault</div>
       </div>
     </section>
 
-    <!-- Scroll chapter: live activity floats in as camera advances -->
-    <section class="vault-activity-band" id="vaultPulse" data-asgard-realm="bifrost" aria-label="Live marketplace activity">
+    <!-- Stage 2 — Entering the vault: live pulse + floor -->
+    <section class="vault-stage vault-stage-enter" id="vaultPulse" data-stage="2" aria-label="Live marketplace">
       <div class="arena-shell vault-activity-grid">
         <aside class="activity-rail reveal" id="activityFeed" aria-live="polite">
           <div class="activity-rail-head"><span class="live-signal"></span> Live marketplace</div>
           <div id="pulseList" class="pulse-list-compact"></div>
         </aside>
         <div class="activity-spotlight reveal">
-          <div class="section-label">Major pulls</div>
-          <h2 id="momentTitle">Legends need a vault.</h2>
-          <p id="momentDescription">Verified hits, room reactions, and chase cards — preserved as cinematic moments inside RAGNAR.</p>
-          <div class="moment-meta compact">
-            <div><b id="momentCategory">1 / 1</b><span>Class</span></div>
-            <div><b id="momentGrade">Verified</b><span>Status</span></div>
-            <div><b id="momentValue">Live</b><span>Value</span></div>
+          <div class="section-label">Inside the vault</div>
+          <h2 id="momentTitle">Where collectors gather.</h2>
+          <p id="momentDescription">Live breaks, verified sellers, and a marketplace built for serious collecting — one continuous experience.</p>
+          <div class="fee-pillars" aria-label="Platform fees">
+            <div class="fee-pillar hot"><strong>4%</strong><span>Founding 250 · forever</span></div>
+            <div class="fee-pillar"><strong>5%</strong><span>Standard seller fee</span></div>
           </div>
-          <div id="momentCard" class="moment-card floating" aria-hidden="true"></div>
         </div>
         <aside class="activity-breakers reveal">
           <div class="section-label">Top breakers</div>
@@ -97,16 +86,7 @@
       </div>
     </section>
 
-    <section class="arena-metrics arena-shell" data-asgard-realm="bifrost" aria-label="Platform economics">
-      <div class="arena-proof">
-        <div class="arena-proof-item hot"><strong>4%</strong><span>Founding 250 rate, forever</span></div>
-        <div class="arena-proof-item"><strong>5%</strong><span>Standard seller fee</span></div>
-        <div class="arena-proof-item"><strong id="liveCount">0</strong><span>Live rooms</span></div>
-        <div class="arena-proof-item"><strong id="vaultCount">—</strong><span>Vault listings</span></div>
-      </div>
-    </section>
-
-    <section id="live" class="section" data-asgard-realm="midgard">
+    <section id="live" class="vault-stage section" data-stage="2" aria-label="Live now">
       <div class="live-marquee" aria-hidden="true">
         <div class="live-marquee-track">
           <span><i class="signal-dot"></i>Live now</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span>
@@ -115,8 +95,8 @@
       </div>
       <div class="arena-shell">
         <div class="section-head reveal">
-          <div><span class="section-label">01 / Live now</span><h2>The floor<br>is live.</h2></div>
-          <p>Breaks, singles, slabs, and chase cards—organized by what you collect, not by how a seller chooses to sell it.</p>
+          <div><span class="section-label">Live now</span><h2>The floor<br>is live.</h2></div>
+          <p>Breaks, singles, slabs, and chase cards — organized by what you collect.</p>
           <a class="section-link" href="/stores">View all live rooms →</a>
         </div>
         <div id="categories" class="arena-categories reveal" role="group" aria-label="Filter live streams by category">
@@ -131,47 +111,48 @@
         <div id="liveArena" class="live-grid reveal" aria-live="polite">
           <div class="arena-empty"><div><strong>Scanning the vault…</strong><span>Loading live rooms and active rides.</span></div></div>
         </div>
-        <div id="categoryEmpty" class="category-empty" hidden>No rooms in this category are live right now. The full arena is one click away.</div>
+        <div id="categoryEmpty" class="category-empty" hidden>No rooms in this category are live right now. Browse all sellers anytime.</div>
       </div>
     </section>
 
-    <section id="breaks" class="section" data-asgard-realm="midgard">
-      <div class="arena-shell">
-        <div class="section-head reveal">
-          <div><span class="section-label">02 / Coming up</span><h2>Next on<br>the floor.</h2></div>
-          <p>Upcoming rooms from breakers and singles sellers. Follow the category, enter the room, and decide how you want to collect.</p>
+    <!-- Stage 3 — Collector realm + signature reveal -->
+    <section id="signature" class="vault-stage vault-stage-signature" data-stage="3" aria-label="Ragnar Vault Key reveal">
+      <div class="arena-shell signature-layout">
+        <div class="signature-stage reveal" id="vaultKeyStage">
+          <div class="vault-key" id="vaultKey" aria-hidden="true">
+            <div class="vault-key-core"></div>
+            <div class="vault-key-ring"></div>
+            <div class="vault-key-ring vault-key-ring-2"></div>
+            <div class="vault-key-facet vault-key-facet-a"></div>
+            <div class="vault-key-facet vault-key-facet-b"></div>
+            <div class="vault-key-facet vault-key-facet-c"></div>
+            <div class="vault-key-glow"></div>
+          </div>
         </div>
-        <div class="break-grid reveal">
-          <div id="breakList" class="break-list" aria-live="polite"></div>
-          <aside class="break-feature">
-            <div class="number">250</div>
-            <div>
-              <span class="section-label">Founding 250</span>
-              <h3>4% flat rate forever.</h3>
-              <p>The first 250 approved sellers lock in a flat 4% RAGNAR platform fee, permanently. Everyone after them pays a simple 5%. No category penalties. No confusing tiers.</p>
-              <a class="arena-btn small" href="#apply">Start selling <span class="arrow">→</span></a>
-            </div>
-          </aside>
+        <div class="signature-copy reveal">
+          <span class="section-label">Signature artifact</span>
+          <h2>The Ragnar<br />Vault Key.</h2>
+          <p>A legendary collector object forged for this platform alone — not a licensed card, not a replica. The symbol of entry into the elite vault.</p>
         </div>
       </div>
     </section>
 
-    <section id="breakers" class="section" data-asgard-realm="midgard">
+    <section id="breakers" class="vault-stage section" data-stage="3" aria-label="Top sellers">
       <div class="arena-shell">
         <div class="section-head reveal">
-          <div><span class="section-label">03 / Top sellers</span><h2>People worth<br>watching.</h2></div>
-          <p>Breakers and singles sellers building rooms collectors return to—not anonymous inventory, but trusted live operators.</p>
+          <div><span class="section-label">Top sellers</span><h2>People worth<br>watching.</h2></div>
+          <p>Breakers and singles sellers building rooms collectors return to.</p>
           <a class="section-link" href="/stores">Explore every seller →</a>
         </div>
         <div id="breakerGrid" class="breaker-grid reveal" aria-live="polite"></div>
       </div>
     </section>
 
-    <section id="pulls" class="section" data-asgard-realm="valhalla">
+    <section id="pulls" class="vault-stage section" data-stage="3" aria-label="Biggest pulls">
       <div class="arena-shell">
         <div class="section-head reveal">
-          <div><span class="section-label">04 / Biggest pulls</span><h2>The hall<br>of ice.</h2></div>
-          <p>Monster cards, room reactions, verified value, and the stories collectors remember long after the stream ends.</p>
+          <div><span class="section-label">Biggest pulls</span><h2>Moments that<br>define a room.</h2></div>
+          <p>Monster cards, room reactions, verified value — preserved after the stream ends.</p>
         </div>
         <article class="moment reveal">
           <div class="moment-visual">
@@ -179,9 +160,9 @@
             <div id="momentCardLarge" class="moment-card"></div>
           </div>
           <div class="moment-copy">
-            <span class="eyebrow">Live pull archive // verified by RAGNAR</span>
-            <h3 id="momentTitleLarge">Legends need a stage.</h3>
-            <p id="momentDescriptionLarge">RAGNAR captures the room, reaction, seller, and card—turning once-in-a-lifetime hits into permanent cinematic moments.</p>
+            <span class="eyebrow">Live pull archive</span>
+            <h3 id="momentTitleLarge">Legends need a vault.</h3>
+            <p id="momentDescriptionLarge">RAGNAR captures the room, reaction, seller, and card — turning once-in-a-lifetime hits into permanent cinematic moments.</p>
             <div class="moment-meta">
               <div><b id="momentCategoryLarge">1 / 1</b><span>Moment class</span></div>
               <div><b id="momentGradeLarge">Verified</b><span>Card status</span></div>
@@ -192,12 +173,13 @@
       </div>
     </section>
 
-    <section id="difference" class="section" data-asgard-realm="valhalla">
+    <!-- Stage 4 — Marketplace world + Founders -->
+    <section id="difference" class="vault-stage section" data-stage="4" aria-label="Why RAGNAR">
       <div class="arena-shell difference-layout reveal">
         <div class="difference-copy">
-          <span class="section-label">05 / The RAGNAR difference</span>
+          <span class="section-label">The RAGNAR difference</span>
           <h2>Built to keep<br>sellers powerful.</h2>
-          <p>Most platforms make scale expensive and trust invisible. RAGNAR makes the economics obvious and gives every card a better information trail.</p>
+          <p>Transparent economics. Trusted identity. Tools that make every card clearer.</p>
           <a class="arena-btn small" href="#apply">Sell on RAGNAR <span class="arrow">→</span></a>
         </div>
         <div class="difference-grid">
@@ -216,23 +198,23 @@
       </div>
     </section>
 
-    <section class="section section-tight" data-asgard-realm="valhalla">
+    <section class="vault-stage section section-tight" data-stage="4" aria-label="Marketplace">
       <div class="arena-shell">
         <div class="market-gateway reveal">
           <div>
-            <span class="section-label">06 / Beyond the broadcast</span>
+            <span class="section-label">Beyond the broadcast</span>
             <h2>The vault never closes.</h2>
-            <p>Search graded cards, compare comps, scan inventory, make offers, and buy from trusted sellers across the RAGNAR marketplace.</p>
+            <p>Search graded cards, compare comps, scan inventory, make offers, and buy from trusted sellers.</p>
           </div>
           <a class="arena-btn primary" href="/marketplace">Enter marketplace <span class="arrow">↗</span></a>
         </div>
       </div>
     </section>
 
-    <section id="apply" class="section" data-asgard-realm="forge">
+    <section id="apply" class="vault-stage section" data-stage="4" aria-label="Founders Program">
       <div class="arena-shell breaker-cta">
         <div class="breaker-copy reveal">
-          <span class="section-label">07 / Sell on RAGNAR</span>
+          <span class="section-label">Founders Program</span>
           <h2>Own the<br>floor.</h2>
           <p>Run high-volume breaks or sell singles live. Bring your audience, build your room, and keep the economics of your business.</p>
           <div id="counter" class="founding-counter-premium"><span><span id="claimed">—</span> / <span id="cap">250</span> founding positions claimed</span></div>
@@ -269,7 +251,7 @@
             </form>
           </div>
           <div id="successBox" class="success-panel" hidden>
-            <span class="section-label">Transmission received</span>
+            <span class="section-label">Application received</span>
             <h3>You're on our radar.</h3>
             <p>We review every application personally. Watch your inbox.</p>
             <a class="arena-btn small" href="/stores">Explore the vault <span class="arrow">→</span></a>
@@ -280,13 +262,17 @@
   </main>
 
   <footer class="arena-footer">
-    <div><div class="arena-footer-brand">RAGNAR</div><p>Precision commerce. Carved from ice. Guided by the old gods.</p></div>
+    <div><div class="arena-footer-brand">RAGNAR</div><p>Precision commerce. Built for elite collectors.</p></div>
     <div class="arena-footer-links"><a href="/stores">Live</a><a href="/marketplace">Marketplace</a><a href="/login">Account</a><a href="#apply">Sellers</a></div>
-    <div class="arena-footer-meta">RAGNAR // 2026<br>Standard fee 5% · Founding 250 start at 4%.</div>
+    <div class="arena-footer-meta">RAGNAR // 2026<br>Standard fee 5% · Founding 250 lock in 4% forever.</div>
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="/static/asgard-bg.js"></script>
+  <!-- Hidden stubs so legacy JS lookups never throw after section removals -->
+  <div id="momentCard" hidden></div>
+  <div id="momentCategory" hidden></div>
+  <div id="momentGrade" hidden></div>
+  <div id="momentValue" hidden></div>
   <script src="/static/founding.js"></script>
   <script src="/static/nav.js"></script>
   <script src="/static/sell.js"></script>

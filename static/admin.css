@@ -5,7 +5,7 @@ body.page-admin {
   --cmd-display: var(--font-display);
   --cmd-mono: var(--font-mono);
   --cmd-ink: var(--color-bg-base);
-  --cmd-panel: color-mix(in srgb, var(--color-bg-panel) 88%, #2a2826);
+  --cmd-panel: var(--color-bg-panel);
   --cmd-line: var(--color-border-default);
   --cmd-accent: var(--color-accent-primary);
   --cmd-gold: var(--color-accent-secondary);
@@ -26,7 +26,7 @@ body.page-admin {
     radial-gradient(980px 540px at 78% -12%, color-mix(in srgb, var(--cmd-accent) 16%, transparent), transparent 58%),
     radial-gradient(720px 480px at 4% 18%, color-mix(in srgb, var(--cmd-gold) 8%, transparent), transparent 55%),
     radial-gradient(640px 420px at 90% 100%, color-mix(in srgb, var(--cmd-accent) 7%, transparent), transparent 50%),
-    linear-gradient(180deg, #e4e0da 0%, #efebe6 42%, #e4e0da 100%);
+    linear-gradient(180deg, #eef5f9 0%, #f5f9fc 42%, #eef5f9 100%);
 }
 .cmd-atmosphere::before {
   content: "";
@@ -44,7 +44,7 @@ body.page-admin {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, transparent 60%, rgba(42, 40, 38, 0.45)),
+    linear-gradient(180deg, transparent 70%, rgba(15, 35, 48, 0.06)),
     repeating-linear-gradient(
       0deg,
       transparent,
@@ -73,7 +73,7 @@ body.page-admin .site-header--admin {
   border-bottom: 1px solid color-mix(in srgb, var(--cmd-accent) 22%, transparent);
   background: color-mix(in srgb, var(--color-bg-base) 88%, transparent);
   backdrop-filter: blur(16px) saturate(1.2);
-  box-shadow: 0 18px 48px rgba(42, 40, 38, 0.28);
+  box-shadow: 0 12px 32px rgba(15, 35, 48, 0.08);
 }
 body.page-admin .site-header--admin::after {
   content: "";
@@ -92,8 +92,8 @@ body.page-admin .site-header--admin .brand {
   min-width: 0;
 }
 body.page-admin .site-header--admin .logo-img {
-  height: 48px;
-  filter: drop-shadow(0 8px 18px rgba(42, 40, 38, 0.45));
+  height: 36px;
+  filter: drop-shadow(0 4px 12px rgba(15, 35, 48, 0.12));
 }
 body.page-admin .cmd-brand-stack {
   display: flex;
@@ -103,11 +103,11 @@ body.page-admin .cmd-brand-stack {
 }
 body.page-admin .cmd-brand-mark {
   font-family: var(--cmd-display);
-  font-size: clamp(22px, 2.8vw, 32px);
-  font-weight: 800;
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 600;
   letter-spacing: var(--tracking-display);
   line-height: 0.95;
-  color: var(--color-frost);
+  color: var(--color-text-primary);
 }
 body.page-admin .cmd-brand-mark span {
   color: var(--cmd-accent);
@@ -243,7 +243,7 @@ body.page-admin .hub-main {
   font-weight: 800;
   letter-spacing: var(--tracking-display);
   line-height: 0.8;
-  color: rgba(255, 255, 255, 0.03);
+  color: rgba(15, 28, 36, 0.04);
   pointer-events: none;
 }
 .cmd-brief-kicker {
@@ -290,7 +290,7 @@ body.page-admin .hub-main {
 .cmd-jump {
   appearance: none;
   border: 1px solid var(--cmd-line);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--color-bg-elevated);
   color: var(--color-text-secondary);
   font-family: var(--cmd-mono);
   font-size: 10px;
@@ -347,8 +347,8 @@ body.page-admin .tabs {
   padding: 4px;
   overflow: visible;
   border: 1px solid var(--cmd-line);
-  border-radius: 0;
-  background: rgba(7, 10, 14, 0.72);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-panel);
 }
 body.page-admin .tab {
   gap: 8px;

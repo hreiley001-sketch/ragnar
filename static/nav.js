@@ -292,8 +292,20 @@
   }
   function applyContent(c) {
     // Landing-page copy, if present on this page.
-    if (c.hero_headline && document.getElementById("heroHeadline")) document.getElementById("heroHeadline").textContent = c.hero_headline;
-    if (c.hero_subtitle && document.getElementById("heroSubtitle")) document.getElementById("heroSubtitle").textContent = c.hero_subtitle;
+    const headline = document.getElementById("heroHeadline");
+    if (c.hero_headline && headline) {
+      // Allow simple line breaks from site config; never inject raw HTML.
+      headline.replaceChildren();
+      String(c.hero_headline).split(/\n/).forEach((line, i) => {
+        if (i) headline.appendChild(document.createElement("br"));
+        const span = document.createElement(i === 1 ? "em" : "span");
+        span.textContent = line;
+        headline.appendChild(span);
+      });
+    }
+    if (c.hero_subtitle && document.getElementById("heroSubtitle")) {
+      document.getElementById("heroSubtitle").textContent = c.hero_subtitle;
+    }
   }
   window.__ragnarApplySite = (c) => { applyTheme(c); applyAnnouncement(c); applyContent(c); };
 
@@ -496,7 +508,7 @@
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
       if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#2a2826";
-      else if (/\b(light|lighter|bright|brighter|white|day|fur|grey|gray)\b/.test(low)) theme.theme_bg = "#e4e0da";
+      else if (/\b(light|lighter|bright|brighter|white|day|ice|arctic)\b/.test(low)) theme.theme_bg = "#eef5f9";
       if (/\b(light|brighter|day|fur)\b/.test(low)) theme.theme_text = "#1c1b19";
       else if (/\b(dark|midnight|night)\b/.test(low)) theme.theme_text = "#f2f7fc";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);

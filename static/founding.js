@@ -135,7 +135,6 @@ function renderLive(streams, rides) {
       category: liveCategory(ride.title, ride.listing && ride.listing.category),
     }));
   const items = [...liveRides, ...liveStreams].slice(0, 6);
-  $("liveCount").textContent = String(items.length);
 
   if (!items.length) {
     $("liveArena").innerHTML = `
@@ -171,35 +170,8 @@ function renderLive(streams, rides) {
   initCategoryFilters();
 }
 
-function renderBreaks(streams, rides) {
-  const scheduled = (streams || []).filter((stream) => stream.status === "scheduled").map((stream) => ({
-    href: `/store/${encodeURIComponent(stream.seller_handle)}`,
-    when: scheduleLabel(stream.scheduled_at),
-    title: stream.title,
-    detail: `${stream.seller_name} · Scheduled live room`,
-  }));
-  const waitingRides = ((rides && rides.items) || []).filter((ride) => ride.status === "idle").map((ride) => ({
-    href: `/ride/${ride.id}`,
-    when: "Lobby forming",
-    title: ride.title,
-    detail: `${ride.seller_handle ? `@${ride.seller_handle}` : "RAGNAR House"} · ${ride.type || "Live ride"}`,
-  }));
-  const items = [...scheduled, ...waitingRides].slice(0, 5);
-  if (!items.length) {
-    $("breakList").innerHTML = `
-      <div class="break-row">
-        <div class="break-time">Lineup<br>loading</div>
-        <div><h3>New break schedules are dropping soon.</h3><p>Follow your favorite breakers and be first into the room.</p></div>
-        <a class="break-arrow" href="/stores" aria-label="Explore breakers">→</a>
-      </div>`;
-    return;
-  }
-  $("breakList").innerHTML = items.map((item) => `
-    <a class="break-row" href="${esc(item.href)}">
-      <div class="break-time">${esc(item.when)}</div>
-      <div><h3>${esc(item.title)}</h3><p>${esc(item.detail)}</p></div>
-      <span class="break-arrow">→</span>
-    </a>`).join("");
+function renderBreaks() {
+  // "Next on the floor" removed from homepage — keep stub for callers.
 }
 
 function renderBreakers(stores) {
@@ -270,7 +242,7 @@ function renderMoment(listings) {
       card.classList.add("with-image");
     }
   };
-  apply("momentTitle", "momentDescription", "momentCategory", "momentGrade", "momentValue", "momentCard");
+  // Stage-2 copy stays editorial; only the pulls archive is data-bound.
   apply("momentTitleLarge", "momentDescriptionLarge", "momentCategoryLarge", "momentGradeLarge", "momentValueLarge", "momentCardLarge");
 }
 
@@ -325,9 +297,7 @@ async function loadArena() {
   const recentData = recentResult.status === "fulfilled" ? recentResult.value : { items: [], total: 0 };
   const recent = recentData.items || [];
 
-  $("vaultCount").textContent = Number(recentData.total || 0).toLocaleString();
   renderLive(streams, rides);
-  renderBreaks(streams, rides);
   renderBreakers(stores);
   renderMoment(featured.length ? featured : recent);
   renderPulse(streams, rides, recent, stores);
@@ -410,20 +380,55 @@ function initReveal() {
   elements.forEach((element) => observer.observe(element));
 }
 
-// The vault hero (logo + slabs) is a static composition on purpose — it does
-// not track scroll or pointer position. All camera/depth motion below is
-// handled by initSectionDepth() and initMomentDrama().
+// Continuous vault environment: one scroll-progress drives depth, light,
+// architecture, and stage. GPU-friendly CSS custom properties only — no
+// particle spam. Content exists inside the world.
+function initVaultEnvironment() {
+  const root = document.documentElement;
+  const body = document.body;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let ticking = false;
 
-// A continuous scroll "camera" for everything under the hero: each section's
-// content drifts in depth (translateZ) and tilts slightly (rotateX) based on
-// how far it is from the center of the viewport, so the whole page keeps
-// feeling like it's moving through a 3D space, not just fading in once.
+  function apply() {
+    ticking = false;
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const progress = Math.min(1, Math.max(0, window.scrollY / max));
+    root.style.setProperty("--vault-p", progress.toFixed(4));
+
+    // Stage thresholds map to the cinematic journey.
+    let stage = 1;
+    if (progress > 0.18) stage = 2;
+    if (progress > 0.42) stage = 3;
+    if (progress > 0.68) stage = 4;
+    if (body.dataset.vaultStage !== String(stage)) {
+      body.dataset.vaultStage = String(stage);
+    }
+
+    if (reduce) return;
+
+    // Gentle parallax for env layers (transforms only).
+    const y = window.scrollY;
+    root.style.setProperty("--vault-far-y", `${(y * 0.04).toFixed(1)}px`);
+    root.style.setProperty("--vault-mid-y", `${(y * 0.08).toFixed(1)}px`);
+    root.style.setProperty("--vault-arch-y", `${(y * 0.12).toFixed(1)}px`);
+    root.style.setProperty("--vault-glass-y", `${(y * 0.16).toFixed(1)}px`);
+  }
+
+  function requestApply() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(apply);
+  }
+
+  window.addEventListener("scroll", requestApply, { passive: true });
+  window.addEventListener("resize", requestApply, { passive: true });
+  apply();
+}
+
 function initSectionDepth() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  // :not(.reveal) avoids clobbering elements that already own their own
-  // reveal transform (inline style would win over the .reveal.in class rule).
   const targets = Array.from(document.querySelectorAll(
-    ".section .arena-shell:not(.reveal), .vault-activity-band .vault-activity-grid:not(.reveal)"
+    ".vault-stage .arena-shell:not(.reveal)"
   ));
   if (!targets.length) return;
 
@@ -436,11 +441,10 @@ function initSectionDepth() {
     targets.forEach((el) => {
       const rect = el.getBoundingClientRect();
       const elCenter = rect.top + rect.height / 2;
-      // -1 (below viewport) .. 0 (centered) .. 1 (above viewport)
       const offset = Math.max(-1, Math.min(1, (elCenter - center) / (viewH * 0.9)));
-      const depth = Math.abs(offset) * -60; // recede in Z the farther from center
-      const tilt = offset * -3.2; // gentle camera tilt as it passes through
-      el.style.transform = `translateZ(${depth.toFixed(1)}px) rotateX(${tilt.toFixed(2)}deg)`;
+      const depth = Math.abs(offset) * -36;
+      const tilt = offset * -1.6;
+      el.style.transform = `translate3d(0,0,${depth.toFixed(1)}px) rotateX(${tilt.toFixed(2)}deg)`;
     });
   }
 
@@ -453,6 +457,53 @@ function initSectionDepth() {
   window.addEventListener("scroll", requestApply, { passive: true });
   window.addEventListener("resize", requestApply, { passive: true });
   requestApply();
+}
+
+function initVaultKey() {
+  const key = $("vaultKey");
+  const stage = $("vaultKeyStage");
+  if (!key || !stage || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  let raf = null;
+
+  function progress() {
+    const rect = stage.getBoundingClientRect();
+    const viewH = window.innerHeight || 1;
+    const raw = 1 - (rect.top + rect.height * 0.35) / (viewH * 0.95);
+    return Math.min(1, Math.max(0, raw));
+  }
+
+  function tick(time) {
+    const p = progress();
+    const t = time / 1000;
+    const reveal = Math.pow(p, 0.85);
+    const floatY = Math.sin(t * 0.7) * 6;
+    const rotY = -28 + reveal * 28 + Math.sin(t * 0.35) * 4;
+    const rotX = 8 - reveal * 6 + Math.cos(t * 0.4) * 2;
+    const scale = 0.72 + reveal * 0.28;
+    const glow = 0.15 + reveal * 0.55 + (Math.sin(t * 1.2) + 1) * 0.08;
+
+    key.style.setProperty("--vk-y", `${floatY.toFixed(1)}px`);
+    key.style.setProperty("--vk-ry", `${rotY.toFixed(2)}deg`);
+    key.style.setProperty("--vk-rx", `${rotX.toFixed(2)}deg`);
+    key.style.setProperty("--vk-scale", scale.toFixed(3));
+    key.style.setProperty("--vk-opacity", Math.min(1, 0.15 + reveal * 0.95).toFixed(3));
+    key.style.setProperty("--vk-glow", glow.toFixed(3));
+    stage.classList.toggle("is-revealed", p > 0.45);
+
+    raf = requestAnimationFrame(tick);
+  }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (raf) cancelAnimationFrame(raf);
+      raf = null;
+    } else if (!raf) {
+      raf = requestAnimationFrame(tick);
+    }
+  });
+
+  raf = requestAnimationFrame(tick);
 }
 
 // The "hall of thunder" chase-card: idle floating motion running constantly,
@@ -477,7 +528,6 @@ function initMomentDrama() {
   function scrollProgress() {
     const rect = stage.getBoundingClientRect();
     const viewH = window.innerHeight || 1;
-    // 0 when the stage is below the viewport, 1 once it's centered/passed center.
     const raw = 1 - (rect.top + rect.height * 0.5) / (viewH * 0.9);
     return Math.min(1, Math.max(0, raw));
   }
@@ -485,23 +535,23 @@ function initMomentDrama() {
   function tick(time) {
     const progress = scrollProgress();
     const t = time / 1000;
-    const idleRx = Math.sin(t * 0.55) * 3.5;
-    const idleRy = Math.cos(t * 0.4) * 5;
-    const idleLift = Math.sin(t * 0.7) * 8;
-    const pulse = (Math.sin(t * 1.3) + 1) / 2; // 0..1 breathing glow
+    const idleRx = Math.sin(t * 0.55) * 2.5;
+    const idleRy = Math.cos(t * 0.4) * 3.5;
+    const idleLift = Math.sin(t * 0.7) * 5;
+    const pulse = (Math.sin(t * 1.3) + 1) / 2;
 
-    const enterRy = -34 * (1 - progress);
-    const scale = 0.86 + progress * 0.14;
+    const enterRy = -24 * (1 - progress);
+    const scale = 0.9 + progress * 0.1;
 
-    const rx = idleRx + pointerY * (hovering ? 10 : 0);
-    const ry = idleRy + enterRy + pointerX * (hovering ? 14 : 0);
+    const rx = idleRx + pointerY * (hovering ? 8 : 0);
+    const ry = idleRy + enterRy + pointerX * (hovering ? 10 : 0);
 
     card.style.setProperty("--mc-rx", `${rx.toFixed(2)}deg`);
     card.style.setProperty("--mc-ry", `${ry.toFixed(2)}deg`);
     card.style.setProperty("--mc-y", `${idleLift.toFixed(1)}px`);
     card.style.setProperty("--mc-scale", scale.toFixed(3));
-    card.style.setProperty("--mc-glow", `${(12 + pulse * 18 + progress * 14).toFixed(1)}px`);
-    card.style.setProperty("--mc-glow-a", (0.1 + pulse * 0.12 + progress * 0.1).toFixed(3));
+    card.style.setProperty("--mc-glow", `${(10 + pulse * 12 + progress * 10).toFixed(1)}px`);
+    card.style.setProperty("--mc-glow-a", (0.08 + pulse * 0.08 + progress * 0.08).toFixed(3));
     card.style.setProperty("--mc-sheen", `${(-60 + ((t * 14) % 220)).toFixed(1)}%`);
 
     raf = requestAnimationFrame(tick);
@@ -531,106 +581,12 @@ function initMomentDrama() {
   raf = requestAnimationFrame(tick);
 }
 
-function initArenaCanvas() {
-  const canvas = $("arenaCanvas");
-  if (!canvas || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const context = canvas.getContext("2d", { alpha: true });
-  if (!context) return;
-  let width = 0;
-  let height = 0;
-  let frame = 0;
-  let active = true;
-  const points = [];
-  const shards = [];
-
-  function resize() {
-    const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = Math.floor(width * ratio);
-    canvas.height = Math.floor(height * ratio);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    points.length = 0;
-    shards.length = 0;
-    const count = Math.min(140, Math.max(60, Math.floor(width / 12)));
-    for (let index = 0; index < count; index += 1) {
-      points.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        z: Math.random() * 1 + 0.2,
-        speed: Math.random() * 0.34 + 0.08,
-        size: Math.random() * 1.6 + 0.3,
-      });
-    }
-    for (let i = 0; i < 18; i += 1) {
-      shards.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        len: 40 + Math.random() * 120,
-        ang: -0.4 + Math.random() * 0.2,
-        alpha: 0.03 + Math.random() * 0.05,
-        drift: 0.08 + Math.random() * 0.12,
-      });
-    }
-  }
-
-  function draw() {
-    if (!active) return;
-    context.clearRect(0, 0, width, height);
-
-    // Soft light rays
-    shards.forEach((s) => {
-      s.y -= s.drift;
-      if (s.y < -s.len) { s.y = height + s.len; s.x = Math.random() * width; }
-      context.save();
-      context.translate(s.x, s.y);
-      context.rotate(s.ang);
-      const grad = context.createLinearGradient(0, 0, 0, s.len);
-      grad.addColorStop(0, `rgba(184,240,255,0)`);
-      grad.addColorStop(0.45, `rgba(143,232,255,${s.alpha})`);
-      grad.addColorStop(1, `rgba(31,111,143,0)`);
-      context.fillStyle = grad;
-      context.fillRect(-1.2, 0, 2.4, s.len);
-      context.restore();
-    });
-
-    const ice = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-primary").trim() || "#3ed0ff";
-    context.fillStyle = ice;
-    points.forEach((point) => {
-      point.y -= point.speed * point.z;
-      point.x += Math.sin((point.y + point.z * 100) * 0.004) * 0.04;
-      if (point.y < -10) {
-        point.y = height + 10;
-        point.x = Math.random() * width;
-      }
-      context.globalAlpha = 0.1 + point.z * 0.32;
-      context.beginPath();
-      context.arc(point.x, point.y, point.size * point.z, 0, Math.PI * 2);
-      context.fill();
-    });
-    context.globalAlpha = 1;
-    frame = requestAnimationFrame(draw);
-  }
-
-  document.addEventListener("visibilitychange", () => {
-    active = !document.hidden;
-    if (active) draw();
-    else cancelAnimationFrame(frame);
-  });
-  window.addEventListener("resize", resize, { passive: true });
-  resize();
-  draw();
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   initReveal();
+  initVaultEnvironment();
   initSectionDepth();
-  // The vault hero (logo + slabs) is intentionally static — no scroll/pointer
-  // camera. All the scroll-driven 3D motion lives below it.
+  initVaultKey();
   initMomentDrama();
-  initArenaCanvas();
   loadArena();
   loadFoundingStatus();
   reflectAccount();
