@@ -5,16 +5,16 @@
 :root {
   color-scheme: dark;
 
-  /* ——— Surfaces (lighter titanium ice vault) ——— */
-  --color-bg-base: #151c26;
-  --color-bg-elevated: #1b2431;
-  --color-bg-panel: #222c3b;
-  --color-bg-panel-strong: #2a3546;
-  --color-bg-glass: rgba(28, 38, 52, 0.78);
-  --color-bg-glass-soft: rgba(34, 44, 59, 0.62);
-  --color-bg-input: #1a2330;
-  --color-bg-overlay: rgba(12, 18, 28, 0.72);
-  --color-surface-deep: #10161f;
+  /* ——— Surfaces (cooler, bluer titanium ice vault) ——— */
+  --color-bg-base: #101a2c;
+  --color-bg-elevated: #16223a;
+  --color-bg-panel: #1c2b46;
+  --color-bg-panel-strong: #243656;
+  --color-bg-glass: rgba(20, 32, 54, 0.78);
+  --color-bg-glass-soft: rgba(26, 40, 66, 0.62);
+  --color-bg-input: #16233c;
+  --color-bg-overlay: rgba(8, 14, 26, 0.74);
+  --color-surface-deep: #0a1220;
 
   /* ——— Text ——— */
   --color-text-primary: #f2f7fc;
@@ -26,33 +26,33 @@
   --color-on-danger: #1a0808;
 
   /* ——— Brand (logo palette) ——— */
-  /* Primary: electric icy blue — wolf/raven eye glow */
-  --color-accent-primary: #4eb6e8;
-  --color-accent-primary-strong: #7dcef2;
+  /* Primary: electric icy blue — wolf/raven eye glow, pushed brighter/colder */
+  --color-accent-primary: #3ed0ff;
+  --color-accent-primary-strong: #8fe8ff;
   /* Secondary: titanium silver — metallic wing plates */
-  --color-accent-secondary: #a8bccb;
-  --color-accent-fallback: #6a93b0;
+  --color-accent-secondary: #aec6d8;
+  --color-accent-fallback: #5fa8cf;
   /* Crystal / glacier helpers */
-  --color-glacier: #6ea8c9;
-  --color-frost: #e8f4fc;
-  --color-titanium: #9aafbf;
-  --color-crystal: #b8e4f7;
-  --color-midnight: #0a1628;
+  --color-glacier: #52c2f0;
+  --color-frost: #eefbff;
+  --color-titanium: #a0b8cc;
+  --color-crystal: #b8f0ff;
+  --color-midnight: #060e1c;
 
   /* ——— Status (cold, restrained) ——— */
   --color-live: #5ec8ef;
   --color-success: #6ec9a8;
-  --color-warning: #a8bccb;
+  --color-warning: #aec6d8;
   --color-error: #e87074;
-  --color-info: #7dcef2;
+  --color-info: #8fe8ff;
 
   /* ——— Lines & interaction ——— */
-  --color-border-subtle: rgba(184, 228, 247, 0.08);
-  --color-border-default: rgba(184, 228, 247, 0.14);
-  --color-border-strong: rgba(184, 228, 247, 0.26);
+  --color-border-subtle: rgba(184, 240, 255, 0.08);
+  --color-border-default: rgba(184, 240, 255, 0.14);
+  --color-border-strong: rgba(184, 240, 255, 0.26);
   --color-focus: var(--color-accent-primary-strong);
-  --color-hover-surface: rgba(78, 182, 232, 0.08);
-  --color-active-surface: rgba(78, 182, 232, 0.14);
+  --color-hover-surface: rgba(62, 208, 255, 0.08);
+  --color-active-surface: rgba(62, 208, 255, 0.14);
   --color-disabled-surface: rgba(255, 255, 255, 0.03);
 
   /* ——— Typography (precision + Nordic presence) ——— */
@@ -99,9 +99,9 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 8, 20, 0.28);
   --shadow-md: 0 12px 36px rgba(0, 6, 18, 0.45);
   --shadow-lg: 0 28px 80px rgba(0, 4, 14, 0.62);
-  --shadow-focus: 0 0 0 3px rgba(78, 182, 232, 0.32);
-  --glow-ice: 0 0 32px rgba(78, 182, 232, 0.18);
-  --glow-crystal: 0 0 48px rgba(184, 228, 247, 0.14);
+  --shadow-focus: 0 0 0 3px rgba(62, 208, 255, 0.36);
+  --glow-ice: 0 0 36px rgba(62, 208, 255, 0.22);
+  --glow-crystal: 0 0 56px rgba(184, 240, 255, 0.18);
   --glow-gold: var(--glow-ice);
 
   /* ——— Motion ——— */
@@ -113,7 +113,7 @@
   /* Dynamic media / crest (store themes may override) */
   --crest-primary: #7a9bb0;
   --crest-accent: var(--color-accent-primary);
-  --moment-fallback: linear-gradient(145deg, #243447, #151c26 72%);
+  --moment-fallback: linear-gradient(145deg, #243447, #101a2c 72%);
   --store-accent: var(--color-accent-primary);
 
   /* ——— Compatibility aliases ——— */

@@ -38,7 +38,8 @@ class Settings:
     # --- Fee model (the core value proposition) ---
     # Standard platform take rate for everyone.
     standard_rate: float = float(os.getenv("RAGNAR_STANDARD_RATE", "0.05"))
-    # Permanent thank-you rate for Founding Sellers (after their intro window).
+    # Founders program: flat rate for the first `founding_cap` sellers to sign
+    # up, forever — no expiry, no dollar cap.
     founding_rate: float = float(os.getenv("RAGNAR_FOUNDING_RATE", "0.04"))
     # Pass-through payment processing (Stripe-style).
     processing_rate: float = float(os.getenv("PROCESSING_RATE", "0.029"))
@@ -50,7 +51,9 @@ class Settings:
     ebay_rate: float = float(os.getenv("EBAY_FEE_RATE", "0.1325"))
     ebay_flat: float = float(os.getenv("EBAY_FLAT_FEE", "0.30"))
 
-    # Founding 250 program
+    # Founding 250 program — the first `founding_cap` sellers to sign up get
+    # `founding_rate` forever. No time window or sales cap; the two fields
+    # below are unused by the fee engine and kept only for schema back-compat.
     founding_cap: int = int(os.getenv("FOUNDING_SELLER_CAP", "250"))
     founding_intro_days: int = int(os.getenv("FOUNDING_INTRO_DAYS", "90"))
     founding_intro_sales_cap: float = float(os.getenv("FOUNDING_INTRO_SALES_CAP", "2500"))

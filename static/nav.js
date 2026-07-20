@@ -447,8 +447,8 @@
   // cards by vibe (plain language, not exact keywords) and can restyle the
   // visitor's OWN view — local-only, never the real site or anyone else. ----
   const VIBES = [
-    [["ice", "frost", "arctic", "cool", "cold", "steel", "platinum", "glacier", "crystal"], "#4eb6e8"],
-    [["gold", "lux", "premium", "elite", "luxury", "grail", "titanium", "silver"], "#a8bccb"],
+    [["ice", "frost", "arctic", "cool", "cold", "steel", "platinum", "glacier", "crystal"], "#3ed0ff"],
+    [["gold", "lux", "premium", "elite", "luxury", "grail", "titanium", "silver"], "#aec6d8"],
     [["live", "signal", "alert", "hot"], "#5ec8ef"],
     [["mint", "success", "emerald"], "#6ec9a8"],
   ];
@@ -473,7 +473,7 @@
       const low = text.toLowerCase();
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
-      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#151c26";
+      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#101a2c";
       else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#2a3546";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);
       if (fm) theme.theme_font = fm[1].trim();
@@ -601,7 +601,7 @@
 
     w.onFirstOpen(() => {
       w.msg("Studio previews locally, then publishes in one tap — colors, announcement, landing copy. Big swings welcome.");
-      w.chips(["Icy blue + titanium silver", "Announce Friday live drop", "Sellers keep 95% headline", "Obsidian ice vault background"]);
+      w.chips(["Icy blue + titanium silver", "Announce Friday live drop", "Founding 250: flat 4% forever", "Obsidian ice vault background"]);
     });
   }
 

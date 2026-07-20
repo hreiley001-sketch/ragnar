@@ -436,7 +436,7 @@
       });
       showSellerState(s);
       updateFeePreview();
-      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! Flat 5% fee — you keep 95%.` : "Seller created (Founding slots full — standard flat 5%).");
+      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! You locked in a flat 4% fee, forever.` : "Seller created (Founding slots full — standard flat 5%).");
     } catch (err) {
       if (String(err.message).includes("already taken")) {
         try { const s = await api(`/api/sellers/${encodeURIComponent(handle)}`); showSellerState(s); updateFeePreview(); toast("Welcome back — seller loaded."); return; } catch (_) {}

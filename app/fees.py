@@ -1,8 +1,9 @@
 """Fee math — the heart of RAGNAR's pitch.
 
-Sellers keep 95% with a flat 5% platform fee. Founding Seller rate ladders still
-exist in config for legacy accounts; every number the storefront shows comes
-from here so the comparison stays honest and in one place.
+Standard fee: 5%. Founders program: the first 250 sellers to sign up get a
+flat 4% platform fee, forever — no dollar cap, no time window. Every number
+the storefront shows comes from here so the comparison stays honest and
+lives in one place.
 """
 from __future__ import annotations
 
@@ -14,10 +15,10 @@ def _money(value: float) -> float:
     return round(value + 1e-9, 2)
 
 
-def platform_rate_for(is_founding: bool, founding_intro: bool) -> float:
-    """The RAGNAR platform take rate for a given seller/state."""
-    if is_founding and founding_intro:
-        return 0.0
+def platform_rate_for(is_founding: bool, founding_intro: bool = False) -> float:
+    """The RAGNAR platform take rate: flat 4% forever for the Founding 250,
+    else the 5% standard rate. ``founding_intro`` is unused (back-compat)."""
+    del founding_intro
     if is_founding:
         return settings.founding_rate
     return settings.standard_rate
