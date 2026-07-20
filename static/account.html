@@ -21,24 +21,6 @@
     .tcount.show { display: inline-flex; }
 
     .tab-panel { padding: 20px; }
-    .sec-title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--steel); margin: 0 0 12px; font-weight: 700; }
-    .sec-title:not(:first-child) { margin-top: 26px; }
-    .panel-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-    .panel-bar .sec-title { margin: 0; }
-
-    /* Status chips */
-    .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-strong); color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
-    .chip.good { color: var(--ok); border-color: rgba(120,230,180,0.45); background: rgba(120,230,180,0.08); }
-    .chip.info { color: var(--ice); border-color: rgba(111,214,255,0.45); background: rgba(55,189,255,0.08); }
-    .chip.warn { color: var(--gold); border-color: rgba(240,198,116,0.5); background: rgba(240,198,116,0.08); }
-    .chip.bad  { color: var(--danger); border-color: rgba(255,138,138,0.45); background: rgba(255,138,138,0.07); }
-
-    /* Tables */
-    .tbl-wrap { overflow-x: auto; }
-    .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .tbl th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--border-strong); white-space: nowrap; }
-    .tbl td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    .tbl .acts { display: flex; gap: 6px; flex-wrap: wrap; }
 
     /* Notifications */
     .nrow { display: flex; gap: 12px; align-items: flex-start; padding: 12px 8px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; }
@@ -128,15 +110,7 @@
 </head>
 <body>
   <div class="aurora"></div>
-  <header class="site-header">
-    <div class="brand">
-      <a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a>
-    </div>
-    <div class="header-actions">
-      <a class="btn btn-ghost btn-sm" href="/">Marketplace</a>
-      <button id="logoutBtn" class="btn btn-ghost btn-sm" type="button">Log out</button>
-    </div>
-  </header>
+  <header id="siteHeader"></header>
 
   <main class="wrap">
     <h2>My Account</h2>
@@ -893,10 +867,13 @@
           : orders.length
             ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Item</th><th>Buyer</th><th>Total</th><th>Status</th></tr></thead><tbody>${orderRows}</tbody></table></div>`
             : `<div class="empty-sm">No orders yet. When someone buys, shipping tools appear here.</div>`}
-        <div class="sec-title">Your listings — polish your photos</div>
+        <div class="panel-bar">
+          <div class="sec-title no-top">Your listings — polish your photos</div>
+          <button type="button" class="btn btn-primary btn-sm" data-open-sell="ai">⚡ Post a card</button>
+        </div>
         ${listings.length
           ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Card</th><th>Price</th><th>Status</th><th>AI photo</th></tr></thead><tbody>${listingRows}</tbody></table></div>`
-          : `<div class="empty-sm">No listings yet — scan a card to post your first.</div>`}`;
+          : `<div class="empty-sm">No listings yet — post your first card above.</div>`}`;
 
       p.querySelectorAll("[data-enh]").forEach((b) => b.addEventListener("click", async () => {
         const id = b.getAttribute("data-enh");
@@ -967,5 +944,6 @@
     });
   </script>
   <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
-// RAGNAR — shared hamburger navigation. Injected on every page for one
-// consistent menu, including the behind-the-scenes Command Hub.
+// RAGNAR — shared hamburger navigation, site header, and chat-widget factory.
+// Injected on every page for one consistent header/menu, plus the assistants
+// (Concierge/Studio) that are built on the same shared chat component.
 "use strict";
 (function () {
   const path = (location.pathname.replace(/\/+$/, "") || "/");
@@ -21,6 +22,55 @@
     return a;
   }
 
+  // ---- Shared site header, built into whatever page provides
+  // <header id="siteHeader"></header>. Runs synchronously (not on
+  // DOMContentLoaded) so page-owned scripts that look up header element IDs
+  // (e.g. #logoutBtn, #viewers) on their own DOMContentLoaded still find them —
+  // this script tag executes before that event fires. ----
+  const acctLinks = [];   // kept in sync together: header link + drawer link
+  let headerSellBtn = null;
+  function headerExtrasHtml() {
+    if (path === "/marketplace") {
+      return `<span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding —</span><span id="backendStatus" class="status-badge checking">connecting…</span>`;
+    }
+    if (path.startsWith("/ride/")) {
+      return `<span id="viewers" class="status-badge">👁 0</span>`;
+    }
+    if (path === "/account") {
+      return `<button id="logoutBtn" class="btn btn-ghost btn-sm" type="button">Log out</button>`;
+    }
+    return "";
+  }
+  function buildHeader() {
+    const header = document.getElementById("siteHeader");
+    if (!header) return;
+    header.className = "site-header";
+    const light = path === "/login" || path === "/verify";
+    if (light) {
+      header.innerHTML = `
+        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+        <div class="header-actions"></div>`;
+      return;
+    }
+    header.innerHTML = `
+      <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+      <div class="header-actions">
+        <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
+        <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
+        <a class="btn btn-ghost btn-sm" href="/stores">Stores</a>
+        <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
+        <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
+      </div>`;
+    acctLinks.push(header.querySelector("#headerAcctLink"));
+    headerSellBtn = header.querySelector("[data-open-sell]");
+    if (path.startsWith("/ride/")) {
+      const link = document.createElement("a");
+      link.className = "btn btn-ghost btn-sm"; link.href = "/rides"; link.textContent = "All rides";
+      header.querySelector(".header-actions").insertBefore(link, header.querySelector(".header-extra").nextSibling);
+    }
+  }
+  buildHeader();
+
   // Drawer
   const scrim = mk("div", "nav-scrim");
   const drawer = mk("div", "nav-drawer");
@@ -36,6 +86,7 @@
   links.appendChild(mk("div", "nav-div"));
   const userLine = mk("div", "nav-user"); userLine.id = "navUser"; userLine.hidden = true; links.appendChild(userLine);
   const acct = navLink({ icon: "👤", label: "Sign in", href: "/login" }); links.appendChild(acct);
+  acctLinks.push(acct);
   // Command Hub is staff-only — hidden until we confirm the user is staff.
   const hub = navLink({ icon: "⚙️", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
 
@@ -135,8 +186,11 @@
     if (d && d.user) {
       userLine.hidden = false;
       userLine.textContent = "Signed in · " + (d.user.name || d.user.email);
-      acct.querySelector(".lbl").textContent = "My account";
-      acct.href = "/account";
+      acctLinks.forEach((a) => {
+        const lbl = a.querySelector(".lbl");
+        if (lbl) lbl.textContent = "My account"; else a.textContent = "My account";
+        a.href = "/account";
+      });
       if (d.user.is_staff) { hub.hidden = false; hub.querySelector(".lbl").textContent = "Command Hub (staff)"; initStudio(); }
       else initConcierge();
 
@@ -176,6 +230,82 @@
     }
   }).catch(() => { initConcierge(); });
 
+  // ---- Shared chat-widget factory: builds a FAB + slide-up panel with a
+  // feed/chips/input, used by Concierge, Studio, and (via window.__ragnarChat)
+  // the seller-facing Store Designer. One visual language, one place to tweak it. ----
+  const escHtml = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function createChatWidget(opts) {
+    const { key, icon, label, gold, publish, footNote } = opts;
+    const fab = mk("button", "chat-fab" + (gold ? " chat-fab-gold" : ""));
+    fab.innerHTML = `${icon} ${label}`;
+    fab.id = "fab-" + key;
+
+    const panel = mk("div", "chat-panel");
+    panel.id = "panel-" + key;
+    panel.innerHTML = `
+      <div class="chat-head">
+        <div class="chat-head-title">${icon} ${label}</div>
+        <button class="chat-close" aria-label="Close">✕</button>
+      </div>
+      <div class="chat-feed"></div>
+      <div class="chat-chips"></div>
+      <div class="chat-input-row">
+        <input placeholder="${footNote ? escHtml(footNote) : "Type a message…"}" />
+        <button class="chat-send" type="button">➤</button>
+      </div>
+      ${publish ? `<div class="chat-foot">
+        <div class="chat-publish-row">
+          <button class="btn btn-ghost btn-sm chat-revert" type="button">Revert</button>
+          <button class="btn btn-primary btn-sm chat-publish-btn" disabled type="button">Publish live</button>
+        </div>
+        <div class="chat-status"></div>
+      </div>` : ""}`;
+
+    document.body.appendChild(fab);
+    document.body.appendChild(panel);
+
+    const feed = panel.querySelector(".chat-feed");
+    const chipsBox = panel.querySelector(".chat-chips");
+    const input = panel.querySelector(".chat-input-row input");
+    const sendBtn = panel.querySelector(".chat-send");
+
+    const msg = (html, who) => {
+      const el = mk("div", "chat-msg" + (who === "me" ? " me" : ""));
+      el.innerHTML = html;
+      feed.appendChild(el); feed.scrollTop = feed.scrollHeight;
+      return el;
+    };
+    const chips = (arr) => {
+      chipsBox.innerHTML = "";
+      (arr || []).forEach((t) => {
+        const c = mk("button", "chat-chip");
+        c.textContent = t;
+        c.addEventListener("click", () => { input.value = t; sendBtn.click(); });
+        chipsBox.appendChild(c);
+      });
+    };
+
+    let onOpenFirst = null;
+    const toggle = () => {
+      const isOpen = panel.classList.contains("open");
+      panel.classList.toggle("open", !isOpen);
+      if (!isOpen && !feed.children.length && onOpenFirst) onOpenFirst();
+    };
+    fab.addEventListener("click", toggle);
+    panel.querySelector(".chat-close").addEventListener("click", () => panel.classList.remove("open"));
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendBtn.click(); });
+
+    return {
+      fab, panel, feed, input, sendBtn, msg, chips, escHtml,
+      publishBtn: panel.querySelector(".chat-publish-btn"),
+      revertBtn: panel.querySelector(".chat-revert"),
+      statusEl: panel.querySelector(".chat-status"),
+      onFirstOpen: (fn) => { onOpenFirst = fn; },
+      onSend: (fn) => { sendBtn.addEventListener("click", fn); },
+    };
+  }
+  window.__ragnarChat = createChatWidget;
+
   // ---- RAGNAR Concierge: a floating shopper assistant for EVERYONE. It finds
   // cards by vibe (plain language, not exact keywords) and can restyle the
   // visitor's OWN view — local-only, never the real site or anyone else. ----
@@ -194,51 +324,7 @@
   function initConcierge() {
     if (conciergeBuilt) return;
     conciergeBuilt = true;
-    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
-    const fab = mk("button", "concierge-fab");
-    fab.innerHTML = "💬 Ask RAGNAR";
-    fab.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:90;border:1px solid var(--border-strong,#4a6);background:linear-gradient(135deg,#101826,#0a0f16);color:var(--ice,#6fd6ff);font-weight:700;font-size:13px;padding:11px 16px;border-radius:999px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.5);";
-
-    const panel = mk("div", "concierge-panel");
-    panel.style.cssText = "position:fixed;right:18px;bottom:70px;z-index:91;width:min(370px,calc(100vw - 36px));height:min(540px,calc(100vh - 120px));display:none;flex-direction:column;background:var(--panel-solid,#121a26);border:1px solid var(--border-strong,#345);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.6);overflow:hidden;";
-    panel.innerHTML = `
-      <div style="padding:12px 14px;border-bottom:1px solid var(--border,#234);display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-weight:700;color:var(--ice,#6fd6ff);">💬 RAGNAR Concierge</div>
-        <button id="cgClose" style="background:none;border:none;color:var(--muted,#89a);cursor:pointer;font-size:16px;">✕</button>
-      </div>
-      <div id="cgFeed" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.5;"></div>
-      <div id="cgChips" style="padding:0 12px 8px;display:flex;flex-wrap:wrap;gap:6px;"></div>
-      <div style="padding:10px 12px;border-top:1px solid var(--border,#234);display:flex;gap:8px;">
-        <input id="cgInput" placeholder="What are you hunting for?" style="flex:1;background:var(--bg,#0a0f16);border:1px solid var(--border,#234);border-radius:10px;color:var(--text,#dfe8f2);padding:9px 11px;font-size:13px;" />
-        <button id="cgSend" style="background:var(--ice,#6fd6ff);color:#04121c;border:none;border-radius:10px;font-weight:700;padding:0 14px;cursor:pointer;">➤</button>
-      </div>`;
-
-    document.body.appendChild(fab);
-    document.body.appendChild(panel);
-    const feed = panel.querySelector("#cgFeed");
-    const chipsBox = panel.querySelector("#cgChips");
-    const input = panel.querySelector("#cgInput");
-
-    const msg = (html, who) => {
-      const el = mk("div");
-      el.style.cssText = who === "me"
-        ? "align-self:flex-end;max-width:85%;background:var(--ice,#6fd6ff);color:#04121c;padding:8px 11px;border-radius:12px 12px 2px 12px;"
-        : "align-self:flex-start;max-width:90%;background:var(--bg,#0a0f16);border:1px solid var(--border,#234);padding:8px 11px;border-radius:12px 12px 12px 2px;";
-      el.innerHTML = html;
-      feed.appendChild(el); feed.scrollTop = feed.scrollHeight;
-      return el;
-    };
-    const chips = (arr) => {
-      chipsBox.innerHTML = "";
-      arr.forEach((t) => {
-        const c = mk("button");
-        c.textContent = t;
-        c.style.cssText = "background:rgba(111,214,255,.1);border:1px solid var(--border,#234);color:var(--ice,#6fd6ff);border-radius:999px;padding:5px 10px;font-size:11.5px;cursor:pointer;";
-        c.addEventListener("click", () => { input.value = t; send(); });
-        chipsBox.appendChild(c);
-      });
-    };
+    const w = createChatWidget({ key: "concierge", icon: "💬", label: "Ask RAGNAR", footNote: "What are you hunting for?" });
 
     function personalize(text) {
       const low = text.toLowerCase();
@@ -260,18 +346,16 @@
       return "Done — I restyled your view (just for you). Say “reset my view” to undo.";
     }
 
-    async function send() {
-      const text = input.value.trim();
+    w.onSend(async () => {
+      const text = w.input.value.trim();
       if (!text) return;
-      input.value = "";
-      msg(esc(text), "me");
-      // 1) Personal look/UX request -> local-only restyle.
+      w.input.value = "";
+      w.msg(escHtml(text), "me");
       if (PERSONAL_RE.test(text)) {
         const r = personalize(text);
-        if (r) { msg(r, "ai"); return; }
+        if (r) { w.msg(r); return; }
       }
-      // 2) Otherwise: shop by vibe -> NL search -> marketplace with filters.
-      const thinking = msg("Searching…", "ai");
+      const thinking = w.msg("Searching…");
       try {
         const r = await fetch(`/api/ai/search?q=${encodeURIComponent(text)}`).then((x) => x.json());
         thinking.remove();
@@ -279,22 +363,15 @@
         const p = new URLSearchParams();
         Object.entries(f).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== "") p.set(k, v); });
         const bits = [f.q, f.grading_company, f.category].filter(Boolean).join(" ");
-        msg(`Hunting for ${esc(bits || text)} — taking you to the results…`, "ai");
+        w.msg(`Hunting for ${escHtml(bits || text)} — taking you to the results…`);
         setTimeout(() => { location.href = "/marketplace?" + p.toString(); }, 700);
-      } catch (e) { thinking.remove(); msg("Couldn't search just now — try again.", "ai"); }
-    }
-
-    fab.addEventListener("click", () => {
-      const open = panel.style.display === "flex";
-      panel.style.display = open ? "none" : "flex";
-      if (!open && !feed.children.length) {
-        msg("Hey! Tell me what you're after — a card, a player, a vibe — and I'll find it. I can also restyle your view just for you. 🐺", "ai");
-        chips(["Vintage Charizard grails", "Cheap graded rookies under $50", "A gift for a Lakers fan", "Make my view dark & cozy"]);
-      }
+      } catch (e) { thinking.remove(); w.msg("Couldn't search just now — try again."); }
     });
-    panel.querySelector("#cgClose").addEventListener("click", () => { panel.style.display = "none"; });
-    panel.querySelector("#cgSend").addEventListener("click", send);
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+
+    w.onFirstOpen(() => {
+      w.msg("Hey! Tell me what you're after — a card, a player, a vibe — and I'll find it. I can also restyle your view just for you. 🐺");
+      w.chips(["Vintage Charizard grails", "Cheap graded rookies under $50", "A gift for a Lakers fan", "Make my view dark & cozy"]);
+    });
   }
 
   // ---- RAGNAR Studio: a floating AI assistant for staff to sculpt the whole
@@ -303,119 +380,60 @@
   function initStudio() {
     if (studioBuilt) return;
     studioBuilt = true;
-    const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-    const pending = {};            // accumulated updates not yet published
+    const pending = {};   // accumulated updates not yet published
+    const w = createChatWidget({ key: "studio", icon: "✨", label: "Studio", gold: true, publish: true, footNote: "Tell me how to sculpt the site…" });
 
-    const launcher = mk("button", "studio-fab");
-    launcher.innerHTML = "✨ Studio";
-    launcher.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:90;border:1px solid var(--border-strong,#4a6);background:linear-gradient(135deg,#101826,#0a0f16);color:var(--ice,#6fd6ff);font-weight:700;font-size:13px;padding:11px 16px;border-radius:999px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.5);";
-
-    const panel = mk("div", "studio-panel");
-    panel.style.cssText = "position:fixed;right:18px;bottom:70px;z-index:91;width:min(380px,calc(100vw - 36px));height:min(560px,calc(100vh - 120px));display:none;flex-direction:column;background:var(--panel-solid,#121a26);border:1px solid var(--border-strong,#345);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.6);overflow:hidden;";
-    panel.innerHTML = `
-      <div style="padding:12px 14px;border-bottom:1px solid var(--border,#234);display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-weight:700;color:var(--ice,#6fd6ff);">✨ RAGNAR Studio</div>
-        <button id="stClose" style="background:none;border:none;color:var(--muted,#89a);cursor:pointer;font-size:16px;">✕</button>
-      </div>
-      <div id="stFeed" style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.5;"></div>
-      <div id="stChips" style="padding:0 12px 8px;display:flex;flex-wrap:wrap;gap:6px;"></div>
-      <div style="padding:10px 12px;border-top:1px solid var(--border,#234);">
-        <div style="display:flex;gap:8px;">
-          <input id="stInput" placeholder="Tell me how to sculpt the site…" style="flex:1;background:var(--bg,#0a0f16);border:1px solid var(--border,#234);border-radius:10px;color:var(--text,#dfe8f2);padding:9px 11px;font-size:13px;" />
-          <button id="stSend" style="background:var(--ice,#6fd6ff);color:#04121c;border:none;border-radius:10px;font-weight:700;padding:0 14px;cursor:pointer;">➤</button>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-          <button id="stPublish" disabled style="flex:1;background:var(--gold,#f0c674);color:#0a0d12;border:none;border-radius:10px;font-weight:700;padding:9px;cursor:pointer;opacity:.5;">Publish live</button>
-          <button id="stReset" style="background:none;border:1px solid var(--border,#234);color:var(--muted,#89a);border-radius:10px;padding:9px 12px;cursor:pointer;font-size:12px;">Revert</button>
-        </div>
-        <div id="stStatus" style="font-size:11.5px;color:var(--muted,#89a);margin-top:6px;min-height:14px;"></div>
-      </div>`;
-
-    document.body.appendChild(launcher);
-    document.body.appendChild(panel);
-    const feed = panel.querySelector("#stFeed");
-    const chipsBox = panel.querySelector("#stChips");
-    const input = panel.querySelector("#stInput");
-    const publishBtn = panel.querySelector("#stPublish");
-    const statusEl = panel.querySelector("#stStatus");
-
-    const msg = (html, who) => {
-      const el = mk("div");
-      el.style.cssText = who === "me"
-        ? "align-self:flex-end;max-width:85%;background:var(--ice,#6fd6ff);color:#04121c;padding:8px 11px;border-radius:12px 12px 2px 12px;"
-        : "align-self:flex-start;max-width:90%;background:var(--bg,#0a0f16);border:1px solid var(--border,#234);padding:8px 11px;border-radius:12px 12px 12px 2px;";
-      el.innerHTML = html;
-      feed.appendChild(el); feed.scrollTop = feed.scrollHeight;
-      return el;
-    };
-    const renderChips = (ideas) => {
-      chipsBox.innerHTML = "";
-      (ideas || []).forEach((idea) => {
-        const c = mk("button");
-        c.textContent = idea;
-        c.style.cssText = "background:rgba(111,214,255,.1);border:1px solid var(--border,#234);color:var(--ice,#6fd6ff);border-radius:999px;padding:5px 10px;font-size:11.5px;cursor:pointer;";
-        c.addEventListener("click", () => { input.value = idea; send(); });
-        chipsBox.appendChild(c);
-      });
-    };
     const setPublish = () => {
       const n = Object.keys(pending).length;
-      publishBtn.disabled = n === 0;
-      publishBtn.style.opacity = n === 0 ? ".5" : "1";
-      publishBtn.textContent = n === 0 ? "Publish live" : `Publish ${n} change${n === 1 ? "" : "s"}`;
+      w.publishBtn.disabled = n === 0;
+      w.publishBtn.textContent = n === 0 ? "Publish live" : `Publish ${n} change${n === 1 ? "" : "s"}`;
     };
 
-    async function send() {
-      const text = input.value.trim();
+    w.onSend(async () => {
+      const text = w.input.value.trim();
       if (!text) return;
-      input.value = "";
-      msg(esc(text), "me");
-      const thinking = msg("…", "ai");
+      w.input.value = "";
+      w.msg(escHtml(text), "me");
+      const thinking = w.msg("…");
       try {
         const r = await fetch("/api/admin/studio", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: text }) }).then((x) => x.json());
         thinking.remove();
-        msg(esc(r.reply || "Done."), "ai");
+        w.msg(escHtml(r.reply || "Done."));
         const keys = Object.keys(r.updates || {});
         if (keys.length) {
           Object.assign(pending, r.updates);
-          // Live preview across the whole site.
           window.__ragnarApplySite(Object.assign({}, window.__ragnarSite, pending));
-          msg(`<span style="color:var(--muted,#89a);font-size:12px;">Previewing: ${keys.map(esc).join(", ")} — Publish to make it live.</span>`, "ai");
+          w.msg(`<span class="chat-note">Previewing: ${keys.map(escHtml).join(", ")} — Publish to make it live.</span>`);
           setPublish();
         }
-        renderChips(r.ideas);
-      } catch (e) { thinking.remove(); msg("Something went wrong — try again.", "ai"); }
-    }
+        w.chips(r.ideas);
+      } catch (e) { thinking.remove(); w.msg("Something went wrong — try again."); }
+    });
 
-    async function publish() {
+    w.publishBtn.addEventListener("click", async () => {
       if (!Object.keys(pending).length) return;
-      statusEl.textContent = "Publishing…";
+      w.statusEl.textContent = "Publishing…";
       try {
         const r = await fetch("/api/admin/site-config", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ updates: pending }) }).then((x) => x.json());
         window.__ragnarSite = r.config || window.__ragnarSite;
         for (const k in pending) delete pending[k];
         setPublish();
-        statusEl.textContent = `Published live ✓ (by ${r.by || "you"})`;
-        msg("Published — it's live on the site now. ✨", "ai");
-      } catch (e) { statusEl.textContent = "Publish failed — check your access."; }
-    }
-
-    launcher.addEventListener("click", () => {
-      const open = panel.style.display === "flex";
-      panel.style.display = open ? "none" : "flex";
-      if (!open && !feed.children.length) {
-        msg("Hey — I'm your Studio assistant. Tell me the vibe and I'll sculpt the whole site: colors, font, announcement, landing copy. Big swings welcome. 🐺", "ai");
-        renderChips(["Midnight forge: black + ember gold", "Icy, premium, minimal", "Announce our Friday live drop", "Bolder headline about beating eBay fees"]);
-      }
+        w.statusEl.textContent = `Published live ✓ (by ${r.by || "you"})`;
+        w.msg("Published — it's live on the site now. ✨");
+      } catch (e) { w.statusEl.textContent = "Publish failed — check your access."; }
     });
-    panel.querySelector("#stClose").addEventListener("click", () => { panel.style.display = "none"; });
-    panel.querySelector("#stSend").addEventListener("click", send);
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
-    publishBtn.addEventListener("click", publish);
-    panel.querySelector("#stReset").addEventListener("click", () => {
+    w.revertBtn.addEventListener("click", () => {
       for (const k in pending) delete pending[k];
-      window.__ragnarApplySite(window.__ragnarSite);   // restore last-published
-      setPublish(); statusEl.textContent = "Reverted to the live version.";
+      window.__ragnarApplySite(window.__ragnarSite);
+      setPublish(); w.statusEl.textContent = "Reverted to the live version.";
+    });
+
+    w.onFirstOpen(() => {
+      w.msg("Hey — I'm your Studio assistant. Tell me the vibe and I'll sculpt the whole site: colors, font, announcement, landing copy. Big swings welcome. 🐺");
+      w.chips(["Midnight forge: black + ember gold", "Icy, premium, minimal", "Announce our Friday live drop", "Bolder headline about beating eBay fees"]);
     });
   }
+
+  // Let any page open Studio directly (e.g. the Command Hub Site tab hint link).
+  window.__ragnarOpenStudio = () => { initStudio(); document.getElementById("fab-studio")?.click(); };
 })();

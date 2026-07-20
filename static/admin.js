@@ -479,7 +479,7 @@ async function loadSite() {
 }
 
 function setSiteBuilderDisabled(disabled) {
-  ["siteSaveBtn", "studioSendBtn", "studioPrompt", "sendEmailTestBtn", "emailTestTo", "emailTestSubject", "emailTestBody", "addCollabBtn", "collabEmail", "collabRole"].forEach((id) => {
+  ["siteSaveBtn", "sendEmailTestBtn", "emailTestTo", "emailTestSubject", "emailTestBody", "addCollabBtn", "collabEmail", "collabRole"].forEach((id) => {
     const el = $(id);
     if (el) el.disabled = !!disabled;
   });
@@ -562,48 +562,6 @@ function collaboratorsAction(e) {
     .catch((err) => toast(err.message));
 }
 
-function studioMsg(text, mine = false) {
-  const feed = $("studioFeed");
-  if (!feed) return null;
-  const node = document.createElement("div");
-  node.className = "studio-msg" + (mine ? " me" : "");
-  node.textContent = text;
-  feed.appendChild(node);
-  feed.scrollTop = feed.scrollHeight;
-  return node;
-}
-
-function injectSiteUpdates(updates) {
-  Object.entries(updates || {}).forEach(([k, v]) => {
-    const el = document.querySelector(`#siteFields [data-key="${CSS.escape(k)}"]`);
-    if (el) el.value = v;
-  });
-}
-
-async function studioSuggest(seed) {
-  if (!SITE_ACCESS.allowed) { toast("Site Builder role required."); return; }
-  const input = $("studioPrompt");
-  const prompt = (seed || (input ? input.value : "") || "").trim();
-  if (!prompt) return;
-  studioMsg(prompt, true);
-  if (input) input.value = "";
-  const wait = studioMsg("Designing updates…");
-  try {
-    const r = await api("/api/admin/studio", { method: "POST", body: JSON.stringify({ message: prompt }) });
-    if (wait) wait.remove();
-    injectSiteUpdates(r.updates || {});
-    studioMsg(r.reply || "Applied suggestions into the editor fields.");
-    const ideas = $("studioIdeas");
-    if (ideas) {
-      ideas.innerHTML = (r.ideas || []).map((i) => `<button class="btn btn-ghost btn-sm" type="button" data-idea="${esc(i)}">${esc(i)}</button>`).join("");
-      ideas.querySelectorAll("[data-idea]").forEach((b) => b.addEventListener("click", () => studioSuggest(b.getAttribute("data-idea"))));
-    }
-  } catch (e) {
-    if (wait) wait.remove();
-    studioMsg("Studio failed: " + e.message);
-  }
-}
-
 async function sendEmailTest() {
   const st = $("emailTestStatus");
   st.className = "form-status";
@@ -677,8 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
   $("ridesRefresh").addEventListener("click", loadRides);
   $("siteSaveBtn").addEventListener("click", saveSite);
   $("siteRefresh").addEventListener("click", loadSite);
-  $("studioSendBtn").addEventListener("click", () => studioSuggest());
-  $("studioPrompt").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); studioSuggest(); } });
+  $("openStudioLink").addEventListener("click", (e) => { e.preventDefault(); window.__ragnarOpenStudio && window.__ragnarOpenStudio(); });
   $("sendEmailTestBtn").addEventListener("click", sendEmailTest);
   $("addCollabBtn").addEventListener("click", saveCollaborator);
   $("collabBody").addEventListener("click", collaboratorsAction);

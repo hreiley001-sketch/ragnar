@@ -27,14 +27,11 @@
     .designer { margin-bottom:14px; }
     .designer-title { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--steel); margin-bottom:6px; }
     .design-feed { display:flex; flex-direction:column; gap:6px; margin:8px 0; max-height:180px; overflow:auto; }
-    .design-msg { font-size:13px; padding:8px 11px; border-radius:10px; max-width:92%; }
-    .design-msg.me { background:rgba(55,189,255,.14); align-self:flex-end; color:var(--text); }
-    .design-msg.ai { background:var(--bg-2); border:1px solid var(--border); color:var(--text-soft); align-self:flex-start; }
     .design-swatch { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px; border:1px solid rgba(255,255,255,.3); }
     .design-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }
     .preset-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
-    .preset-btn { border:1px solid var(--border-strong); background:var(--bg-2); color:var(--text-soft); border-radius:999px; padding:4px 10px; font-size:11px; cursor:pointer; }
-    .preset-btn.active { background:rgba(55,189,255,.14); color:var(--text); border-color:var(--ice); }
+    .designer-preset-btn { border:1px solid var(--border-strong); background:var(--bg-2); color:var(--text-soft); border-radius:999px; padding:4px 10px; font-size:11px; cursor:pointer; }
+    .designer-preset-btn.active { background:rgba(55,189,255,.14); color:var(--text); border-color:var(--ice); }
     .store-listing-link { color: inherit; text-decoration: none; }
     .store-listing-link:hover { text-decoration: underline; }
     .designer-note { font-size:12px; margin:8px 0 0; }
@@ -58,15 +55,7 @@
 </head>
 <body>
   <div class="aurora"></div>
-  <header class="site-header">
-    <div class="brand">
-      <a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a>
-    </div>
-    <div class="header-actions">
-      <a class="btn btn-ghost btn-sm" href="/stores">← Stores</a>
-      <a class="btn btn-ghost btn-sm" href="/">Marketplace</a>
-    </div>
-  </header>
+  <header id="siteHeader"></header>
 
   <div class="store-hero" id="storeHero">
     <div class="store-hero-inner">
@@ -97,10 +86,10 @@
       <div class="designer">
         <div class="designer-title">✨ Store Designer — describe your vibe</div>
         <div class="preset-row" id="designPresetRow">
-          <button class="preset-btn" type="button" data-preset="whatnot">Whatnot-style live seller</button>
-          <button class="preset-btn" type="button" data-preset="ebay">eBay-style catalog seller</button>
+          <button class="designer-preset-btn" type="button" data-preset="whatnot">Whatnot-style live seller</button>
+          <button class="designer-preset-btn" type="button" data-preset="ebay">eBay-style catalog seller</button>
         </div>
-        <div id="designFeed" class="design-feed"></div>
+        <div id="designFeed" class="design-feed chat-feed"></div>
         <div class="design-row">
           <input id="designPrompt" placeholder="e.g. dark & premium for vintage Pokémon" />
           <button id="designSend" class="btn btn-primary btn-sm" type="button">Design</button>
@@ -140,5 +129,6 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="/static/store.js"></script>
   <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
 </body>
 </html>

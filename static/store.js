@@ -169,7 +169,7 @@ async function saveStore() {
 
 function addDesignMsg(html, who) {
   const el = document.createElement("div");
-  el.className = "design-msg " + who;
+  el.className = "chat-msg" + (who === "me" ? " me" : "");
   el.innerHTML = html;
   $("designFeed").appendChild(el);
   $("designFeed").scrollTop = $("designFeed").scrollHeight;
