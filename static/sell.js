@@ -51,9 +51,9 @@
   }
 
   let META = null;
-  function keepInfo(price, founding) {
+  function keepInfo(price, introActive) {
     const f = META.fees;
-    const rate = founding ? f.founding_rate : f.standard_rate;
+    const rate = introActive ? f.founding_rate : f.standard_rate;
     const keep = price - price * rate - (price * f.processing_rate + f.processing_flat);
     const ebayNet = price - (price * f.ebay_rate + f.ebay_flat);
     return { keep, savings: keep - ebayNet, rate };
@@ -220,30 +220,35 @@
     els.sellerSummary.hidden = false;
     els.sellerSummaryName.textContent = s.display_name || $("form-handle").value;
     $("sellerState").hidden = false;
-    if (s.is_founding) {
+    const badge = s.is_founding ? `★ <strong>Founding Seller #${s.founding_number}</strong> · ` : "";
+    if (s.intro_active) {
       $("sellerState").className = "seller-state founding";
-      $("sellerState").innerHTML = `★ <strong>Founding Seller #${s.founding_number}</strong> · flat ${(s.effective_rate * 100).toFixed(0)}% platform fee, same as everyone`;
+      $("sellerState").innerHTML = `${badge}4% intro fee — ${money(s.intro_sales_remaining)} left before the standard 5% rate`;
     } else {
-      $("sellerState").className = "seller-state";
-      $("sellerState").innerHTML = `Standard seller · ${(s.effective_rate * 100).toFixed(0)}% fee`;
+      $("sellerState").className = s.is_founding ? "seller-state founding" : "seller-state";
+      $("sellerState").innerHTML = `${badge}${(s.effective_rate * 100).toFixed(0)}% standard fee`;
     }
     $("sellerState").dataset.founding = s.is_founding ? "1" : "0";
+    $("sellerState").dataset.introActive = s.intro_active ? "1" : "0";
   }
   $("editSellerBtn").addEventListener("click", () => {
     els.sellerSetup.hidden = false;
     els.sellerSummary.hidden = true;
   });
 
-  function sellerIsFounding() { return $("sellerState").dataset.founding === "1"; }
+  function sellerIntroActive() {
+    const v = $("sellerState").dataset.introActive;
+    return v === undefined ? true : v === "1"; // no seller yet → preview the new-seller intro rate
+  }
 
   function updateFeePreview() {
     if (!META) return;
     const price = parseFloat($("form-price").value);
     const el = $("feePreview");
     if (!price || price <= 0) { el.innerHTML = "Enter a price to see what you keep on RAGNAR vs eBay."; return; }
-    const founding = sellerIsFounding();
-    const { keep, savings, rate } = keepInfo(price, founding);
-    el.innerHTML = `On a ${money(price)} sale you keep <strong>${money(keep)}</strong> (${(rate * 100).toFixed(0)}% flat platform fee). <span class="vs">≈ ${money(savings)} more than eBay.</span>`;
+    const introActive = sellerIntroActive();
+    const { keep, savings, rate } = keepInfo(price, introActive);
+    el.innerHTML = `On a ${money(price)} sale you keep <strong>${money(keep)}</strong> (${(rate * 100).toFixed(0)}% platform fee${introActive ? " — intro rate" : ""}). <span class="vs">≈ ${money(savings)} more than eBay.</span>`;
   }
 
   function syncGradedFields() {
@@ -436,7 +441,7 @@
       });
       showSellerState(s);
       updateFeePreview();
-      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! You keep 95% on every sale.` : "Seller created — you keep 95% on every sale.");
+      toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! You start at 4% on your first $250 in sales.` : "Seller created — you start at 4% on your first $250 in sales.");
     } catch (err) {
       if (String(err.message).includes("already taken")) {
         try { const s = await api(`/api/sellers/${encodeURIComponent(handle)}`); showSellerState(s); updateFeePreview(); toast("Welcome back — seller loaded."); return; } catch (_) {}

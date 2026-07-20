@@ -126,9 +126,11 @@ function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTi
 const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="var(--crest-primary)"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="var(--crest-accent)"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
 
 /* ---------------- fee math (mirrors backend fees.py) ---------------- */
-function keepInfo(price, founding) {
+// Buyer-facing estimate always uses the standard rate — an individual seller's
+// intro-rate status (4% on their first $250) isn't exposed on listing cards.
+function keepInfo(price) {
   const f = META.fees;
-  const rate = founding ? f.founding_rate : f.standard_rate;
+  const rate = f.standard_rate;
   const keep = price - price * rate - (price * f.processing_rate + f.processing_flat);
   const ebayNet = price - (price * f.ebay_rate + f.ebay_flat);
   return { keep, savings: keep - ebayNet, rate };
@@ -144,10 +146,9 @@ function renderHero() {
   const el = $("heroStats");
   if (!el || !META.fees) return;
   const f = META.fees;
-  const keepPct = (100 - f.standard_rate * 100).toFixed(0);
   el.innerHTML = `
-    <div class="stat hot"><div class="stat-num">${keepPct}%</div><div class="stat-label">Sellers keep</div></div>
-    <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Flat platform fee</div></div>
+    <div class="stat hot"><div class="stat-num">${(f.founding_rate * 100).toFixed(0)}%</div><div class="stat-label">Intro rate, first $${f.founding_intro_sales_cap}</div></div>
+    <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Standard fee after</div></div>
     <div class="stat"><div class="stat-num">★</div><div class="stat-label">Founding ${f.founding_cap} badge</div></div>`;
 }
 
@@ -165,8 +166,8 @@ function renderIntegrations() {
 async function refreshFoundingCounter() {
   try {
     const s = await api("/api/sellers/founding-status");
-    $("foundingCounter").textContent = `Founding ${s.claimed}/${s.cap} · sellers keep 95%`;
-    $("foundingCounter").title = `${s.remaining} Founding Seller badges left — flat 5% fee for every seller`;
+    $("foundingCounter").textContent = `Founding ${s.claimed}/${s.cap}`;
+    $("foundingCounter").title = `${s.remaining} Founding Seller badges left — every seller starts at 4% on their first $${s.intro_sales_cap} in sales, then 5% flat`;
   } catch (_) {}
 }
 
@@ -194,7 +195,7 @@ function listingCard(l) {
   if (l.is_featured) badges.push(`<span class="badge founding">FEATURED</span>`);
 
   const sub = [l.set_name, l.card_number].filter(Boolean).map(escapeHtml).join(" · ");
-  const { keep, savings } = keepInfo(l.price, l.is_founding_seller);
+  const { keep, savings } = keepInfo(l.price);
   const src = l.thumb_url || l.image_url;
   const img = src
     ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(l.title)}" loading="lazy" onerror="this.outerHTML='${CREST.replace(/'/g, "&#39;")}'" />`

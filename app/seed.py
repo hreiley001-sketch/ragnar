@@ -111,7 +111,6 @@ def _make_founding(seller: Seller, number: int) -> None:
     seller.is_founding = True
     seller.founding_number = number
     seller.founding_activated_at = utcnow()
-    seller.founding_intro_ends_at = utcnow() + timedelta(days=settings.founding_intro_days)
 
 
 def seed_if_empty() -> None:

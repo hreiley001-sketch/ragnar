@@ -1,5 +1,6 @@
-"""Business logic shared across routers: Founding-250 seller state, effective
-fee rates, and sold-comp matching/aggregation for sales history.
+"""Business logic shared across routers: Founding-250 badge state, the
+universal introductory fee offer (4% on a seller's first $250 in sales, then
+5% flat forever), and sold-comp matching/aggregation for sales history.
 """
 from __future__ import annotations
 
@@ -18,36 +19,38 @@ from .models import Listing, ListingStatus, Sale, Seller, utcnow
 
 
 def founding_intro_active(seller: Optional[Seller]) -> bool:
-    """Retained for schema/back-compat — the fee is flat for everyone now, so
-    there is no intro window that changes the rate. Always False."""
-    return False
+    """True while this seller is still within their introductory offer: the
+    first ``founding_intro_sales_cap`` dollars of sales, for every seller
+    (founding badge or not) — no time window."""
+    if not seller:
+        return False
+    return seller.founding_intro_sales_cents < settings.founding_intro_sales_cap_cents
 
 
 def effective_platform_rate(seller: Optional[Seller]) -> float:
-    """The platform take rate that applies to this seller — flat 5% for all."""
+    """The platform take rate for this seller right now: the introductory
+    rate on their first ``founding_intro_sales_cap`` dollars in sales, then
+    the flat standard rate for everyone, forever after."""
+    if founding_intro_active(seller):
+        return settings.founding_rate
     return settings.standard_rate
 
 
 def seller_state(seller: Seller) -> dict:
-    """Serializable snapshot of a seller's Founding status for the API/UI."""
+    """Serializable snapshot of a seller's Founding + introductory-offer state."""
     intro_active = founding_intro_active(seller)
-    days_left = None
-    sales_remaining = None
-    if seller.is_founding and seller.founding_intro_ends_at:
-        delta = seller.founding_intro_ends_at - utcnow()
-        days_left = max(0, delta.days + (1 if delta.seconds else 0)) if delta.total_seconds() > 0 else 0
-        sales_remaining = max(
-            0.0,
-            (settings.founding_intro_sales_cap_cents - seller.founding_intro_sales_cents) / 100,
-        )
+    sales_remaining = max(
+        0.0,
+        (settings.founding_intro_sales_cap_cents - seller.founding_intro_sales_cents) / 100,
+    ) if intro_active else 0.0
     return {
         "handle": seller.handle,
         "display_name": seller.display_name,
         "is_founding": seller.is_founding,
         "founding_number": seller.founding_number,
         "intro_active": intro_active,
-        "intro_ends_at": seller.founding_intro_ends_at,
-        "intro_days_left": days_left,
+        "intro_ends_at": None,
+        "intro_days_left": None,
         "intro_sales_remaining": sales_remaining,
         "effective_rate": effective_platform_rate(seller),
     }
@@ -67,15 +70,15 @@ def founding_status(session: Session) -> dict:
 
 
 def grant_founding_if_available(session: Session, seller: Seller) -> None:
-    """Give the seller Founding status if slots remain. Caller commits."""
+    """Give the seller permanent Founding-badge status if slots remain. The
+    introductory fee offer is separate and universal — it isn't reset or
+    affected by earning the Founding badge. Caller commits."""
     status = founding_status(session)
     if status["remaining"] <= 0:
         return
     seller.is_founding = True
     seller.founding_number = status["claimed"] + 1
     seller.founding_activated_at = utcnow()
-    seller.founding_intro_ends_at = utcnow() + timedelta(days=settings.founding_intro_days)
-    seller.founding_intro_sales_cents = 0
 
 
 # --------------------------------------------------------------------------- #
