@@ -49,7 +49,7 @@ async function load() {
       location.href = `/ride/${this.getAttribute("data-id")}`;
     });
   } catch (err) {
-    $("rgrid").innerHTML = `<p class="muted">Could not load rides: ${esc(err.message || "Unknown error")}.</p>`;
+    $("rgrid").innerHTML = `<div class="empty-state"><p>No live rooms open.</p><span>Auctions and drops will show here when a room goes live.</span></div>`;
   }
 }
 document.addEventListener("DOMContentLoaded", () => { load(); setInterval(load, 5000); });

@@ -6,55 +6,9 @@
   <title>RAGNAR — Store</title>
   <link rel="icon" href="/static/logo.png" />
   <link rel="stylesheet" href="/static/styles.css" />
-  <style>
-    .store-hero { position:relative; height:200px; border-radius:0 0 var(--radius) var(--radius); overflow:hidden; }
-    .store-hero-inner { position:absolute; inset:0; display:flex; align-items:flex-end; gap:16px; padding:18px clamp(16px,4vw,40px); background:linear-gradient(180deg, transparent, rgba(8,11,16,.85)); }
-    .store-av { width:88px;height:88px;border-radius:20px;border:3px solid var(--bg); display:grid;place-items:center;font-weight:800;font-size:34px;color:#fff; flex:none; }
-    .store-h-meta h1 { margin:0; font-size:clamp(24px,4vw,36px); }
-    .store-h-meta .tg { color:var(--text-soft); }
-    .store-social { display:flex; align-items:center; gap:10px; margin-top:8px; flex-wrap:wrap; }
-    .social-meta { font-size:13px; }
-    .store-bio { max-width:720px; }
-    .store-wrap { padding: 18px clamp(16px,4vw,40px) 60px; }
-    .live-strip { display:flex; gap:12px; flex-wrap:wrap; margin:16px 0; }
-    .live-pill { display:flex;align-items:center;gap:8px; padding:8px 14px; border-radius:10px; border:1px solid var(--border-strong); background:rgba(200,30,30,.12); cursor:pointer; }
-    .live-dot { width:9px;height:9px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;animation:pulse 1.4s infinite; } @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-    .bar { display:flex; align-items:center; justify-content:space-between; margin:18px 0 12px; }
-    .customize { margin-top:14px; padding:16px; }
-    .customize .field-row { grid-template-columns:1fr 1fr; }
-    .embed-wrap { aspect-ratio:16/9; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border-strong); margin:12px 0; background:#000; }
-    .embed-wrap iframe { width:100%; height:100%; border:0; }
-    .designer { margin-bottom:14px; }
-    .designer-title { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--steel); margin-bottom:6px; }
-    .design-feed { display:flex; flex-direction:column; gap:6px; margin:8px 0; max-height:180px; overflow:auto; }
-    .design-swatch { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin-right:5px; border:1px solid rgba(255,255,255,.3); }
-    .design-row { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; }
-    .preset-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
-    .designer-preset-btn { border:1px solid var(--border-strong); background:var(--bg-2); color:var(--text-soft); border-radius:999px; padding:4px 10px; font-size:11px; cursor:pointer; }
-    .designer-preset-btn.active { background:rgba(55,189,255,.14); color:var(--text); border-color:var(--ice); }
-    .store-listing-link { color: inherit; text-decoration: none; }
-    .store-listing-link:hover { text-decoration: underline; }
-    .designer-note { font-size:12px; margin:8px 0 0; }
-    .nav-space { margin:14px 0; }
-    .token-note { margin-top:0; }
-    .message-card { margin-top:22px; padding:16px; max-width:640px; }
-    .msg-gate { font-size:13px; }
-    @media (max-width:760px) {
-      .store-wrap { padding: 14px 12px 40px; }
-      .bar { flex-direction: column; align-items: flex-start; }
-      .customize .field-row { grid-template-columns: 1fr; }
-    }
-    @media (max-width:640px) {
-      .store-hero { height: 230px; }
-      .store-hero-inner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px; }
-      .store-av { width:72px; height:72px; border-radius:16px; font-size:28px; }
-      .design-row { grid-template-columns: 1fr; }
-      .message-card { max-width: 100%; }
-    }
-  </style>
   <link rel="stylesheet" href="/static/pages.css" />
 </head>
-<body>
+<body class="page-store">
   <div class="aurora"></div>
   <header id="siteHeader"></header>
 
@@ -102,7 +56,7 @@
       <label class="field"><span>Store token</span><input id="storeToken" type="password" placeholder="X-Store-Token" /></label>
       <div class="field-row">
         <label class="field"><span>Tagline</span><input id="c-tagline" maxlength="140" /></label>
-        <label class="field"><span>Accent color</span><input id="c-accent" type="color" value="#6fd6ff" /></label>
+        <label class="field"><span>Accent color</span><input id="c-accent" type="color" value="#a9d5e2" /></label>
       </div>
       <label class="field"><span>Heading font</span><select id="c-font"><option value="">Default</option></select></label>
       <div class="field-row">

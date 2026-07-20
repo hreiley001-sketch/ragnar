@@ -90,7 +90,7 @@ async function loadLive() {
     LAST_STREAMS = await api("/api/streams");
     renderLive(LAST_STREAMS);
   } catch (err) {
-    $("liveRow").innerHTML = `<p class="muted">Could not load live streams: ${esc(err.message || "Unknown error")}.</p>`;
+    $("liveRow").innerHTML = `<div class="empty-state"><p>No live rooms right now.</p><span>Check back soon — new sessions go live throughout the day.</span></div>`;
   }
 }
 
@@ -148,7 +148,7 @@ async function loadStores(q) {
       location.href = `/store/${this.getAttribute("data-handle")}`;
     });
   } catch (err) {
-    $("storeGrid").innerHTML = `<p class="muted">Could not load stores: ${esc(err.message || "Unknown error")}.</p>`;
+    $("storeGrid").innerHTML = `<div class="empty-state"><p>Stores will appear here.</p><span>Seller storefronts load when the marketplace is online.</span></div>`;
   }
 }
 

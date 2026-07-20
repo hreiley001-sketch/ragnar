@@ -6,114 +6,14 @@
   <title>RAGNAR — My Account</title>
   <link rel="icon" href="/static/logo.png" />
   <link rel="stylesheet" href="/static/styles.css" />
-  <style>
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 26px clamp(16px, 4vw, 40px) 70px; }
-    .wrap > h2 { margin: 0 0 4px; letter-spacing: 0.04em; }
-    .wrap .sub { color: var(--muted); margin: 0 0 20px; font-size: 14px; }
-
-    /* Tabs (admin-hub pill pattern) */
-    .tabs { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 20px; padding-bottom: 4px; }
-    .tab { font: inherit; font-size: 14px; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text-soft); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
-    .tab { white-space: nowrap; }
-    .tab:hover { background: rgba(55,189,255,0.08); color: var(--text); }
-    .tab.active { background: var(--ice); color: var(--color-on-accent); border-color: var(--ice); font-weight: 600; }
-    .tcount { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: rgba(255,90,90,0.85); color: #fff; font-size: 11px; font-weight: 700; display: none; align-items: center; justify-content: center; line-height: 1; }
-    .tcount.show { display: inline-flex; }
-
-    .tab-panel { padding: 20px; }
-
-    /* Notifications */
-    .nrow { display: flex; gap: 12px; align-items: flex-start; padding: 12px 8px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; }
-    .nrow:hover { background: rgba(55,189,255,0.05); }
-    .ndot { width: 8px; height: 8px; border-radius: 50%; background: var(--ice-strong); box-shadow: 0 0 8px rgba(55,189,255,0.7); margin-top: 7px; flex: none; visibility: hidden; }
-    .nrow.unread .ndot { visibility: visible; }
-    .nrow .n-title { color: var(--text-soft); font-size: 14px; }
-    .nrow.unread .n-title { font-weight: 700; color: var(--text); }
-    .n-body { font-size: 13px; color: var(--muted); margin-top: 2px; }
-    .n-date { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap; padding-top: 2px; }
-
-    /* Watchlist mini cards */
-    .wgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
-    .wcard { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--panel); display: flex; flex-direction: column; transition: transform .15s ease, border-color .15s ease; }
-    .wcard:hover { transform: translateY(-3px); border-color: var(--border-strong); }
-    .wimg { aspect-ratio: 4/3; background: radial-gradient(circle at 50% 30%, rgba(183,231,244,.12), var(--color-bg-panel-strong)); display: grid; place-items: center; overflow: hidden; }
-    .wimg img { width: 100%; height: 100%; object-fit: cover; }
-    .wbody { padding: 10px 11px 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-    .wtitle { font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--text); }
-    .wfoot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .wprice { font-weight: 800; color: var(--text); }
-
-    /* Messages */
-    .thread { display: flex; gap: 12px; align-items: center; padding: 13px 10px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; }
-    .thread:hover { background: rgba(55,189,255,0.05); }
-    .t-av { width: 38px; height: 38px; border-radius: 50%; background: var(--ice); display: grid; place-items: center; font-weight: 800; color: var(--color-on-accent); flex: none; }
-    .t-main { min-width: 0; flex: 1; }
-    .t-with { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-    .t-last { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 480px; }
-    .t-unread { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: rgba(255,90,90,0.85); color: #fff; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex: none; }
-    .side-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); border: 1px solid rgba(240,198,116,0.5); border-radius: 999px; padding: 1px 7px; }
-    .bubbles { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; max-height: 420px; overflow-y: auto; padding: 4px; }
-    .bubble { max-width: 78%; padding: 9px 13px; border-radius: 14px; font-size: 14px; line-height: 1.4; align-self: flex-start; background: var(--bg-2); border: 1px solid var(--border); color: var(--text-soft); }
-    .bubble.me { align-self: flex-end; background: rgba(42,143,196,0.28); border-color: rgba(111,214,255,0.4); color: var(--text); }
-    .bubble .b-date { display: block; font-size: 10px; color: var(--muted); margin-top: 4px; }
-    .reply-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
-
-    /* Misc */
-    .empty-sm { padding: 26px 14px; text-align: center; color: var(--muted); font-size: 14px; }
-    .inline-form { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; padding: 10px; border: 1px dashed var(--border-strong); border-radius: 10px; background: rgba(55,189,255,0.04); }
-    .inline-form select, .inline-form input { width: auto; }
-    .role-badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 16px; }
-    .ov-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-    .claim-box { margin-top: 20px; padding: 16px; border: 1px dashed var(--border-strong); border-radius: 12px; background: rgba(55,189,255,0.04); max-width: 520px; }
-    .claim-box h4 { margin: 0 0 6px; }
-    .store-link-box { margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(240,198,116,0.45); border-radius: 12px; background: rgba(240,198,116,0.07); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .strong-name { font-size: 18px; }
-    .mini-note { margin: 0 0 12px; font-size: 13px; }
-    .notif-main { min-width: 0; }
-    .clean-link { color: inherit; text-decoration: none; }
-    .w-placeholder { font-size: 26px; }
-    .w-foot-pad { padding: 0 11px 11px; }
-    .muted-sm-inline { font-size: 13px; }
-    .inline-form-top { margin-top: 16px; }
-    .want-desc { flex: 2; min-width: 220px; }
-    .want-cat { flex: 1; min-width: 130px; }
-    .want-max { width: 140px; }
-    .thumb-sm { width: 38px; height: 38px; object-fit: cover; border-radius: 6px; }
-    .thumb-sm-empty { width: 38px; height: 38px; display: inline-block; border-radius: 6px; background: var(--bg-2,#0c111a); }
-    .title-thumb-row { display: flex; align-items: center; gap: 8px; }
-    .muted-xs-inline { font-size: 12px; }
-    .track-input { flex: 1; min-width: 160px; }
-    .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
-    .settings-card { border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02); padding: 14px; }
-    .settings-card h4 { margin: 0 0 10px; font-size: 14px; letter-spacing: 0.02em; }
-    .settings-card .field { margin: 0 0 10px; }
-    .settings-card .field:last-of-type { margin-bottom: 0; }
-    .setting-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
-    .setting-note { font-size: 12px; color: var(--muted); }
-    .danger-box { margin-top: 14px; border: 1px solid rgba(255,138,138,0.4); background: rgba(255,138,138,0.06); border-radius: 12px; padding: 14px; }
-    .danger-box h4 { margin: 0 0 8px; color: var(--danger); font-size: 14px; }
-    .btn-danger { background: rgba(255,138,138,0.18); border-color: rgba(255,138,138,0.5); color: #fff; }
-    .btn-danger:hover { background: rgba(255,138,138,0.25); }
-    @media (max-width: 640px) {
-      .wrap { padding: 18px 12px 48px; }
-      .tab { padding: 8px 12px; }
-      .tab-panel { padding: 14px; }
-      .t-last { max-width: 200px; }
-      .reply-row { grid-template-columns: 1fr; }
-      .inline-form { align-items: stretch; }
-      .inline-form input, .inline-form select, .inline-form .btn { width: 100%; }
-      .want-max { width: 100%; }
-      .settings-grid { grid-template-columns: 1fr; }
-      .setting-row .btn { width: 100%; }
-    }
-  </style>
   <link rel="stylesheet" href="/static/pages.css" />
 </head>
-<body>
+<body class="page-account">
   <div class="aurora"></div>
   <header id="siteHeader"></header>
 
   <main class="wrap">
+    <div class="section-title">Account</div>
     <h2>My Account</h2>
     <p class="sub" id="acctSub">Loading your longhouse…</p>
 

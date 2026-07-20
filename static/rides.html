@@ -3,29 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RAGNAR — Live Rides</title>
-  <meta name="description" content="Live trading-card auctions and drops on RAGNAR. Join a ride, bid live, win cards." />
+  <title>RAGNAR — Live Rooms</title>
+  <meta name="description" content="Live trading-card auctions and drops on RAGNAR. Enter a room, bid live, win cards." />
   <link rel="icon" href="/static/logo.png" />
   <link rel="stylesheet" href="/static/styles.css" />
-  <style>
-    .rides-wrap { padding: 18px clamp(16px,4vw,40px) 60px; }
-    .rides-title { margin: 6px 0 2px; }
-    .rides-sub { margin-top: 0; max-width: 680px; }
-    .rgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-top:18px; }
-    .rcard { border-radius:var(--radius); border:1px solid var(--border); background:var(--panel); padding:16px; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s; }
-    .rcard:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(20,30,55,.14); border-color:var(--border-strong); }
-    .rphase { font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:3px 9px; border-radius:999px; border:1px solid var(--border-strong); color:var(--text-soft); }
-    .rphase.bidding { color:#ff8a8a; border-color:rgba(255,90,90,.5); }
-    .live-d { width:8px;height:8px;border-radius:50%;background:#ff5a5a;box-shadow:0 0 8px #ff5a5a;display:inline-block;animation:pulse 1.3s infinite;} @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-  </style>
   <link rel="stylesheet" href="/static/pages.css" />
 </head>
-<body>
+<body class="page-rides">
   <div class="aurora"></div>
   <header id="siteHeader"></header>
   <main class="rides-wrap">
+    <div class="section-title">Live auctions</div>
     <h1 class="rides-title">Live Rooms</h1>
-    <p class="muted rides-sub">Auctions and drops running now. Jump in a car and bid live.</p>
+    <p class="muted rides-sub">Live auctions and drops happening now. Enter a room and bid in real time.</p>
     <div id="rgrid" class="rgrid" aria-live="polite"></div>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>

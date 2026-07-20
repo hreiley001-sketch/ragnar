@@ -608,6 +608,10 @@ async function aiSearch() {
 /* ---------------- backend status ---------------- */
 async function checkBackend() {
   const el = $("backendStatus");
+  if (!el) {
+    try { await api("/health"); } catch (_) { /* silent */ }
+    return;
+  }
   try { await api("/health"); el.textContent = "online"; el.className = "status-badge online"; }
   catch (_) { el.textContent = "offline"; el.className = "status-badge offline"; }
 }
@@ -695,8 +699,11 @@ async function init() {
     updatePresetState();
     if (!hydrateFromUrl()) await loadListings();
   } catch (err) {
-    $("backendStatus").textContent = "offline";
-    $("backendStatus").className = "status-badge offline";
+    const status = $("backendStatus");
+    if (status) {
+      status.textContent = "offline";
+      status.className = "status-badge offline";
+    }
     $("resultCount").textContent = "Marketplace unavailable";
     $("grid").innerHTML = `<div class="empty">Could not load marketplace data: ${escapeHtml(err.message || "Unknown error")}.</div>`;
     toast("Could not initialize the marketplace.");

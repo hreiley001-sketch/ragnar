@@ -15,11 +15,11 @@
   }
 
   const ITEMS = [
-    { icon: "01", label: "Home", href: "/" },
-    { icon: "02", label: "Marketplace", href: "/marketplace" },
-    { icon: "03", label: "Live Sellers", href: "/stores" },
-    { icon: "04", label: "Live Rooms", href: "/rides" },
-    { icon: "05", label: "Sell on RAGNAR", href: "/#apply" },
+    { icon: "", label: "Home", href: "/" },
+    { icon: "", label: "Marketplace", href: "/marketplace" },
+    { icon: "", label: "Live Sellers", href: "/stores" },
+    { icon: "", label: "Live Rooms", href: "/rides" },
+    { icon: "", label: "Sell on RAGNAR", href: "/#apply" },
   ];
 
   const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
@@ -27,7 +27,9 @@
     const a = document.createElement("a");
     a.className = "nav-link" + (it.cls ? " " + it.cls : "");
     a.href = it.href;
-    a.innerHTML = `<span class="ico">${it.icon}</span><span class="lbl">${it.label}</span>`;
+    a.innerHTML = it.icon
+      ? `<span class="ico">${it.icon}</span><span class="lbl">${it.label}</span>`
+      : `<span class="lbl">${it.label}</span>`;
     return a;
   }
 
@@ -40,43 +42,68 @@
   let headerSellBtn = null;
   function headerExtrasHtml() {
     if (path === "/marketplace") {
-      return `<span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding —</span><span id="backendStatus" class="status-badge checking">connecting…</span>`;
+      return `<span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding</span>`;
     }
     if (path.startsWith("/ride/")) {
-      return `<span id="viewers" class="status-badge">0 watching</span>`;
+      return `<span id="viewers" class="status-badge">0 watching</span><a class="btn btn-ghost btn-sm" href="/rides">All rooms</a>`;
     }
     if (path === "/account") {
       return `<button id="logoutBtn" class="btn btn-ghost btn-sm" type="button">Log out</button>`;
     }
     return "";
   }
+  function midNavHtml() {
+    if (document.body.classList.contains("arena-home")) {
+      return `
+        <a href="#live">Live now</a>
+        <a href="#categories">Categories</a>
+        <a href="#difference">Why RAGNAR</a>
+        <a href="/marketplace">Marketplace</a>`;
+    }
+    const links = [
+      { href: "/marketplace", label: "Marketplace" },
+      { href: "/stores", label: "Sellers" },
+      { href: "/rides", label: "Live" },
+    ];
+    return links.map((l) => {
+      const active = path === l.href || (l.href !== "/" && path.startsWith(l.href));
+      return `<a href="${l.href}" class="${active ? "is-active" : ""}">${l.label}</a>`;
+    }).join("");
+  }
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
-    header.className = "site-header";
+    header.className = header.className || "site-header";
+    if (!header.classList.contains("site-header")) header.classList.add("site-header");
+    // Admin ships its own chrome; only ensure class + leave markup alone.
+    if (document.body.classList.contains("page-admin") && header.querySelector(".cmd-title")) {
+      return;
+    }
+    if (document.body.classList.contains("arena-home")) header.classList.add("site-header--arena");
+    if (document.body.classList.contains("premium-room")) header.classList.add("site-header--room");
     const light = path === "/login" || path === "/verify";
     if (light) {
+      header.classList.add("site-header--light");
       header.innerHTML = `
         <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
         <div class="header-actions"></div>`;
       return;
     }
+    const sellLabel = document.body.classList.contains("arena-home") ? "Sell on RAGNAR" : "Sell";
+    const sellHref = document.body.classList.contains("arena-home") ? "#apply" : null;
+    const sellCtrl = sellHref
+      ? `<a class="btn btn-primary btn-sm" href="${sellHref}">${sellLabel}</a>`
+      : `<button class="btn btn-primary btn-sm" type="button" data-open-sell>${sellLabel}</button>`;
     header.innerHTML = `
       <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+      <nav class="site-nav" aria-label="Primary">${midNavHtml()}</nav>
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
-        <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
-        <a class="btn btn-ghost btn-sm" href="/stores">Stores</a>
-        <button class="btn btn-primary btn-sm" type="button" data-open-sell>Sell</button>
+        ${sellCtrl}
         <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
       </div>`;
     acctLinks.push(header.querySelector("#headerAcctLink"));
     headerSellBtn = header.querySelector("[data-open-sell]");
-    if (path.startsWith("/ride/")) {
-      const link = document.createElement("a");
-      link.className = "btn btn-ghost btn-sm"; link.href = "/rides"; link.textContent = "All rides";
-      header.querySelector(".header-actions").insertBefore(link, header.querySelector(".header-extra").nextSibling);
-    }
   }
   buildHeader();
 
@@ -99,10 +126,10 @@
   ITEMS.forEach((it) => links.appendChild(navLink(it)));
   links.appendChild(mk("div", "nav-div"));
   const userLine = mk("div", "nav-user"); userLine.id = "navUser"; userLine.hidden = true; links.appendChild(userLine);
-  const acct = navLink({ icon: "ID", label: "Sign in", href: "/login" }); links.appendChild(acct);
+  const acct = navLink({ icon: "", label: "Sign in", href: "/login" }); links.appendChild(acct);
   acctLinks.push(acct);
   // Command Hub is staff-only — hidden until we confirm the user is staff.
-  const hub = navLink({ icon: "//", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
+  const hub = navLink({ icon: "", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
 
   document.body.appendChild(scrim);
   document.body.appendChild(drawer);
@@ -164,6 +191,14 @@
     document.head.appendChild(l);
   }
   loadWebFont("Inter Tight");
+  (function loadCoreFonts() {
+    if (document.getElementById("ragnar-fonts")) return;
+    const l = document.createElement("link");
+    l.id = "ragnar-fonts";
+    l.rel = "stylesheet";
+    l.href = "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap";
+    document.head.appendChild(l);
+  })();
   function shade(hex, amt) {
     // Lightens dark colors and darkens light ones, so --bg-2 always has gentle
     // contrast against --bg whether the theme is light or dark.
@@ -386,7 +421,7 @@
   // visitor's OWN view — local-only, never the real site or anyone else. ----
   const VIBES = [
     [["gold", "lux", "premium", "elite", "luxury", "grail", "royal", "regal"], "#f0c674"],
-    [["ice", "frost", "blue", "arctic", "cool", "cold", "steel"], "#6fd6ff"],
+    [["ice", "frost", "blue", "arctic", "cool", "cold", "steel"], "#a9d5e2"],
     [["fire", "red", "ember", "hot", "bold", "aggressive", "crimson", "blood"], "#ff6b5e"],
     [["green", "mint", "emerald", "money", "forest"], "#6fe3b0"],
     [["purple", "cosmic", "galaxy", "mystic", "magic", "violet"], "#b18cff"],
