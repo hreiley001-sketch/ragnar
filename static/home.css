@@ -427,6 +427,39 @@ body.arena-home {
 .difference-card.fee-card::before { background: var(--arena-gold); }
 .difference-card.fee-card strong { color: var(--arena-gold); }
 
+.intel-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--arena-line);
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--arena-ice) 10%, transparent), transparent 55%),
+    rgba(10, 12, 15, 0.72);
+}
+.intel-strip-kicker {
+  font: 700 10px/1 var(--arena-mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--arena-ice);
+}
+.intel-strip-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.intel-strip-steps span {
+  font: 700 10px/1 var(--arena-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 7px 10px;
+  border: 1px solid var(--arena-line);
+  color: var(--color-text-secondary);
+}
+
 .moment {
   position: relative; min-height: 650px; overflow: hidden; display: grid;
   grid-template-columns: 1fr 1fr; align-items: center; border: 1px solid var(--arena-line);

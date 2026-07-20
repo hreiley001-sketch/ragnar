@@ -598,13 +598,52 @@ function hydrateFromUrl() {
 }
 
 async function aiSearch() {
-  const q = $("f-q").value.trim();
+  const q = ($("heroSearch")?.value || $("f-q").value || "").trim();
   if (!q) { toast("Type what you want — e.g. 'PSA 10 Charizards under $5k'"); return; }
+  const card = $("vaultAdvisor");
+  const chipsEl = $("vaultAdvisorChips");
+  const sourceEl = $("vaultAdvisorSource");
+  if (card) {
+    card.hidden = false;
+    card.classList.add("loading");
+    if (chipsEl) chipsEl.innerHTML = "";
+    if (sourceEl) sourceEl.textContent = "Parsing…";
+  }
   try {
     const r = await api(`/api/ai/search?q=${encodeURIComponent(q)}`);
-    applyFilters(r.filters || {});
-    toast(`AI search applied (${r.source})`);
-  } catch (e) { toast(e.message); }
+    const filters = r.filters || {};
+    window.__vaultAdvisorFilters = filters;
+    if (card) {
+      card.classList.remove("loading");
+      if (sourceEl) sourceEl.textContent = r.source ? `via ${r.source}` : "parsed";
+      if (chipsEl) {
+        const labels = {
+          q: "Query", category: "Category", grading_company: "Grader",
+          graded: "Graded", min_grade: "Min grade", min_price: "Min $",
+          max_price: "Max $", condition: "Condition", sort: "Sort",
+        };
+        chipsEl.innerHTML = Object.entries(filters)
+          .filter(([, v]) => v !== undefined && v !== null && v !== "")
+          .map(([k, v]) => `<span class="vault-advisor-chip"><b>${escapeHtml(labels[k] || k)}</b>${escapeHtml(String(v))}</span>`)
+          .join("") || `<span class="vault-advisor-chip"><b>Query</b>${escapeHtml(q)}</span>`;
+      }
+    } else {
+      applyFilters(filters);
+      toast(`Vault Advisor applied (${r.source || "ai"})`);
+    }
+  } catch (e) {
+    if (card) { card.classList.remove("loading"); card.hidden = true; }
+    toast(e.message);
+  }
+}
+
+function applyVaultAdvisor() {
+  const filters = window.__vaultAdvisorFilters;
+  if (!filters) return;
+  applyFilters(filters);
+  const hs = $("heroSearch");
+  if (hs && filters.q) hs.value = filters.q;
+  toast("Filters applied");
 }
 
 /* ---------------- backend status ---------------- */
@@ -646,6 +685,17 @@ async function init() {
   }
 
   $("aiSearchBtn").addEventListener("click", aiSearch);
+  $("vaultAdvisorApply")?.addEventListener("click", applyVaultAdvisor);
+  $("vaultAdvisorDismiss")?.addEventListener("click", () => { const c = $("vaultAdvisor"); if (c) c.hidden = true; });
+  document.querySelectorAll(".vault-prompt").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const q = btn.getAttribute("data-q") || "";
+      const hs = $("heroSearch");
+      if (hs) hs.value = q;
+      $("f-q").value = q;
+      aiSearch();
+    });
+  });
   $("f-q").addEventListener("input", debounce(resetAndLoad, 300));
   $("f-q").addEventListener("input", () => { const hs = $("heroSearch"); if (hs) hs.value = $("f-q").value; });
   $("f-category").addEventListener("change", syncCatChips);

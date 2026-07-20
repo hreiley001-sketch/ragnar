@@ -457,22 +457,59 @@ async function ridesAction(e) {
 /* ---------- AI tools ---------- */
 async function nlSearch() {
   const q = $("nlQuery").value.trim(); if (!q) return;
-  $("nlOut").textContent = "Parsing…";
+  const out = $("nlOut");
+  out.innerHTML = `<div class="intel-meta">Parsing…</div>`;
   try {
     const r = await api(`/api/ai/search?q=${encodeURIComponent(q)}`);
-    $("nlOut").textContent = `source: ${r.source}\nfilters: ${JSON.stringify(r.filters, null, 2)}\n\nOpen on storefront:`;
-    const p = new URLSearchParams(); Object.entries(r.filters).forEach(([k, v]) => p.set(k, v));
-    const a = document.createElement("a"); a.href = `/?${p.toString()}`; a.target = "_blank"; a.textContent = ` /?${p.toString()}`; a.style.color = "var(--ice)";
-    $("nlOut").appendChild(a);
-  } catch (e) { $("nlOut").textContent = e.message; }
+    const filters = r.filters || {};
+    const labels = {
+      q: "Query", category: "Category", grading_company: "Grader",
+      graded: "Graded", min_grade: "Min grade", min_price: "Min $",
+      max_price: "Max $", condition: "Condition", sort: "Sort",
+    };
+    const chips = Object.entries(filters)
+      .filter(([, v]) => v !== undefined && v !== null && v !== "")
+      .map(([k, v]) => `<span class="intel-filter"><b>${esc(labels[k] || k)}</b>${esc(String(v))}</span>`)
+      .join("") || `<span class="intel-filter"><b>Query</b>${esc(q)}</span>`;
+    const p = new URLSearchParams();
+    Object.entries(filters).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== "") p.set(k, v); });
+    const href = `/marketplace?${p.toString()}`;
+    out.innerHTML = `
+      <div class="intel-filters">${chips}</div>
+      <div class="intel-meta">Source · ${esc(r.source || "ai")}</div>
+      <div class="intel-actions">
+        <a class="btn btn-primary btn-sm" href="${esc(href)}" target="_blank" rel="noopener">Open in Vault</a>
+        <button type="button" class="btn btn-ghost btn-sm" id="nlCopyLink">Copy link</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="nlCopyJson">Copy JSON</button>
+      </div>`;
+    $("nlCopyLink")?.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(location.origin + href); toast("Link copied"); }
+      catch (_) { toast(href); }
+    });
+    $("nlCopyJson")?.addEventListener("click", async () => {
+      const raw = JSON.stringify(filters, null, 2);
+      try { await navigator.clipboard.writeText(raw); toast("JSON copied"); }
+      catch (_) { toast("Copy failed"); }
+    });
+  } catch (e) { out.textContent = e.message; }
 }
 async function genDesc() {
   const title = $("descTitle").value.trim(); if (!title) return;
-  $("descOut").textContent = "Generating…";
+  const out = $("descOut");
+  out.innerHTML = `<div class="intel-meta">Drafting…</div>`;
   try {
     const r = await api("/api/ai/describe", { method: "POST", body: JSON.stringify({ title, set_name: $("descExtra").value.trim() || null }) });
-    $("descOut").textContent = `(${r.source})\n\n${r.description}`;
-  } catch (e) { $("descOut").textContent = e.message; }
+    out.innerHTML = `
+      <p class="intel-copy">${esc(r.description || "")}</p>
+      <div class="intel-meta">Source · ${esc(r.source || "ai")} · collector-grade</div>
+      <div class="intel-actions">
+        <button type="button" class="btn btn-ghost btn-sm" id="descCopyBtn">Copy description</button>
+      </div>`;
+    $("descCopyBtn")?.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(r.description || ""); toast("Description copied"); }
+      catch (_) { toast("Copy failed"); }
+    });
+  } catch (e) { out.textContent = e.message; }
 }
 
 /* ---------- team / staff ---------- */

@@ -69,12 +69,12 @@
 
       <div id="sellChoice" class="sell-choice">
         <button type="button" class="sell-choice-btn sell-choice-ai" id="sellChoiceAi">
-          <span class="sc-badge">✨ AI</span>
+          <span class="sc-badge">Scan Suite</span>
           <strong>Scan with AI</strong>
           <span class="muted">Upload a photo — we identify the card, pull sold-price history, and pre-fill the listing.</span>
         </button>
         <button type="button" class="sell-choice-btn" id="sellChoiceManual">
-          <strong>✏️ Enter manually</strong>
+          <strong>Enter manually</strong>
           <span class="muted">Already know the details? Fill in the form yourself.</span>
         </button>
       </div>
@@ -85,9 +85,9 @@
         <input id="scanInput" type="file" accept="image/*" hidden />
         <div class="scan-drop" id="scanDrop">
           <div class="scan-drop-inner">
-            <div class="scan-icon">⚡</div>
+            <div class="scan-icon" aria-hidden="true">◇</div>
             <p><strong>Upload your card photo</strong></p>
-            <p class="muted">We'll auto-identify it and pull its sold-price history. You can edit anything before publishing.</p>
+            <p class="muted">Identity → comps → pricing. Edit anything before publishing.</p>
           </div>
           <img id="scanPreview" class="scan-preview" alt="" hidden />
         </div>
