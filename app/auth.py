@@ -102,6 +102,21 @@ def can_act_for_seller(user: Optional[User], seller, x_store_token: str = "") ->
     return bool(seller.store_edit_token) and x_store_token == seller.store_edit_token
 
 
+def require_can_act_for_seller(
+    user: Optional[User],
+    seller,
+    x_store_token: str = "",
+    *,
+    detail: str = "Not authorized for this store",
+) -> None:
+    """Raise 401 if anonymous with no store token; 403 if authenticated but not owner."""
+    if can_act_for_seller(user, seller, x_store_token):
+        return
+    if user is None and not x_store_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sign in required")
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
+
+
 # --------------------------- roles --------------------------- #
 
 def role_for_verified_email(email: str) -> str:

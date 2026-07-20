@@ -159,7 +159,8 @@ def refresh_account_status(session: Session, seller: Seller) -> dict:
 
 
 def create_checkout_session(listing: Listing, seller: Seller | None,
-                            amount_cents: int | None = None) -> dict:
+                            amount_cents: int | None = None,
+                            buyer_user_id: int | None = None) -> dict:
     """Create a Stripe Checkout Session for a listing using a destination charge
     with RAGNAR's platform fee as the application fee. ``amount_cents`` overrides
     the listing price (accepted Best Offers). Shipping is added on top."""
@@ -173,6 +174,9 @@ def create_checkout_session(listing: Listing, seller: Seller | None,
     total_cents = price_cents + (listing.shipping_cents or 0)
     split = compute_split(total_cents, seller)
     base = settings.public_base_url
+    metadata = {"listing_id": str(listing.id), "seller_handle": seller.handle}
+    if buyer_user_id is not None:
+        metadata["buyer_user_id"] = str(buyer_user_id)
     session_obj = stripe.checkout.Session.create(
         mode="payment",
         line_items=[{
@@ -187,7 +191,7 @@ def create_checkout_session(listing: Listing, seller: Seller | None,
             "application_fee_amount": split.platform_fee_cents,
             "transfer_data": {"destination": seller.stripe_account_id},
         },
-        metadata={"listing_id": str(listing.id), "seller_handle": seller.handle},
+        metadata=metadata,
         success_url=f"{base}/?checkout=success&listing={listing.id}",
         cancel_url=f"{base}/?checkout=cancel&listing={listing.id}",
     )
