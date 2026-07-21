@@ -124,6 +124,30 @@ SITE_FIELDS: list[dict] = [
 # Keys whose values must be a #RRGGBB color (validated on save + by the studio).
 COLOR_KEYS: set[str] = {f["key"] for f in SITE_FIELDS if f["type"] == "color"}
 
+# Retired palettes: theme values from earlier brand eras. If a stored row still
+# holds one of these exact values it predates the glacial redesign and should
+# fall back to the current default (rows with genuinely custom colors are kept).
+_RETIRED_THEME_VALUES: dict[str, set[str]] = {
+    "theme_accent": {"#1a7fa8", "#3ed0ff", "#4eb6e8"},
+    "theme_gold": {"#8a96a0", "#aec6d8", "#a8bccb"},
+    "theme_bg": {"#eef5f9", "#101a2c", "#151c26"},
+    "theme_text": {"#0f1c24", "#f2f7fc"},
+}
+
+
+def retire_legacy_theme_values(session: Session) -> int:
+    """Drop stored theme rows that still carry a retired palette so the current
+    defaults apply. Returns the number of rows cleared."""
+    cleared = 0
+    for key, retired in _RETIRED_THEME_VALUES.items():
+        row = session.get(SiteSetting, key)
+        if row and row.value in retired:
+            session.delete(row)
+            cleared += 1
+    if cleared:
+        session.commit()
+    return cleared
+
 DEFAULTS: dict[str, str] = {f["key"]: f["default"] for f in SITE_FIELDS}
 ALLOWED: set[str] = set(DEFAULTS)
 _MAX_LEN = 4000
