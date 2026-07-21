@@ -80,6 +80,7 @@ function sellerCardHtml(l) {
     </div>
     <div class="seller-links">
       <a class="btn btn-ghost btn-sm" href="${esc(url)}">Visit store</a>
+      <button class="btn btn-ghost btn-sm" id="followBtn" type="button" data-handle="${esc(s.handle)}">Follow seller</button>
       <a class="btn btn-ghost btn-sm" href="${esc(url)}#message">Message seller</a>
     </div>
   </div>`;
@@ -97,20 +98,27 @@ function renderMain(l) {
     <div class="views">👁 ${Number(l.view_count || 0).toLocaleString()} views${!sold && l.quantity > 1 ? ` · ${Number(l.quantity)} available` : ""}</div>
     <div class="action-row">
       <button id="buyBtn" class="btn btn-primary" type="button" ${sold ? "disabled" : ""}>Buy now</button>
+      <button id="cartBtn" class="btn btn-ghost" type="button" ${sold ? "disabled" : ""}>Add to cart</button>
       <button id="watchBtn" class="btn btn-ghost" type="button" aria-pressed="false">♡ Watch</button>
+      <button id="collectBtn" class="btn btn-ghost" type="button">＋ Collection</button>
       <button id="shareBtn" class="btn btn-ghost" type="button">⤴ Share</button>
     </div>
+    <div id="feeLine" class="fee-breakdown" style="margin:10px 0 12px"></div>
     <div id="authNote" class="form-status auth-note"></div>
     ${sold ? "" : offerBoxHtml()}
     ${sellerCardHtml(l)}
     ${l.description ? `<h3 class="desc-head">Description</h3><p class="item-desc">${esc(l.description)}</p>` : ""}`;
 
   if (!sold) $("buyBtn").addEventListener("click", () => buy());
+  if (!sold) $("cartBtn").addEventListener("click", addToCart);
   $("watchBtn").addEventListener("click", toggleWatch);
+  $("collectBtn").addEventListener("click", addToCollection);
   $("shareBtn").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(location.href); toast("Link copied"); }
     catch (_) { toast("Could not copy the link."); }
   });
+  loadFeeLine(l);
+  bindFollow(l);
   if (!sold) {
     $("offerSend").addEventListener("click", submitOffer);
     $("offerAmount").addEventListener("keydown", (e) => { if (e.key === "Enter") submitOffer(); });
@@ -129,6 +137,60 @@ async function buy(offerId) {
     if (e.status === 401) showAuthNote("Sign in to buy this item.");
     else toast(e.message);
   }
+}
+
+async function addToCart() {
+  try {
+    await api("/api/cart/add", { method: "POST", body: JSON.stringify({ listing_id: Number(ID) }) });
+    toast("Added to cart.");
+  } catch (e) {
+    if (e.status === 401) showAuthNote("Sign in to use your cart.");
+    else toast(e.message || "Could not add to cart.");
+  }
+}
+
+async function addToCollection() {
+  try {
+    const title = (LISTING && LISTING.title) || "Card";
+    await api("/api/collection/add", {
+      method: "POST",
+      body: JSON.stringify({ listing_id: Number(ID), title }),
+    });
+    toast("Saved to your collection.");
+  } catch (e) {
+    if (e.status === 401) showAuthNote("Sign in to save to collection.");
+    else toast(e.message || "Could not save.");
+  }
+}
+
+async function loadFeeLine(l) {
+  const el = $("feeLine");
+  if (!el || !l || l.price == null) return;
+  try {
+    const founding = !!(l.is_founding_seller || (l.seller && l.seller.is_founding));
+    const q = await api(`/api/fees/quote?price=${encodeURIComponent(l.price)}&founding=${founding ? "true" : "false"}`);
+    el.innerHTML = `Fee clarity — platform <b>${(q.platform_rate * 100).toFixed(1)}%</b> (${money(q.platform_fee)}) + card processing <b>${money(q.processing_fee)}</b> (2.9% + $0.30). Seller keeps <b>${money(q.seller_net)}</b>.`;
+  } catch (_) {
+    el.textContent = "Platform fee 5% (4% Founding) + card processing 2.9% + $0.30.";
+  }
+}
+
+function bindFollow(l) {
+  const btn = $("followBtn");
+  if (!btn || !l.seller) return;
+  btn.addEventListener("click", async () => {
+    try {
+      const r = await api("/api/social/follow", {
+        method: "POST",
+        body: JSON.stringify({ handle: l.seller.handle }),
+      });
+      btn.textContent = r.following ? "Following" : "Follow seller";
+      toast(r.following ? "Following seller." : "Unfollowed.");
+    } catch (e) {
+      if (e.status === 401) showAuthNote("Sign in to follow sellers.");
+      else toast(e.message || "Follow failed.");
+    }
+  });
 }
 
 /* ---------- Watch ---------- */

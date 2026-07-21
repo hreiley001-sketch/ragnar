@@ -659,3 +659,94 @@ class SupportRefund(SQLModel, table=True):
     reason: Optional[str] = Field(default=None, max_length=500)
     issued_by: str = Field(default="ai", max_length=24)
     created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+# --------------------------------------------------------------------------- #
+# Unified platform: social feed, groups, cart, collection
+# --------------------------------------------------------------------------- #
+
+
+class FeedPost(SQLModel, table=True):
+    """Instagram-style seller post for the social feed."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    seller_id: int = Field(foreign_key="seller.id", index=True)
+    kind: str = Field(default="post", index=True, max_length=32)
+    # post | live_announce | pickup | pc_highlight | grading | spotlight | story
+    title: Optional[str] = Field(default=None, max_length=200)
+    body: str = Field(max_length=2000)
+    image_url: Optional[str] = Field(default=None, max_length=500)
+    listing_id: Optional[int] = Field(default=None, foreign_key="listing.id")
+    tags: list = Field(default_factory=list, sa_column=Column(JSON))
+    market_value_cents: Optional[int] = Field(default=None)
+    like_count: int = Field(default=0)
+    comment_count: int = Field(default=0)
+    is_story: bool = Field(default=False, index=True)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class CommunityGroup(SQLModel, table=True):
+    """Reddit-style collector group."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    slug: str = Field(index=True, unique=True, max_length=60)
+    name: str = Field(max_length=120)
+    description: str = Field(default="", max_length=1000)
+    kind: str = Field(default="club", index=True, max_length=40)
+    # club | fantasy | meetup | seller_support | new
+    banner_url: Optional[str] = Field(default=None, max_length=500)
+    member_count: int = Field(default=0)
+    created_by_user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class GroupMember(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    group_id: int = Field(foreign_key="communitygroup.id", index=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    role: str = Field(default="member", max_length=24)  # member | mod | admin
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class GroupThread(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    group_id: int = Field(foreign_key="communitygroup.id", index=True)
+    author_user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    title: str = Field(max_length=200)
+    body: str = Field(max_length=4000)
+    is_poll: bool = Field(default=False)
+    poll_options: list = Field(default_factory=list, sa_column=Column(JSON))
+    upvotes: int = Field(default=0)
+    comment_count: int = Field(default=0)
+    ai_summary: Optional[str] = Field(default=None, max_length=500)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class GroupComment(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    thread_id: int = Field(foreign_key="groupthread.id", index=True)
+    author_user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    body: str = Field(max_length=2000)
+    upvotes: int = Field(default=0)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class CartItem(SQLModel, table=True):
+    """Multi-seller cart line (checkout still per-seller Stripe sessions)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    listing_id: int = Field(foreign_key="listing.id", index=True)
+    quantity: int = Field(default=1)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class CollectionItem(SQLModel, table=True):
+    """Buyer collection — 'Add to collection' from listing pages."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    listing_id: Optional[int] = Field(default=None, foreign_key="listing.id")
+    title: str = Field(max_length=200)
+    notes: Optional[str] = Field(default=None, max_length=500)
+    created_at: datetime = Field(default_factory=utcnow, index=True)

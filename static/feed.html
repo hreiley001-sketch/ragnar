@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Feed</title>
+  <link rel="icon" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/tokens.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/platform.css" />
+</head>
+<body class="theme-utility">
+  <div class="aurora"></div>
+  <header id="siteHeader"></header>
+
+  <main class="platform-main">
+    <section class="platform-hero">
+      <h1>Feed</h1>
+      <p>Posts from sellers you follow — live announcements, pickups, PC highlights, and AI card spotlights.</p>
+    </section>
+
+    <div class="platform-tabs">
+      <button class="btn btn-ghost btn-sm active" id="tabAll" type="button">For you</button>
+      <button class="btn btn-ghost btn-sm" id="tabFollowing" type="button">Following</button>
+      <a class="btn btn-primary btn-sm" href="/mystore">Post from My Store</a>
+    </div>
+
+    <div id="stories" class="feed-stories" aria-label="Stories"></div>
+    <div id="feedList" class="feed-list" aria-live="polite"></div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/feed.js"></script>
+  <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
+</body>
+</html>

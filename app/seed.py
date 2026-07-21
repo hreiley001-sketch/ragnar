@@ -189,3 +189,96 @@ def seed_if_empty() -> None:
             len(sellers),
             len(_SAMPLES),
         )
+
+
+def seed_platform_content() -> None:
+    """Seed feed posts + community groups when missing (safe on every boot)."""
+    from .models import CommunityGroup, FeedPost, GroupThread
+
+    with Session(engine) as session:
+        sellers = list(session.exec(select(Seller).limit(10)).all())
+        if not sellers:
+            # Lightweight cold-start sellers so Feed/Groups never look empty
+            # even when SEED_DEMO listings are off.
+            for handle, name, founding in (
+                ("yggdrasil", "Yggdrasil Cards", True),
+                ("fenrir", "Fenrir Vault", True),
+                ("muninn", "Muninn Collectibles", False),
+            ):
+                s = Seller(
+                    handle=handle,
+                    display_name=name,
+                    tagline="Collect. Break. Conquer.",
+                    accent_color="#8ecae6",
+                )
+                if founding:
+                    s.is_founding = True
+                    s.founding_number = 1 if handle == "yggdrasil" else 2
+                    s.founding_activated_at = utcnow()
+                session.add(s)
+            session.commit()
+            sellers = list(session.exec(select(Seller).limit(10)).all())
+            logger.info("Seeded lightweight sellers for platform surfaces.")
+
+        if not sellers:
+            return
+
+        if not session.exec(select(FeedPost).limit(1)).first():
+            samples = [
+                ("spotlight", "Wolf of the North sealed", "Chase frost foil just entered the vault. AI tagged set + comps attached.", ["chase", "frost", "1/1"], True, 4200),
+                ("live_announce", "Friday Night Grail Rips", "Going live tonight — queue is loaded. Follow for the drop.", ["live", "break"], False, None),
+                ("grading", "PSA returns landed", "Slabs are in. Spotlights hitting the feed after photos.", ["psa", "grading"], False, None),
+                ("pc_highlight", "PC pull of the week", "Jungle Pikachu raw NM — market snapshot refreshed via Intel.", ["pc", "pokemon"], False, 18),
+                ("pickup", "Show pickup — Muninn", "Table finds from the weekend. Listing drafts auto-tagged.", ["pickup", "show"], True, None),
+            ]
+            for i, (kind, title, body, tags, story, value) in enumerate(samples):
+                seller = sellers[i % len(sellers)]
+                session.add(FeedPost(
+                    seller_id=seller.id,
+                    kind=kind,
+                    title=title,
+                    body=body,
+                    tags=tags,
+                    is_story=story,
+                    market_value_cents=int(value * 100) if value else None,
+                    like_count=3 + i,
+                ))
+            logger.info("Seeded feed posts.")
+
+        if not session.exec(select(CommunityGroup).limit(1)).first():
+            groups = [
+                ("charizard-hunters", "Charizard Hunters", "Chase the flame. Breaks, comps, and PC flexes.", "club", 128),
+                ("sports-grail-league", "Sports Grail League", "Fantasy scoring for modern and vintage sports cards.", "fantasy", 86),
+                ("local-show-meetup", "Local Show Meetup", "Coordinate tables, trades, and carpools.", "meetup", 54),
+                ("seller-ops-circle", "Seller Ops Circle", "Fees, shipping, and AI listing tips for breakers.", "seller_support", 73),
+                ("new-collectors-hall", "New Collectors Hall", "Start here — grading basics and vault etiquette.", "new", 210),
+            ]
+            for slug, name, desc, kind, members in groups:
+                g = CommunityGroup(
+                    slug=slug, name=name, description=desc, kind=kind, member_count=members,
+                )
+                session.add(g)
+                session.commit()
+                session.refresh(g)
+                session.add(GroupThread(
+                    group_id=g.id,
+                    title=f"Welcome to {name}",
+                    body=f"House rules + how we use AI summaries in this group. {desc}",
+                    upvotes=5,
+                    ai_summary=desc[:120],
+                ))
+            logger.info("Seeded community groups.")
+
+        session.commit()
+
+
+# Keep cold-start rich: sellers first, then platform surfaces.
+_orig_seed = seed_if_empty
+
+
+def seed_if_empty() -> None:  # noqa: F811 — wrap original
+    _orig_seed()
+    try:
+        seed_platform_content()
+    except Exception:
+        logger.exception("Platform content seed failed")

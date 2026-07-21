@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — My Store</title>
+  <link rel="icon" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/tokens.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/platform.css" />
+</head>
+<body class="theme-utility">
+  <div class="aurora"></div>
+  <header id="siteHeader"></header>
+
+  <main class="platform-main">
+    <section class="platform-hero">
+      <h1>My Store</h1>
+      <p>Seller dashboard — inventory, storefront, live tools, analytics, and AI insights. Fees: 5% platform (4% Founding) + 2.9% + $0.30 processing.</p>
+    </section>
+
+    <div id="guestGate" class="empty-state" hidden>
+      <strong>Sign in to manage your store</strong>
+      <p style="margin:10px 0 16px">Claim a storefront, list inventory, and go live.</p>
+      <a class="btn btn-primary" href="/login">Sign in</a>
+      <a class="btn btn-ghost" href="/#apply">Apply to sell</a>
+    </div>
+
+    <div id="sellerDash" hidden>
+      <div class="dash-grid" id="dashStats"></div>
+
+      <div class="platform-tabs">
+        <a class="btn btn-primary btn-sm" href="#" id="openSell">List with AI</a>
+        <a class="btn btn-ghost btn-sm" id="storeLink" href="/stores">View storefront</a>
+        <a class="btn btn-ghost btn-sm" href="/live">Live tools</a>
+        <a class="btn btn-ghost btn-sm" href="/account">Account & orders</a>
+        <a class="btn btn-ghost btn-sm" href="/feed">Post to feed</a>
+      </div>
+
+      <div class="section-title">Inventory</div>
+      <div id="invList" class="feed-list"></div>
+
+      <div class="section-title">AI insights</div>
+      <div class="dash-card" id="aiInsights">
+        <p>Scan-to-list, auto pricing, and comps keep your vault priced with clarity. Use <b>List with AI</b> to identify set, rarity, and suggested price.</p>
+      </div>
+
+      <div class="section-title">Fee reminder</div>
+      <div class="fee-breakdown" id="feeBox"></div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/mystore.js"></script>
+  <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
+</body>
+</html>
