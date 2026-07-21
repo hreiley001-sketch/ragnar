@@ -182,8 +182,43 @@
 }
 
 .fee-pillar {
-  background: rgba(42, 65, 88, 0.45);
-  border-color: var(--color-border-subtle);
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(212, 165, 116, 0.12), transparent 45%),
+    rgba(42, 65, 88, 0.55) !important;
+  border-color: rgba(184, 223, 240, 0.28) !important;
+}
+
+.fee-pillar::before {
+  content: "ᚱ";
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  font: 600 16px/1 var(--font-mono);
+  color: rgba(212, 165, 116, 0.45);
+  letter-spacing: 0;
+}
+
+.fee-pillar.hot::before {
+  content: "ᛟ";
+  color: rgba(212, 165, 116, 0.7);
+}
+
+.breaker-chip {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(58, 95, 125, 0.35), transparent 55%),
+    rgba(16, 31, 46, 0.55) !important;
+  border-color: rgba(184, 223, 240, 0.26) !important;
+}
+
+.activity-rail,
+.activity-breakers {
+  background:
+    linear-gradient(165deg, rgba(58, 95, 125, 0.22), transparent 50%),
+    rgba(14, 27, 41, 0.88) !important;
 }
 
 .fee-pillar.hot {
