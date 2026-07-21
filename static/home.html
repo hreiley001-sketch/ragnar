@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="/static/home.css" />
   <link rel="stylesheet" href="/static/home-polish.css" />
   <link rel="stylesheet" href="/static/home-asgard.css" />
+  <link rel="stylesheet" href="/static/nordic-cards.css" />
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","description":"Premium live-commerce marketplace for trading cards. Standard 5% seller fee; the first 250 sellers to sign up lock in a flat 4% forever."}
   </script>
@@ -41,8 +42,10 @@
   <div class="vault-env" id="vaultEnv" aria-hidden="true">
     <div class="vault-env-camera" id="vaultCamera">
       <div class="vault-env-sky"></div>
+      <div class="vault-env-fjord"></div>
       <div class="vault-env-aurora vault-env-aurora-a"></div>
       <div class="vault-env-aurora vault-env-aurora-b"></div>
+      <div class="vault-env-aurora vault-env-aurora-c"></div>
       <div class="vault-aperture">
         <div class="vault-ring vault-ring-1"></div>
         <div class="vault-ring vault-ring-2"></div>
@@ -66,6 +69,7 @@
       <div class="vault-env-glass vault-env-glass-r"></div>
       <div class="vault-env-reflection"></div>
       <div class="vault-env-ice"></div>
+      <div class="vault-env-frost"></div>
       <div class="vault-env-light"></div>
       <div class="vault-env-floor"></div>
       <div class="asgard-bifrost"></div>
@@ -189,7 +193,52 @@
         <article class="moment reveal-orchestrated">
           <div class="moment-visual">
             <div class="moment-ring"></div>
-            <div id="momentCardLarge" class="moment-card"></div>
+            <div id="momentCardLarge" class="moment-card">
+              <article class="nordic-card nordic-card--frost" aria-hidden="true">
+                <div class="nordic-card__foil"></div>
+                <div class="nordic-card__frame"></div>
+                <div class="nordic-card__runes"><span>ᚱ</span><span>ᚨ</span><span>ᚷ</span><span>ᚾ</span><span>ᚨ</span><span>ᚱ</span></div>
+                <div class="nordic-card__art">
+                  <div class="nordic-card__orb"></div>
+                  <img class="nordic-card__crest" src="/static/logo.png" alt="" width="140" height="140" decoding="async" />
+                </div>
+                <div class="nordic-card__meta">
+                  <span class="nordic-card__series">Chase · Frost Vault</span>
+                  <h4 class="nordic-card__title">Wolf of the North</h4>
+                  <p class="nordic-card__sub">Legendary pull · ice foil</p>
+                </div>
+              </article>
+            </div>
+            <div class="nordic-orbit" aria-hidden="true">
+              <article class="nordic-card nordic-card--brass nordic-orbit-card nordic-orbit-a">
+                <div class="nordic-card__foil"></div>
+                <div class="nordic-card__frame"></div>
+                <div class="nordic-card__runes"><span>ᚹ</span><span>ᛟ</span><span>ᚱ</span></div>
+                <div class="nordic-card__art">
+                  <div class="nordic-card__orb"></div>
+                  <span class="nordic-card__glyph">ᚹ</span>
+                </div>
+                <div class="nordic-card__meta">
+                  <span class="nordic-card__series">Brass Sigil</span>
+                  <h4 class="nordic-card__title">Raven Mark</h4>
+                  <p class="nordic-card__sub">Founders foil</p>
+                </div>
+              </article>
+              <article class="nordic-card nordic-card--raven nordic-orbit-card nordic-orbit-b">
+                <div class="nordic-card__foil"></div>
+                <div class="nordic-card__frame"></div>
+                <div class="nordic-card__runes"><span>ᚢ</span><span>ᚦ</span><span>ᛁ</span></div>
+                <div class="nordic-card__art">
+                  <div class="nordic-card__orb"></div>
+                  <span class="nordic-card__glyph">ᚦ</span>
+                </div>
+                <div class="nordic-card__meta">
+                  <span class="nordic-card__series">Ice Key</span>
+                  <h4 class="nordic-card__title">Vault Relic</h4>
+                  <p class="nordic-card__sub">Archive foil</p>
+                </div>
+              </article>
+            </div>
           </div>
           <div class="moment-copy">
             <span class="eyebrow">Live pull archive</span>
@@ -215,10 +264,26 @@
           <a class="arena-btn small" href="#apply">Sell on RAGNAR <span class="arrow">→</span></a>
         </div>
         <div class="difference-grid">
-          <article class="difference-card fee-card"><span>Market insights</span><strong>Intel</strong><p>Pricing intelligence, trend tracking, and comps that keep sellers ahead of the market.</p></article>
-          <article class="difference-card"><span>AI Listing Assistant</span><strong>List faster</strong><p>Card recognition, automated details, and draft copy so listings go live in seconds.</p></article>
-          <article class="difference-card"><span>Know the card</span><strong>AI scan</strong><p>Scan-to-list, grading-aware details, live pricing, and real sold-price history.</p></article>
-          <article class="difference-card"><span>Trade with confidence</span><strong>Trust</strong><p>Structured listings, buyer protection, seller identity, offers, orders, and disputes.</p></article>
+          <article class="difference-card fee-card">
+            <span class="nordic-card-icon" aria-hidden="true">ᛟ</span>
+            <span>Market insights</span><strong>Intel</strong>
+            <p>Pricing intelligence, trend tracking, and comps that keep sellers ahead of the market.</p>
+          </article>
+          <article class="difference-card">
+            <span class="nordic-card-icon" aria-hidden="true">ᚱ</span>
+            <span>AI Listing Assistant</span><strong>List faster</strong>
+            <p>Card recognition, automated details, and draft copy so listings go live in seconds.</p>
+          </article>
+          <article class="difference-card">
+            <span class="nordic-card-icon" aria-hidden="true">ᚦ</span>
+            <span>Know the card</span><strong>AI scan</strong>
+            <p>Scan-to-list, grading-aware details, live pricing, and real sold-price history.</p>
+          </article>
+          <article class="difference-card">
+            <span class="nordic-card-icon" aria-hidden="true">ᛉ</span>
+            <span>Trade with confidence</span><strong>Trust</strong>
+            <p>Structured listings, buyer protection, seller identity, offers, orders, and disputes.</p>
+          </article>
         </div>
       </div>
     </section>

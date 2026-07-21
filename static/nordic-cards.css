@@ -1,0 +1,390 @@
+/* RAGNAR — Nordic chase-card faces for empty homepage slots.
+   Ice foil · rune borders · wolf/raven crest · brass accents.
+   Homepage-only; pairs with .nordic-card markup in home.html. */
+
+.nordic-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  color: var(--color-frost);
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(184, 223, 240, 0.28), transparent 55%),
+    radial-gradient(90% 50% at 50% 110%, rgba(212, 165, 116, 0.16), transparent 58%),
+    linear-gradient(165deg, #3a5f7d 0%, #243d56 48%, #152536 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(244, 251, 255, 0.28),
+    inset 0 0 0 1px rgba(184, 223, 240, 0.18);
+}
+
+.nordic-card__frame {
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(184, 223, 240, 0.32);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 165, 116, 0.18),
+    0 0 24px rgba(142, 202, 230, 0.08);
+}
+
+.nordic-card__frame::before,
+.nordic-card__frame::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: rgba(212, 165, 116, 0.65);
+  border-style: solid;
+}
+
+.nordic-card__frame::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2px 0 0 2px;
+}
+
+.nordic-card__frame::after {
+  bottom: -1px;
+  right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+.nordic-card__runes {
+  position: absolute;
+  inset: 18px 14px auto;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  font: 600 11px/1 var(--font-mono);
+  letter-spacing: 0.28em;
+  color: rgba(212, 165, 116, 0.7);
+  text-shadow: 0 0 12px rgba(212, 165, 116, 0.35);
+}
+
+.nordic-card__art {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: 36px 20px 12px;
+}
+
+.nordic-card__crest {
+  position: relative;
+  z-index: 1;
+  width: min(68%, 140px);
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 18px rgba(142, 202, 230, 0.55))
+    drop-shadow(0 10px 24px rgba(15, 28, 42, 0.45));
+  animation: nordicCrestBreath 6s ease-in-out infinite;
+}
+
+.nordic-card__glyph {
+  position: relative;
+  z-index: 1;
+  font: 600 clamp(42px, 8vw, 64px)/1 var(--font-mono);
+  color: var(--color-accent-gold);
+  text-shadow:
+    0 0 24px rgba(142, 202, 230, 0.45),
+    0 0 40px rgba(212, 165, 116, 0.25);
+  animation: nordicCrestBreath 6s ease-in-out infinite;
+}
+
+/* Orbit companions around the main chase card */
+.nordic-orbit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.nordic-orbit-card {
+  position: absolute;
+  width: min(132px, 30%);
+  height: auto;
+  aspect-ratio: 5 / 7;
+  border-radius: 12px;
+  box-shadow:
+    0 18px 40px rgba(3, 9, 15, 0.55),
+    0 0 24px rgba(142, 202, 230, 0.12);
+  animation: nordicOrbitFloat 7s ease-in-out infinite;
+}
+
+.nordic-orbit-card .nordic-card__runes {
+  font-size: 8px;
+  inset: 10px 8px auto;
+  letter-spacing: 0.18em;
+}
+
+.nordic-orbit-card .nordic-card__meta {
+  padding: 0 10px 12px;
+  flex: none;
+}
+
+.nordic-orbit-card .nordic-card__title { font-size: 12px; }
+.nordic-orbit-card .nordic-card__series { font-size: 7px; margin-bottom: 4px; }
+.nordic-orbit-card .nordic-card__sub {
+  display: block;
+  font-size: 9px;
+  margin-top: 3px;
+}
+
+.nordic-orbit-card .nordic-card__art {
+  flex: 1 1 auto;
+  padding: 26px 10px 4px;
+  min-height: 0;
+}
+
+.nordic-orbit-card .nordic-card__glyph {
+  font-size: clamp(28px, 5vw, 40px);
+}
+
+.nordic-orbit-card .nordic-card__frame { inset: 6px; }
+.nordic-orbit-card .nordic-card__frame::before,
+.nordic-orbit-card .nordic-card__frame::after { width: 10px; height: 10px; }
+
+@keyframes nordicOrbitFloat {
+  0%, 100% { transform: translateY(0) rotate(var(--orbit-rot, -12deg)); }
+  50% { transform: translateY(-10px) rotate(var(--orbit-rot, -12deg)); }
+}
+
+.nordic-orbit-a {
+  left: 4%;
+  top: 22%;
+  --orbit-rot: -11deg;
+  animation-delay: -1.5s;
+}
+
+.nordic-orbit-b {
+  right: 3%;
+  bottom: 16%;
+  --orbit-rot: 9deg;
+  animation-delay: -3.5s;
+}
+
+@media (max-width: 820px) {
+  .nordic-orbit-card { width: min(104px, 28%); }
+  .nordic-orbit-a { left: 2%; top: 14%; }
+  .nordic-orbit-b { right: 2%; bottom: 12%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nordic-orbit-card {
+    animation: none !important;
+  }
+}
+
+.nordic-card__orb {
+  position: absolute;
+  width: 72%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 40%,
+      rgba(184, 223, 240, 0.22),
+      rgba(142, 202, 230, 0.06) 48%,
+      transparent 70%);
+  border: 1px solid rgba(184, 223, 240, 0.2);
+  box-shadow: 0 0 40px rgba(142, 202, 230, 0.15);
+  animation: nordicOrbPulse 5.5s ease-in-out infinite alternate;
+}
+
+.nordic-card__meta {
+  position: relative;
+  z-index: 3;
+  padding: 0 18px 18px;
+  text-align: center;
+}
+
+.nordic-card__series {
+  display: block;
+  margin-bottom: 6px;
+  font: 600 9px/1 var(--font-mono);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-accent-gold);
+}
+
+.nordic-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.8vw, 20px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--color-frost);
+}
+
+.nordic-card__sub {
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+}
+
+.nordic-card__foil {
+  position: absolute;
+  inset: -40%;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 36%,
+    rgba(244, 251, 255, 0.1) 46%,
+    rgba(212, 165, 116, 0.16) 50%,
+    rgba(142, 202, 230, 0.12) 54%,
+    transparent 64%
+  );
+  animation: nordicFoilSweep 5.5s var(--ease-premium) infinite;
+}
+
+.nordic-card--frost {
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(191, 234, 255, 0.32), transparent 55%),
+    radial-gradient(80% 45% at 20% 80%, rgba(142, 202, 230, 0.18), transparent 55%),
+    linear-gradient(160deg, #4a7090 0%, #2a5068 42%, #152536 100%);
+}
+
+.nordic-card--brass {
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(212, 165, 116, 0.28), transparent 55%),
+    radial-gradient(80% 45% at 80% 85%, rgba(142, 202, 230, 0.14), transparent 55%),
+    linear-gradient(160deg, #3d5a72 0%, #2a4158 48%, #1a2d42 100%);
+}
+
+.nordic-card--raven {
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(184, 223, 240, 0.2), transparent 55%),
+    radial-gradient(70% 40% at 50% 100%, rgba(21, 37, 54, 0.7), transparent 60%),
+    linear-gradient(168deg, #2f4d68 0%, #1e3850 50%, #0f1c2a 100%);
+}
+
+/* Moment stage hosts a nordic face until a real listing image loads */
+.moment-card:not(.with-image) {
+  background: transparent !important;
+  border-color: rgba(184, 223, 240, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(244, 251, 255, 0.2),
+    0 36px 80px rgba(3, 9, 15, 0.65),
+    0 0 calc(46px + var(--mc-glow, 0px)) rgba(86, 200, 242, calc(0.2 + var(--mc-glow-a, 0)));
+}
+
+.moment-card:not(.with-image)::before,
+.moment-card:not(.with-image)::after {
+  display: none !important;
+}
+
+.moment-card.with-image .nordic-card {
+  display: none;
+}
+
+/* Difference cards — nordic face accents */
+.difference-card {
+  background:
+    linear-gradient(160deg, rgba(58, 95, 125, 0.45), transparent 55%),
+    var(--color-bg-glass) !important;
+}
+
+.difference-card .nordic-card-icon {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(184, 223, 240, 0.28);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 40% 30%, rgba(184, 223, 240, 0.2), transparent 65%),
+    rgba(26, 45, 66, 0.55);
+  color: var(--color-accent-gold);
+  font: 600 18px/1 var(--font-mono);
+  box-shadow: inset 0 1px 0 rgba(244, 251, 255, 0.12);
+}
+
+.difference-card.fee-card .nordic-card-icon {
+  color: var(--color-accent-primary-strong);
+  border-color: rgba(142, 202, 230, 0.4);
+}
+
+/* Blank / empty pulse slots — nordic mini faces */
+.ragnar-card--blank .ragnar-card__pulse {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(184, 223, 240, 0.32) !important;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(184, 223, 240, 0.25), transparent 60%),
+    linear-gradient(160deg, #3a5f7d, #1a2d42) !important;
+}
+
+.ragnar-card--blank .ragnar-card__pulse::before {
+  content: "ᚱ";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 600 28px/1 var(--font-mono);
+  color: rgba(212, 165, 116, 0.75);
+  text-shadow: 0 0 16px rgba(142, 202, 230, 0.4);
+}
+
+.ragnar-card--blank .ragnar-card__pulse::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(184, 223, 240, 0.22);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Activity rail empty signal — nordic tile */
+.pulse-icon {
+  background:
+    radial-gradient(circle at 40% 30%, rgba(142, 202, 230, 0.18), transparent 70%),
+    rgba(26, 45, 66, 0.6) !important;
+  border-color: rgba(184, 223, 240, 0.28) !important;
+  color: var(--color-accent-gold) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.breaker-chip-av {
+  background:
+    radial-gradient(circle at 40% 30%, rgba(142, 202, 230, 0.22), transparent 65%),
+    var(--color-ice-deep) !important;
+  border-color: rgba(212, 165, 116, 0.35) !important;
+  color: var(--color-accent-gold) !important;
+}
+
+@keyframes nordicFoilSweep {
+  0%, 68% { transform: translateX(-130%) rotate(8deg); }
+  100% { transform: translateX(130%) rotate(8deg); }
+}
+
+@keyframes nordicCrestBreath {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.03); }
+}
+
+@keyframes nordicOrbPulse {
+  from { opacity: 0.7; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1.04); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nordic-card__foil,
+  .nordic-card__crest,
+  .nordic-card__orb {
+    animation: none !important;
+  }
+}

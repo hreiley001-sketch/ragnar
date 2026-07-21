@@ -1,5 +1,109 @@
 /* RAGNAR — Asgard atmosphere · wolf & raven · mystical power */
 
+/* ——— Nordic fjord background (homepage only) ——— */
+.vault-env-sky {
+  background:
+    radial-gradient(ellipse 110% 58% at 50% -14%,
+      rgba(142, 202, 230, 0.38),
+      transparent 58%),
+    radial-gradient(ellipse 55% 40% at 12% 28%,
+      rgba(184, 223, 240, 0.16),
+      transparent 62%),
+    radial-gradient(ellipse 48% 36% at 88% 22%,
+      rgba(212, 165, 116, 0.12),
+      transparent 60%),
+    linear-gradient(175deg,
+      #4a7090 0%,
+      #2f4d68 28%,
+      #243d56 58%,
+      #1a2d42 100%) !important;
+}
+
+.vault-env-fjord {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: 4%;
+  height: 48%;
+  opacity: calc(0.72 + var(--vault-p) * 0.28);
+  background:
+    linear-gradient(180deg,
+      rgba(58, 95, 125, 0.35) 0%,
+      rgba(36, 61, 86, 0.55) 38%,
+      rgba(21, 37, 54, 0.85) 100%),
+    linear-gradient(90deg,
+      rgba(26, 45, 66, 0.4),
+      transparent 30%,
+      transparent 70%,
+      rgba(26, 45, 66, 0.4));
+  clip-path: polygon(
+    0% 100%, 0% 58%, 5% 54%, 11% 62%, 17% 48%, 24% 58%, 32% 40%,
+    40% 52%, 48% 34%, 56% 50%, 64% 38%, 72% 54%, 80% 44%, 88% 56%,
+    94% 48%, 100% 52%, 100% 100%
+  );
+  filter: drop-shadow(0 -12px 28px rgba(142, 202, 230, 0.12));
+  transform: translate3d(0, var(--vault-far-y), 0);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.vault-env-fjord::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(184, 223, 240, 0.35) 20%,
+    rgba(212, 165, 116, 0.25) 50%,
+    rgba(184, 223, 240, 0.35) 80%,
+    transparent);
+  opacity: 0.8;
+}
+
+.vault-env-aurora-c {
+  inset: -18% -40%;
+  background:
+    radial-gradient(ellipse 60% 14% at 48% 18%, rgba(106, 200, 170, 0.32), transparent 70%),
+    radial-gradient(ellipse 42% 10% at 72% 28%, rgba(212, 165, 116, 0.18), transparent 68%);
+  opacity: calc(0.48 + var(--vault-p) * 0.28);
+  animation: auroraDrift 26s ease-in-out infinite alternate;
+  filter: blur(22px);
+  mix-blend-mode: screen;
+}
+
+.vault-env-frost {
+  position: absolute;
+  inset: 0;
+  opacity: calc(0.28 + var(--vault-p) * 0.14);
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(244, 251, 255, 0.45) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 72% 18%, rgba(184, 223, 240, 0.4) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 44% 48%, rgba(244, 251, 255, 0.3) 0 1px, transparent 2px),
+    radial-gradient(circle at 86% 62%, rgba(184, 223, 240, 0.35) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 28% 78%, rgba(244, 251, 255, 0.28) 0 1px, transparent 2px),
+    radial-gradient(circle at 58% 34%, rgba(212, 165, 116, 0.28) 0 1.2px, transparent 2.2px);
+  background-size: 180px 180px, 220px 220px, 160px 160px, 200px 200px, 240px 240px, 190px 190px;
+  animation: frostDrift 40s linear infinite;
+}
+
+@keyframes frostDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-40px, -24px, 0); }
+}
+
+body.arena-home[data-vault-stage="1"] .vault-env-fjord {
+  opacity: 0.42;
+}
+
+body.arena-home[data-vault-stage="3"] .vault-env-fjord,
+body.arena-home[data-vault-stage="4"] .vault-env-fjord {
+  opacity: calc(0.7 + var(--vault-p) * 0.25);
+}
+
 /* ——— Environment overlays ——— */
 .asgard-bifrost {
   position: absolute;
@@ -301,5 +405,7 @@
   .asgard-crest-ring,
   .asgard-crest-shimmer,
   .asgard-crest-logo,
-  .asgard-crest-halo { animation: none !important; }
+  .asgard-crest-halo,
+  .vault-env-frost,
+  .vault-env-aurora-c { animation: none !important; }
 }
