@@ -111,6 +111,7 @@ function initCategoryFilters() {
 }
 
 function renderLive(streams, rides) {
+  if (!$("liveArena") || $("liveArena").hidden) return;
   const liveStreams = (streams || []).filter((stream) => stream.status === "live").map((stream) => ({
     href: `/store/${encodeURIComponent(stream.seller_handle)}`,
     title: stream.title,
@@ -197,6 +198,8 @@ function renderBreakers(stores) {
     }
   }
 
+  const grid = $("breakerGrid");
+  if (!grid || grid.hidden) return;
   if (!items.length) {
     $("breakerGrid").innerHTML = `
       <a class="breaker-card ragnar-card ragnar-card--seller" data-rank="01" href="#apply">
