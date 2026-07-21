@@ -472,11 +472,16 @@ function initVaultEnvironment() {
       root.style.setProperty("--vault-p", stepped.toFixed(3));
     }
 
-    // Stage thresholds map to the cinematic journey.
+    // Stage thresholds — concise home only has two content beats.
+    const concise = body.classList.contains("arena-home--concise");
     let stage = 1;
-    if (progress > 0.18) stage = 2;
-    if (progress > 0.42) stage = 3;
-    if (progress > 0.68) stage = 4;
+    if (concise) {
+      if (progress > 0.35) stage = 2;
+    } else {
+      if (progress > 0.18) stage = 2;
+      if (progress > 0.42) stage = 3;
+      if (progress > 0.68) stage = 4;
+    }
     if (body.dataset.vaultStage !== String(stage)) {
       body.dataset.vaultStage = String(stage);
     }
@@ -713,15 +718,18 @@ function initMomentDrama() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const concise = document.body.classList.contains("arena-home--concise");
   initReveal();
-  initVaultPath();
+  if (!concise) initVaultPath();
   initVaultEnvironment();
   initVaultCamera();
-  initSectionDepth();
-  initVaultKey();
-  initMomentDrama();
+  if (!concise) {
+    initSectionDepth();
+    initVaultKey();
+    initMomentDrama();
+    loadArena();
+  }
   initFoundersCounterFill();
-  loadArena();
   loadFoundingStatus();
   reflectAccount();
   const form = $("applyForm");
