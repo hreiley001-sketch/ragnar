@@ -1332,10 +1332,10 @@ body.arena-home[data-vault-stage="4"] .vault-aperture {
 .arena-footer p { margin: 5px 0 0; font-size: 11px; }
 .arena-footer-links { display: flex; gap: 22px; }
 .arena-footer-links a {
-  color: var(--color-text-muted); font: 10px/1 var(--arena-mono);
+  color: #dceaf5; font: 600 10px/1 var(--arena-mono);
   letter-spacing: .12em; text-transform: uppercase; text-decoration: none;
 }
-.arena-footer-links a:hover { color: var(--color-text-primary); }
+.arena-footer-links a:hover { color: #ffffff; }
 .arena-footer-meta {
   justify-self: end; text-align: right; font: 9px/1.7 var(--arena-mono);
   letter-spacing: .12em; text-transform: uppercase;
