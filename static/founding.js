@@ -389,11 +389,19 @@ function initVaultEnvironment() {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let ticking = false;
 
+  let lastP = -1;
+
   function apply() {
     ticking = false;
     const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
     const progress = Math.min(1, Math.max(0, window.scrollY / max));
-    root.style.setProperty("--vault-p", progress.toFixed(4));
+    // Quantize: --vault-p drives gradient recolors (paint work), so update it
+    // in coarse steps; the per-frame parallax below stays transform-only.
+    const stepped = Math.round(progress * 40) / 40;
+    if (stepped !== lastP) {
+      lastP = stepped;
+      root.style.setProperty("--vault-p", stepped.toFixed(3));
+    }
 
     // Stage thresholds map to the cinematic journey.
     let stage = 1;
@@ -529,16 +537,25 @@ function initVaultKey() {
     raf = requestAnimationFrame(tick);
   }
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      if (raf) cancelAnimationFrame(raf);
-      raf = null;
-    } else if (!raf) {
-      raf = requestAnimationFrame(tick);
-    }
-  });
+  let onScreen = false;
 
-  raf = requestAnimationFrame(tick);
+  function start() {
+    if (!raf && onScreen && !document.hidden) raf = requestAnimationFrame(tick);
+  }
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+  }
+
+  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+  // Only animate while the stage is actually visible — a permanent rAF loop
+  // for an offscreen artifact is wasted CPU on every other section.
+  new IntersectionObserver((entries) => {
+    onScreen = entries[0].isIntersecting;
+    onScreen ? start() : stop();
+  }, { rootMargin: "80px" }).observe(stage);
+
+  start();
 }
 
 // The "hall of thunder" chase-card: idle floating motion running constantly,
@@ -604,16 +621,23 @@ function initMomentDrama() {
     pointerY = 0;
   });
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      if (raf) cancelAnimationFrame(raf);
-      raf = null;
-    } else if (!raf) {
-      raf = requestAnimationFrame(tick);
-    }
-  });
+  let onScreen = false;
 
-  raf = requestAnimationFrame(tick);
+  function start() {
+    if (!raf && onScreen && !document.hidden) raf = requestAnimationFrame(tick);
+  }
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+  }
+
+  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+  new IntersectionObserver((entries) => {
+    onScreen = entries[0].isIntersecting;
+    onScreen ? start() : stop();
+  }, { rootMargin: "80px" }).observe(stage);
+
+  start();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -182,10 +182,10 @@ code {
 
 /* Page-specific header atmosphere (shared chrome; no parallel nav) */
 .site-header--arena {
-  background: linear-gradient(180deg, rgba(14, 27, 41, 0.55), rgba(12, 23, 35, 0.28));
+  /* No backdrop blur here: the homepage environment animates continuously and
+     re-filtering the strip every frame costs real GPU time. */
+  background: linear-gradient(180deg, rgba(8, 17, 27, 0.88), rgba(8, 17, 27, 0.62));
   border-bottom-color: rgba(3, 9, 15, 0.08);
-  backdrop-filter: saturate(1.15) blur(18px);
-  -webkit-backdrop-filter: saturate(1.15) blur(18px);
   box-shadow: none;
 }
 .site-header--arena .site-nav a { color: #e6f1f9; }
