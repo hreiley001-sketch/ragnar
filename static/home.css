@@ -1446,3 +1446,39 @@ body.arena-home[data-vault-stage="4"] .vault-aperture {
 @media (max-width: 1100px) {
   .vault-activity-grid { grid-template-columns: 1fr; }
 }
+
+/* ——— Concise homepage: hero + founders only ——— */
+body.arena-home--concise .vault-stage-arrival {
+  min-height: min(92svh, 860px);
+  padding: clamp(72px, 9vh, 100px) 0 clamp(28px, 4vh, 48px);
+}
+body.arena-home--concise .asgard-crest {
+  width: min(280px, 62vw);
+}
+body.arena-home--concise .vault-hero-sub {
+  max-width: 34rem;
+}
+body.arena-home--concise .home-apply.section-tight {
+  padding: clamp(36px, 6vh, 56px) 0 clamp(48px, 7vh, 72px);
+}
+body.arena-home--concise .breaker-cta {
+  gap: clamp(28px, 4vw, 48px);
+}
+body.arena-home--concise .arena-footer--compact {
+  grid-template-columns: 1fr auto;
+  padding: 28px clamp(18px, 4vw, 64px);
+  gap: 20px;
+}
+@media (max-width: 720px) {
+  body.arena-home--concise .vault-stage-arrival {
+    min-height: auto;
+    padding: 72px 0 24px;
+  }
+  body.arena-home--concise .arena-footer--compact {
+    grid-template-columns: 1fr;
+  }
+  body.arena-home--concise .arena-footer-meta {
+    justify-self: start;
+    text-align: left;
+  }
+}
