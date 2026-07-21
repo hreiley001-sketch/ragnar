@@ -167,6 +167,10 @@
   links.addEventListener("click", (e) => {
     if (e.target.closest("a.nav-link")) close();
   });
+  // Deep-link / QA: #menu opens the drawer once.
+  if (location.hash === "#menu") {
+    requestAnimationFrame(open);
+  }
 
   // Highlight current page in the drawer
   links.querySelectorAll("a.nav-link").forEach((a) => {

@@ -62,7 +62,7 @@ code {
 
 /* ---------- Header (luxury tech chrome — built by nav.js) ---------- */
 .site-header {
-  position: sticky; top: 0; z-index: 40;
+  position: sticky; top: 0; z-index: 50;
   display: flex; align-items: center; gap: clamp(16px, 2.5vw, 36px);
   min-height: 68px;
   padding: 0 clamp(18px, 3.5vw, 40px);
@@ -831,13 +831,17 @@ select option { background: var(--panel-solid); color: var(--text); }
   border-color: var(--color-border-default);
   transform: none;
 }
+@media (min-width: 960px) {
+  /* Desktop already has primary links — drawer is mobile-only. */
+  .nav-burger { display: none !important; }
+}
 .nav-scrim {
   position: fixed; inset: 0;
   background: var(--color-bg-overlay);
   backdrop-filter: blur(2px);
   opacity: 0; pointer-events: none;
   transition: opacity var(--duration-medium) var(--ease-premium);
-  z-index: 80;
+  z-index: 100;
 }
 .nav-scrim.open { opacity: 1; pointer-events: auto; }
 .nav-drawer {
@@ -845,7 +849,7 @@ select option { background: var(--panel-solid); color: var(--text); }
   width: min(320px, 90%);
   background: var(--panel-solid);
   border-left: 1px solid var(--border);
-  z-index: 81;
+  z-index: 101;
   transform: translateX(102%);
   transition: transform var(--duration-medium) var(--ease-premium);
   display: flex; flex-direction: column;
@@ -873,7 +877,7 @@ select option { background: var(--panel-solid); color: var(--text); }
   display: flex; align-items: center; gap: 12px;
   padding: 11px 12px; border-radius: var(--radius-sm);
   color: var(--text-soft); text-decoration: none;
-  font-size: 15px; font-weight: 550;
+  font-size: 15px; font-weight: 500;
   border: 1px solid transparent;
   transition: background var(--duration-fast), color var(--duration-fast), border-color var(--duration-fast);
 }
