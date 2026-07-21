@@ -1,20 +1,28 @@
-// RAGNAR — shared hamburger navigation, site header, and chat-widget factory.
-// Injected on every page for one consistent header/menu, plus the assistants
-// (Concierge/Studio) that are built on the same shared chat component.
+// RAGNAR — shared site header, hamburger drawer, and chat-widget factory.
+// Injected on every page for one consistent chrome, plus Concierge/Studio.
 "use strict";
 (function () {
   const path = (location.pathname.replace(/\/+$/, "") || "/");
 
+  // Primary destinations — used by the drawer (and mirrored in the desktop nav).
+  // Keep a single Account row; signed-in state updates that link in place.
   const ITEMS = [
+    { icon: "🏠", label: "Home", href: "/" },
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
     { icon: "📡", label: "Live", href: "/live" },
     { icon: "📰", label: "Feed", href: "/feed" },
     { icon: "👥", label: "Groups", href: "/groups" },
     { icon: "🏪", label: "My Store", href: "/mystore" },
+    { icon: "🛍", label: "Cart", href: "/cart" },
     { icon: "🔔", label: "Notifications", href: "/notifications" },
-    { icon: "👤", label: "Profile", href: "/account" },
-    { icon: "🏠", label: "Home", href: "/" },
-    { icon: "⭐", label: "Become a Seller", href: "/#apply" },
+  ];
+
+  const DESKTOP_NAV = [
+    { label: "Marketplace", href: "/marketplace" },
+    { label: "Live", href: "/live" },
+    { label: "Feed", href: "/feed" },
+    { label: "Groups", href: "/groups" },
+    { label: "My Store", href: "/mystore" },
   ];
 
   const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
@@ -26,13 +34,13 @@
     return a;
   }
 
-  // ---- Shared site header, built into whatever page provides
-  // <header id="siteHeader"></header>. Runs synchronously (not on
-  // DOMContentLoaded) so page-owned scripts that look up header element IDs
-  // (e.g. #logoutBtn, #viewers) on their own DOMContentLoaded still find them —
-  // this script tag executes before that event fires. ----
-  const acctLinks = [];   // kept in sync together: header link + drawer link
+  // ---- Shared site header, built into <header id="siteHeader"></header>.
+  // Runs synchronously so page scripts that query header IDs on DOMContentLoaded
+  // still find them (this script executes before that event). ----
+  const acctLinks = [];   // header + drawer account links, kept in sync
   let headerSellBtn = null;
+  let headerNotif = null;
+
   function headerExtrasHtml() {
     if (path === "/marketplace") {
       return `<span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding —</span><span id="backendStatus" class="status-badge checking">connecting…</span>`;
@@ -45,79 +53,137 @@
     }
     return "";
   }
+
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
-    header.className = "site-header";
     const light = path === "/login" || path === "/verify";
+    // Keep page-set modifiers (arena / room / admin) that were on the element.
+    const modifiers = Array.from(header.classList).filter((c) => c.startsWith("site-header--"));
+    // Admin owns its masthead — don't replace it; only ensure the base class + modifiers.
+    if (path === "/admin" || header.classList.contains("site-header--admin")) {
+      header.classList.add("site-header");
+      return;
+    }
+    header.className = "site-header" + (light ? " site-header--light" : "");
+    modifiers.forEach((c) => header.classList.add(c));
+    if (light) header.classList.add("site-header--light");
+
     if (light) {
       header.innerHTML = `
         <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
         <div class="header-actions"></div>`;
       return;
     }
+
+    const navHtml = DESKTOP_NAV.map((it) => {
+      const href = it.href.replace(/\/+$/, "") || "/";
+      const active = href === path ? " is-active" : "";
+      return `<a href="${it.href}" class="${active.trim()}">${it.label}</a>`;
+    }).join("");
+
     header.innerHTML = `
       <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+      <nav class="site-nav" aria-label="Primary">${navHtml}</nav>
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
-        <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
-        <a class="btn btn-ghost btn-sm" href="/live">Live</a>
-        <a class="btn btn-ghost btn-sm" href="/feed">Feed</a>
-        <a class="btn btn-ghost btn-sm" href="/groups">Groups</a>
-        <a class="btn btn-ghost btn-sm" href="/mystore">My Store</a>
-        <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
-        <a class="btn btn-ghost btn-sm" href="/notifications" title="Notifications">🔔</a>
-        <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
-        <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
+        <a class="header-icon" href="/cart" title="Cart" aria-label="Cart">🛒</a>
+        <a class="header-icon" id="headerNotif" href="/notifications" title="Notifications" aria-label="Notifications">🔔</a>
+        <button class="btn btn-primary btn-sm" type="button" data-open-sell>Sell</button>
+        <a id="headerAcctLink" class="btn btn-ghost btn-sm header-acct" href="/login"><span class="lbl">Sign in</span></a>
       </div>`;
     acctLinks.push(header.querySelector("#headerAcctLink"));
     headerSellBtn = header.querySelector("[data-open-sell]");
+    headerNotif = header.querySelector("#headerNotif");
     if (path.startsWith("/ride/")) {
       const link = document.createElement("a");
-      link.className = "btn btn-ghost btn-sm"; link.href = "/rides"; link.textContent = "All rides";
+      link.className = "btn btn-ghost btn-sm";
+      link.href = "/rides";
+      link.textContent = "All rides";
       header.querySelector(".header-actions").insertBefore(link, header.querySelector(".header-extra").nextSibling);
     }
   }
   buildHeader();
 
-  // Drawer
+  // ---- Drawer (hamburger) — one row per destination, single account entry ----
   const scrim = mk("div", "nav-scrim");
   const drawer = mk("div", "nav-drawer");
+  drawer.setAttribute("role", "dialog");
+  drawer.setAttribute("aria-label", "Site menu");
   drawer.innerHTML = `
     <div class="nav-head">
       <a href="/" style="display:inline-flex"><img src="/static/logo.png" alt="RAGNAR" /></a>
-      <button class="nav-close" aria-label="Close menu">✕</button>
+      <button class="nav-close" type="button" aria-label="Close menu">✕</button>
     </div>
-    <nav class="nav-links" id="navLinks"></nav>
+    <nav class="nav-links" id="navLinks" aria-label="Menu"></nav>
     <div class="nav-foot">RAGNAR · ᚱᚨᚷᚾᚨᚱ</div>`;
   const links = drawer.querySelector("#navLinks");
   ITEMS.forEach((it) => links.appendChild(navLink(it)));
   links.appendChild(mk("div", "nav-div"));
-  const userLine = mk("div", "nav-user"); userLine.id = "navUser"; userLine.hidden = true; links.appendChild(userLine);
-  const acct = navLink({ icon: "👤", label: "Sign in", href: "/login" }); links.appendChild(acct);
+  const userLine = mk("div", "nav-user");
+  userLine.id = "navUser";
+  userLine.hidden = true;
+  links.appendChild(userLine);
+  const acct = navLink({ icon: "👤", label: "Sign in", href: "/login" });
+  links.appendChild(acct);
   acctLinks.push(acct);
+  links.appendChild(navLink({ icon: "⭐", label: "Become a Seller", href: "/#apply" }));
+  links.appendChild(navLink({ icon: "💬", label: "Support", href: "/support" }));
   // Command Hub is staff-only — hidden until we confirm the user is staff.
-  const hub = navLink({ icon: "⚙️", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
+  const hub = navLink({ icon: "⚙️", label: "Command Hub", href: "/admin", cls: "nav-hub" });
+  hub.hidden = true;
+  links.appendChild(hub);
 
   document.body.appendChild(scrim);
   document.body.appendChild(drawer);
 
-  // Burger button — into the header if present, else a floating button.
+  // Burger button — into the header if present, else floating.
+  // Auth pages keep a logo-only chrome (no menu clutter).
+  const lightChrome = path === "/login" || path === "/verify";
   const burger = mk("button", "nav-burger");
+  burger.type = "button";
   burger.innerHTML = "☰";
   burger.setAttribute("aria-label", "Open menu");
-  const actions = document.querySelector(".header-actions");
-  if (actions) actions.appendChild(burger);
-  else { Object.assign(burger.style, { position: "fixed", top: "14px", right: "14px", zIndex: "82" }); document.body.appendChild(burger); }
+  burger.setAttribute("aria-expanded", "false");
+  burger.setAttribute("aria-controls", "navDrawer");
+  drawer.id = "navDrawer";
+  if (!lightChrome) {
+    const actions = document.querySelector(".header-actions");
+    if (actions) actions.appendChild(burger);
+    else {
+      Object.assign(burger.style, { position: "fixed", top: "14px", right: "14px", zIndex: "102" });
+      document.body.appendChild(burger);
+    }
+  }
 
-  const open = () => { scrim.classList.add("open"); drawer.classList.add("open"); };
-  const close = () => { scrim.classList.remove("open"); drawer.classList.remove("open"); };
-  burger.addEventListener("click", open);
+  const open = () => {
+    scrim.classList.add("open");
+    drawer.classList.add("open");
+    document.body.classList.add("nav-open");
+    burger.setAttribute("aria-expanded", "true");
+  };
+  const close = () => {
+    scrim.classList.remove("open");
+    drawer.classList.remove("open");
+    document.body.classList.remove("nav-open");
+    burger.setAttribute("aria-expanded", "false");
+  };
+  if (!lightChrome) {
+    burger.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (drawer.classList.contains("open")) close();
+      else open();
+    });
+  }
   scrim.addEventListener("click", close);
   drawer.querySelector(".nav-close").addEventListener("click", close);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  links.addEventListener("click", (e) => {
+    if (e.target.closest("a.nav-link")) close();
+  });
 
-  // Highlight current page
+  // Highlight current page in the drawer
   links.querySelectorAll("a.nav-link").forEach((a) => {
     const href = (a.getAttribute("href").split("#")[0].replace(/\/+$/, "") || "/");
     if (href === path) a.classList.add("active");
@@ -135,8 +201,6 @@
     document.head.appendChild(l);
   }
   function shade(hex, amt) {
-    // Lightens dark colors and darkens light ones, so --bg-2 always has gentle
-    // contrast against --bg whether the theme is light or dark.
     const m = /^#([0-9a-fA-F]{6})$/.exec(hex || ""); if (!m) return hex;
     const n = parseInt(m[1], 16);
     let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
@@ -168,7 +232,6 @@
       : msg;
   }
   function applyContent(c) {
-    // Landing-page copy, if present on this page (skip vault homepage — it owns its hero HTML).
     const onVaultHome = document.body.classList.contains("arena-home");
     if (c.hero_headline && document.getElementById("heroHeadline") && !onVaultHome) {
       document.getElementById("heroHeadline").textContent = c.hero_headline;
@@ -179,8 +242,6 @@
   }
   window.__ragnarApplySite = (c) => { applyTheme(c); applyAnnouncement(c); applyContent(c); };
 
-  // A visitor's personal, LOCAL-only look override (set by the shopper concierge).
-  // Never touches the global site — it only restyles this one browser.
   function applyPersonalTheme() {
     try {
       const t = JSON.parse(localStorage.getItem("ragnar_personal_theme") || "null");
@@ -192,10 +253,19 @@
   fetch("/api/site-config").then((r) => r.json()).then((c) => {
     window.__ragnarSite = c;
     window.__ragnarApplySite(c);
-    applyPersonalTheme();   // personal override wins over the global theme
+    applyPersonalTheme();
   }).catch(() => {});
 
-  // Reflect signed-in state + notifications bell
+  function setNotifBadge(n) {
+    if (!headerNotif) return;
+    let b = headerNotif.querySelector(".bump");
+    if (n > 0) {
+      if (!b) { b = document.createElement("span"); b.className = "bump"; headerNotif.appendChild(b); }
+      b.textContent = n > 99 ? "99+" : String(n);
+    } else if (b) b.remove();
+  }
+
+  // Reflect signed-in state; badge unread count on the single header bell
   fetch("/api/auth/me").then((r) => r.json()).then((d) => {
     if (d && d.user) {
       userLine.hidden = false;
@@ -208,7 +278,6 @@
       if (d.user.is_staff) { hub.hidden = false; hub.querySelector(".lbl").textContent = "Command Hub (staff)"; initStudio(); }
       else initConcierge();
 
-      // "Verify your email" banner for unverified accounts (site-wide reminder).
       if (d.user.email_verified === false && !sessionStorage.getItem("ragnar_hide_verify")) {
         const bar = document.createElement("div");
         bar.style.cssText = "position:sticky;top:0;z-index:79;background:linear-gradient(90deg,#8a6d1f,#b8901f);color:#0a0d12;font-size:13px;font-weight:600;padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;";
@@ -222,31 +291,18 @@
         bar.querySelector("#navVdismiss").addEventListener("click", () => { sessionStorage.setItem("ragnar_hide_verify", "1"); bar.remove(); });
       }
 
-      const bell = document.createElement("a");
-      bell.className = "nav-bell";
-      bell.href = "/account#notifications";
-      bell.setAttribute("aria-label", "Notifications");
-      bell.innerHTML = "🔔";
-      if (actions) actions.insertBefore(bell, burger);
       const refreshBell = () =>
         fetch("/api/notifications/unread-count").then((r) => r.json()).then((c) => {
-          const n = (c && c.unread) || 0;
-          let b = bell.querySelector(".bump");
-          if (n > 0) {
-            if (!b) { b = document.createElement("span"); b.className = "bump"; bell.appendChild(b); }
-            b.textContent = n > 99 ? "99+" : String(n);
-          } else if (b) b.remove();
+          setNotifBadge((c && c.unread) || 0);
         }).catch(() => {});
       refreshBell();
       setInterval(refreshBell, 30000);
     } else {
-      initConcierge();   // logged-out visitors get the shopper concierge too
+      initConcierge();
     }
   }).catch(() => { initConcierge(); });
 
-  // ---- Shared chat-widget factory: builds a FAB + slide-up panel with a
-  // feed/chips/input, used by Concierge, Studio, and (via window.__ragnarChat)
-  // the seller-facing Store Designer. One visual language, one place to tweak it. ----
+  // ---- Shared chat-widget factory ----
   const escHtml = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   function createChatWidget(opts) {
     const { key, icon, label, gold, publish, footNote } = opts;
@@ -320,9 +376,6 @@
   }
   window.__ragnarChat = createChatWidget;
 
-  // ---- RAGNAR Concierge: a floating shopper assistant for EVERYONE. It finds
-  // cards by vibe (plain language, not exact keywords) and can restyle the
-  // visitor's OWN view — local-only, never the real site or anyone else. ----
   const VIBES = [
     [["gold", "lux", "premium", "elite", "luxury", "grail", "royal", "regal"], "#f0c674"],
     [["ice", "frost", "blue", "arctic", "cool", "cold", "steel"], "#6fd6ff"],
@@ -388,13 +441,11 @@
     });
   }
 
-  // ---- RAGNAR Studio: a floating AI assistant for staff to sculpt the whole
-  // site (look + copy) in plain English. Preview live, publish in one tap. ----
   let studioBuilt = false;
   function initStudio() {
     if (studioBuilt) return;
     studioBuilt = true;
-    const pending = {};   // accumulated updates not yet published
+    const pending = {};
     const w = createChatWidget({ key: "studio", icon: "✨", label: "Studio", gold: true, publish: true, footNote: "Tell me how to sculpt the site…" });
 
     const setPublish = () => {
@@ -448,6 +499,5 @@
     });
   }
 
-  // Let any page open Studio directly (e.g. the Command Hub Site tab hint link).
   window.__ragnarOpenStudio = () => { initStudio(); document.getElementById("fab-studio")?.click(); };
 })();
