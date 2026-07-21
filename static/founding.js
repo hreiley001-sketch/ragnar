@@ -425,6 +425,41 @@ function initVaultEnvironment() {
   apply();
 }
 
+// Pointer-reactive camera: the whole environment leans gently toward the
+// cursor (lerped, transform-only) so the world feels physical, not painted.
+function initVaultCamera() {
+  const camera = $("vaultCamera");
+  if (!camera) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (matchMedia("(pointer: coarse)").matches) return; // touch devices: scroll parallax only
+
+  let targetX = 0;
+  let targetY = 0;
+  let currentX = 0;
+  let currentY = 0;
+  let raf = null;
+
+  function tick() {
+    currentX += (targetX - currentX) * 0.045;
+    currentY += (targetY - currentY) * 0.045;
+    camera.style.setProperty("--cam-x", `${currentX.toFixed(2)}px`);
+    camera.style.setProperty("--cam-y", `${currentY.toFixed(2)}px`);
+    if (Math.abs(targetX - currentX) < 0.05 && Math.abs(targetY - currentY) < 0.05) {
+      raf = null;
+      return;
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  window.addEventListener("pointermove", (event) => {
+    const nx = event.clientX / window.innerWidth - 0.5;
+    const ny = event.clientY / window.innerHeight - 0.5;
+    targetX = nx * -26;
+    targetY = ny * -16;
+    if (!raf) raf = requestAnimationFrame(tick);
+  }, { passive: true });
+}
+
 function initSectionDepth() {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const targets = Array.from(document.querySelectorAll(
@@ -584,6 +619,7 @@ function initMomentDrama() {
 document.addEventListener("DOMContentLoaded", () => {
   initReveal();
   initVaultEnvironment();
+  initVaultCamera();
   initSectionDepth();
   initVaultKey();
   initMomentDrama();
