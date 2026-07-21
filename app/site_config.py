@@ -87,7 +87,7 @@ SITE_FIELDS: list[dict] = [
         "label": "Accent color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#56c8f2",
+        "default": "#8ecae6",
         "help": "Primary highlight — buttons, links, prices.",
     },
     {
@@ -95,21 +95,21 @@ SITE_FIELDS: list[dict] = [
         "label": "Gold / badge color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#c9a227",
+        "default": "#d4a574",
     },
     {
         "key": "theme_bg",
         "label": "Background",
         "type": "color",
         "group": "Look & feel",
-        "default": "#132234",
+        "default": "#2f4d68",
     },
     {
         "key": "theme_text",
         "label": "Text color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#e7edf3",
+        "default": "#f4f8fb",
     },
     {
         "key": "theme_font",
