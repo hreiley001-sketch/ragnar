@@ -138,29 +138,44 @@
   document.body.appendChild(drawer);
 
   // Burger button — into the header if present, else floating.
+  // Auth pages keep a logo-only chrome (no menu clutter).
+  const lightChrome = path === "/login" || path === "/verify";
   const burger = mk("button", "nav-burger");
   burger.type = "button";
   burger.innerHTML = "☰";
   burger.setAttribute("aria-label", "Open menu");
   burger.setAttribute("aria-expanded", "false");
-  const actions = document.querySelector(".header-actions");
-  if (actions) actions.appendChild(burger);
-  else {
-    Object.assign(burger.style, { position: "fixed", top: "14px", right: "14px", zIndex: "82" });
-    document.body.appendChild(burger);
+  burger.setAttribute("aria-controls", "navDrawer");
+  drawer.id = "navDrawer";
+  if (!lightChrome) {
+    const actions = document.querySelector(".header-actions");
+    if (actions) actions.appendChild(burger);
+    else {
+      Object.assign(burger.style, { position: "fixed", top: "14px", right: "14px", zIndex: "102" });
+      document.body.appendChild(burger);
+    }
   }
 
   const open = () => {
     scrim.classList.add("open");
     drawer.classList.add("open");
+    document.body.classList.add("nav-open");
     burger.setAttribute("aria-expanded", "true");
   };
   const close = () => {
     scrim.classList.remove("open");
     drawer.classList.remove("open");
+    document.body.classList.remove("nav-open");
     burger.setAttribute("aria-expanded", "false");
   };
-  burger.addEventListener("click", open);
+  if (!lightChrome) {
+    burger.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (drawer.classList.contains("open")) close();
+      else open();
+    });
+  }
   scrim.addEventListener("click", close);
   drawer.querySelector(".nav-close").addEventListener("click", close);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
