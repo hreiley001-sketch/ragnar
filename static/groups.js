@@ -4,11 +4,7 @@
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   let kind = "";
 
-  async function api(path) {
-    const r = await fetch(path);
-    if (!r.ok) throw new Error("failed");
-    return r.json();
-  }
+  const api = window.api;
 
   function card(g) {
     return `<a class="group-card" href="/groups/${encodeURIComponent(g.slug)}">

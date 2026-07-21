@@ -20,18 +20,6 @@ function toast(message) {
   toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
 }
 
-async function api(path, options = {}) {
-  const response = await fetch(path, {
-    ...options,
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-  });
-  const data = await response.json().catch(() => null);
-  if (!response.ok) {
-    throw new Error((data && (data.detail || data.error)) || `Request failed (${response.status})`);
-  }
-  return data;
-}
-
 function safeMediaUrl(value) {
   if (!value) return "";
   try {

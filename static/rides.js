@@ -4,14 +4,6 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-async function api(path) {
-  const r = await fetch(path);
-  let d = null;
-  try { d = await r.json(); } catch (_) {}
-  if (!r.ok) throw new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`);
-  return d;
-}
-
 function bindCardNavigation(nodes, onOpen) {
   nodes.forEach((el) => {
     el.addEventListener("click", onOpen);

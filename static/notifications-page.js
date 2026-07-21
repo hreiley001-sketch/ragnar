@@ -3,12 +3,7 @@
   const $ = (id) => document.getElementById(id);
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-  async function api(path, opts = {}) {
-    const r = await fetch(path, opts);
-    const data = await r.json().catch(() => null);
-    if (!r.ok) throw new Error((data && data.detail) || "failed");
-    return data;
-  }
+  const api = window.api;
 
   async function load() {
     try {

@@ -56,12 +56,7 @@
     let toastTimer;
     function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2800); }
 
-    async function api(p, o = {}) {
-      const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
-      let d = null; try { d = await r.json(); } catch (_) {}
-      if (!r.ok) { const e = new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`); e.status = r.status; throw e; }
-      return d;
-    }
+    const api = window.api;
 
     function relDate(iso) {
       if (!iso) return "";
@@ -866,6 +861,7 @@
       switchTab(location.hash.slice(1) || "overview", false);
     });
   </script>
+  <script src="/static/api.js"></script>
   <script src="/static/nav.js"></script>
   <script src="/static/sell.js"></script>
 </body>

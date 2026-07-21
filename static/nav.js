@@ -4,14 +4,16 @@
 "use strict";
 (function () {
   const path = (location.pathname.replace(/\/+$/, "") || "/");
+  const LOGO = "/static/logo-nav.png";
 
+  // Drawer items (full menu). Header shows the primary subset.
   const ITEMS = [
-    { icon: "🛒", label: "Marketplace", href: "/marketplace" },
-    { icon: "📡", label: "Live", href: "/live" },
-    { icon: "📰", label: "Feed", href: "/feed" },
-    { icon: "👥", label: "Groups", href: "/groups" },
-    { icon: "🏪", label: "My Store", href: "/mystore" },
-    { icon: "🔔", label: "Notifications", href: "/notifications" },
+    { icon: "🛒", label: "Marketplace", href: "/marketplace", header: true },
+    { icon: "📡", label: "Live", href: "/live", header: true },
+    { icon: "📰", label: "Feed", href: "/feed", header: true },
+    { icon: "👥", label: "Groups", href: "/groups", header: true },
+    { icon: "🏪", label: "My Store", href: "/mystore", header: true },
+    { icon: "🔔", label: "Notifications", href: "/notifications", header: "icon" },
     { icon: "👤", label: "Profile", href: "/account" },
     { icon: "🏠", label: "Home", href: "/" },
     { icon: "⭐", label: "Become a Seller", href: "/#apply" },
@@ -25,6 +27,8 @@
     a.innerHTML = `<span class="ico">${it.icon}</span><span class="lbl">${it.label}</span>`;
     return a;
   }
+  const brandHtml = () =>
+    `<div class="brand"><a href="/" class="logo-link"><img src="${LOGO}" alt="RAGNAR" class="logo-img" /></a></div>`;
 
   // ---- Shared site header, built into whatever page provides
   // <header id="siteHeader"></header>. Runs synchronously (not on
@@ -45,28 +49,34 @@
     }
     return "";
   }
+  function headerNavHtml() {
+    const parts = [];
+    for (const it of ITEMS) {
+      if (!it.header) continue;
+      if (it.header === "icon") continue; // icon-only links rendered after cart
+      parts.push(`<a class="btn btn-ghost btn-sm" href="${it.href}">${it.label}</a>`);
+    }
+    parts.push(`<a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>`);
+    for (const it of ITEMS) {
+      if (it.header !== "icon") continue;
+      parts.push(`<a class="btn btn-ghost btn-sm" href="${it.href}" title="${it.label}">${it.icon}</a>`);
+    }
+    return parts.join("");
+  }
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
     header.className = "site-header";
     const light = path === "/login" || path === "/verify";
     if (light) {
-      header.innerHTML = `
-        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
-        <div class="header-actions"></div>`;
+      header.innerHTML = `${brandHtml()}<div class="header-actions"></div>`;
       return;
     }
     header.innerHTML = `
-      <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+      ${brandHtml()}
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
-        <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
-        <a class="btn btn-ghost btn-sm" href="/live">Live</a>
-        <a class="btn btn-ghost btn-sm" href="/feed">Feed</a>
-        <a class="btn btn-ghost btn-sm" href="/groups">Groups</a>
-        <a class="btn btn-ghost btn-sm" href="/mystore">My Store</a>
-        <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
-        <a class="btn btn-ghost btn-sm" href="/notifications" title="Notifications">🔔</a>
+        ${headerNavHtml()}
         <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
         <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
       </div>`;
@@ -85,7 +95,7 @@
   const drawer = mk("div", "nav-drawer");
   drawer.innerHTML = `
     <div class="nav-head">
-      <a href="/" style="display:inline-flex"><img src="/static/logo.png" alt="RAGNAR" /></a>
+      <a href="/" style="display:inline-flex"><img src="${LOGO}" alt="RAGNAR" /></a>
       <button class="nav-close" aria-label="Close menu">✕</button>
     </div>
     <nav class="nav-links" id="navLinks"></nav>

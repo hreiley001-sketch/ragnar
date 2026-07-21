@@ -1,7 +1,6 @@
 // RAGNAR — stores directory + live hub.
 "use strict";
-const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const { $: $, esc, accentGrad } = window.Ragnar;
 
 let toastTimer;
 function toast(msg) {
@@ -13,17 +12,6 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
 }
 
-async function api(p, o = {}) {
-  const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
-  const d = await r.json().catch(() => null);
-  if (!r.ok) throw new Error((d && (d.detail || d.error)) || "Request failed");
-  return d;
-}
-
-function accentGrad(color) {
-  const c = color || "var(--color-accent-fallback)";
-  return `linear-gradient(135deg, color-mix(in srgb, ${c} 24%, transparent), var(--color-bg-base)), radial-gradient(circle at 30% 20%, color-mix(in srgb, ${c} 38%, transparent), transparent 60%)`;
-}
 function initial(name) { return (name || "?").trim()[0].toUpperCase(); }
 
 function countdownText(iso) {

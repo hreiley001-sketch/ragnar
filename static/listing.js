@@ -1,21 +1,10 @@
 // RAGNAR — item page (eBay-style listing detail: buy, watch, offers, seller, comps).
 "use strict";
-const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const { $: $, esc, money, CREST } = window.Ragnar;
 const ID = decodeURIComponent(location.pathname.split("/listing/")[1] || "").replace(/\/$/, "");
 
 let toastTimer;
 function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2600); }
-
-async function api(p, o = {}) {
-  const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
-  let d = null; try { d = await r.json(); } catch (_) {}
-  if (!r.ok) { const e = new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`); e.status = r.status; throw e; }
-  return d;
-}
-
-const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="var(--crest-primary)"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="var(--crest-accent)"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
 
 let LISTING = null;
 let myOffer = null;

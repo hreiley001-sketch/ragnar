@@ -1,15 +1,8 @@
 // RAGNAR — sign in / sign up with email verification + password reset.
 "use strict";
-const $ = (id) => document.getElementById(id);
+const $ = window.Ragnar.$;
 let mode = "login";
 let resetToken = "";
-
-async function api(p, o = {}) {
-  const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
-  let d = null; try { d = await r.json(); } catch (_) {}
-  if (!r.ok) throw new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`);
-  return d;
-}
 
 function hideChromeForSpecial() {
   const tabs = document.querySelector(".auth-tabs");
