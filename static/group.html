@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Group</title>
+  <link rel="icon" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/tokens.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/platform.css" />
+</head>
+<body class="theme-utility">
+  <div class="aurora"></div>
+  <header id="siteHeader"></header>
+
+  <main class="platform-main">
+    <a class="btn btn-ghost btn-sm" href="/groups">← All groups</a>
+    <section class="platform-hero" style="margin-top:14px">
+      <h1 id="groupName">Group</h1>
+      <p id="groupDesc"></p>
+      <div class="card-actions">
+        <button class="btn btn-primary btn-sm" id="joinBtn" type="button">Join group</button>
+        <span id="memberCount" class="muted"></span>
+      </div>
+    </section>
+
+    <div class="section-title">Threads</div>
+    <form id="threadForm" class="feed-card" style="margin-bottom:14px">
+      <label class="field"><span>Title</span><input name="title" required maxlength="200" placeholder="What's on your mind?" /></label>
+      <label class="field"><span>Post</span><textarea name="body" required maxlength="4000" rows="3" placeholder="Share with the group…"></textarea></label>
+      <button class="btn btn-primary btn-sm" type="submit">Post thread</button>
+      <span id="threadStatus" class="muted"></span>
+    </form>
+    <div id="threadList" class="thread-list"></div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/group.js"></script>
+  <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
+</body>
+</html>

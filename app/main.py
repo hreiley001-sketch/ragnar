@@ -20,8 +20,11 @@ from .routers import (
     admin,
     ai_router,
     auth,
+    cart,
     catalog,
+    feed,
     founding,
+    groups,
     health,
     listings,
     media,
@@ -146,6 +149,10 @@ app.include_router(support.router)
 app.include_router(support.admin_router)
 app.include_router(watch.router)
 app.include_router(social.router)
+app.include_router(feed.router)
+app.include_router(groups.router)
+app.include_router(cart.router)
+app.include_router(cart.collection_router)
 app.include_router(media.router)
 app.include_router(admin.router)
 
@@ -253,3 +260,59 @@ def ride_page(ride_id: int):
     if page.exists():
         return FileResponse(str(page))
     return {"error": "ride UI not found"}
+
+
+@app.get("/live", include_in_schema=False)
+def live_hub_page():
+    page = STATIC_DIR / "live.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "live hub UI not found"}
+
+
+@app.get("/feed", include_in_schema=False)
+def feed_page():
+    page = STATIC_DIR / "feed.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "feed UI not found"}
+
+
+@app.get("/groups", include_in_schema=False)
+def groups_page():
+    page = STATIC_DIR / "groups.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "groups UI not found"}
+
+
+@app.get("/groups/{slug}", include_in_schema=False)
+def group_page(slug: str):
+    page = STATIC_DIR / "group.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "group UI not found"}
+
+
+@app.get("/mystore", include_in_schema=False)
+def mystore_page():
+    page = STATIC_DIR / "mystore.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "my store UI not found"}
+
+
+@app.get("/notifications", include_in_schema=False)
+def notifications_page():
+    page = STATIC_DIR / "notifications.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "notifications UI not found"}
+
+
+@app.get("/cart", include_in_schema=False)
+def cart_page():
+    page = STATIC_DIR / "cart.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "cart UI not found"}

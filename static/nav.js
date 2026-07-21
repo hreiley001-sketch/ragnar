@@ -6,10 +6,14 @@
   const path = (location.pathname.replace(/\/+$/, "") || "/");
 
   const ITEMS = [
-    { icon: "🏠", label: "Home", href: "/" },
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
-    { icon: "🏪", label: "Stores", href: "/stores" },
-    { icon: "🎢", label: "Live Rides", href: "/rides" },
+    { icon: "📡", label: "Live", href: "/live" },
+    { icon: "📰", label: "Feed", href: "/feed" },
+    { icon: "👥", label: "Groups", href: "/groups" },
+    { icon: "🏪", label: "My Store", href: "/mystore" },
+    { icon: "🔔", label: "Notifications", href: "/notifications" },
+    { icon: "👤", label: "Profile", href: "/account" },
+    { icon: "🏠", label: "Home", href: "/" },
     { icon: "⭐", label: "Become a Seller", href: "/#apply" },
   ];
 
@@ -57,7 +61,12 @@
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
         <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
-        <a class="btn btn-ghost btn-sm" href="/stores">Stores</a>
+        <a class="btn btn-ghost btn-sm" href="/live">Live</a>
+        <a class="btn btn-ghost btn-sm" href="/feed">Feed</a>
+        <a class="btn btn-ghost btn-sm" href="/groups">Groups</a>
+        <a class="btn btn-ghost btn-sm" href="/mystore">My Store</a>
+        <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
+        <a class="btn btn-ghost btn-sm" href="/notifications" title="Notifications">🔔</a>
         <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
         <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
       </div>`;
