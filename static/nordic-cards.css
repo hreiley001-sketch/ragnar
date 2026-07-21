@@ -352,9 +352,10 @@
 }
 
 .difference-card.nordic-diff span:not(.nordic-card-icon) {
+  position: static !important;
   top: auto;
   left: auto;
-  position: static;
+  display: block;
   margin-bottom: 8px;
 }
 
