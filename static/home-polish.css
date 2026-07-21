@@ -1,0 +1,142 @@
+
+/* ——— RAGNAR polish pass: wayfinding, orchestrated reveals, utility gateway ——— */
+
+.vault-path {
+  position: fixed;
+  left: max(12px, calc(var(--space-page-x) - 8px));
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  pointer-events: none;
+}
+.vault-path-track {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+  height: min(320px, 42vh);
+  justify-content: space-between;
+}
+.vault-path-track::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(201, 162, 39, 0.15) 12%,
+    rgba(86, 200, 242, 0.35) calc(var(--path-progress, 0) * 100%),
+    rgba(191, 234, 255, 0.12) 100%
+  );
+}
+.vault-path-node {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid rgba(191, 234, 255, 0.35);
+  background: rgba(10, 20, 31, 0.8);
+  box-shadow: 0 0 0 0 rgba(201, 162, 39, 0);
+  transition: box-shadow 0.5s var(--ease-premium), background 0.4s ease, border-color 0.4s ease;
+}
+.vault-path-node.is-lit {
+  background: var(--color-accent-gold);
+  border-color: var(--color-accent-gold-strong);
+  box-shadow: 0 0 12px rgba(201, 162, 39, 0.55);
+}
+
+.reveal-orchestrated {
+  opacity: 0;
+  transform: translateY(36px) scale(0.98);
+  transition: opacity 0.9s var(--ease-premium), transform 0.9s var(--ease-premium);
+}
+.reveal-orchestrated.in {
+  opacity: 1;
+  transform: none;
+}
+
+.theme-utility-panel {
+  --local-bg: #f4f2ed;
+  --local-text: #131a24;
+  --local-muted: #4a5768;
+  color: var(--local-text);
+  background:
+    linear-gradient(110deg, rgba(37, 99, 235, 0.06), transparent 44%),
+    var(--local-bg) !important;
+  border-color: rgba(20, 30, 55, 0.12) !important;
+  box-shadow: var(--shadow-md);
+}
+.theme-utility-panel h2,
+.theme-utility-panel p { color: var(--local-text); }
+.theme-utility-panel p { color: var(--local-muted); }
+.theme-utility-panel .section-label { color: var(--color-accent-gold); }
+
+.founding-counter-premium {
+  position: relative;
+  overflow: hidden;
+  border-color: var(--color-border-gold) !important;
+  color: var(--color-accent-gold) !important;
+  background: rgba(201, 162, 39, 0.1) !important;
+}
+.founding-counter-premium::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: var(--founders-fill, 0%);
+  background: linear-gradient(90deg, var(--color-accent-gold), var(--color-accent-gold-strong));
+  transition: width 1.2s var(--ease-premium);
+}
+.founding-counter-premium::before {
+  background: var(--color-accent-gold) !important;
+  box-shadow: 0 0 8px rgba(201, 162, 39, 0.65) !important;
+}
+
+.breaker-benefits b { color: var(--color-accent-gold) !important; }
+
+body.arena-home[data-vault-stage="3"] .vault-env-sky {
+  filter: saturate(1.05);
+}
+body.arena-home[data-vault-stage="4"] .vault-env-aurora-a {
+  opacity: calc(0.55 + var(--vault-p) * 0.35);
+}
+
+.vault-key::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(201, 162, 39, 0.08), transparent 42%),
+    radial-gradient(circle at 70% 80%, rgba(86, 200, 242, 0.12), transparent 48%);
+  animation: keyAmbient 14s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: -1;
+}
+@keyframes keyAmbient {
+  from { transform: translate3d(-2%, -1%, 0) rotate(-2deg); opacity: 0.7; }
+  to { transform: translate3d(2%, 2%, 0) rotate(2deg); opacity: 1; }
+}
+
+.live-card .live-card-media {
+  background:
+    radial-gradient(circle at 72% 20%, rgba(201, 162, 39, 0.12), transparent 34%),
+    var(--card-surface-live) !important;
+}
+
+.arena-empty.ragnar-card--blank {
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 900px) {
+  .vault-path { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vault-key::before { animation: none; }
+  .founding-counter-premium::after { transition: none; width: var(--founders-fill, 0%); }
+}

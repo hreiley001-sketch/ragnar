@@ -1383,3 +1383,29 @@ table.hub tr:hover td { color: var(--color-text-primary); background: var(--colo
   .cmd-brand-mark { letter-spacing: 0.03em; }
   input, select, textarea, .btn { font-size: 16px; }
 }
+
+/* Utility / marketplace light surfaces */
+.theme-utility .aurora {
+  background:
+    radial-gradient(900px 480px at 82% -8%, rgba(37, 99, 235, 0.07), transparent 62%),
+    radial-gradient(760px 420px at 8% -10%, rgba(184, 121, 26, 0.05), transparent 60%);
+}
+.theme-utility .site-header {
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom-color: var(--color-border-subtle);
+}
+.theme-utility .listing-img {
+  background: linear-gradient(160deg, #ece8e0, #f4f2ed) !important;
+}
+.theme-utility .compare-panel,
+.theme-utility .filters.card {
+  background: var(--color-bg-panel);
+  color: var(--color-text-primary);
+}
+.theme-utility .mkt-search {
+  background: #fff;
+  border-color: var(--color-border-default);
+}
+.theme-utility .stat {
+  background: #fff;
+}

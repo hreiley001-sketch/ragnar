@@ -199,7 +199,7 @@ function listingCard(l) {
     ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(l.title)}" loading="lazy" onerror="this.outerHTML='${CREST.replace(/'/g, "&#39;")}'" />`
     : CREST;
 
-  return `<article class="listing">
+  return `<article class="listing ragnar-card ragnar-card--archive">
     <a class="listing-link" href="/listing/${l.id}">
       <div class="listing-img">
         <div class="listing-badges">${badges.join("")}</div>
@@ -270,6 +270,7 @@ async function loadFeatured() {
     if (!d.items.length) return;
     $("featuredWrap").hidden = false;
     $("featuredGrid").innerHTML = d.items.map(listingCard).join("");
+    if (window.RagnarCard) RagnarCard.enhanceCards($("featuredGrid"), { selector: ".listing.ragnar-card" });
     hydrateWatchHearts($("featuredGrid"));
   } catch (_) {}
 }
@@ -295,6 +296,7 @@ async function loadListings() {
       $("resultCount").textContent = "0 cards";
     } else {
       grid.innerHTML = data.items.map(listingCard).join("");
+      if (window.RagnarCard) RagnarCard.enhanceCards(grid, { selector: ".listing.ragnar-card", noTilt: false });
       $("resultCount").textContent = `${data.total} card${data.total === 1 ? "" : "s"} in the vault`;
       hydrateWatchHearts(grid);
     }

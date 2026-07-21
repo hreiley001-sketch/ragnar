@@ -1,0 +1,174 @@
+/* RAGNAR Card — shared foil-stock surface for live, seller, archive, and blank slots */
+
+.ragnar-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  background:
+    var(--card-foil),
+    var(--card-surface);
+  background-size: 220% 220%, 100% 100%;
+  background-position: 0% 50%, center;
+  border: 1px solid var(--color-border-default);
+  box-shadow:
+    inset 0 1px 0 rgba(244, 251, 255, 0.12),
+    var(--shadow-sm);
+  transition:
+    transform var(--duration-medium) var(--ease-premium),
+    box-shadow var(--duration-medium) var(--ease-premium),
+    border-color var(--duration-fast) ease,
+    background-position 1.2s var(--ease-premium);
+}
+
+.ragnar-card::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(191, 234, 255, 0.14);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ragnar-card__shimmer {
+  position: absolute;
+  inset: -50%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(244, 251, 255, 0.07) 46%,
+    rgba(201, 162, 39, 0.12) 50%,
+    rgba(138, 220, 255, 0.1) 54%,
+    transparent 62%
+  );
+  transform: translateX(-120%);
+  animation: cardShimmer 4.8s var(--ease-premium) infinite;
+}
+
+.ragnar-card__shimmer--slow {
+  animation-duration: 7s;
+}
+
+@keyframes cardShimmer {
+  0%, 72% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+.ragnar-card--live {
+  background:
+    var(--card-foil),
+    var(--card-surface-live);
+  border-color: color-mix(in srgb, var(--color-accent-gold) 35%, var(--color-border-default));
+  box-shadow:
+    inset 0 1px 0 rgba(244, 251, 255, 0.14),
+    0 0 0 1px rgba(201, 162, 39, 0.08),
+    var(--shadow-sm);
+}
+
+.ragnar-card--live:hover {
+  border-color: var(--color-border-gold);
+  box-shadow:
+    inset 0 1px 0 rgba(244, 251, 255, 0.18),
+    var(--shadow-md),
+    var(--glow-gold);
+}
+
+.ragnar-card--seller {
+  background:
+    var(--card-foil),
+    var(--card-surface);
+}
+
+.ragnar-card--archive {
+  background:
+    var(--card-foil),
+    var(--card-surface-archive);
+  border-color: color-mix(in srgb, var(--color-border-default) 80%, var(--color-accent-gold) 20%);
+  box-shadow:
+    inset 0 0 0 1px rgba(191, 234, 255, 0.08),
+    inset 0 1px 0 rgba(244, 251, 255, 0.1),
+    0 24px 48px rgba(3, 9, 15, 0.45);
+}
+
+.ragnar-card--blank {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 32px;
+}
+
+.ragnar-card--blank .ragnar-card__pulse {
+  width: 48%;
+  max-width: 140px;
+  aspect-ratio: 0.72;
+  border-radius: 10px;
+  border: 1px solid rgba(191, 234, 255, 0.2);
+  background:
+    var(--card-foil),
+    var(--card-surface);
+  background-size: 220% 220%, 100% 100%;
+  animation: cardBreathe 3.2s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes cardBreathe {
+  0%, 100% { opacity: 0.72; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.ragnar-card.is-hovered {
+  background-position: 100% 50%, center;
+}
+
+.ragnar-card:not(.ragnar-card--no-tilt):hover {
+  transform: translateY(-6px) perspective(900px) rotateX(var(--card-rx, 0deg)) rotateY(var(--card-ry, 0deg));
+}
+
+.ragnar-card--live .signal-dot,
+.live-badge .signal-dot {
+  background: var(--color-accent-gold);
+  box-shadow: 0 0 8px rgba(201, 162, 39, 0.65);
+  animation: livePulse 1.4s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.92); }
+}
+
+.theme-utility .ragnar-card,
+.theme-utility .listing {
+  background: var(--card-surface);
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-utility .ragnar-card::before {
+  border-color: rgba(20, 30, 55, 0.08);
+}
+
+.theme-utility .listing-img {
+  background: linear-gradient(160deg, #ece8e0, #f4f2ed) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ragnar-card__shimmer,
+  .ragnar-card__shimmer--slow,
+  .ragnar-card--blank .ragnar-card__pulse {
+    animation: none;
+  }
+
+  .ragnar-card:not(.ragnar-card--no-tilt):hover {
+    transform: translateY(-4px);
+  }
+}
+
+@media (pointer: coarse) {
+  .ragnar-card:not(.ragnar-card--no-tilt):hover {
+    transform: translateY(-4px);
+  }
+}

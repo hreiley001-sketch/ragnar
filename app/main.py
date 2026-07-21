@@ -157,7 +157,10 @@ if STATIC_DIR.exists():
 
 @app.get("/", include_in_schema=False)
 def home():
-    # Front door = the Founding 250 application landing page.
+    # Front door = vault homepage (live breaks, vault key, founders apply).
+    page = STATIC_DIR / "home.html"
+    if page.exists():
+        return FileResponse(str(page))
     page = STATIC_DIR / "founding.html"
     if page.exists():
         return FileResponse(str(page))

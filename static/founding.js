@@ -137,20 +137,21 @@ function renderLive(streams, rides) {
   const items = [...liveRides, ...liveStreams].slice(0, 6);
 
   if (!items.length) {
-    $("liveArena").innerHTML = `
-      <div class="arena-empty">
-        <div>
-          <span class="section-label">Between main events</span>
-          <strong>The next room is forming.</strong>
-          <span>Explore scheduled breaks or enter the marketplace while the vault resets.</span>
-          <div style="margin-top:22px"><a class="arena-btn small" href="/stores">View the lineup <span class="arrow">→</span></a></div>
-        </div>
-      </div>`;
+    $("liveArena").innerHTML = window.RagnarCard
+      ? RagnarCard.blankCardHTML({
+          title: "The next room is forming.",
+          subtitle: "Explore scheduled breaks or enter the marketplace while the vault resets.",
+          ctaHref: "/stores",
+          ctaLabel: "View the lineup",
+          variant: "live",
+        })
+      : `<div class="arena-empty"><div><strong>The next room is forming.</strong><span>Explore scheduled breaks or enter the marketplace while the vault resets.</span></div></div>`;
+    if (window.RagnarCard) RagnarCard.enhanceCards($("liveArena"));
     return;
   }
 
   $("liveArena").innerHTML = items.map((item) => `
-    <a class="live-card" data-category="${esc(item.category)}" href="${esc(item.href)}">
+    <a class="live-card ragnar-card ragnar-card--live" data-category="${esc(item.category)}" href="${esc(item.href)}">
       <div class="live-card-media" data-bg="${esc(item.image || "")}"></div>
       <div class="live-card-code">${esc(item.code)}</div>
       <div class="live-card-top">
@@ -167,6 +168,7 @@ function renderLive(streams, rides) {
       </div>
     </a>`).join("");
   attachBackgrounds($("liveArena"));
+  if (window.RagnarCard) RagnarCard.enhanceCards($("liveArena"), { selector: ".live-card.ragnar-card" });
   initCategoryFilters();
 }
 
@@ -197,14 +199,15 @@ function renderBreakers(stores) {
 
   if (!items.length) {
     $("breakerGrid").innerHTML = `
-      <a class="breaker-card" data-rank="01" href="#apply">
+      <a class="breaker-card ragnar-card ragnar-card--seller" data-rank="01" href="#apply">
         <div class="breaker-avatar-lg">R</div>
         <div class="breaker-card-body"><span class="section-label">Founding roster</span><h3>Your room could lead the vault.</h3><p>Applications for elite sellers are open.</p></div>
       </a>`;
+    if (window.RagnarCard) RagnarCard.enhanceCards($("breakerGrid"));
     return;
   }
   $("breakerGrid").innerHTML = items.map((store, index) => `
-    <a class="breaker-card" data-rank="${String(index + 1).padStart(2, "0")}" href="/store/${encodeURIComponent(store.handle)}">
+    <a class="breaker-card ragnar-card ragnar-card--seller" data-rank="${String(index + 1).padStart(2, "0")}" href="/store/${encodeURIComponent(store.handle)}">
       ${store.is_live ? '<span class="breaker-live"><i class="signal-dot"></i>Live</span>' : ""}
       <div class="breaker-avatar-lg">${store.avatar_optimized || store.avatar_url
         ? `<img src="${esc(store.avatar_optimized || store.avatar_url)}" alt="" loading="lazy" />`
@@ -216,6 +219,7 @@ function renderBreakers(stores) {
         <div class="breaker-stats"><div><b>${Number(store.listing_count || 0).toLocaleString()}</b><span>Vault items</span></div><div><b>${store.is_live ? "On" : "Ready"}</b><span>Status</span></div></div>
       </div>
     </a>`).join("");
+  if (window.RagnarCard) RagnarCard.enhanceCards($("breakerGrid"), { selector: ".breaker-card.ragnar-card" });
 }
 
 function renderMoment(listings) {
@@ -308,6 +312,7 @@ async function loadFoundingStatus() {
     const status = await api("/api/founding/status");
     $("claimed").textContent = Number(status.claimed || 0).toLocaleString();
     $("cap").textContent = Number(status.cap || 250).toLocaleString();
+    initFoundersCounterFill();
     if (status.remaining <= 0) {
       $("counter").innerHTML = "<span>Founding class full · waitlist access only</span>";
     }
@@ -364,7 +369,7 @@ async function submitApplication(event) {
 }
 
 function initReveal() {
-  const elements = document.querySelectorAll(".reveal");
+  const elements = document.querySelectorAll(".reveal-orchestrated");
   if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) {
     elements.forEach((element) => element.classList.add("in"));
     return;
@@ -376,8 +381,54 @@ function initReveal() {
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.09, rootMargin: "0px 0px -5% 0px" });
+  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
   elements.forEach((element) => observer.observe(element));
+}
+
+function initVaultPath() {
+  const path = $("vaultPath");
+  if (!path) return;
+  const nodes = path.querySelectorAll(".vault-path-node");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function update() {
+    const progress = Math.min(1, Math.max(0, window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight)));
+    const stage = progress > 0.68 ? 4 : progress > 0.42 ? 3 : progress > 0.18 ? 2 : 1;
+    path.style.setProperty("--path-progress", progress.toFixed(3));
+    nodes.forEach((node) => {
+      const n = Number(node.dataset.path);
+      node.classList.toggle("is-lit", n <= stage);
+    });
+  }
+
+  if (reduce) {
+    nodes.forEach((node) => node.classList.add("is-lit"));
+    return;
+  }
+  window.addEventListener("scroll", update, { passive: true });
+  update();
+}
+
+function initFoundersCounterFill() {
+  const counter = $("counter");
+  const claimed = $("claimed");
+  if (!counter || !claimed) return;
+
+  const fill = () => {
+    const cap = Number(($("cap") && $("cap").textContent || "250").replace(/,/g, ""));
+    const value = Number((claimed.textContent || "0").replace(/,/g, ""));
+    if (!Number.isFinite(cap) || cap <= 0 || !Number.isFinite(value)) return;
+    counter.style.setProperty("--founders-fill", `${Math.min(100, (value / cap) * 100).toFixed(1)}%`);
+    counter.classList.add("is-filled");
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      fill();
+      observer.disconnect();
+    }
+  }, { threshold: 0.4 });
+  observer.observe(counter);
 }
 
 // Continuous vault environment: one scroll-progress drives depth, light,
@@ -566,6 +617,9 @@ function initMomentDrama() {
   const stage = card && card.closest(".moment-visual");
   if (!card || !stage || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+  card.classList.add("ragnar-card", "ragnar-card--archive", "ragnar-card--no-tilt");
+  if (window.RagnarCard) RagnarCard.ensureShimmer(card, true);
+
   if (!card.querySelector(".moment-card-sheen")) {
     const sheen = document.createElement("div");
     sheen.className = "moment-card-sheen";
@@ -642,11 +696,13 @@ function initMomentDrama() {
 
 document.addEventListener("DOMContentLoaded", () => {
   initReveal();
+  initVaultPath();
   initVaultEnvironment();
   initVaultCamera();
   initSectionDepth();
   initVaultKey();
   initMomentDrama();
+  initFoundersCounterFill();
   loadArena();
   loadFoundingStatus();
   reflectAccount();

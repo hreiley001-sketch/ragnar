@@ -23,7 +23,7 @@ SITE_FIELDS: list[dict] = [
         "type": "text",
         "group": "Global",
         "default": "",
-        "help": "Shown as a frost banner on every page. Leave blank to hide it.",
+        "help": "Shown as a gold banner on every page. Leave blank to hide it.",
     },
     {
         "key": "announcement_link",
@@ -38,7 +38,7 @@ SITE_FIELDS: list[dict] = [
         "label": "Landing headline",
         "type": "text",
         "group": "Landing page",
-        "default": "Live breaks. Elite marketplace.",
+        "default": "Be one of the 250 Founding Sellers.",
         "help": "Big headline on the front door.",
     },
     {
@@ -46,8 +46,9 @@ SITE_FIELDS: list[dict] = [
         "label": "Landing subtitle",
         "type": "textarea",
         "group": "Landing page",
-        "default": "The premium platform for sports card collectors. "
-                   "Standard fee: 5%. The first 250 sellers lock in a flat 4% forever.",
+        "default": "RAGNAR is a trust-first marketplace for trading cards — built so "
+                   "sellers keep more and buyers stop getting burned. The first 250 "
+                   "sellers lock in founding status forever.",
         "help": "Supporting sentence under the headline.",
     },
     {
@@ -72,10 +73,10 @@ SITE_FIELDS: list[dict] = [
         "default": "henry@ragnarips.com",
     },
     # --- Homepage perk cards (the four boxes under the hero) ---
-    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "4% founders rate"},
-    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "The first 250 sellers to sign up lock in a flat 4% platform fee, forever."},
-    {"key": "perk2_title", "label": "Perk 2 title", "type": "text", "group": "Homepage perks", "default": "5% standard fee"},
-    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "One transparent rate for every other seller. No category maze. No surprise tiers."},
+    {"key": "perk1_title", "label": "Perk 1 title", "type": "text", "group": "Homepage perks", "default": "Fees for 90 days"},
+    {"key": "perk1_desc", "label": "Perk 1 detail", "type": "text", "group": "Homepage perks", "default": "Pay only payment processing during your intro window — keep the rest."},
+    {"key": "perk2_title", "label": "Perk 2 title", "type": "text", "group": "Homepage perks", "default": "Permanent founding rate"},
+    {"key": "perk2_desc", "label": "Perk 2 detail", "type": "text", "group": "Homepage perks", "default": "A lower rate than everyone else, locked in for good — our thank-you for being early."},
     {"key": "perk3_title", "label": "Perk 3 title", "type": "text", "group": "Homepage perks", "default": "Founding badge"},
     {"key": "perk3_desc", "label": "Perk 3 detail", "type": "text", "group": "Homepage perks", "default": "A permanent Founding Seller badge on your storefront. Status that never expires."},
     {"key": "perk4_title", "label": "Perk 4 title", "type": "text", "group": "Homepage perks", "default": "Your own store"},
@@ -87,29 +88,28 @@ SITE_FIELDS: list[dict] = [
         "type": "color",
         "group": "Look & feel",
         "default": "#56c8f2",
-        "help": "Primary highlight — buttons, links, prices. Default ice blue from the RAGNAR crest: #56c8f2.",
+        "help": "Primary highlight — buttons, links, prices.",
     },
     {
         "key": "theme_gold",
-        "label": "Titanium / badge color",
+        "label": "Gold / badge color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#a7bfd1",
+        "default": "#c9a227",
     },
     {
         "key": "theme_bg",
         "label": "Background",
         "type": "color",
         "group": "Look & feel",
-        "default": "#0a141f",
-        "help": "Glacial vault base. Site surfaces derive from this.",
+        "default": "#132234",
     },
     {
         "key": "theme_text",
         "label": "Text color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#f2f8fc",
+        "default": "#e7edf3",
     },
     {
         "key": "theme_font",
@@ -117,36 +117,12 @@ SITE_FIELDS: list[dict] = [
         "type": "text",
         "group": "Look & feel",
         "default": "",
-        "help": "A Google Font family for body text, e.g. 'Inter'. Blank = Space Grotesk + Inter system.",
+        "help": "A Google Font family, e.g. 'Space Grotesk'. Blank = default.",
     },
 ]
 
 # Keys whose values must be a #RRGGBB color (validated on save + by the studio).
 COLOR_KEYS: set[str] = {f["key"] for f in SITE_FIELDS if f["type"] == "color"}
-
-# Retired palettes: theme values from earlier brand eras. If a stored row still
-# holds one of these exact values it predates the glacial redesign and should
-# fall back to the current default (rows with genuinely custom colors are kept).
-_RETIRED_THEME_VALUES: dict[str, set[str]] = {
-    "theme_accent": {"#1a7fa8", "#3ed0ff", "#4eb6e8"},
-    "theme_gold": {"#8a96a0", "#aec6d8", "#a8bccb"},
-    "theme_bg": {"#eef5f9", "#101a2c", "#151c26"},
-    "theme_text": {"#0f1c24", "#f2f7fc"},
-}
-
-
-def retire_legacy_theme_values(session: Session) -> int:
-    """Drop stored theme rows that still carry a retired palette so the current
-    defaults apply. Returns the number of rows cleared."""
-    cleared = 0
-    for key, retired in _RETIRED_THEME_VALUES.items():
-        row = session.get(SiteSetting, key)
-        if row and row.value in retired:
-            session.delete(row)
-            cleared += 1
-    if cleared:
-        session.commit()
-    return cleared
 
 DEFAULTS: dict[str, str] = {f["key"]: f["default"] for f in SITE_FIELDS}
 ALLOWED: set[str] = set(DEFAULTS)
