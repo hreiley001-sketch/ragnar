@@ -971,7 +971,7 @@ body:not(.arena-home):not(.premium-room) {
 }
 body:not(.arena-home):not(.premium-room) > main,
 body:not(.arena-home):not(.premium-room) > section,
-body:not(.arena-home):not(.premium-room) > div:not(.aurora):not(.asgard-atmosphere):not(.nav-scrim):not(.nav-drawer):not(.drawer):not(.toast) {
+body:not(.arena-home):not(.premium-room) > div:not(.aurora):not(.asgard-atmosphere):not(.asgard-ornaments):not(.nav-scrim):not(.nav-drawer):not(.drawer):not(.toast):not(.chat-fab):not(.chat-panel) {
   position: relative; z-index: 1;
 }
 /* Header chrome owned by the block above — keep cinematic pages quiet. */
