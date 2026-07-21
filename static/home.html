@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="/static/card.css" />
   <link rel="stylesheet" href="/static/home.css" />
   <link rel="stylesheet" href="/static/home-polish.css" />
+  <link rel="stylesheet" href="/static/home-asgard.css" />
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","description":"Premium live-commerce marketplace for trading cards. Standard 5% seller fee; the first 250 sellers to sign up lock in a flat 4% forever."}
   </script>
@@ -67,6 +68,11 @@
       <div class="vault-env-ice"></div>
       <div class="vault-env-light"></div>
       <div class="vault-env-floor"></div>
+      <div class="asgard-bifrost"></div>
+      <div class="asgard-godrays"></div>
+      <div class="asgard-runes-float" aria-hidden="true">
+        <span>ᚦ</span><span>ᚱ</span><span>ᚨ</span><span>ᚷ</span><span>ᚾ</span>
+      </div>
     </div>
     <div class="vault-env-grain"></div>
     <div class="vault-env-haze"></div>
@@ -86,17 +92,29 @@
   <main id="main" class="arena-main">
     <!-- Stage 1 — Arrival -->
     <section class="vault-stage vault-stage-arrival" id="vaultHero" data-stage="1" aria-label="RAGNAR vault entrance">
-      <div class="arena-shell vault-arrival-copy">
-        <p class="vault-kicker">RAGNAR</p>
-        <h1 id="vaultHeroHeadline">Live breaks.<br /><em>Elite marketplace.</em></h1>
-        <p id="vaultHeroSubtitle" class="vault-hero-sub">
-          The premium platform for sports card collectors. Standard fee: 5%. The first 250 sellers lock in a flat 4% forever.
-        </p>
-        <div class="arena-hero-actions">
-          <a class="arena-btn primary" href="#live">Enter live rooms <span class="arrow">↗</span></a>
-          <a class="arena-btn" href="/marketplace">Explore marketplace <span class="arrow">→</span></a>
+      <div class="arena-shell asgard-hero-layout">
+        <div class="asgard-crest">
+          <div class="asgard-crest-halo"></div>
+          <div class="asgard-crest-ring asgard-crest-ring-1"></div>
+          <div class="asgard-crest-ring asgard-crest-ring-2"></div>
+          <img src="/static/logo.png" alt="RAGNAR — wolf and raven crest" class="asgard-crest-logo" width="420" height="420" decoding="async" />
+          <div class="asgard-crest-shimmer"></div>
         </div>
-        <div class="vault-scroll-cue" aria-hidden="true"><span></span> Continue into the vault</div>
+        <div class="vault-arrival-copy asgard-throne">
+          <p class="vault-kicker">
+            <span class="runes-kicker" aria-label="Ragnar in runes">ᚱᚨᚷᚾᚨᚱ</span>
+            <span class="vault-kicker-tag">Wolf · Raven · Vault</span>
+          </p>
+          <h1 id="vaultHeroHeadline">Break live.<br /><em>Hunt the grail.</em></h1>
+          <p id="vaultHeroSubtitle" class="vault-hero-sub">
+            Enter the hall where collectors gather like legends — live breaks, elite sellers, and a marketplace forged in ice and gold. Standard fee 5%; the first 250 wolves lock in 4% forever.
+          </p>
+          <div class="arena-hero-actions">
+            <a class="arena-btn primary" href="#live">Enter live rooms <span class="arrow">↗</span></a>
+            <a class="arena-btn" href="/marketplace">Explore marketplace <span class="arrow">→</span></a>
+          </div>
+          <div class="vault-scroll-cue" aria-hidden="true"><span></span> Descend into the vault</div>
+        </div>
       </div>
     </section>
 
@@ -108,9 +126,9 @@
           <div id="pulseList" class="pulse-list-compact"></div>
         </aside>
         <div class="activity-spotlight">
-          <div class="section-label">Inside the vault</div>
+          <div class="section-label">The great hall</div>
           <h2 id="momentTitle">Where collectors gather.</h2>
-          <p id="momentDescription">Live breaks, verified sellers, and a marketplace built for serious collecting — one continuous experience.</p>
+          <p id="momentDescription">Live breaks, verified sellers, and a marketplace built for serious collecting — one realm, one vault, one hunt.</p>
           <div class="fee-pillars" aria-label="Platform fees">
             <div class="fee-pillar hot"><strong>4%</strong><span>Founding 250 · forever</span></div>
             <div class="fee-pillar"><strong>5%</strong><span>Standard seller fee</span></div>
@@ -126,14 +144,14 @@
     <section id="live" class="vault-stage section" data-stage="2" aria-label="Live now">
       <div class="live-marquee" aria-hidden="true">
         <div class="live-marquee-track">
-          <span><i class="signal-dot"></i>Live now</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span>
-          <span><i class="signal-dot"></i>Live now</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span>
+          <span><i class="signal-dot"></i>Live now</span><span>Wolf pack breaks</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span><span>Bifrøst open</span>
+          <span><i class="signal-dot"></i>Live now</span><span>Wolf pack breaks</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span><span>Bifrøst open</span>
         </div>
       </div>
       <div class="arena-shell">
         <div class="section-head">
-          <div><span class="section-label">Live now</span><h2>The floor<br>is live.</h2></div>
-          <p>Breaks, singles, slabs, and chase cards — organized by what you collect.</p>
+          <div><span class="section-label">The floor awakens</span><h2>The floor<br>is live.</h2></div>
+          <p>Breaks, singles, slabs, and chase cards — summoned by what you collect.</p>
           <a class="section-link" href="/stores">View all live rooms →</a>
         </div>
         <div id="categories" class="arena-categories" role="group" aria-label="Filter live streams by category">
@@ -167,9 +185,9 @@
           </div>
         </div>
         <div class="signature-copy reveal-orchestrated">
-          <span class="section-label">Signature artifact</span>
+          <span class="section-label">Sigil of entry</span>
           <h2>The Ragnar<br />Vault Key.</h2>
-          <p>A legendary collector object forged for this platform alone — not a licensed card, not a replica. The symbol of entry into the elite vault.</p>
+          <p>A legendary collector object forged for this realm alone — not a licensed card, not a replica. The wolf's mark of entry into the elite vault.</p>
         </div>
       </div>
     </section>
@@ -299,7 +317,16 @@
   </main>
 
   <footer class="arena-footer">
-    <div><div class="arena-footer-brand">RAGNAR</div><p>Precision commerce. Built for elite collectors.</p></div>
+    <div>
+      <div class="arena-footer-brand">
+        <img src="/static/logo.png" alt="" class="arena-footer-logo" width="52" height="52" decoding="async" />
+        <div>
+          RAGNAR
+          <span class="arena-footer-runes" aria-label="Ragnar in runes">ᚱᚨᚷᚾᚨᚱ</span>
+        </div>
+      </div>
+      <p>Wolf · Raven · Vault. Built for elite collectors.</p>
+    </div>
     <div class="arena-footer-links"><a href="/stores">Live</a><a href="/marketplace">Marketplace</a><a href="/login">Account</a><a href="#apply">Sellers</a></div>
     <div class="arena-footer-meta">RAGNAR // 2026<br>Standard fee 5% · Founding 250 lock in 4% forever.</div>
   </footer>

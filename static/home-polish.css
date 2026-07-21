@@ -35,10 +35,19 @@
 
 .vault-env-aurora-a,
 .vault-env-aurora-b {
-  opacity: calc(0.35 + var(--vault-p) * 0.2) !important;
+  opacity: calc(0.45 + var(--vault-p) * 0.25) !important;
+}
+
+.vault-aperture-core {
+  background:
+    radial-gradient(circle at 50% 42%,
+      rgba(255, 220, 160, calc(0.08 + var(--vault-p) * 0.06)),
+      rgba(191, 234, 255, calc(.16 + var(--vault-p) * .1)) 46%,
+      transparent 72%) !important;
 }
 
 /* ——— Hero: always readable ——— */
+.vault-arrival-copy.asgard-throne,
 .vault-arrival-copy {
   position: relative;
   z-index: 4;
