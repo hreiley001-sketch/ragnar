@@ -37,22 +37,88 @@
     // Homepage owns the full vault-env; other pages enter the shared hall.
     document.body.classList.remove("theme-utility");
     if (!onHome) document.body.classList.add("asgard-realm");
-    if (onHome || document.getElementById("asgardAtmosphere")) return;
-    const atm = document.createElement("div");
-    atm.id = "asgardAtmosphere";
-    atm.className = "asgard-atmosphere";
-    atm.setAttribute("aria-hidden", "true");
-    atm.innerHTML = `
-      <div class="asgard-atmosphere-rays"></div>
-      <div class="asgard-atmosphere-frost"></div>
-      <div class="asgard-atmosphere-grid"></div>
-      <div class="asgard-atmosphere-runes">
-        <span>ᚦ</span><span>ᚱ</span><span>ᚨ</span><span>ᚷ</span><span>ᚾ</span>
-      </div>`;
-    document.body.insertBefore(atm, document.body.firstChild);
+    if (onHome) return;
+
+    if (!document.getElementById("asgardAtmosphere")) {
+      const atm = document.createElement("div");
+      atm.id = "asgardAtmosphere";
+      atm.className = "asgard-atmosphere";
+      atm.setAttribute("aria-hidden", "true");
+      atm.innerHTML = `
+        <div class="asgard-atmosphere-rays"></div>
+        <div class="asgard-atmosphere-frost"></div>
+        <div class="asgard-atmosphere-grid"></div>
+        <div class="asgard-atmosphere-runes">
+          <span>\u16a6</span><span>\u16b1</span><span>\u16a8</span><span>\u16b7</span><span>\u16be</span>
+        </div>`;
+      document.body.insertBefore(atm, document.body.firstChild);
+    }
+
+    // Embedded ornaments — corners, crest seal, side rails, ice frame.
+    if (!document.getElementById("asgardOrnaments") && !onRoom) {
+      const orn = document.createElement("div");
+      orn.id = "asgardOrnaments";
+      orn.className = "asgard-ornaments";
+      orn.setAttribute("aria-hidden", "true");
+      orn.innerHTML = `
+        <div class="asgard-frame"></div>
+        <div class="asgard-corner asgard-corner-tl"></div>
+        <div class="asgard-corner asgard-corner-tr"></div>
+        <div class="asgard-corner asgard-corner-bl"></div>
+        <div class="asgard-corner asgard-corner-br"></div>
+        <div class="asgard-rail asgard-rail-l"><span>\u16b1</span><span>\u16a8</span><span>\u16b7</span><span>\u16be</span><span>\u16a8</span><span>\u16b1</span></div>
+        <div class="asgard-rail asgard-rail-r"><span>\u16a6</span><span>\u16b1</span><span>\u16a8</span><span>\u16df</span><span>\u16b9</span><span>\u16a2</span></div>
+        <div class="asgard-crest-seal">
+          <img src="/static/logo.png" alt="" width="120" height="120" decoding="async" />
+        </div>
+        <div class="asgard-spark asgard-spark-a"></div>
+        <div class="asgard-spark asgard-spark-b"></div>
+        <div class="asgard-spark asgard-spark-c"></div>`;
+      document.body.appendChild(orn);
+    }
   }
+
+  function embellishAsgardPage() {
+    if (onHome || onRoom || !document.body.classList.contains("asgard-realm")) return;
+
+    document.querySelectorAll(".mkt-hero, .platform-hero, .hero-strip, .auth-wrap .logo-c").forEach((hero) => {
+      if (hero.querySelector(".asgard-hero-seal")) return;
+      const seal = document.createElement("div");
+      seal.className = "asgard-hero-seal";
+      seal.setAttribute("aria-hidden", "true");
+      seal.innerHTML = `<span class="asgard-hero-ring"></span><span class="asgard-hero-ring asgard-hero-ring-2"></span>`;
+      hero.prepend(seal);
+    });
+
+    document.querySelectorAll(".section-title").forEach((el) => {
+      if (el.querySelector(".asgard-section-rune")) return;
+      const rune = document.createElement("span");
+      rune.className = "asgard-section-rune";
+      rune.setAttribute("aria-hidden", "true");
+      rune.textContent = "\u16df";
+      el.prepend(rune);
+    });
+
+    document.querySelectorAll(
+      ".card, .listing, .live-card, .store-card, .rcard, .feed-card, .live-hub-card, .dash-card, .auth-wrap, .stat"
+    ).forEach((card) => {
+      if (card.querySelector(".asgard-foil")) return;
+      const foil = document.createElement("span");
+      foil.className = "asgard-foil";
+      foil.setAttribute("aria-hidden", "true");
+      card.classList.add("asgard-panel");
+      card.appendChild(foil);
+    });
+  }
+
   ensureAsgardAssets();
   mountAsgardRealm();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", embellishAsgardPage);
+  } else {
+    embellishAsgardPage();
+  }
+  window.addEventListener("load", () => setTimeout(embellishAsgardPage, 400));
 
   const ITEMS = [
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
