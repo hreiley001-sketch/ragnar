@@ -12,14 +12,17 @@ let toastTimer = null;
 function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2600); }
 
 async function api(path, options = {}) {
-  const res = await fetch(path, { ...options, headers: { "Content-Type": "application/json", "X-Admin-Token": TOKEN, ...(options.headers || {}) } });
-  let data = null; try { data = await res.json(); } catch (_) {}
-  if (!res.ok) {
-    const d = data && (data.detail || data.error);
-    const msg = typeof d === "string" ? d : (res.status === 401 ? "Not signed in — enter your admin token, or sign in at /login with a staff account." : `Request failed (${res.status})`);
-    const err = new Error(msg); err.status = res.status; throw err;
+  try {
+    return await window.api(path, {
+      ...options,
+      headers: { "X-Admin-Token": TOKEN, ...(options.headers || {}) },
+    });
+  } catch (err) {
+    if (err.status === 401 && !err.message.includes("Not signed in")) {
+      err.message = "Not signed in — enter your admin token, or sign in at /login with a staff account.";
+    }
+    throw err;
   }
-  return data;
 }
 
 /* ---------- status pills ---------- */

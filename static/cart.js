@@ -4,15 +4,7 @@
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const money = (n) => "$" + Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-  async function api(path, opts = {}) {
-    const r = await fetch(path, {
-      ...opts,
-      headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
-    });
-    const data = await r.json().catch(() => null);
-    if (!r.ok) throw Object.assign(new Error((data && data.detail) || "failed"), { status: r.status });
-    return data;
-  }
+  const api = window.api;
 
   function render(data) {
     if (!data.item_count) {

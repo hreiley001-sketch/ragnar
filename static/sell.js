@@ -5,34 +5,7 @@
 // collapses to a summary once the visitor has a seller profile.
 "use strict";
 (function () {
-  const $ = (id) => document.getElementById(id);
-  const escapeHtml = (s) =>
-    String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const money = (n) =>
-    n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-  async function api(path, options) {
-    const headers = { "Content-Type": "application/json", ...(options?.headers || {}) };
-    const res = await fetch(path, { headers, ...options });
-    let data = null;
-    try { data = await res.json(); } catch (_) {}
-    if (!res.ok) {
-      const detail = data && (data.detail || data.error);
-      throw new Error(typeof detail === "string" ? detail : `Request failed (${res.status})`);
-    }
-    return data;
-  }
-  async function apiForm(path, formData) {
-    const res = await fetch(path, { method: "POST", body: formData });
-    let data = null;
-    try { data = await res.json(); } catch (_) {}
-    if (!res.ok) {
-      const detail = data && (data.detail || data.error);
-      throw new Error(typeof detail === "string" ? detail : `Request failed (${res.status})`);
-    }
-    return data;
-  }
+  const { $, escapeHtml, money, api, apiForm } = window.Ragnar;
 
   let toastTimer = null;
   function toast(msg) {

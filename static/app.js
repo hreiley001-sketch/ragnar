@@ -1,35 +1,16 @@
 // RAGNAR storefront — talks to the FastAPI backend on the same origin.
 "use strict";
 
-const API = "";
 let META = null;
 const state = { page: 1, pageSize: 24, lastItems: [], compareIds: [] };
 let activeListingsRequest = null;
 const COMPARE_STORAGE_KEY = "ragnar:compare:listings";
 const FREE_SHIP_TOKEN = "free shipping";
 
-/* ---------------- helpers ---------------- */
-const $ = (id) => document.getElementById(id);
-const money = (n) =>
-  n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const escapeHtml = (s) =>
-  String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
-async function api(path, options) {
-  const headers = { "Content-Type": "application/json", ...(options?.headers || {}) };
-  const res = await fetch(API + path, {
-    headers,
-    ...options,
-  });
-  let data = null;
-  try { data = await res.json(); } catch (_) {}
-  if (!res.ok) {
-    const detail = data && (data.detail || data.error);
-    throw new Error(typeof detail === "string" ? detail : `Request failed (${res.status})`);
-  }
-  return data;
-}
+/* ---------------- helpers (shared via api.js) ---------------- */
+const $ = window.Ragnar.$;
+const money = window.Ragnar.money;
+const escapeHtml = window.Ragnar.escapeHtml;
 
 function filterParams(includePaging = true) {
   const p = new URLSearchParams();
@@ -102,14 +83,7 @@ function hydrateCompareState() {
 }
 
 async function apiForm(path, formData) {
-  const res = await fetch(API + path, { method: "POST", body: formData });
-  let data = null;
-  try { data = await res.json(); } catch (_) {}
-  if (!res.ok) {
-    const detail = data && (data.detail || data.error);
-    throw new Error(typeof detail === "string" ? detail : `Request failed (${res.status})`);
-  }
-  return data;
+  return window.apiForm(path, formData);
 }
 
 let toastTimer = null;

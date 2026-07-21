@@ -1,21 +1,12 @@
 // RAGNAR / BirdmanOS — live ride (auction rollercoaster) client.
 "use strict";
-const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const { $: $, esc, money } = window.Ragnar;
 const RIDE_ID = decodeURIComponent(location.pathname.split("/ride/")[1] || "").replace(/\/$/, "");
 const PHASES = ["lobby", "showcase", "bidding", "cooldown"];
 const CREST = `<svg viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="#7fa8c9"><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g></svg>`;
 
 let toastTimer, localLeft = null, timerInt = null, lastState = null;
 function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2600); }
-
-async function api(p, o = {}) {
-  const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
-  let d = null; try { d = await r.json(); } catch (_) {}
-  if (!r.ok) throw new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`);
-  return d;
-}
 
 function crestDataUri() {
   return `data:image/svg+xml;utf8,${encodeURIComponent(CREST)}`;

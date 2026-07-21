@@ -4,15 +4,7 @@
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const slug = decodeURIComponent((location.pathname.split("/").pop() || "").replace(/\/+$/, ""));
 
-  async function api(path, opts = {}) {
-    const r = await fetch(path, {
-      ...opts,
-      headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
-    });
-    const data = await r.json().catch(() => null);
-    if (!r.ok) throw new Error((data && (data.detail || data.error)) || "Request failed");
-    return data;
-  }
+  const api = window.api;
 
   function threadCard(t) {
     return `<article class="thread-card">

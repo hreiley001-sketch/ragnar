@@ -4,11 +4,7 @@
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
 
-  async function api(path) {
-    const r = await fetch(path);
-    if (!r.ok) throw new Error("Request failed");
-    return r.json();
-  }
+  const api = window.api;
 
   function card(item, kind) {
     const href = item.href || "#";
