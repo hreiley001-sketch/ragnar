@@ -31,30 +31,42 @@
   <a class="arena-skip" href="#main">Skip to content</a>
 
   <!-- Continuous vault environment — one world for the entire scroll journey.
-       Layers (far → near): sky · aurora · far depth · horizon · monoliths ·
-       mid depth · arches · glass · reflection sweep · ice sheen · light · haze.
-       Every layer animates with transform/opacity only (GPU-composited). -->
+       A camera wrapper gives the whole world pointer/scroll parallax; layers
+       (far → near): sky · aurora ribbons · aperture rings · horizon ·
+       monoliths · light shafts · arches · glass · reflection · floor ·
+       grain · vignette. Transform/opacity only — fully GPU-composited. -->
   <div class="vault-env" id="vaultEnv" aria-hidden="true">
-    <div class="vault-env-sky"></div>
-    <div class="vault-env-aurora"></div>
-    <div class="vault-env-depth vault-env-far"></div>
-    <div class="vault-env-horizon"></div>
-    <div class="vault-env-monoliths">
-      <div class="vault-monolith vault-monolith-a"></div>
-      <div class="vault-monolith vault-monolith-b"></div>
-      <div class="vault-monolith vault-monolith-c"></div>
-      <div class="vault-monolith vault-monolith-d"></div>
-      <div class="vault-monolith vault-monolith-e"></div>
+    <div class="vault-env-camera" id="vaultCamera">
+      <div class="vault-env-sky"></div>
+      <div class="vault-env-aurora vault-env-aurora-a"></div>
+      <div class="vault-env-aurora vault-env-aurora-b"></div>
+      <div class="vault-aperture">
+        <div class="vault-ring vault-ring-1"></div>
+        <div class="vault-ring vault-ring-2"></div>
+        <div class="vault-ring vault-ring-3"></div>
+        <div class="vault-ring-arc"></div>
+        <div class="vault-aperture-core"></div>
+      </div>
+      <div class="vault-env-horizon"></div>
+      <div class="vault-env-monoliths">
+        <div class="vault-monolith vault-monolith-a"></div>
+        <div class="vault-monolith vault-monolith-b"></div>
+        <div class="vault-monolith vault-monolith-c"></div>
+        <div class="vault-monolith vault-monolith-d"></div>
+        <div class="vault-monolith vault-monolith-e"></div>
+      </div>
+      <div class="vault-env-shaft vault-env-shaft-l"></div>
+      <div class="vault-env-shaft vault-env-shaft-r"></div>
+      <div class="vault-env-arch vault-env-arch-l"></div>
+      <div class="vault-env-arch vault-env-arch-r"></div>
+      <div class="vault-env-glass vault-env-glass-l"></div>
+      <div class="vault-env-glass vault-env-glass-r"></div>
+      <div class="vault-env-reflection"></div>
+      <div class="vault-env-ice"></div>
+      <div class="vault-env-light"></div>
+      <div class="vault-env-floor"></div>
     </div>
-    <div class="vault-env-depth vault-env-mid"></div>
-    <div class="vault-env-arch vault-env-arch-l"></div>
-    <div class="vault-env-arch vault-env-arch-r"></div>
-    <div class="vault-env-glass vault-env-glass-l"></div>
-    <div class="vault-env-glass vault-env-glass-r"></div>
-    <div class="vault-env-reflection"></div>
-    <div class="vault-env-ice"></div>
-    <div class="vault-env-light"></div>
-    <div class="vault-env-floor"></div>
+    <div class="vault-env-grain"></div>
     <div class="vault-env-haze"></div>
   </div>
 
