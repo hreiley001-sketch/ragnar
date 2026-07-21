@@ -110,7 +110,7 @@
             Enter the hall where collectors gather like legends — live breaks, elite sellers, and a marketplace forged in ice and gold. Standard fee 5%; the first 250 wolves lock in 4% forever.
           </p>
           <div class="arena-hero-actions">
-            <a class="arena-btn primary" href="#live">Enter live rooms <span class="arrow">↗</span></a>
+            <a class="arena-btn primary" href="/stores">Enter live rooms <span class="arrow">↗</span></a>
             <a class="arena-btn" href="/marketplace">Explore marketplace <span class="arrow">→</span></a>
           </div>
           <div class="vault-scroll-cue" aria-hidden="true"><span></span> Descend into the vault</div>
@@ -118,7 +118,24 @@
       </div>
     </section>
 
-    <!-- Stage 2 — Entering the vault: live pulse + floor -->
+    <!-- Ragnar Intel — elevated premium feature, first after hero -->
+    <section id="intel" class="vault-stage section section-tight" data-stage="2" aria-label="Ragnar Intel">
+      <div class="arena-shell">
+        <div class="intel-spotlight" aria-label="RAGNAR Intelligence">
+          <div class="intel-spotlight-copy">
+            <span class="section-label">Ragnar Intel</span>
+            <h2>Market intelligence<br>built for the hunt.</h2>
+            <p>Pricing intelligence, trend tracking, and sold comps — so every listing and every bid moves with clarity.</p>
+            <div class="intel-strip-steps">
+              <span>Scan</span><span>Compare</span><span>Price</span><span>List</span>
+            </div>
+          </div>
+          <button type="button" class="arena-btn primary" data-open-sell="ai">Try scan-to-list <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stage 2 — Entering the vault: live pulse -->
     <section class="vault-stage vault-stage-enter" id="vaultPulse" data-stage="2" aria-label="Live marketplace">
       <div class="arena-shell vault-activity-grid">
         <aside class="activity-rail" id="activityFeed" aria-live="polite">
@@ -141,35 +158,6 @@
       </div>
     </section>
 
-    <section id="live" class="vault-stage section" data-stage="2" aria-label="Live now">
-      <div class="live-marquee" aria-hidden="true">
-        <div class="live-marquee-track">
-          <span><i class="signal-dot"></i>Live now</span><span>Wolf pack breaks</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span><span>Bifrøst open</span>
-          <span><i class="signal-dot"></i>Live now</span><span>Wolf pack breaks</span><span>Sports cards</span><span>Pokémon</span><span>One Piece</span><span>Magic</span><span>High-end slabs</span><span>Bifrøst open</span>
-        </div>
-      </div>
-      <div class="arena-shell">
-        <div class="section-head">
-          <div><span class="section-label">The floor awakens</span><h2>The floor<br>is live.</h2></div>
-          <p>Breaks, singles, slabs, and chase cards — summoned by what you collect.</p>
-          <a class="section-link" href="/stores">View all live rooms →</a>
-        </div>
-        <div id="categories" class="arena-categories" role="group" aria-label="Filter live streams by category">
-          <button class="arena-category active" type="button" data-live-category="all">All live</button>
-          <button class="arena-category" type="button" data-live-category="basketball">Basketball</button>
-          <button class="arena-category" type="button" data-live-category="football">Football</button>
-          <button class="arena-category" type="button" data-live-category="baseball">Baseball</button>
-          <button class="arena-category" type="button" data-live-category="soccer">Soccer</button>
-          <button class="arena-category" type="button" data-live-category="pokemon">Pokémon</button>
-          <button class="arena-category" type="button" data-live-category="tcg">TCG</button>
-        </div>
-        <div id="liveArena" class="live-grid" aria-live="polite">
-          <div class="arena-empty"><div><strong>Scanning the vault…</strong><span>Loading live rooms and active rides.</span></div></div>
-        </div>
-        <div id="categoryEmpty" class="category-empty" hidden>No rooms in this category are live right now. Browse all sellers anytime.</div>
-      </div>
-    </section>
-
     <!-- Stage 3 — Collector realm + signature reveal -->
     <section id="signature" class="vault-stage vault-stage-signature" data-stage="3" aria-label="Ragnar Vault Key reveal">
       <div class="arena-shell signature-layout">
@@ -189,17 +177,6 @@
           <h2>The Ragnar<br />Vault Key.</h2>
           <p>A legendary collector object forged for this realm alone — not a licensed card, not a replica. The wolf's mark of entry into the elite vault.</p>
         </div>
-      </div>
-    </section>
-
-    <section id="breakers" class="vault-stage section" data-stage="3" aria-label="Top sellers">
-      <div class="arena-shell">
-        <div class="section-head">
-          <div><span class="section-label">Top sellers</span><h2>People worth<br>watching.</h2></div>
-          <p>Breakers and singles sellers building rooms collectors return to.</p>
-          <a class="section-link" href="/stores">Explore every seller →</a>
-        </div>
-        <div id="breakerGrid" class="breaker-grid" aria-live="polite"></div>
       </div>
     </section>
 
@@ -238,30 +215,10 @@
           <a class="arena-btn small" href="#apply">Sell on RAGNAR <span class="arrow">→</span></a>
         </div>
         <div class="difference-grid">
-          <article class="difference-card fee-card"><span>Founding 250</span><strong>4%</strong><p>Flat platform fee, locked in forever for the first 250 sellers who join.</p></article>
-          <article class="difference-card"><span>Every seller</span><strong>5%</strong><p>One transparent standard rate. No category maze and no surprise tiers.</p></article>
+          <article class="difference-card fee-card"><span>Market insights</span><strong>Intel</strong><p>Pricing intelligence, trend tracking, and comps that keep sellers ahead of the market.</p></article>
+          <article class="difference-card"><span>AI Listing Assistant</span><strong>List faster</strong><p>Card recognition, automated details, and draft copy so listings go live in seconds.</p></article>
           <article class="difference-card"><span>Know the card</span><strong>AI scan</strong><p>Scan-to-list, grading-aware details, live pricing, and real sold-price history.</p></article>
           <article class="difference-card"><span>Trade with confidence</span><strong>Trust</strong><p>Structured listings, buyer protection, seller identity, offers, orders, and disputes.</p></article>
-        </div>
-        <div class="intel-strip" aria-label="RAGNAR Intelligence">
-          <div class="intel-strip-kicker">RAGNAR Intelligence</div>
-          <div class="intel-strip-steps">
-            <span>Scan</span><span>Compare</span><span>Price</span><span>List</span>
-          </div>
-          <button type="button" class="arena-btn small" data-open-sell="ai">Try scan-to-list <span class="arrow">→</span></button>
-        </div>
-      </div>
-    </section>
-
-    <section class="vault-stage section section-tight" data-stage="4" aria-label="Marketplace">
-      <div class="arena-shell">
-        <div class="market-gateway theme-utility-panel">
-          <div>
-            <span class="section-label">Beyond the broadcast</span>
-            <h2>The vault never closes.</h2>
-            <p>Search graded cards, compare comps, scan inventory, make offers, and buy from trusted sellers.</p>
-          </div>
-          <a class="arena-btn primary" href="/marketplace">Enter marketplace <span class="arrow">↗</span></a>
         </div>
       </div>
     </section>
@@ -333,6 +290,9 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <!-- Hidden stubs so legacy JS lookups never throw after section removals -->
+  <div id="liveArena" hidden></div>
+  <div id="breakerGrid" hidden></div>
+  <div id="categoryEmpty" hidden></div>
   <div id="momentCard" hidden></div>
   <div id="momentCategory" hidden></div>
   <div id="momentGrade" hidden></div>
