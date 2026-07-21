@@ -110,9 +110,9 @@ code {
 .site-nav a {
   position: relative;
   padding: 10px 14px;
-  color: var(--color-text-secondary);
+  color: #e6f1f9;
   font-size: 13px;
-  font-weight: 550;
+  font-weight: 600;
   letter-spacing: 0.02em;
   text-decoration: none;
   border-radius: var(--radius-xs);
@@ -154,17 +154,17 @@ code {
   box-shadow: none;
 }
 .site-header .btn-ghost {
-  background: transparent;
-  border-color: transparent;
-  color: var(--color-text-secondary);
+  background: rgba(191, 234, 255, 0.06);
+  border-color: rgba(191, 234, 255, 0.22);
+  color: #e6f1f9;
   text-transform: none;
   letter-spacing: 0.01em;
-  font-weight: 550;
+  font-weight: 600;
 }
 .site-header .btn-ghost:hover:not(:disabled) {
-  color: var(--color-text-primary);
+  color: #ffffff;
   background: var(--color-hover-surface);
-  border-color: transparent;
+  border-color: rgba(191, 234, 255, 0.4);
   transform: none;
   box-shadow: none;
 }
@@ -188,9 +188,9 @@ code {
   -webkit-backdrop-filter: saturate(1.15) blur(18px);
   box-shadow: none;
 }
-.site-header--arena .site-nav a { color: var(--color-text-secondary); }
+.site-header--arena .site-nav a { color: #e6f1f9; }
 .site-header--arena .site-nav a:hover,
-.site-header--arena .site-nav a.is-active { color: var(--color-text-primary); }
+.site-header--arena .site-nav a.is-active { color: #ffffff; }
 .site-header--arena .btn-primary {
   background: var(--color-accent-primary);
   border-color: var(--color-accent-primary);

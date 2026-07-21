@@ -454,8 +454,8 @@ function initVaultCamera() {
   window.addEventListener("pointermove", (event) => {
     const nx = event.clientX / window.innerWidth - 0.5;
     const ny = event.clientY / window.innerHeight - 0.5;
-    targetX = nx * -26;
-    targetY = ny * -16;
+    targetX = nx * -48;
+    targetY = ny * -30;
     if (!raf) raf = requestAnimationFrame(tick);
   }, { passive: true });
 }
