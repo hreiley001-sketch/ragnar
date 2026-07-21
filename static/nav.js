@@ -48,12 +48,27 @@
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
-    header.className = "site-header";
+    const onHome = path === "/" || document.body.classList.contains("arena-home");
+    header.className = "site-header" + (onHome ? " site-header--arena" : "");
     const light = path === "/login" || path === "/verify";
     if (light) {
       header.innerHTML = `
         <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
         <div class="header-actions"></div>`;
+      return;
+    }
+    // Home: one nav channel only — utilities in the bar, full destinations in the drawer.
+    if (onHome) {
+      header.innerHTML = `
+        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+        <div class="header-actions">
+          <div class="header-extra" id="headerExtra"></div>
+          <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
+          <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
+          <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
+        </div>`;
+      acctLinks.push(header.querySelector("#headerAcctLink"));
+      headerSellBtn = header.querySelector("[data-open-sell]");
       return;
     }
     header.innerHTML = `
