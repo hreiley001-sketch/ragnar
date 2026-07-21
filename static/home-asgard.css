@@ -82,11 +82,6 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
   opacity: calc(0.7 + var(--vault-p) * 0.25);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .vault-env-frost,
-  .vault-env-aurora-c { animation: none !important; }
-}
-
 /* ——— Environment overlays ——— */
 .asgard-bifrost {
   position: absolute;
@@ -388,5 +383,7 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
   .asgard-crest-ring,
   .asgard-crest-shimmer,
   .asgard-crest-logo,
-  .asgard-crest-halo { animation: none !important; }
+  .asgard-crest-halo,
+  .vault-env-frost,
+  .vault-env-aurora-c { animation: none !important; }
 }
