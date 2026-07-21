@@ -26,7 +26,7 @@
   <link rel="stylesheet" href="/static/home.css" />
   <link rel="stylesheet" href="/static/home-polish.css" />
   <link rel="stylesheet" href="/static/home-asgard.css" />
-  <link rel="stylesheet" href="/static/nordic-cards.css" />
+  <link rel="stylesheet" href="/static/nordic-cards.css?v=nordic2" />
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","description":"Premium live-commerce marketplace for trading cards. Standard 5% seller fee; the first 250 sellers to sign up lock in a flat 4% forever."}
   </script>
@@ -134,6 +134,35 @@
               <span>Scan</span><span>Compare</span><span>Price</span><span>List</span>
             </div>
           </div>
+          <div class="intel-card-stack" aria-hidden="true">
+            <article class="nordic-card nordic-card--frost nordic-mini">
+              <div class="nordic-card__foil"></div>
+              <div class="nordic-card__frame"></div>
+              <div class="nordic-card__art"><span class="nordic-card__glyph">ᚱ</span></div>
+              <div class="nordic-card__meta">
+                <span class="nordic-card__series">Comps</span>
+                <h4 class="nordic-card__title">Sold history</h4>
+              </div>
+            </article>
+            <article class="nordic-card nordic-card--brass nordic-mini nordic-mini-mid">
+              <div class="nordic-card__foil"></div>
+              <div class="nordic-card__frame"></div>
+              <div class="nordic-card__art"><span class="nordic-card__glyph">ᛟ</span></div>
+              <div class="nordic-card__meta">
+                <span class="nordic-card__series">Scan</span>
+                <h4 class="nordic-card__title">Identify</h4>
+              </div>
+            </article>
+            <article class="nordic-card nordic-card--raven nordic-mini nordic-mini-back">
+              <div class="nordic-card__foil"></div>
+              <div class="nordic-card__frame"></div>
+              <div class="nordic-card__art"><span class="nordic-card__glyph">ᚦ</span></div>
+              <div class="nordic-card__meta">
+                <span class="nordic-card__series">Price</span>
+                <h4 class="nordic-card__title">List live</h4>
+              </div>
+            </article>
+          </div>
           <button type="button" class="arena-btn primary" data-open-sell="ai">Try scan-to-list <span class="arrow">→</span></button>
         </div>
       </div>
@@ -151,8 +180,18 @@
           <h2 id="momentTitle">Where collectors gather.</h2>
           <p id="momentDescription">Live breaks, verified sellers, and a marketplace built for serious collecting — one realm, one vault, one hunt.</p>
           <div class="fee-pillars" aria-label="Platform fees">
-            <div class="fee-pillar hot"><strong>4%</strong><span>Founding 250 · forever</span></div>
-            <div class="fee-pillar"><strong>5%</strong><span>Standard seller fee</span></div>
+            <div class="fee-pillar hot nordic-fee">
+              <span class="nordic-fee-rune" aria-hidden="true">ᛟ</span>
+              <strong>4%</strong>
+              <span>Founding 250 · forever</span>
+              <em class="nordic-fee-tag">Locked rate</em>
+            </div>
+            <div class="fee-pillar nordic-fee">
+              <span class="nordic-fee-rune" aria-hidden="true">ᚱ</span>
+              <strong>5%</strong>
+              <span>Standard seller fee</span>
+              <em class="nordic-fee-tag">Flat forever</em>
+            </div>
           </div>
         </div>
         <aside class="activity-breakers">
@@ -264,23 +303,35 @@
           <a class="arena-btn small" href="#apply">Sell on RAGNAR <span class="arrow">→</span></a>
         </div>
         <div class="difference-grid">
-          <article class="difference-card fee-card">
-            <span class="nordic-card-icon" aria-hidden="true">ᛟ</span>
+          <article class="difference-card fee-card nordic-diff">
+            <div class="nordic-diff-art" aria-hidden="true">
+              <span class="nordic-card-icon">ᛟ</span>
+              <div class="nordic-diff-foil"></div>
+            </div>
             <span>Market insights</span><strong>Intel</strong>
             <p>Pricing intelligence, trend tracking, and comps that keep sellers ahead of the market.</p>
           </article>
-          <article class="difference-card">
-            <span class="nordic-card-icon" aria-hidden="true">ᚱ</span>
+          <article class="difference-card nordic-diff">
+            <div class="nordic-diff-art" aria-hidden="true">
+              <span class="nordic-card-icon">ᚱ</span>
+              <div class="nordic-diff-foil"></div>
+            </div>
             <span>AI Listing Assistant</span><strong>List faster</strong>
             <p>Card recognition, automated details, and draft copy so listings go live in seconds.</p>
           </article>
-          <article class="difference-card">
-            <span class="nordic-card-icon" aria-hidden="true">ᚦ</span>
+          <article class="difference-card nordic-diff">
+            <div class="nordic-diff-art" aria-hidden="true">
+              <span class="nordic-card-icon">ᚦ</span>
+              <div class="nordic-diff-foil"></div>
+            </div>
             <span>Know the card</span><strong>AI scan</strong>
             <p>Scan-to-list, grading-aware details, live pricing, and real sold-price history.</p>
           </article>
-          <article class="difference-card">
-            <span class="nordic-card-icon" aria-hidden="true">ᛉ</span>
+          <article class="difference-card nordic-diff">
+            <div class="nordic-diff-art" aria-hidden="true">
+              <span class="nordic-card-icon">ᛉ</span>
+              <div class="nordic-diff-foil"></div>
+            </div>
             <span>Trade with confidence</span><strong>Trust</strong>
             <p>Structured listings, buyer protection, seller identity, offers, orders, and disputes.</p>
           </article>
@@ -296,9 +347,21 @@
           <p>Run high-volume breaks or sell singles live. Bring your audience, build your room, and keep the economics of your business.</p>
           <div id="counter" class="founding-counter-premium"><span><span id="claimed">—</span> / <span id="cap">250</span> founding positions claimed</span></div>
           <div class="breaker-benefits">
-            <div><b id="perkIntro">4%</b><span id="perk1Title">Founders rate, forever</span></div>
-            <div><b id="perkRate">5%</b><span id="perk2Title">Standard fee after</span></div>
-            <div><b>★</b><span id="perk3Title">Founding badge</span></div>
+            <div class="nordic-perk">
+              <span class="nordic-perk-rune" aria-hidden="true">ᛟ</span>
+              <b id="perkIntro">4%</b>
+              <span id="perk1Title">Founders rate, forever</span>
+            </div>
+            <div class="nordic-perk">
+              <span class="nordic-perk-rune" aria-hidden="true">ᚱ</span>
+              <b id="perkRate">5%</b>
+              <span id="perk2Title">Standard fee after</span>
+            </div>
+            <div class="nordic-perk nordic-perk-hot">
+              <span class="nordic-perk-rune" aria-hidden="true">ᚹ</span>
+              <b>★</b>
+              <span id="perk3Title">Founding badge</span>
+            </div>
           </div>
           <span id="perk1Desc" hidden>Founding 250 sellers lock in a flat 4% platform fee, forever.</span>
           <span id="perk2Desc" hidden>Then the same flat 5% as every seller. No category maze. No surprise tiers.</span>
@@ -362,8 +425,8 @@
   <div id="momentCategory" hidden></div>
   <div id="momentGrade" hidden></div>
   <div id="momentValue" hidden></div>
-  <script src="/static/card.js"></script>
-  <script src="/static/founding.js"></script>
+  <script src="/static/card.js?v=nordic2"></script>
+  <script src="/static/founding.js?v=nordic2"></script>
   <script src="/static/nav.js"></script>
   <script src="/static/sell.js"></script>
 </body>

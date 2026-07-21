@@ -183,11 +183,23 @@ function renderBreakers(stores) {
   if (strip) {
     const top = (stores || []).slice(0, 5);
     if (!top.length) {
-      strip.innerHTML = `<a class="breaker-chip" href="#apply"><span class="breaker-chip-av">R</span><div><strong>Claim the floor</strong><span>Applications open</span></div></a>`;
+      strip.innerHTML = [
+        { rune: "ᚱ", name: "Frost Hall", tag: "Founding seat open", href: "#apply" },
+        { rune: "ᚹ", name: "Raven Floor", tag: "Break room ready", href: "#apply" },
+        { rune: "ᚦ", name: "Ice Vault", tag: "Applications open", href: "#apply" },
+        { rune: "ᛟ", name: "Claim the floor", tag: "Join Founding 250", href: "#apply" },
+      ].map((seat) => `
+        <a class="breaker-chip nordic-breaker" href="${seat.href}">
+          <span class="breaker-chip-av nordic-breaker-av">${seat.rune}</span>
+          <div>
+            <strong>${seat.name}</strong>
+            <span>${seat.tag}</span>
+          </div>
+        </a>`).join("");
     } else {
       strip.innerHTML = top.map((store) => `
-        <a class="breaker-chip" href="/store/${encodeURIComponent(store.handle)}">
-          <span class="breaker-chip-av">${store.avatar_optimized || store.avatar_url
+        <a class="breaker-chip nordic-breaker" href="/store/${encodeURIComponent(store.handle)}">
+          <span class="breaker-chip-av nordic-breaker-av">${store.avatar_optimized || store.avatar_url
             ? `<img src="${esc(store.avatar_optimized || store.avatar_url)}" alt="" loading="lazy" />`
             : esc(initial(store.display_name))}</span>
           <div>
@@ -256,35 +268,38 @@ function renderMoment(listings) {
 function renderPulse(streams, rides, listings, stores) {
   const events = [];
   (streams || []).filter((stream) => stream.status === "live").forEach((stream) => events.push({
-    code: "LV", time: relativeTime(stream.started_at), title: `${stream.seller_name} went live`,
+    code: "ᚢ", time: relativeTime(stream.started_at), title: `${stream.seller_name} went live`,
     detail: stream.title, value: `${stream.viewer_count || 0} watching`,
   }));
   ((rides && rides.items) || []).filter((ride) => !["idle", "archived"].includes(ride.status)).forEach((ride) => events.push({
-    code: "RD", time: "live", title: `${ride.title} is in ${ride.current_phase || "session"}`,
+    code: "ᚦ", time: "live", title: `${ride.title} is in ${ride.current_phase || "session"}`,
     detail: ride.current_bidder ? `${ride.current_bidder} controls the room` : "The room is open",
     value: ride.current_bid != null ? money(ride.current_bid) : "Enter",
   }));
   (listings || []).slice(0, 4).forEach((listing) => events.push({
-    code: "VL", time: relativeTime(listing.created_at), title: "New card entered the vault",
+    code: "ᚱ", time: relativeTime(listing.created_at), title: "New card entered the vault",
     detail: listing.title, value: money(listing.price),
   }));
   (stores || []).filter((store) => store.is_live).slice(0, 2).forEach((store) => events.push({
-    code: "BR", time: "now", title: `${store.display_name} controls the floor`,
+    code: "ᛟ", time: "now", title: `${store.display_name} controls the floor`,
     detail: store.tagline || `@${store.handle}`, value: "Live",
   }));
   const visible = events.slice(0, 7);
   if (!visible.length) {
-    visible.push({
-      code: "RG", time: "now", title: "RAGNAR systems online",
-      detail: "Waiting for the next signal from the vault", value: "Armed",
-    });
+    visible.push(
+      { code: "ᚱ", time: "now", title: "Wolf of the North sealed", detail: "Chase · Frost Vault foil", value: "1/1" },
+      { code: "ᚹ", time: "2m", title: "Raven Mark claimed", detail: "Brass Sigil · Founders foil", value: "Live" },
+      { code: "ᚦ", time: "6m", title: "Vault Relic surfaced", detail: "Ice Key · Archive pull", value: "PSA 10" },
+      { code: "ᛟ", time: "12m", title: "Great Hall doors open", detail: "Waiting rooms forming", value: "Armed" },
+      { code: "ᚢ", time: "18m", title: "Bifröst scan complete", detail: "Intel comps refreshed", value: "Ready" },
+    );
   }
   const list = $("pulseList");
   if (!list) return;
   list.innerHTML = visible.map((event) => `
-    <div class="pulse-item">
+    <div class="pulse-item nordic-pulse">
       <div class="pulse-time">${esc(event.time)}</div>
-      <div class="pulse-event"><span class="pulse-icon">${esc(event.code)}</span><div><strong>${esc(event.title)}</strong><span>${esc(event.detail)}</span></div></div>
+      <div class="pulse-event"><span class="pulse-icon nordic-pulse-icon">${esc(event.code)}</span><div><strong>${esc(event.title)}</strong><span>${esc(event.detail)}</span></div></div>
       <div class="pulse-value">${esc(event.value)}</div>
     </div>`).join("");
 }
