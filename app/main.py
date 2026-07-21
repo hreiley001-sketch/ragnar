@@ -75,6 +75,19 @@ async def lifespan(app: FastAPI):
     init_db()
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     seed_if_empty()
+    # Retire stored theme rows from earlier brand eras so the glacial palette
+    # defaults apply (custom colors staff picked deliberately are preserved).
+    try:
+        from sqlmodel import Session
+        from .database import engine
+        from .site_config import retire_legacy_theme_values
+
+        with Session(engine) as session:
+            cleared = retire_legacy_theme_values(session)
+        if cleared:
+            logger.info("Retired %d legacy theme setting(s).", cleared)
+    except Exception:  # noqa: BLE001
+        logger.exception("Legacy theme cleanup skipped")
     # Seed Counsel knowledge base so support chat works on first request.
     try:
         from sqlmodel import Session

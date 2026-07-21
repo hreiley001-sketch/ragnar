@@ -26,7 +26,7 @@ body.page-admin {
     radial-gradient(980px 540px at 78% -12%, color-mix(in srgb, var(--cmd-accent) 16%, transparent), transparent 58%),
     radial-gradient(720px 480px at 4% 18%, color-mix(in srgb, var(--cmd-gold) 8%, transparent), transparent 55%),
     radial-gradient(640px 420px at 90% 100%, color-mix(in srgb, var(--cmd-accent) 7%, transparent), transparent 50%),
-    linear-gradient(180deg, #eef5f9 0%, #f5f9fc 42%, #eef5f9 100%);
+    linear-gradient(180deg, #0d1d2e 0%, #0a141f 42%, #071019 100%);
 }
 .cmd-atmosphere::before {
   content: "";
@@ -44,7 +44,7 @@ body.page-admin {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, transparent 70%, rgba(15, 35, 48, 0.06)),
+    linear-gradient(180deg, transparent 70%, rgba(3, 9, 15, 0.06)),
     repeating-linear-gradient(
       0deg,
       transparent,
@@ -73,7 +73,7 @@ body.page-admin .site-header--admin {
   border-bottom: 1px solid color-mix(in srgb, var(--cmd-accent) 22%, transparent);
   background: color-mix(in srgb, var(--color-bg-base) 88%, transparent);
   backdrop-filter: blur(16px) saturate(1.2);
-  box-shadow: 0 12px 32px rgba(15, 35, 48, 0.08);
+  box-shadow: 0 12px 32px rgba(3, 9, 15, 0.08);
 }
 body.page-admin .site-header--admin::after {
   content: "";
@@ -93,7 +93,7 @@ body.page-admin .site-header--admin .brand {
 }
 body.page-admin .site-header--admin .logo-img {
   height: 36px;
-  filter: drop-shadow(0 4px 12px rgba(15, 35, 48, 0.12));
+  filter: drop-shadow(0 4px 12px rgba(3, 9, 15, 0.12));
 }
 body.page-admin .cmd-brand-stack {
   display: flex;
@@ -111,7 +111,7 @@ body.page-admin .cmd-brand-mark {
 }
 body.page-admin .cmd-brand-mark span {
   color: var(--cmd-accent);
-  text-shadow: 0 0 18px rgba(31, 111, 143, 0.35);
+  text-shadow: 0 0 18px rgba(86, 200, 242, 0.35);
 }
 body.page-admin .cmd-title {
   margin: 0;
@@ -243,7 +243,7 @@ body.page-admin .hub-main {
   font-weight: 800;
   letter-spacing: var(--tracking-display);
   line-height: 0.8;
-  color: rgba(15, 28, 36, 0.04);
+  color: rgba(191, 234, 255, 0.04);
   pointer-events: none;
 }
 .cmd-brief-kicker {
@@ -509,12 +509,12 @@ body.page-admin .tab-panel > .card h3 {
 body.page-admin .tbl-wrap {
   border-radius: 0;
   border-color: var(--cmd-line);
-  background: color-mix(in srgb, var(--color-bg-glass) 90%, #2a2826);
+  background: color-mix(in srgb, var(--color-bg-glass) 90%, #0c1927);
   box-shadow: var(--shadow-sm);
 }
 body.page-admin table.hub th {
   background: color-mix(in srgb, var(--cmd-accent) 5%, transparent);
-  color: var(--cmd-accent);
+  color: var(--color-text-muted);
   border-bottom-color: color-mix(in srgb, var(--cmd-accent) 18%, transparent);
 }
 body.page-admin .card {
@@ -595,8 +595,9 @@ body.page-admin .pill.info {
   color: var(--cmd-accent);
   border-color: color-mix(in srgb, var(--cmd-accent) 45%, transparent);
 }
-body.page-admin .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+body.page-admin .row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 body.page-admin .btn-danger {
+  margin-left: 6px;
   color: var(--color-error);
   border-color: color-mix(in srgb, var(--color-error) 45%, transparent);
 }

@@ -20,8 +20,8 @@ body.vault-page {
   position: absolute; inset: 0;
   opacity: 0.22;
   background-image:
-    linear-gradient(rgba(255, 253, 250, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 253, 250, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(191, 234, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(191, 234, 255, 0.05) 1px, transparent 1px);
   background-size: 72px 72px;
   mask-image: radial-gradient(ellipse at 50% 18%, #000 12%, transparent 70%);
 }
@@ -29,7 +29,7 @@ body.vault-page {
   content: "";
   position: absolute; inset: 0;
   background:
-    linear-gradient(115deg, transparent 40%, rgba(42, 40, 38, 0.03) 50%, transparent 60%);
+    linear-gradient(115deg, transparent 40%, rgba(3, 9, 15, 0.03) 50%, transparent 60%);
   animation: vaultSheen 9s ease-in-out infinite;
   pointer-events: none;
 }
@@ -49,8 +49,8 @@ body.vault-page {
 .vault-hero::after {
   content: "";
   position: absolute; left: 8%; right: 8%; bottom: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(31, 111, 143, 0.55), transparent);
-  box-shadow: 0 0 20px rgba(31, 111, 143, 0.25);
+  background: linear-gradient(90deg, transparent, rgba(86, 200, 242, 0.55), transparent);
+  box-shadow: 0 0 20px rgba(86, 200, 242, 0.25);
 }
 .vault-brand {
   display: inline-flex;
@@ -66,11 +66,11 @@ body.vault-page {
   letter-spacing: var(--tracking-display);
   line-height: 0.92;
   color: var(--color-frost);
-  text-shadow: 0 0 48px rgba(31, 111, 143, 0.25);
+  text-shadow: 0 0 48px rgba(86, 200, 242, 0.25);
 }
 .vault-brand-mark span {
   color: var(--color-accent-primary);
-  text-shadow: 0 0 32px rgba(31, 111, 143, 0.45);
+  text-shadow: 0 0 32px rgba(86, 200, 242, 0.45);
 }
 .vault-brand-runes {
   font-family: var(--font-mono);
@@ -81,7 +81,7 @@ body.vault-page {
   align-self: center;
   padding: 6px 10px;
   border: 1px solid var(--color-border-default);
-  background: rgba(31, 111, 143, 0.04);
+  background: rgba(86, 200, 242, 0.04);
 }
 .vault-hero h1 {
   margin: 0 0 14px;
@@ -116,10 +116,10 @@ body.vault-page {
   padding: 7px 7px 7px 18px;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-xs);
-  background: rgba(246, 243, 239, 0.92);
+  background: rgba(14, 27, 41, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(42, 40, 38, 0.08);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(3, 9, 15, 0.08);
   animation: vaultRise 0.9s var(--ease-premium) 0.18s both;
   transition: border-color var(--duration-fast), box-shadow var(--duration-medium);
 }
@@ -163,7 +163,7 @@ body.vault-page {
   border-color: var(--color-border-default);
 }
 .vault-search .btn-primary {
-  box-shadow: 0 0 28px rgba(31, 111, 143, 0.3);
+  box-shadow: 0 0 28px rgba(86, 200, 242, 0.3);
 }
 
 .vault-prompt-row {
@@ -273,7 +273,7 @@ body.vault-page {
   background: var(--color-accent-primary);
   border-color: var(--color-accent-primary);
   color: var(--color-on-accent);
-  box-shadow: 0 0 24px rgba(31, 111, 143, 0.28);
+  box-shadow: 0 0 24px rgba(86, 200, 242, 0.28);
 }
 
 .trust-bar {
@@ -311,7 +311,7 @@ body.vault-page {
   border-radius: var(--radius-xs);
   border: 1px solid var(--color-border-default);
   background:
-    linear-gradient(160deg, rgba(31, 111, 143, 0.06), transparent 40%),
+    linear-gradient(160deg, rgba(86, 200, 242, 0.06), transparent 40%),
     var(--color-bg-glass);
   box-shadow: none;
   backdrop-filter: blur(14px);
@@ -342,12 +342,12 @@ body.vault-page {
 .vault-page .listing:hover {
   transform: translateY(-5px);
   border-color: var(--color-border-strong);
-  box-shadow: var(--shadow-md), 0 0 28px rgba(31, 111, 143, 0.1);
+  box-shadow: var(--shadow-md), 0 0 28px rgba(86, 200, 242, 0.1);
 }
 .vault-page .listing-img {
   background:
-    radial-gradient(circle at 50% 28%, rgba(31, 111, 143, 0.12), transparent 55%),
-    linear-gradient(165deg, #e8e4de, #d2cdc6);
+    radial-gradient(circle at 50% 28%, rgba(86, 200, 242, 0.12), transparent 55%),
+    linear-gradient(165deg, #14293c, #0c1927);
 }
 .vault-page .listing-title {
   font-family: var(--font-display);

@@ -1,57 +1,58 @@
-/* RAGNAR design tokens — ice · arctic · titanium · premium.
-   Space Grotesk + Inter. Crisp cold luxury. Never fantasy, never muddy. */
+/* RAGNAR design tokens — glacial arctic luxury.
+   Deep ice-navy surfaces · ice-blue light · frost white · titanium silver.
+   Space Grotesk + Inter. Crisp, cold, premium. Never fantasy, never muddy. */
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  /* ——— Surfaces (ice vault) ——— */
-  --color-bg-base: #eef5f9;
-  --color-bg-elevated: #f5f9fc;
-  --color-bg-panel: #ffffff;
-  --color-bg-panel-strong: #ffffff;
-  --color-bg-glass: rgba(255, 255, 255, 0.78);
-  --color-bg-glass-soft: rgba(238, 245, 249, 0.72);
-  --color-bg-input: #f7fbfd;
-  --color-bg-overlay: rgba(15, 35, 48, 0.42);
-  --color-surface-deep: #d7e6ef;
+  /* ——— Surfaces (glacial vault) ——— */
+  --color-bg-base: #0a141f;
+  --color-bg-elevated: #0e1a28;
+  --color-bg-panel: #101f2e;
+  --color-bg-panel-strong: #142534;
+  --color-bg-glass: rgba(14, 27, 41, 0.72);
+  --color-bg-glass-soft: rgba(12, 23, 35, 0.6);
+  --color-bg-input: #0d1926;
+  --color-bg-overlay: rgba(4, 10, 17, 0.72);
+  --color-surface-deep: #060d15;
 
-  /* ——— Text (high contrast on ice) ——— */
-  --color-text-primary: #0f1c24;
-  --color-text-secondary: #3a4f5c;
-  --color-text-muted: #5c7382;
-  --color-text-subtle: #7a91a0;
-  --color-text-disabled: #a3b4bf;
-  --color-on-accent: #f5fbff;
-  --color-on-danger: #fff8f7;
+  /* ——— Text (frost on deep ice) ——— */
+  --color-text-primary: #f2f8fc;
+  --color-text-secondary: #b8cad9;
+  --color-text-muted: #8ba1b4;
+  --color-text-subtle: #7d93a7;
+  --color-text-disabled: #5d7386;
+  --color-on-accent: #04131d;
+  --color-on-danger: #1a0808;
 
-  /* ——— Brand (logo ice / arctic / titanium) ——— */
-  --color-accent-primary: #1a7fa8;
-  --color-accent-primary-strong: #146687;
-  --color-accent-secondary: #8a96a0;
-  --color-accent-fallback: #3d9bc0;
-  --color-glacier: #4aa3c4;
-  --color-frost: #0f1c24;
-  --color-titanium: #9aabba;
-  --color-crystal: #6bb8d4;
-  --color-midnight: #152833;
-  --color-ice-deep: #c5dde9;
-  --color-arctic: #e8f4fa;
+  /* ——— Brand (ice blue / arctic / white / titanium silver) ——— */
+  --color-accent-primary: #56c8f2;
+  --color-accent-primary-strong: #8adcff;
+  --color-accent-secondary: #a7bfd1;
+  --color-accent-fallback: #4a9cc4;
+  --color-glacier: #67b6dd;
+  --color-frost: #f4fbff;
+  --color-titanium: #9fb4c6;
+  --color-crystal: #bfeaff;
+  --color-midnight: #050d16;
+  --color-ice-deep: #16344a;
+  --color-arctic: #0f2233;
 
-  /* ——— Status ——— */
-  --color-live: #0d8a9e;
-  --color-success: #1f8a68;
-  --color-warning: #9a7a3c;
-  --color-error: #c44a4e;
-  --color-info: #1a7fa8;
+  /* ——— Status (cold, restrained) ——— */
+  --color-live: #5ecfef;
+  --color-success: #62c9a3;
+  --color-warning: #cdb27c;
+  --color-error: #e87478;
+  --color-info: #8adcff;
 
   /* ——— Lines & interaction ——— */
-  --color-border-subtle: rgba(15, 28, 36, 0.08);
-  --color-border-default: rgba(15, 28, 36, 0.14);
-  --color-border-strong: rgba(15, 28, 36, 0.26);
+  --color-border-subtle: rgba(191, 234, 255, 0.09);
+  --color-border-default: rgba(191, 234, 255, 0.16);
+  --color-border-strong: rgba(191, 234, 255, 0.3);
   --color-focus: var(--color-accent-primary);
-  --color-hover-surface: rgba(26, 127, 168, 0.08);
-  --color-active-surface: rgba(26, 127, 168, 0.14);
-  --color-disabled-surface: rgba(15, 28, 36, 0.04);
+  --color-hover-surface: rgba(86, 200, 242, 0.1);
+  --color-active-surface: rgba(86, 200, 242, 0.16);
+  --color-disabled-surface: rgba(191, 234, 255, 0.07);
 
   /* ——— Typography ———
      Space Grotesk: headings.
@@ -97,12 +98,12 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-pill: 999px;
-  --shadow-sm: 0 1px 2px rgba(15, 35, 48, 0.05), 0 4px 14px rgba(15, 35, 48, 0.05);
-  --shadow-md: 0 12px 32px rgba(15, 35, 48, 0.08);
-  --shadow-lg: 0 28px 64px rgba(15, 35, 48, 0.12);
-  --shadow-focus: 0 0 0 3px rgba(26, 127, 168, 0.28);
-  --glow-ice: 0 0 28px rgba(26, 127, 168, 0.16);
-  --glow-crystal: 0 0 40px rgba(26, 127, 168, 0.1);
+  --shadow-sm: 0 1px 2px rgba(3, 9, 15, 0.4), 0 4px 14px rgba(3, 9, 15, 0.3);
+  --shadow-md: 0 12px 32px rgba(3, 9, 15, 0.45);
+  --shadow-lg: 0 28px 64px rgba(3, 9, 15, 0.55);
+  --shadow-focus: 0 0 0 3px rgba(86, 200, 242, 0.3);
+  --glow-ice: 0 0 28px rgba(86, 200, 242, 0.18);
+  --glow-crystal: 0 0 40px rgba(86, 200, 242, 0.12);
   --glow-gold: var(--glow-ice);
 
   /* ——— Motion ——— */
@@ -112,9 +113,9 @@
   --duration-slow: 480ms;
 
   /* Dynamic media / crest */
-  --crest-primary: #7a8f9c;
+  --crest-primary: #9fb4c6;
   --crest-accent: var(--color-accent-primary);
-  --moment-fallback: linear-gradient(145deg, #c5dde9, #eef5f9 72%);
+  --moment-fallback: linear-gradient(145deg, #16344a, #0a141f 72%);
   --store-accent: var(--color-accent-primary);
 
   /* ——— Compatibility aliases ——— */
