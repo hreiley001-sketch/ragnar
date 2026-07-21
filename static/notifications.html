@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Notifications</title>
+  <link rel="icon" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/tokens.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/platform.css" />
+</head>
+<body class="theme-utility">
+  <div class="aurora"></div>
+  <header id="siteHeader"></header>
+
+  <main class="platform-main">
+    <section class="platform-hero">
+      <h1>Notifications</h1>
+      <p>Live shows, listings, group activity, sales, offers, and storefront updates.</p>
+    </section>
+
+    <div class="card-actions" style="margin-bottom:14px">
+      <button class="btn btn-ghost btn-sm" id="markAll" type="button">Mark all read</button>
+      <a class="btn btn-ghost btn-sm" href="/account#notifications">Account preferences</a>
+    </div>
+    <div id="notifList" class="notif-list"></div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/notifications-page.js"></script>
+  <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
+</body>
+</html>

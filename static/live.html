@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Live Hub</title>
+  <link rel="icon" href="/static/logo.png" />
+  <link rel="stylesheet" href="/static/tokens.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/platform.css" />
+</head>
+<body class="theme-utility">
+  <div class="aurora"></div>
+  <header id="siteHeader"></header>
+
+  <main class="platform-main">
+    <section class="platform-hero">
+      <h1>Live Hub</h1>
+      <p>Shows happening now, starting soon, and recommended breakers — sports, Pokémon, MTG, and more.</p>
+    </section>
+
+    <div class="platform-tabs" id="liveCats">
+      <button class="btn btn-ghost btn-sm active" data-cat="all" type="button">All</button>
+      <button class="btn btn-ghost btn-sm" data-cat="sports" type="button">Sports</button>
+      <button class="btn btn-ghost btn-sm" data-cat="pokemon" type="button">Pokémon</button>
+      <button class="btn btn-ghost btn-sm" data-cat="mtg" type="button">MTG</button>
+      <button class="btn btn-ghost btn-sm" data-cat="yugioh" type="button">Yu-Gi-Oh</button>
+    </div>
+
+    <div class="section-title"><span class="live-dot"></span> Happening now</div>
+    <div id="liveNow" class="live-hub-grid"></div>
+
+    <div class="section-title">Starting soon</div>
+    <div id="liveSoon" class="live-hub-grid"></div>
+
+    <div class="section-title section-title-row">
+      <span>Recommended sellers</span>
+      <a class="btn btn-ghost btn-sm" href="/stores">Browse stores</a>
+    </div>
+    <div id="liveRecs" class="live-hub-grid"></div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/live-hub.js"></script>
+  <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
+</body>
+</html>

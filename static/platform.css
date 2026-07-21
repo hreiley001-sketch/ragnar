@@ -1,0 +1,186 @@
+/* Unified platform pages — layout only, reuses existing tokens/components. */
+
+.platform-main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px clamp(16px, 4vw, 40px) 72px;
+}
+
+.platform-hero {
+  margin-bottom: 22px;
+}
+
+.platform-hero h1 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.4vw, 36px);
+  letter-spacing: var(--tracking-display);
+  color: var(--color-text-primary);
+}
+
+.platform-hero p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  max-width: 58ch;
+  line-height: 1.55;
+}
+
+.platform-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.platform-tabs .btn.active {
+  border-color: var(--color-accent-primary);
+  background: color-mix(in srgb, var(--color-accent-primary) 16%, transparent);
+}
+
+.feed-stories {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+}
+
+.story-chip {
+  flex: none;
+  width: 88px;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.story-chip .av {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 6px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent-gold);
+  display: grid;
+  place-items: center;
+  background: var(--color-bg-panel);
+  font-weight: 700;
+  color: var(--color-accent-primary);
+  overflow: hidden;
+}
+
+.story-chip .av img { width: 100%; height: 100%; object-fit: cover; }
+.story-chip span { font-size: 11px; color: var(--color-text-muted); }
+
+.feed-list, .group-list, .thread-list, .notif-list, .cart-list {
+  display: grid;
+  gap: 12px;
+}
+
+.feed-card, .group-card, .thread-card, .notif-card, .dash-card, .live-hub-card {
+  padding: 16px 18px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-glass);
+  box-shadow: var(--shadow-sm);
+}
+
+.feed-card-head, .group-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.feed-card h3, .group-card h3, .thread-card h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.feed-card p, .group-card p, .thread-card p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.feed-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.feed-tags span {
+  font: 650 10px/1 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-xs);
+}
+
+.feed-actions, .card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.live-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.dash-stat strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--color-frost);
+}
+
+.dash-stat span {
+  color: var(--color-text-muted);
+  font: 650 11px/1.3 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fee-breakdown {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-panel);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.fee-breakdown b { color: var(--color-text-primary); }
+
+.empty-state {
+  padding: 28px;
+  text-align: center;
+  border: 1px dashed var(--color-border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+
+.cart-seller-block { margin-bottom: 18px; }
+.cart-seller-block h3 { margin: 0 0 10px; font-size: 15px; }
+
+@media (max-width: 700px) {
+  .platform-main { padding-top: 18px; }
+}
