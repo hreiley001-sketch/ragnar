@@ -1,0 +1,379 @@
+/* RAGNAR — Asgard realm shell for every non-home page.
+   Lit fjord sky · bifrost haze · frost glass · rune accents.
+   Homepage keeps its own vault-env; this is the shared hall. */
+
+body.asgard-realm {
+  color-scheme: dark;
+  background: #1a2d42;
+  color: var(--color-text-primary);
+}
+
+/* Atmosphere sits behind content; hide page-local .aurora so we don't double-stack. */
+body.asgard-realm > .aurora {
+  display: none;
+}
+
+.asgard-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 110% 58% at 50% -14%, rgba(142, 202, 230, 0.34), transparent 58%),
+    radial-gradient(ellipse 55% 40% at 12% 28%, rgba(184, 223, 240, 0.14), transparent 62%),
+    radial-gradient(ellipse 48% 36% at 88% 22%, rgba(212, 165, 116, 0.1), transparent 60%),
+    linear-gradient(175deg, #4a7090 0%, #2f4d68 28%, #243d56 58%, #1a2d42 100%);
+}
+
+.asgard-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: -20% -30%;
+  opacity: 0.28;
+  background: linear-gradient(
+    118deg,
+    transparent 28%,
+    rgba(232, 122, 58, 0.05) 36%,
+    rgba(255, 198, 92, 0.12) 42%,
+    rgba(184, 223, 240, 0.2) 48%,
+    rgba(142, 202, 230, 0.14) 54%,
+    rgba(106, 158, 184, 0.07) 60%,
+    transparent 68%
+  );
+  filter: blur(12px) saturate(1.3);
+  mix-blend-mode: screen;
+  animation: asgardBifrost 20s ease-in-out infinite alternate;
+}
+
+.asgard-atmosphere::after {
+  content: "";
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  bottom: 0;
+  height: min(42vh, 420px);
+  opacity: 0.55;
+  background:
+    linear-gradient(180deg, rgba(58, 95, 125, 0.28) 0%, rgba(36, 61, 86, 0.5) 40%, rgba(21, 37, 54, 0.82) 100%);
+  clip-path: polygon(
+    0% 100%, 0% 58%, 5% 54%, 11% 62%, 17% 48%, 24% 58%, 32% 40%,
+    40% 52%, 48% 34%, 56% 50%, 64% 38%, 72% 54%, 80% 44%, 88% 56%,
+    94% 48%, 100% 52%, 100% 100%
+  );
+  filter: drop-shadow(0 -10px 24px rgba(142, 202, 230, 0.1));
+}
+
+.asgard-atmosphere-rays {
+  position: absolute;
+  inset: -8%;
+  opacity: 0.38;
+  background:
+    conic-gradient(from 248deg at 50% -6%,
+      transparent 0deg,
+      rgba(255, 214, 140, 0.1) 18deg,
+      transparent 42deg,
+      rgba(184, 223, 240, 0.12) 58deg,
+      transparent 88deg),
+    radial-gradient(ellipse 90% 55% at 50% -4%, rgba(255, 220, 160, 0.12), transparent 62%);
+  mix-blend-mode: screen;
+  animation: asgardGodrays 16s ease-in-out infinite alternate;
+}
+
+.asgard-atmosphere-frost {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(244, 251, 255, 0.4) 0 1.1px, transparent 2.1px),
+    radial-gradient(circle at 72% 18%, rgba(184, 223, 240, 0.35) 0 1.1px, transparent 2.1px),
+    radial-gradient(circle at 44% 48%, rgba(244, 251, 255, 0.28) 0 1px, transparent 2px),
+    radial-gradient(circle at 86% 62%, rgba(184, 223, 240, 0.3) 0 1.1px, transparent 2.1px);
+  background-size: 180px 180px, 220px 220px, 160px 160px, 200px 200px;
+  animation: asgardFrost 42s linear infinite;
+}
+
+.asgard-atmosphere-runes {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.28;
+  font-family: var(--font-mono);
+  font-size: clamp(16px, 2vw, 24px);
+  color: rgba(184, 223, 240, 0.42);
+  letter-spacing: 0.4em;
+  pointer-events: none;
+}
+.asgard-atmosphere-runes span {
+  position: absolute;
+  text-shadow: 0 0 18px rgba(142, 202, 230, 0.3);
+  animation: asgardRune 24s ease-in-out infinite;
+}
+.asgard-atmosphere-runes span:nth-child(1) { left: 7%; top: 16%; }
+.asgard-atmosphere-runes span:nth-child(2) { left: 86%; top: 20%; animation-delay: -5s; }
+.asgard-atmosphere-runes span:nth-child(3) { left: 12%; top: 74%; animation-delay: -10s; }
+.asgard-atmosphere-runes span:nth-child(4) { left: 80%; top: 70%; animation-delay: -15s; }
+.asgard-atmosphere-runes span:nth-child(5) { left: 48%; top: 8%; animation-delay: -7s; opacity: 0.55; }
+
+.asgard-atmosphere-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.07;
+  background-image:
+    linear-gradient(rgba(212, 234, 245, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 234, 245, 0.5) 1px, transparent 1px);
+  background-size: 84px 84px;
+  mask-image: radial-gradient(ellipse at 50% 12%, #000 10%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 12%, #000 10%, transparent 72%);
+}
+
+@keyframes asgardBifrost {
+  from { transform: translate3d(-2%, -1%, 0) rotate(-1deg); }
+  to { transform: translate3d(3%, 2%, 0) rotate(1.2deg); }
+}
+@keyframes asgardGodrays {
+  from { opacity: 0.28; }
+  to { opacity: 0.46; }
+}
+@keyframes asgardFrost {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-36px, -20px, 0); }
+}
+@keyframes asgardRune {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(-10px); opacity: 0.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .asgard-atmosphere::before,
+  .asgard-atmosphere-rays,
+  .asgard-atmosphere-frost,
+  .asgard-atmosphere-runes span {
+    animation: none !important;
+  }
+}
+
+/* ——— Header: frost glass across the realm ——— */
+body.asgard-realm .site-header,
+.site-header--asgard {
+  background: rgba(26, 45, 66, 0.78) !important;
+  backdrop-filter: blur(16px) saturate(1.3) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.3) !important;
+  border-bottom: 1px solid rgba(212, 234, 245, 0.16) !important;
+  box-shadow: 0 1px 0 rgba(142, 202, 230, 0.08), 0 12px 36px rgba(15, 28, 42, 0.18) !important;
+}
+body.asgard-realm .site-header::before,
+.site-header--asgard::before {
+  background: linear-gradient(90deg, transparent, rgba(184, 223, 240, 0.4), rgba(212, 165, 116, 0.25), transparent) !important;
+}
+
+/* ——— Drawer: hall of doors ——— */
+body.asgard-realm .nav-drawer {
+  background:
+    linear-gradient(180deg, rgba(58, 95, 125, 0.35), transparent 28%),
+    rgba(26, 45, 66, 0.96);
+  border-left: 1px solid rgba(212, 234, 245, 0.2);
+  box-shadow: -20px 0 60px rgba(15, 28, 42, 0.45);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+body.asgard-realm .nav-scrim {
+  background: rgba(15, 28, 42, 0.55);
+}
+body.asgard-realm .nav-link {
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+}
+body.asgard-realm .nav-link:hover,
+body.asgard-realm .nav-link.active {
+  background: rgba(142, 202, 230, 0.1);
+  border-color: rgba(212, 234, 245, 0.22);
+  color: var(--color-frost);
+}
+body.asgard-realm .nav-foot {
+  font-family: var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ——— Surfaces: frost glass panels ——— */
+body.asgard-realm .card,
+body.asgard-realm .card-soft,
+body.asgard-realm .filters,
+body.asgard-realm .compare-panel,
+body.asgard-realm .auth-wrap,
+body.asgard-realm .drawer-panel,
+body.asgard-realm .panel,
+body.asgard-realm .stat,
+body.asgard-realm .listing,
+body.asgard-realm .live-card,
+body.asgard-realm .store-card,
+body.asgard-realm .rcard,
+body.asgard-realm .platform-card,
+body.asgard-realm .mkt-search {
+  background:
+    linear-gradient(155deg, rgba(58, 88, 112, 0.55), rgba(36, 61, 86, 0.72) 70%),
+    rgba(42, 65, 88, 0.55) !important;
+  border-color: rgba(212, 234, 245, 0.2) !important;
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px) saturate(1.15);
+  -webkit-backdrop-filter: blur(12px) saturate(1.15);
+}
+
+body.asgard-realm .listing:hover,
+body.asgard-realm .live-card:hover,
+body.asgard-realm .store-card:hover,
+body.asgard-realm .rcard:hover {
+  border-color: rgba(184, 223, 240, 0.4) !important;
+  box-shadow: var(--shadow-md), var(--glow-ice);
+}
+
+body.asgard-realm input,
+body.asgard-realm select,
+body.asgard-realm textarea {
+  background: rgba(26, 45, 66, 0.72);
+  border-color: rgba(212, 234, 245, 0.22);
+  color: var(--color-text-primary);
+}
+body.asgard-realm input::placeholder,
+body.asgard-realm textarea::placeholder {
+  color: var(--color-text-muted);
+}
+body.asgard-realm input:focus,
+body.asgard-realm select:focus,
+body.asgard-realm textarea:focus {
+  border-color: var(--color-accent-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+/* ——— Typography & kickers ——— */
+body.asgard-realm h1,
+body.asgard-realm h2,
+body.asgard-realm .mkt-hero h2,
+body.asgard-realm .rides-title,
+body.asgard-realm .wrap > h2 {
+  color: var(--color-frost);
+  font-family: var(--font-display);
+}
+body.asgard-realm .mkt-hero h2 .accent,
+body.asgard-realm .accent {
+  color: var(--color-accent-primary-strong);
+}
+body.asgard-realm .hero-pitch,
+body.asgard-realm .muted,
+body.asgard-realm .muted-sm {
+  color: var(--color-text-secondary);
+}
+
+body.asgard-realm .asgard-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 7px 14px;
+  font: 600 11px/1 var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-crystal);
+  border: 1px solid rgba(184, 223, 240, 0.3);
+  border-radius: var(--radius-pill);
+  background: rgba(42, 65, 88, 0.55);
+}
+body.asgard-realm .asgard-kicker .runes {
+  display: inline;
+  letter-spacing: var(--tracking-rune);
+  color: var(--color-accent-primary);
+}
+
+/* Page heroes — brand-first chamber */
+body.asgard-realm .mkt-hero,
+body.asgard-realm .platform-hero,
+body.asgard-realm .hero-strip {
+  position: relative;
+  background: transparent;
+  padding-top: clamp(36px, 5vh, 64px);
+}
+body.asgard-realm .platform-hero h1,
+body.asgard-realm .hero-strip h2 {
+  color: var(--color-frost);
+}
+body.asgard-realm .mkt-hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(184, 223, 240, 0.45), rgba(212, 165, 116, 0.3), transparent);
+}
+body.asgard-realm .cat-chip {
+  background: rgba(42, 65, 88, 0.55);
+  border-color: rgba(212, 234, 245, 0.2);
+  color: var(--color-text-secondary);
+}
+body.asgard-realm .cat-chip.active {
+  background: linear-gradient(135deg, var(--color-accent-primary), #6eb8d8);
+  border-color: transparent;
+  color: var(--color-on-accent);
+}
+body.asgard-realm .listing-img {
+  background: linear-gradient(165deg, #3a5872, #243d56) !important;
+}
+body.asgard-realm .badge {
+  background: rgba(26, 45, 66, 0.85);
+  border-color: rgba(212, 234, 245, 0.22);
+  color: var(--color-text-secondary);
+}
+body.asgard-realm .trust-bar {
+  background: rgba(26, 45, 66, 0.55);
+  border-color: rgba(212, 234, 245, 0.14);
+  color: var(--color-text-secondary);
+}
+body.asgard-realm .watch-heart {
+  background: rgba(26, 45, 66, 0.85);
+  border-color: rgba(212, 234, 245, 0.22);
+}
+
+/* Buttons stay icy */
+body.asgard-realm .btn-primary {
+  background: linear-gradient(135deg, var(--color-accent-primary), #6eb8d8);
+  border-color: transparent;
+  color: var(--color-on-accent);
+  box-shadow: 0 6px 20px rgba(142, 202, 230, 0.28);
+}
+body.asgard-realm .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-accent-primary-strong), var(--color-accent-primary));
+  box-shadow: 0 10px 28px rgba(142, 202, 230, 0.35);
+}
+body.asgard-realm .btn-ghost {
+  background: rgba(42, 65, 88, 0.45);
+  border-color: rgba(212, 234, 245, 0.28);
+  color: var(--color-frost);
+}
+body.asgard-realm .btn-ghost:hover:not(:disabled) {
+  background: rgba(142, 202, 230, 0.12);
+  border-color: rgba(184, 223, 240, 0.4);
+  color: #fff;
+}
+
+/* Chat FAB — realm chrome */
+body.asgard-realm .chat-fab {
+  background: rgba(26, 45, 66, 0.88);
+  border: 1px solid rgba(212, 234, 245, 0.28);
+  color: var(--color-frost);
+  box-shadow: var(--shadow-md), var(--glow-ice);
+}
+body.asgard-realm .chat-panel {
+  background: rgba(26, 45, 66, 0.96);
+  border-color: rgba(212, 234, 245, 0.22);
+}
+
+/* Live room keeps its own stage — only soft realm tint if class present */
+body.premium-room.asgard-realm .asgard-atmosphere {
+  opacity: 0.35;
+}
+body.premium-room.asgard-realm .asgard-atmosphere-runes {
+  display: none;
+}

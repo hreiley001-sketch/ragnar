@@ -4,6 +4,55 @@
 "use strict";
 (function () {
   const path = (location.pathname.replace(/\/+$/, "") || "/");
+  const onHome = path === "/" || document.body.classList.contains("arena-home");
+  const onRoom = document.body.classList.contains("premium-room");
+
+  // ---- Asgard realm: fonts + shell CSS + atmosphere on every hall page ----
+  function ensureAsgardAssets() {
+    if (!document.getElementById("ragnar-fonts")) {
+      const pre1 = document.createElement("link");
+      pre1.rel = "preconnect";
+      pre1.href = "https://fonts.googleapis.com";
+      const pre2 = document.createElement("link");
+      pre2.rel = "preconnect";
+      pre2.href = "https://fonts.gstatic.com";
+      pre2.crossOrigin = "anonymous";
+      const fonts = document.createElement("link");
+      fonts.id = "ragnar-fonts";
+      fonts.rel = "stylesheet";
+      fonts.href = "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap";
+      document.head.appendChild(pre1);
+      document.head.appendChild(pre2);
+      document.head.appendChild(fonts);
+    }
+    if (!document.getElementById("asgard-shell-css")) {
+      const css = document.createElement("link");
+      css.id = "asgard-shell-css";
+      css.rel = "stylesheet";
+      css.href = "/static/asgard-shell.css";
+      document.head.appendChild(css);
+    }
+  }
+  function mountAsgardRealm() {
+    // Homepage owns the full vault-env; other pages enter the shared hall.
+    document.body.classList.remove("theme-utility");
+    if (!onHome) document.body.classList.add("asgard-realm");
+    if (onHome || document.getElementById("asgardAtmosphere")) return;
+    const atm = document.createElement("div");
+    atm.id = "asgardAtmosphere";
+    atm.className = "asgard-atmosphere";
+    atm.setAttribute("aria-hidden", "true");
+    atm.innerHTML = `
+      <div class="asgard-atmosphere-rays"></div>
+      <div class="asgard-atmosphere-frost"></div>
+      <div class="asgard-atmosphere-grid"></div>
+      <div class="asgard-atmosphere-runes">
+        <span>ᚦ</span><span>ᚱ</span><span>ᚨ</span><span>ᚷ</span><span>ᚾ</span>
+      </div>`;
+    document.body.insertBefore(atm, document.body.firstChild);
+  }
+  ensureAsgardAssets();
+  mountAsgardRealm();
 
   const ITEMS = [
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
@@ -48,7 +97,12 @@
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
-    header.className = "site-header";
+    const headerTone = onHome
+      ? "site-header site-header--arena site-header--asgard"
+      : onRoom
+        ? "site-header site-header--room site-header--asgard"
+        : "site-header site-header--asgard";
+    header.className = headerTone;
     const light = path === "/login" || path === "/verify";
     if (light) {
       header.innerHTML = `
