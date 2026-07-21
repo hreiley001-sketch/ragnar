@@ -1098,7 +1098,7 @@ body.arena-home[data-vault-stage="4"] .vault-aperture {
 }
 
 .intel-spotlight {
-  display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: center;
+  display: grid; grid-template-columns: minmax(0, 1.2fr) auto auto; gap: 28px; align-items: center;
   padding: clamp(28px,4.5vw,56px); border: 1px solid var(--arena-line-hot);
   background:
     linear-gradient(120deg, color-mix(in srgb, var(--arena-ice) 12%, transparent), transparent 52%),
