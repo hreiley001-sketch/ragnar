@@ -110,8 +110,9 @@
 
 .nordic-orbit-card {
   position: absolute;
-  width: min(118px, 28%);
-  aspect-ratio: 0.7;
+  width: min(132px, 30%);
+  height: auto;
+  aspect-ratio: 5 / 7;
   border-radius: 12px;
   box-shadow:
     0 18px 40px rgba(3, 9, 15, 0.55),
@@ -119,41 +120,68 @@
   animation: nordicOrbitFloat 7s ease-in-out infinite;
 }
 
-.nordic-orbit-card .nordic-card__runes { font-size: 8px; inset: 12px 8px auto; }
-.nordic-orbit-card .nordic-card__meta { padding: 0 10px 12px; }
+.nordic-orbit-card .nordic-card__runes {
+  font-size: 8px;
+  inset: 10px 8px auto;
+  letter-spacing: 0.18em;
+}
+
+.nordic-orbit-card .nordic-card__meta {
+  padding: 0 10px 12px;
+  flex: none;
+}
+
 .nordic-orbit-card .nordic-card__title { font-size: 12px; }
-.nordic-orbit-card .nordic-card__series { font-size: 7px; }
-.nordic-orbit-card .nordic-card__art { padding: 28px 10px 6px; }
+.nordic-orbit-card .nordic-card__series { font-size: 7px; margin-bottom: 4px; }
+.nordic-orbit-card .nordic-card__sub {
+  display: block;
+  font-size: 9px;
+  margin-top: 3px;
+}
+
+.nordic-orbit-card .nordic-card__art {
+  flex: 1 1 auto;
+  padding: 26px 10px 4px;
+  min-height: 0;
+}
+
+.nordic-orbit-card .nordic-card__glyph {
+  font-size: clamp(28px, 5vw, 40px);
+}
+
 .nordic-orbit-card .nordic-card__frame { inset: 6px; }
 .nordic-orbit-card .nordic-card__frame::before,
 .nordic-orbit-card .nordic-card__frame::after { width: 10px; height: 10px; }
-
-.nordic-orbit-a {
-  left: 6%;
-  top: 18%;
-  transform: rotate(-12deg);
-  animation-delay: -1.5s;
-}
-
-.nordic-orbit-b {
-  right: 4%;
-  bottom: 14%;
-  transform: rotate(10deg);
-  animation-delay: -3.5s;
-}
 
 @keyframes nordicOrbitFloat {
   0%, 100% { transform: translateY(0) rotate(var(--orbit-rot, -12deg)); }
   50% { transform: translateY(-10px) rotate(var(--orbit-rot, -12deg)); }
 }
 
-.nordic-orbit-a { --orbit-rot: -12deg; }
-.nordic-orbit-b { --orbit-rot: 10deg; }
+.nordic-orbit-a {
+  left: 4%;
+  top: 22%;
+  --orbit-rot: -11deg;
+  animation-delay: -1.5s;
+}
+
+.nordic-orbit-b {
+  right: 3%;
+  bottom: 16%;
+  --orbit-rot: 9deg;
+  animation-delay: -3.5s;
+}
 
 @media (max-width: 820px) {
-  .nordic-orbit-card { width: min(96px, 26%); }
-  .nordic-orbit-a { left: 2%; top: 12%; }
-  .nordic-orbit-b { right: 2%; bottom: 10%; }
+  .nordic-orbit-card { width: min(104px, 28%); }
+  .nordic-orbit-a { left: 2%; top: 14%; }
+  .nordic-orbit-b { right: 2%; bottom: 12%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nordic-orbit-card {
+    animation: none !important;
+  }
 }
 
 .nordic-card__orb {
