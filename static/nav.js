@@ -4,6 +4,121 @@
 "use strict";
 (function () {
   const path = (location.pathname.replace(/\/+$/, "") || "/");
+  const onHome = path === "/" || document.body.classList.contains("arena-home");
+  const onRoom = document.body.classList.contains("premium-room");
+
+  // ---- Asgard realm: fonts + shell CSS + atmosphere on every hall page ----
+  function ensureAsgardAssets() {
+    if (!document.getElementById("ragnar-fonts")) {
+      const pre1 = document.createElement("link");
+      pre1.rel = "preconnect";
+      pre1.href = "https://fonts.googleapis.com";
+      const pre2 = document.createElement("link");
+      pre2.rel = "preconnect";
+      pre2.href = "https://fonts.gstatic.com";
+      pre2.crossOrigin = "anonymous";
+      const fonts = document.createElement("link");
+      fonts.id = "ragnar-fonts";
+      fonts.rel = "stylesheet";
+      fonts.href = "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap";
+      document.head.appendChild(pre1);
+      document.head.appendChild(pre2);
+      document.head.appendChild(fonts);
+    }
+    if (!document.getElementById("asgard-shell-css")) {
+      const css = document.createElement("link");
+      css.id = "asgard-shell-css";
+      css.rel = "stylesheet";
+      css.href = "/static/asgard-shell.css";
+      document.head.appendChild(css);
+    }
+  }
+  function mountAsgardRealm() {
+    // Homepage owns the full vault-env; other pages enter the shared hall.
+    document.body.classList.remove("theme-utility");
+    if (!onHome) document.body.classList.add("asgard-realm");
+    if (onHome) return;
+
+    if (!document.getElementById("asgardAtmosphere")) {
+      const atm = document.createElement("div");
+      atm.id = "asgardAtmosphere";
+      atm.className = "asgard-atmosphere";
+      atm.setAttribute("aria-hidden", "true");
+      atm.innerHTML = `
+        <div class="asgard-atmosphere-rays"></div>
+        <div class="asgard-atmosphere-frost"></div>
+        <div class="asgard-atmosphere-grid"></div>
+        <div class="asgard-atmosphere-runes">
+          <span>\u16a6</span><span>\u16b1</span><span>\u16a8</span><span>\u16b7</span><span>\u16be</span>
+        </div>`;
+      document.body.insertBefore(atm, document.body.firstChild);
+    }
+
+    // Embedded ornaments — corners, crest seal, side rails, ice frame.
+    if (!document.getElementById("asgardOrnaments") && !onRoom) {
+      const orn = document.createElement("div");
+      orn.id = "asgardOrnaments";
+      orn.className = "asgard-ornaments";
+      orn.setAttribute("aria-hidden", "true");
+      orn.innerHTML = `
+        <div class="asgard-frame"></div>
+        <div class="asgard-corner asgard-corner-tl"></div>
+        <div class="asgard-corner asgard-corner-tr"></div>
+        <div class="asgard-corner asgard-corner-bl"></div>
+        <div class="asgard-corner asgard-corner-br"></div>
+        <div class="asgard-rail asgard-rail-l"><span>\u16b1</span><span>\u16a8</span><span>\u16b7</span><span>\u16be</span><span>\u16a8</span><span>\u16b1</span></div>
+        <div class="asgard-rail asgard-rail-r"><span>\u16a6</span><span>\u16b1</span><span>\u16a8</span><span>\u16df</span><span>\u16b9</span><span>\u16a2</span></div>
+        <div class="asgard-crest-seal">
+          <img src="/static/logo.png" alt="" width="120" height="120" decoding="async" />
+        </div>
+        <div class="asgard-spark asgard-spark-a"></div>
+        <div class="asgard-spark asgard-spark-b"></div>
+        <div class="asgard-spark asgard-spark-c"></div>`;
+      document.body.appendChild(orn);
+    }
+  }
+
+  function embellishAsgardPage() {
+    if (onHome || onRoom || !document.body.classList.contains("asgard-realm")) return;
+
+    document.querySelectorAll(".mkt-hero, .platform-hero, .hero-strip, .auth-wrap .logo-c").forEach((hero) => {
+      if (hero.querySelector(".asgard-hero-seal")) return;
+      const seal = document.createElement("div");
+      seal.className = "asgard-hero-seal";
+      seal.setAttribute("aria-hidden", "true");
+      seal.innerHTML = `<span class="asgard-hero-ring"></span><span class="asgard-hero-ring asgard-hero-ring-2"></span>`;
+      hero.prepend(seal);
+    });
+
+    document.querySelectorAll(".section-title").forEach((el) => {
+      if (el.querySelector(".asgard-section-rune")) return;
+      const rune = document.createElement("span");
+      rune.className = "asgard-section-rune";
+      rune.setAttribute("aria-hidden", "true");
+      rune.textContent = "\u16df";
+      el.prepend(rune);
+    });
+
+    document.querySelectorAll(
+      ".card, .listing, .live-card, .store-card, .rcard, .feed-card, .live-hub-card, .dash-card, .auth-wrap, .stat"
+    ).forEach((card) => {
+      if (card.querySelector(".asgard-foil")) return;
+      const foil = document.createElement("span");
+      foil.className = "asgard-foil";
+      foil.setAttribute("aria-hidden", "true");
+      card.classList.add("asgard-panel");
+      card.appendChild(foil);
+    });
+  }
+
+  ensureAsgardAssets();
+  mountAsgardRealm();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", embellishAsgardPage);
+  } else {
+    embellishAsgardPage();
+  }
+  window.addEventListener("load", () => setTimeout(embellishAsgardPage, 400));
 
   const ITEMS = [
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
@@ -48,8 +163,13 @@
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
-    const onHome = path === "/" || document.body.classList.contains("arena-home");
-    header.className = "site-header" + (onHome ? " site-header--arena" : "");
+    // Asgard chrome sitewide; arena/room tones keep home + live-room special cases.
+    const headerTone = onHome
+      ? "site-header site-header--arena site-header--asgard"
+      : onRoom
+        ? "site-header site-header--room site-header--asgard"
+        : "site-header site-header--asgard";
+    header.className = headerTone;
     const light = path === "/login" || path === "/verify";
     if (light) {
       header.innerHTML = `
