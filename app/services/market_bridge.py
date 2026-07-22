@@ -153,3 +153,36 @@ def mirror_order_paid(
         invalidate("market:listings:active", "market:feed")
     except Exception as exc:  # noqa: BLE001
         logger.warning("mirror_order_paid skipped: %s", exc)
+
+
+def mirror_order_status(
+    order: Order,
+    *,
+    status: str,
+    actor: Optional[User] = None,
+) -> None:
+    """Best-effort status change → n8n + optional Supabase patch."""
+    try:
+        order_uuid = str(uuid.uuid5(uuid.NAMESPACE_URL, f"ragnar:order:{order.id}"))
+        actor_uid = actor_id(actor) if actor else None
+        mapped = {
+            "paid": "paid",
+            "shipped": "shipped",
+            "delivered": "completed",
+            "completed": "completed",
+            "cancelled": "cancelled",
+            "disputed": "cancelled",
+        }.get(status, status)
+        supabase_rest.patch("orders", {"id": f"eq.{order_uuid}"}, {"status": mapped})
+        enqueue_job(
+            "order_status_changed",
+            user_id=actor_uid,
+            extra={
+                "order_id": order_uuid,
+                "legacy_order_id": order.id,
+                "status": mapped,
+                "legacy_status": status,
+            },
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("mirror_order_status skipped: %s", exc)

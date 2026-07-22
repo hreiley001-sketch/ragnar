@@ -152,6 +152,21 @@ function renderHero() {
     <div class="stat hot"><div class="stat-num">${(f.founding_rate * 100).toFixed(0)}%</div><div class="stat-label">Founding 250 rate</div></div>
     <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Standard seller fee</div></div>
     <div class="stat"><div class="stat-num">★</div><div class="stat-label">Founding ${f.founding_cap} badge</div></div>`;
+  mountPulseChip();
+}
+
+async function mountPulseChip() {
+  const hero = document.querySelector(".mkt-hero");
+  if (!hero || hero.querySelector(".birdman-pulse-chip") || !window.Birdman) return;
+  try {
+    const pulse = await window.Birdman.pulse();
+    const redisOk = pulse && pulse.redis && pulse.redis.ok;
+    const chip = document.createElement("div");
+    chip.className = "birdman-pulse-chip";
+    chip.textContent = redisOk ? "Birdman · live" : "Birdman · ready";
+    chip.title = "Marketplace spine health";
+    hero.appendChild(chip);
+  } catch (_) {}
 }
 
 function renderIntegrations() {

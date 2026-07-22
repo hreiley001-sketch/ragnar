@@ -190,6 +190,12 @@ def ship_order(
                  + (f" ({order.carrier})" if order.carrier else ""),
             link="/account#orders",
         )
+    try:
+        from ..services.market_bridge import mirror_order_status
+
+        mirror_order_status(order, status="shipped", actor=user)
+    except Exception:  # noqa: BLE001
+        pass
     return _order_dict(session, order)
 
 
@@ -233,6 +239,12 @@ def mark_delivered(
             body="The seller marked your order as delivered.",
             link="/account#orders",
         )
+    try:
+        from ..services.market_bridge import mirror_order_status
+
+        mirror_order_status(order, status="delivered", actor=user)
+    except Exception:  # noqa: BLE001
+        pass
     return _order_dict(session, order)
 
 

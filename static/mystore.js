@@ -4,8 +4,11 @@
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const money = (n) => "$" + Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-  async function api(path) {
-    const r = await fetch(path);
+  async function api(path, options = {}) {
+    if (window.Birdman && typeof window.Birdman.api === "function") {
+      return window.Birdman.api(path, options);
+    }
+    const r = await fetch(path, { credentials: "same-origin", ...options });
     const data = await r.json().catch(() => null);
     if (!r.ok) throw Object.assign(new Error("fail"), { status: r.status, data });
     return data;
@@ -13,7 +16,12 @@
 
   async function load() {
     let me;
-    try { me = await api("/api/auth/me"); } catch (_) { me = { user: null }; }
+    try {
+      const profile = window.Birdman ? await window.Birdman.me() : await api("/api/auth/me");
+      // v1 UserProfile or legacy { user }
+      me = profile && profile.user !== undefined ? profile : { user: profile };
+      if (me.auth === "anonymous") me = { user: null };
+    } catch (_) { me = { user: null }; }
     if (!me.user) {
       $("guestGate").hidden = false;
       $("sellerDash").hidden = true;

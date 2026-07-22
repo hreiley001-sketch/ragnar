@@ -41,6 +41,13 @@
       css.href = "/static/asgard-shell.css";
       document.head.appendChild(css);
     }
+    if (!document.getElementById("birdman-chrome-css")) {
+      const css = document.createElement("link");
+      css.id = "birdman-chrome-css";
+      css.rel = "stylesheet";
+      css.href = "/static/birdman-chrome.css";
+      document.head.appendChild(css);
+    }
     if (!document.getElementById("gods-css")) {
       const css = document.createElement("link");
       css.id = "gods-css";
