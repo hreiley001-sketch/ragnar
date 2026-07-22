@@ -219,8 +219,8 @@
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(15px, 1.8vw, 20px);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  letter-spacing: var(--tracking-display);
   line-height: 1.15;
   color: var(--color-frost);
 }

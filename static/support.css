@@ -89,8 +89,9 @@ body.counsel-page .counsel-brand-name {
   display: flex; flex-direction: column; gap: 2px;
 }
 .counsel-brand-name {
+  font-family: var(--counsel-display);
   font-size: clamp(36px, 5.5vw, 56px);
-  font-weight: 800;
+  font-weight: 400;
   letter-spacing: var(--tracking-display);
   line-height: 0.95;
   color: var(--color-frost);
@@ -99,24 +100,25 @@ body.counsel-page .counsel-brand-name {
 .counsel-brand-name span { color: var(--counsel-ice); text-shadow: 0 0 28px rgba(184, 121, 26, 0.4); }
 .counsel-brand-runes {
   font-family: var(--counsel-mono);
-  font-size: 10px;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: var(--counsel-steel);
+  font-size: 11px;
+  letter-spacing: var(--tracking-rune);
+  text-transform: none;
+  color: var(--color-accent-gold);
 }
 .counsel-hero h1 {
   margin: 0 0 14px;
+  font-family: var(--counsel-display);
   font-size: clamp(22px, 3.4vw, 32px);
-  font-weight: 650;
-  letter-spacing: var(--tracking-tight);
+  font-weight: 400;
+  letter-spacing: var(--tracking-display);
   line-height: 1.15;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   max-width: 18ch;
 }
 .counsel-hero h1 em {
   font-style: normal;
-  color: var(--color-frost);
-  font-weight: 750;
+  color: var(--color-accent-primary-strong);
+  font-weight: 400;
 }
 .counsel-hero-sub {
   margin: 0 0 26px;

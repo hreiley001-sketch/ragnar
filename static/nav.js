@@ -20,7 +20,7 @@
       const fonts = document.createElement("link");
       fonts.id = "ragnar-fonts";
       fonts.rel = "stylesheet";
-      fonts.href = "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap";
+      fonts.href = "https://fonts.googleapis.com/css2?family=Germania+One&family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap";
       document.head.appendChild(pre1);
       document.head.appendChild(pre2);
       document.head.appendChild(fonts);

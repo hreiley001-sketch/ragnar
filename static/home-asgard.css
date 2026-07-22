@@ -147,18 +147,18 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  opacity: 0.35;
+  opacity: 0.62;
   font-family: var(--font-mono);
-  font-size: clamp(18px, 2.4vw, 28px);
-  color: rgba(184, 121, 26, 0.45);
-  letter-spacing: 0.4em;
+  font-size: clamp(20px, 2.6vw, 32px);
+  color: rgba(138, 101, 16, 0.58);
+  letter-spacing: 0.45em;
   pointer-events: none;
 }
 
 .asgard-runes-float span {
   position: absolute;
   animation: runeFloat 22s ease-in-out infinite;
-  text-shadow: 0 0 20px rgba(184, 121, 26, 0.35);
+  text-shadow: 0 0 24px rgba(184, 121, 26, 0.5);
 }
 
 .asgard-runes-float span:nth-child(1) { left: 8%; top: 18%; animation-delay: 0s; }
@@ -369,16 +369,17 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
   opacity: 0.85;
 }
 
-/* ——— Fun power buttons ——— */
+/* ——— Asgard gold CTAs ——— */
 .arena-btn.primary {
-  background: linear-gradient(135deg, #8ecae6 0%, #5a9ec4 48%, #d4a574 100%) !important;
+  background: linear-gradient(135deg, var(--color-accent-primary), #d8a13f) !important;
+  color: var(--color-on-accent) !important;
   box-shadow:
-    0 6px 22px rgba(184, 121, 26, 0.3),
-    0 0 0 1px rgba(255, 220, 160, 0.15) inset !important;
+    0 6px 22px rgba(184, 121, 26, 0.32),
+    0 0 0 1px rgba(255, 220, 160, 0.18) inset !important;
 }
 
 .arena-btn.primary:hover {
-  background: linear-gradient(135deg, #b8dff0 0%, #8ecae6 42%, #e4bb8a 100%) !important;
+  background: linear-gradient(135deg, var(--color-accent-primary-strong), var(--color-accent-primary)) !important;
 }
 
 /* Activity spotlight — great hall */
