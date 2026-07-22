@@ -1,0 +1,73 @@
+{
+  "name": "Birdman — Ride Phase Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ride/phase-changed",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.headers['x-birdman-token']}}",
+              "value2": "={{$env.BIRDMAN_SHARED_SECRET}}"
+            }
+          ]
+        }
+      },
+      "id": "auth",
+      "name": "Shared Secret?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = items[0].json.body || items[0].json;\nreturn [{ json: { topic: body.topic, ride_id: body.payload?.ride_id, phase: body.payload?.phase, job_id: body.id } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [700, 220]
+    },
+    {
+      "parameters": {
+        "content": "## Ride phase changed\nJob `{{$json.job_id}}` — ride {{$json.ride_id}} → `{{$json.phase}}`",
+        "options": {}
+      },
+      "id": "notify",
+      "name": "Ops Note",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [920, 220]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Shared Secret?", "type": "main", "index": 0 }]] },
+    "Shared Secret?": {
+      "main": [
+        [{ "node": "Normalize", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Normalize": { "main": [[{ "node": "Ops Note", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "birdman": {
+      "topic": "ride.phase_changed",
+      "enqueue_from": "app.event_bus.emit → platform.enqueue"
+    }
+  }
+}

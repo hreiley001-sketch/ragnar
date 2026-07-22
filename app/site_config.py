@@ -203,4 +203,10 @@ def set_many(session: Session, updates: dict, by: str | None) -> dict[str, str]:
             row = SiteSetting(key=key, value=value, updated_by=by, updated_at=now)
         session.add(row)
     session.commit()
+    try:
+        from .platform.cache import invalidate
+
+        invalidate("site-config:public")
+    except Exception:  # noqa: BLE001
+        pass
     return get_all(session)

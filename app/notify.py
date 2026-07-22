@@ -60,6 +60,23 @@ def notify_admins(session: Session, type_: str, title: str, body: str = "", link
         notify(session, a.id, type_, title, body, link, commit=False)
     if admins:
         session.commit()
+    # Fan-out to n8n ops workflow (never blocks the request path meaningfully).
+    try:
+        from .platform.queue import enqueue
+
+        enqueue(
+            "ops.notify",
+            {
+                "type": type_,
+                "title": title,
+                "message": body or title,
+                "link": link,
+                "severity": "info",
+            },
+            workflow="ops/notify",
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("ops.notify enqueue failed: %s", exc)
 
 
 def notify_followers(session: Session, seller: Seller, type_: str, title: str,

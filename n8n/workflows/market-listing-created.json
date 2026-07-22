@@ -1,0 +1,59 @@
+{
+  "name": "Birdman — Listing Created",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "market/listing-created",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const b = items[0].json.body || items[0].json;\nconst p = b.payload || b;\nreturn [{ json: { type: 'listing_created', user_id: p.user_id, listing_id: p.listing_id, card_id: p.card_id, price: p.price, job_id: b.id, timestamp: p.timestamp } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {},
+      "id": "market_event",
+      "name": "Insert market_events",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {},
+      "id": "notify",
+      "name": "Notify followers",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {},
+      "id": "log",
+      "name": "Write system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1240, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Normalize", "type": "main", "index": 0 }]] },
+    "Normalize": { "main": [[{ "node": "Insert market_events", "type": "main", "index": 0 }]] },
+    "Insert market_events": { "main": [[{ "node": "Notify followers", "type": "main", "index": 0 }]] },
+    "Notify followers": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] }
+  },
+  "meta": { "birdman": { "type": "listing_created", "category": "marketplace" } }
+}

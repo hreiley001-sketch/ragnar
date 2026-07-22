@@ -8,6 +8,15 @@
   const onRoom = document.body.classList.contains("premium-room");
 
   // ---- Asgard realm: fonts + shell CSS + atmosphere on every hall page ----
+  function ensureBirdmanClient() {
+    if (window.Birdman || document.getElementById("birdman-js")) return;
+    const s = document.createElement("script");
+    s.id = "birdman-js";
+    s.src = "/static/birdman.js";
+    document.head.appendChild(s);
+  }
+  ensureBirdmanClient();
+
   function ensureAsgardAssets() {
     if (!document.getElementById("ragnar-fonts")) {
       const pre1 = document.createElement("link");
@@ -30,6 +39,13 @@
       css.id = "asgard-shell-css";
       css.rel = "stylesheet";
       css.href = "/static/asgard-shell.css";
+      document.head.appendChild(css);
+    }
+    if (!document.getElementById("birdman-chrome-css")) {
+      const css = document.createElement("link");
+      css.id = "birdman-chrome-css";
+      css.rel = "stylesheet";
+      css.href = "/static/birdman-chrome.css";
       document.head.appendChild(css);
     }
     if (!document.getElementById("gods-css")) {

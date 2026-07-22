@@ -11,12 +11,10 @@ from __future__ import annotations
 
 import csv
 import io
-import math
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile, status
-from sqlalchemy import func
-from sqlmodel import Session, or_, select
+from sqlmodel import Session, select
 
 from ..auth import (
     get_current_user,
@@ -24,6 +22,7 @@ from ..auth import (
     require_can_act_for_seller,
     require_user,
 )
+from ..config import settings
 from ..database import get_session
 from ..fees import quote
 from ..models import (
@@ -36,8 +35,10 @@ from ..models import (
     User,
 )
 from ..payments import compute_split
+from ..platform.cache import cached_json
 from ..schemas import ListingCreate, ListingPage, ListingRead, ListingUpdate, MarkSold, SortOption
-from ..services import record_sale
+from ..services import listing_query_service, record_sale
+from ..services.market_bridge import mirror_listing_created
 
 router = APIRouter(prefix="/api/listings", tags=["listings"])
 
@@ -173,7 +174,11 @@ def create_listing(
     x_store_token: str = Header(default=""),
 ) -> ListingRead:
     seller = _resolve_create_seller(payload, session, user, x_store_token)
-    return _persist_listing(payload, session, seller)
+    result = _persist_listing(payload, session, seller)
+    listing = session.get(Listing, result.id)
+    if listing:
+        mirror_listing_created(listing, user=user)
+    return result
 
 
 def _row_to_payload(row: dict[str, str]) -> dict:
@@ -395,62 +400,78 @@ def search_listings(
     page: int = Query(1, ge=1),
     page_size: int = Query(24, ge=1, le=100),
 ) -> ListingPage:
-    filters = [Listing.status == ListingStatus.active.value]
+    cache_key = (
+        "listings:search:"
+        f"q={q or ''}|cat={category.value if category else ''}|"
+        f"set={set_name or ''}|cond={condition.value if condition else ''}|"
+        f"gc={grading_company.value if grading_company else ''}|"
+        f"graded={graded}|ming={min_grade}|minp={min_price}|maxp={max_price}|"
+        f"founding={founding_only}|feat={featured}|sort={sort.value}|"
+        f"page={page}|ps={page_size}"
+    )
 
-    if q:
-        like = f"%{q.strip()}%"
-        filters.append(
-            or_(
-                Listing.title.ilike(like),
-                Listing.player_or_character.ilike(like),
-                Listing.set_name.ilike(like),
-            )
-        )
-    if category:
-        filters.append(Listing.category == category.value)
-    if set_name:
-        filters.append(Listing.set_name.ilike(f"%{set_name.strip()}%"))
-    if condition:
-        filters.append(Listing.condition == condition.value)
-    if grading_company:
-        filters.append(Listing.grading_company == grading_company.value)
-    if graded is not None:
-        filters.append(Listing.is_graded == graded)
-    if min_grade is not None:
-        filters.append(Listing.grade >= min_grade)
-    if min_price is not None:
-        filters.append(Listing.price_cents >= round(min_price * 100))
-    if max_price is not None:
-        filters.append(Listing.price_cents <= round(max_price * 100))
-    if founding_only:
-        filters.append(Listing.is_founding_seller == True)  # noqa: E712
-    if featured:
-        filters.append(Listing.is_featured == True)  # noqa: E712
+    def load() -> dict:
+        return _search_listings_page(
+            session,
+            q=q,
+            category=category,
+            set_name=set_name,
+            condition=condition,
+            grading_company=grading_company,
+            graded=graded,
+            min_grade=min_grade,
+            min_price=min_price,
+            max_price=max_price,
+            founding_only=founding_only,
+            featured=featured,
+            sort=sort,
+            page=page,
+            page_size=page_size,
+        ).model_dump(mode="json")
 
-    total = session.exec(
-        select(func.count()).select_from(Listing).where(*filters)
-    ).one()
+    data = cached_json(
+        cache_key,
+        ttl_seconds=settings.cache_ttl_listings_seconds,
+        loader=load,
+    )
+    return ListingPage.model_validate(data)
 
-    statement = select(Listing).where(*filters)
-    if sort == SortOption.price_asc:
-        statement = statement.order_by(Listing.price_cents.asc())
-    elif sort == SortOption.price_desc:
-        statement = statement.order_by(Listing.price_cents.desc())
-    elif sort == SortOption.grade_desc:
-        # On SQLite, DESC already sorts NULL grades last, which is what we want.
-        statement = statement.order_by(Listing.grade.desc(), Listing.created_at.desc())
-    else:  # newest
-        statement = statement.order_by(Listing.created_at.desc())
 
-    statement = statement.offset((page - 1) * page_size).limit(page_size)
-    rows = session.exec(statement).all()
-
-    return ListingPage(
-        items=[ListingRead.from_listing(r) for r in rows],
-        total=total,
+def _search_listings_page(
+    session: Session,
+    *,
+    q: str | None,
+    category: Category | None,
+    set_name: str | None,
+    condition: Condition | None,
+    grading_company: GradingCompany | None,
+    graded: bool | None,
+    min_grade: float | None,
+    min_price: float | None,
+    max_price: float | None,
+    founding_only: bool,
+    featured: bool,
+    sort: SortOption,
+    page: int,
+    page_size: int,
+) -> ListingPage:
+    """Compat shim — logic lives in listing_query_service."""
+    return listing_query_service.search_listings_page(
+        session,
+        q=q,
+        category=category,
+        set_name=set_name,
+        condition=condition,
+        grading_company=grading_company,
+        graded=graded,
+        min_grade=min_grade,
+        min_price=min_price,
+        max_price=max_price,
+        founding_only=founding_only,
+        featured=featured,
+        sort=sort,
         page=page,
         page_size=page_size,
-        pages=max(1, math.ceil(total / page_size)) if total else 0,
     )
 
 

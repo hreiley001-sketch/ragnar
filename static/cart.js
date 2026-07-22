@@ -5,7 +5,11 @@
   const money = (n) => "$" + Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
   async function api(path, opts = {}) {
-    const r = await fetch(path, {
+    if (window.Birdman && typeof window.Birdman.api === "function") {
+      return window.Birdman.api(path, opts);
+    }
+
+    const r = await fetch(path, { credentials: "same-origin", 
       ...opts,
       headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
     });

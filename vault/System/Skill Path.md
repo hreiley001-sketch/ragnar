@@ -37,6 +37,12 @@ Progressive Obsidian mastery. Do the level you’re on. Don’t skip the feel.
 
 **Win condition:** The vault feels like thinking — not administering notes.
 
+## Level 6 — Birdman craft (RAGNAR)
+
+**Practice:** Each site upgrade leaves a [[Skills/Birdman Storefront Remap]] residue + updates [[Playbooks/Site Remap]].
+
+**Win condition:** Remaps are repeatable skills, not one-off patches. See [[Skills/Shared Birdman Client]] · [[Skills/Dual-Write Bridge]].
+
 ## Exercises
 
 | Exercise | How |

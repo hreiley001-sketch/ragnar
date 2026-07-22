@@ -13,8 +13,11 @@
     n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   async function api(path, options) {
+    if (window.Birdman && typeof window.Birdman.api === "function") {
+      return window.Birdman.api(path, options);
+    }
     const headers = { "Content-Type": "application/json", ...(options?.headers || {}) };
-    const res = await fetch(path, { headers, ...options });
+    const res = await fetch(path, { credentials: "same-origin", headers, ...options });
     let data = null;
     try { data = await res.json(); } catch (_) {}
     if (!res.ok) {
@@ -24,7 +27,10 @@
     return data;
   }
   async function apiForm(path, formData) {
-    const res = await fetch(path, { method: "POST", body: formData });
+    if (window.Birdman && typeof window.Birdman.api === "function") {
+      return window.Birdman.api(path, { method: "POST", body: formData });
+    }
+    const res = await fetch(path, { method: "POST", credentials: "same-origin", body: formData });
     let data = null;
     try { data = await res.json(); } catch (_) {}
     if (!res.ok) {

@@ -1,0 +1,59 @@
+{
+  "name": "Birdman — Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notification/send",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const b = items[0].json.body || items[0].json;\nconst p = b.payload || b;\nreturn [{ json: { type: p.type || 'notification', user_id: p.user_id, message: p.message, job_id: b.id, timestamp: p.timestamp } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {},
+      "id": "fetch",
+      "name": "Fetch user (Supabase)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {},
+      "id": "send",
+      "name": "Send email / push",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {},
+      "id": "log",
+      "name": "Write system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1240, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Normalize", "type": "main", "index": 0 }]] },
+    "Normalize": { "main": [[{ "node": "Fetch user (Supabase)", "type": "main", "index": 0 }]] },
+    "Fetch user (Supabase)": { "main": [[{ "node": "Send email / push", "type": "main", "index": 0 }]] },
+    "Send email / push": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] }
+  },
+  "meta": { "birdman": { "type": "notification", "category": "notification" } }
+}

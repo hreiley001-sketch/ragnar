@@ -1,24 +1,44 @@
 """Database engine and session management (SQLModel over SQLite by default)."""
 from __future__ import annotations
 
+import os
 from collections.abc import Iterator
 
 from sqlmodel import Session, SQLModel, create_engine
 
 from .config import settings
 
+# Prefer Supabase pooled Postgres only when explicitly enabled.
+_db_url = settings.database_url
+if settings.use_supabase_db:
+    try:
+        from .platform.supabase_client import database_url_for_sqlalchemy
+
+        _supabase = database_url_for_sqlalchemy()
+        if _supabase:
+            _db_url = _supabase
+    except Exception:  # noqa: BLE001
+        pass
+
 # SQLite needs check_same_thread=False when used with FastAPI's threadpool.
 _connect_args = (
     {"check_same_thread": False}
-    if settings.database_url.startswith("sqlite")
+    if _db_url.startswith("sqlite")
     else {}
 )
 
-engine = create_engine(
-    settings.database_url,
-    echo=settings.debug,
-    connect_args=_connect_args,
-)
+# Postgres pool — small, explicit; LB fan-out expects many short connections.
+_engine_kwargs: dict = {"echo": settings.debug, "connect_args": _connect_args}
+if not _db_url.startswith("sqlite"):
+    _engine_kwargs.update(
+        {
+            "pool_size": int(os.getenv("DB_POOL_SIZE", "5")),
+            "max_overflow": int(os.getenv("DB_MAX_OVERFLOW", "10")),
+            "pool_pre_ping": True,
+        }
+    )
+
+engine = create_engine(_db_url, **_engine_kwargs)
 
 
 # Columns added after each table originally shipped. On SQLite we add them in
@@ -58,6 +78,7 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "pending_email": "VARCHAR",
         "reset_token": "VARCHAR",
         "reset_sent_at": "DATETIME",
+        "supabase_sub": "VARCHAR",
     },
 }
 
@@ -68,7 +89,7 @@ def _quote_ident(name: str) -> str:
 
 
 def _sqlite_add_missing_columns() -> None:
-    if not settings.database_url.startswith("sqlite"):
+    if not _db_url.startswith("sqlite"):
         return
     from sqlalchemy import inspect, text
 

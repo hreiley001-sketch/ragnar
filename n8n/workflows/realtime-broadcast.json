@@ -1,0 +1,50 @@
+{
+  "name": "Birdman — Realtime Broadcast",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "realtime/broadcast",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const b = items[0].json.body || items[0].json;\nconst p = b.payload || b;\nreturn [{ json: { channel: p.channel, event_type: p.event_type, data: p.data || {}, job_id: b.id } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {},
+      "id": "write",
+      "name": "Insert realtime_events",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {},
+      "id": "log",
+      "name": "Write system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Normalize", "type": "main", "index": 0 }]] },
+    "Normalize": { "main": [[{ "node": "Insert realtime_events", "type": "main", "index": 0 }]] },
+    "Insert realtime_events": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] }
+  },
+  "meta": { "birdman": { "type": "broadcast_event", "category": "realtime" } }
+}

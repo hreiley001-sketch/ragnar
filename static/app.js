@@ -17,9 +17,13 @@ const escapeHtml = (s) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 async function api(path, options) {
+  if (window.Birdman && typeof window.Birdman.api === "function") {
+    return window.Birdman.api(path, options);
+  }
   const headers = { "Content-Type": "application/json", ...(options?.headers || {}) };
   const res = await fetch(API + path, {
     headers,
+    credentials: "same-origin",
     ...options,
   });
   let data = null;
@@ -148,17 +152,49 @@ function renderHero() {
     <div class="stat hot"><div class="stat-num">${(f.founding_rate * 100).toFixed(0)}%</div><div class="stat-label">Founding 250 rate</div></div>
     <div class="stat"><div class="stat-num">${(f.standard_rate * 100).toFixed(0)}%</div><div class="stat-label">Standard seller fee</div></div>
     <div class="stat"><div class="stat-num">★</div><div class="stat-label">Founding ${f.founding_cap} badge</div></div>`;
+  mountPulseChip();
+}
+
+async function mountPulseChip() {
+  const hero = document.querySelector(".mkt-hero");
+  if (!hero || hero.querySelector(".birdman-pulse-chip") || !window.Birdman) return;
+  try {
+    const pulse = await window.Birdman.pulse();
+    const redisOk = pulse && pulse.redis && pulse.redis.ok;
+    const chip = document.createElement("div");
+    chip.className = "birdman-pulse-chip";
+    chip.textContent = redisOk ? "Birdman · live" : "Birdman · ready";
+    chip.title = "Marketplace spine health";
+    hero.appendChild(chip);
+  } catch (_) {}
 }
 
 function renderIntegrations() {
   const el = $("integrations");
-  if (!el || !META.integrations) return;
-  const i = META.integrations;
-  const dot = (on) => `<span class="int-dot ${on ? "on" : "off"}"></span>`;
-  el.innerHTML = `integrations: ${dot(i.recognition !== "heuristic")}recognition (${escapeHtml(i.recognition)})`
-    + ` · ${dot(i.live_pricing)}live pricing`
-    + ` · ${dot(i.external_comps)}external comps`
-    + ` · ${dot((META.payments || {}).live)}payments`;
+  if (!el) return;
+  const paint = (pulse) => {
+    const redis = pulse && pulse.redis && (pulse.redis.ok === true || pulse.redis === true);
+    const supabase = pulse && pulse.supabase && (
+      pulse.supabase.enabled === true
+      || pulse.supabase.configured === true
+      || pulse.supabase.ok === true
+      || pulse.supabase === true
+    );
+    const dot = (on) => `<span class="int-dot ${on ? "on" : "off"}"></span>`;
+    let html = `systems: ${dot(!!redis)}redis · ${dot(!!supabase)}supabase · birdman`;
+    if (META && META.integrations) {
+      const i = META.integrations;
+      html += ` · ${dot(i.recognition !== "heuristic")}recognition`
+        + ` · ${dot(i.live_pricing)}pricing`
+        + ` · ${dot((META.payments || {}).live)}payments`;
+    }
+    el.innerHTML = html;
+  };
+  if (window.Birdman) {
+    window.Birdman.pulse().then(paint).catch(() => paint(null));
+  } else if (META && META.integrations) {
+    paint(null);
+  }
 }
 
 async function refreshFoundingCounter() {
@@ -266,7 +302,9 @@ async function toggleWatch(btn) {
 
 async function loadFeatured() {
   try {
-    const d = await api("/api/listings?featured=true&page_size=8");
+    const d = window.Birdman
+      ? await window.Birdman.browseListings({ featured: true, page_size: 8 })
+      : await api("/api/listings?featured=true&page_size=8");
     if (!d.items.length) return;
     $("featuredWrap").hidden = false;
     $("featuredGrid").innerHTML = d.items.map(listingCard).join("");
@@ -289,7 +327,10 @@ async function loadListings() {
   grid.innerHTML = loadingCards();
   $("resultCount").textContent = "Loading listings…";
   try {
-    const data = await api(`/api/listings?${currentQuery()}`, { signal: activeListingsRequest.signal });
+    const qs = currentQuery();
+    const data = window.Birdman
+      ? await window.Birdman.browseListings(Object.fromEntries(new URLSearchParams(qs)))
+      : await api(`/api/listings?${qs}`, { signal: activeListingsRequest.signal });
     state.lastItems = data.items || [];
     if (!data.items.length) {
       grid.innerHTML = `<div class="empty">No cards match your search — widen the filters to see more of the hoard.</div>`;

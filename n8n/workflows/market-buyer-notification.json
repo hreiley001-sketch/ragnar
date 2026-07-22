@@ -1,0 +1,50 @@
+{
+  "name": "Birdman — Buyer Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "market/buyer-notification",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const b = items[0].json.body || items[0].json;\nconst p = b.payload || b;\nreturn [{ json: { type: 'buyer_notification', user_id: p.user_id, order_id: p.order_id, message: p.message, job_id: b.id } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {},
+      "id": "send",
+      "name": "Send buyer message",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {},
+      "id": "log",
+      "name": "Write system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Normalize", "type": "main", "index": 0 }]] },
+    "Normalize": { "main": [[{ "node": "Send buyer message", "type": "main", "index": 0 }]] },
+    "Send buyer message": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] }
+  },
+  "meta": { "birdman": { "type": "buyer_notification", "category": "marketplace" } }
+}

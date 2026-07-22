@@ -1,0 +1,68 @@
+{
+  "name": "Birdman — Order Placed",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "market/order-placed",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const b = items[0].json.body || items[0].json;\nconst p = b.payload || b;\nreturn [{ json: { type: 'order_placed', user_id: p.user_id, order_id: p.order_id, listing_id: p.listing_id, seller_id: p.seller_id, total: p.total, job_id: b.id, timestamp: p.timestamp } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {},
+      "id": "emails",
+      "name": "Email buyer + seller",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {},
+      "id": "market_event",
+      "name": "Insert market_events",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    },
+    {
+      "parameters": {},
+      "id": "payment",
+      "name": "Payment confirmation hook",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1240, 300]
+    },
+    {
+      "parameters": {},
+      "id": "log",
+      "name": "Write system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1480, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Normalize", "type": "main", "index": 0 }]] },
+    "Normalize": { "main": [[{ "node": "Email buyer + seller", "type": "main", "index": 0 }]] },
+    "Email buyer + seller": { "main": [[{ "node": "Insert market_events", "type": "main", "index": 0 }]] },
+    "Insert market_events": { "main": [[{ "node": "Payment confirmation hook", "type": "main", "index": 0 }]] },
+    "Payment confirmation hook": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] }
+  },
+  "meta": { "birdman": { "type": "order_placed", "category": "marketplace" } }
+}

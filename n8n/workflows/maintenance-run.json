@@ -1,0 +1,48 @@
+{
+  "name": "Birdman — Maintenance",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "maintenance/run",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {},
+      "id": "clean",
+      "name": "Clean old system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {},
+      "id": "cache",
+      "name": "Rebuild caches (optional)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {},
+      "id": "log",
+      "name": "Write system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Clean old system_logs", "type": "main", "index": 0 }]] },
+    "Clean old system_logs": { "main": [[{ "node": "Rebuild caches (optional)", "type": "main", "index": 0 }]] },
+    "Rebuild caches (optional)": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] }
+  },
+  "meta": { "birdman": { "type": "maintenance", "category": "maintenance" } }
+}

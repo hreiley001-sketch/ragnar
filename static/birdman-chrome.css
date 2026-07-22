@@ -1,0 +1,59 @@
+/* Birdman chrome — shared systems polish on Asgard pages */
+.site-footer .integrations {
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.site-footer .int-dot {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  margin-right: 0.28rem;
+  vertical-align: 0.05rem;
+  background: var(--color-text-disabled, #c2b9a6);
+}
+.site-footer .int-dot.on {
+  background: var(--color-success, #1a7a50);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success, #1a7a50) 22%, transparent);
+}
+.site-footer .int-dot.off {
+  background: var(--color-text-disabled, #c2b9a6);
+}
+
+.birdman-pulse-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-accent-gold, #b8791a) 35%, transparent);
+  background: color-mix(in srgb, var(--color-bg-panel, #fffdf9) 88%, var(--color-accent-gold, #b8791a));
+  color: var(--color-text-secondary, #5a4f3d);
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mkt-hero .birdman-pulse-chip {
+  margin-top: 0.75rem;
+}
+
+/* Slightly quieter trust bar on dense marketplace */
+.asgard-realm .trust-bar {
+  gap: 1.1rem;
+  flex-wrap: wrap;
+}
+.asgard-realm .trust-bar span {
+  opacity: 0.92;
+}
+
+/* Listing card hover: less noise, clearer lift */
+.asgard-realm .listing.ragnar-card {
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+.asgard-realm .listing.ragnar-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-accent-gold, #b8791a) 40%, transparent);
+}

@@ -60,6 +60,9 @@ def meta() -> dict:
             "image_enhance": replicate_configured(),
             "web_extract": firecrawl_configured(),
             "fonts": google_fonts_configured(),
+            "redis": bool(settings.redis_url),
+            "n8n": bool(settings.n8n_webhook_base),
+            "supabase": bool(settings.supabase_url),
         },
     }
 
@@ -74,7 +77,16 @@ async def meta_fonts(limit: int = Query(60, ge=1, le=200)) -> dict:
 def site_config_public(session: Session = Depends(get_session)) -> dict:
     """Staff-editable site content (announcement, landing copy, links). Public —
     every page hydrates from this."""
-    return site_config.get_all(session)
+    from ..platform.cache import cached_json
+
+    def load() -> dict:
+        return site_config.get_all(session)
+
+    return cached_json(
+        "site-config:public",
+        ttl_seconds=settings.cache_ttl_listings_seconds,
+        loader=load,
+    )
 
 
 @router.get("/fees/quote")

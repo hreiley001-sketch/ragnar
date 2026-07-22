@@ -17,6 +17,13 @@ Permanent notes. Atomic. Link-rich. Alive.
 - [[Evergreen/Ride as Flow State]]
 - [[Evergreen/Event Bus as Nervous System]]
 - [[Evergreen/Command Hub as Attention]]
+- [[Evergreen/Platform as One Organism]]
+- [[Evergreen/Async Boundary]]
+- [[Evergreen/Dual Auth Path]]
+- [[Evergreen/Schema Drift SQLModel vs Supabase]]
+- [[Evergreen/Birdman Supabase Schema]]
+- [[Evergreen/Cache Keys and TTLs]]
+- [[Evergreen/Birdman FastAPI Structure]]
 
 ## Rule of place
 

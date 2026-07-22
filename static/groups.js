@@ -5,7 +5,11 @@
   let kind = "";
 
   async function api(path) {
-    const r = await fetch(path);
+    if (window.Birdman && typeof window.Birdman.api === "function") {
+      return window.Birdman.api(path);
+    }
+
+    const r = await fetch(path, { credentials: "same-origin" });
     if (!r.ok) throw new Error("failed");
     return r.json();
   }

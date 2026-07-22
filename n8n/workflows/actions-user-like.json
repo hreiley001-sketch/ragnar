@@ -1,0 +1,70 @@
+{
+  "name": "Birdman — User Like Ripple",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "actions/user-like",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const b = items[0].json.body || items[0].json;\nconst p = b.payload || b;\nreturn [{ json: {\n  type: p.type || 'user_action_like',\n  user_id: p.user_id,\n  content_id: p.content_id,\n  action_type: p.action_type || 'like',\n  timestamp: p.timestamp,\n  job_id: b.id\n}}];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {},
+      "id": "stats",
+      "name": "Update content_stats likes",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [740, 220]
+    },
+    {
+      "parameters": {},
+      "id": "rt",
+      "name": "Insert realtime_events content_liked",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [740, 380]
+    },
+    {
+      "parameters": {},
+      "id": "log",
+      "name": "Write system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [980, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Normalize", "type": "main", "index": 0 }]] },
+    "Normalize": {
+      "main": [[
+        { "node": "Update content_stats likes", "type": "main", "index": 0 },
+        { "node": "Insert realtime_events content_liked", "type": "main", "index": 0 }
+      ]]
+    },
+    "Update content_stats likes": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] },
+    "Insert realtime_events content_liked": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] }
+  },
+  "meta": {
+    "birdman": {
+      "type": "user_action_like",
+      "category": "ripple",
+      "endpoint": "POST /api/v1/actions/like"
+    }
+  }
+}

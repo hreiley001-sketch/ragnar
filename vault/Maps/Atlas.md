@@ -22,6 +22,9 @@ The master map. Not a directory — a living orientation of the mind.
 - [[Maps/Creative Flow]] — how ideas move
 - [[Maps/BirdmanOS]] — product operating logic
 - [[Maps/RAGNAR]] — marketplace knowledge surface
+- [[Maps/Birdman Systems]] — FastAPI · Supabase · Redis · n8n · CDN/LB
+- [[Maps/Birdman Supabase Schema]] — memory layer (users → content → actions)
+- [[Maps/Birdman Workflows]] — FastAPI → Redis → n8n muscles
 
 ## Graph health
 

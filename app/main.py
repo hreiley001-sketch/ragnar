@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .database import init_db
+from .api import router as birdman_api
 from .routers import (
     admin,
     ai_router,
@@ -33,6 +34,7 @@ from .routers import (
     offers,
     orders,
     payments,
+    platform,
     pricing,
     ride_social,
     rides,
@@ -108,8 +110,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="RAGNAR API",
     version=settings.version,
-    description="A trust-first trading-card marketplace. "
-    "Guided by counsel, driven by conquest.",
+    description=(
+        "RAGNAR — trust-first trading-card marketplace on the Birdman stack. "
+        "Storefront `/api/*` + Birdman spine `/api/v1/*` (FastAPI · Supabase · Redis · n8n)."
+    ),
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
     lifespan=lifespan,
@@ -124,6 +128,8 @@ app.add_middleware(
 )
 
 app.include_router(health.router)
+app.include_router(birdman_api)  # Birdman spine: /api/v1/*
+app.include_router(platform.router)
 app.include_router(auth.router)
 app.include_router(meta.router)
 app.include_router(sellers.router)

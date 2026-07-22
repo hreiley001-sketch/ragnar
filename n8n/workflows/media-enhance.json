@@ -1,0 +1,46 @@
+{
+  "name": "Birdman — Media Enhance",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "media/enhance",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = items[0].json.body || items[0].json;\nconst p = body.payload || {};\nreturn [{ json: { listing_id: p.listing_id, image_url: p.image_url, job_id: body.id } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {},
+      "id": "external",
+      "name": "External AI / CDN (placeholder)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Normalize", "type": "main", "index": 0 }]] },
+    "Normalize": { "main": [[{ "node": "External AI / CDN (placeholder)", "type": "main", "index": 0 }]] }
+  },
+  "meta": {
+    "birdman": {
+      "topic": "media.enhance",
+      "note": "Heavy image work leaves FastAPI hot path via enqueue"
+    }
+  }
+}

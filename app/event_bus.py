@@ -23,8 +23,29 @@ def emit(session: Session, event_type: str, data: dict | None = None, ride_id: i
     session.add(ev)
     session.commit()
     session.refresh(ev)
+    payload = {**(data or {}), "ride_id": ride_id, "event_type": event_type}
     _to_posthog(event_type, data or {}, ride_id)
+    _to_platform_queue(event_type, payload, ride_id)
     return ev
+
+
+def _to_platform_queue(event_type: str, payload: dict, ride_id: int | None) -> None:
+    """Cross the async boundary — never wait on n8n."""
+    try:
+        from .core.jobs import enqueue_job
+
+        if "phase" in event_type:
+            enqueue_job(
+                "ride.phase_changed",
+                extra={**payload, "ride_id": ride_id, "event_type": event_type},
+            )
+        else:
+            enqueue_job(
+                event_type if "." in event_type else f"ride.{event_type}",
+                extra={**payload, "ride_id": ride_id, "event_type": event_type},
+            )
+    except Exception as exc:  # noqa: BLE001 - automation must never break a ride
+        logger.warning("platform enqueue failed: %s", exc)
 
 
 def _to_posthog(event_type: str, data: dict, ride_id: int | None) -> None:

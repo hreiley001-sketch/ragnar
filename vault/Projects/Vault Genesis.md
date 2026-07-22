@@ -19,6 +19,7 @@ Knowledge was trapped in code and chat. The vault gives ideas a home that can gr
 - [x] Seed Home, Inbox, Daily, Evergreen, Projects, Maps, System
 - [x] Templates for every major note type
 - [x] Skill path for progressive mastery
+- [x] Connect full system into live Obsidian vault (Valhalla)
 - [ ] First weekly review after real use
 - [ ] Add the next live project from actual work
 
@@ -29,6 +30,7 @@ Knowledge was trapped in code and chat. The vault gives ideas a home that can gr
 - [[Maps/Creative Flow]]
 - [[Maps/BirdmanOS]]
 - [[Maps/RAGNAR]]
+- [[Home]]
 
 ## Next move
 
