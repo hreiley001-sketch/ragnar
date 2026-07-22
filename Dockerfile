@@ -9,8 +9,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 8000
 
-# Shell form so hosts that inject $PORT (Render/Railway/Fly/etc.) are respected.
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Shell entrypoint migrates Postgres/Supabase then starts uvicorn.
+# Hosts that inject $PORT (Render/Railway/Fly/etc.) are respected.
+CMD ["sh", "-c", "/app/docker-entrypoint.sh"]

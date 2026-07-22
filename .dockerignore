@@ -9,3 +9,8 @@ __pycache__/
 .vscode/
 .idea/
 .pytest_cache/
+integrations/n8n/runtime/node_modules/
+integrations/n8n/runtime/.n8n/
+tests/
+*.md
+!README.md

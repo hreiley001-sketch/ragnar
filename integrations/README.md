@@ -6,36 +6,39 @@ ops stack.
 Upstream n8n: **https://github.com/n8n-io/n8n.git** (we run the published
 `n8n` npm package — same project, no need to build the monorepo).
 
+Docker Compose (V2): **https://github.com/docker/compose.git** — use
+`docker compose up` with the root [`docker-compose.yml`](../docker-compose.yml).
+See [integrations/docker/README.md](docker/README.md).
+
 ```
 RAGNAR  --webhook-->  n8n  --write notes-->  Obsidian vault
    |                    |
    +-- Local REST API --+  (optional direct push)
 ```
 
-## 0. Run n8n locally (this repo)
+## 0. Run with Docker Compose (recommended)
+
+```bash
+# needs Docker Engine + Compose V2 plugin
+# upstream: https://github.com/docker/compose.git
+# Ubuntu: sudo apt-get install -y docker.io docker-compose-v2
+docker compose up --build -d
+# RAGNAR :8000   n8n :5678
+```
+
+Details: [integrations/docker/README.md](docker/README.md).
+
+### Or run n8n via npm only
 
 Requires **Node ≥ 22.22**.
 
 ```bash
 cd integrations/n8n
 ./start.sh
-# UI: http://127.0.0.1:5678
-
-./import-workflow.sh   # creates + activates "RAGNAR → Obsidian events"
+./import-workflow.sh
 ```
 
-Then set in RAGNAR `.env`:
-
-```bash
-N8N_WEBHOOK_URL=http://127.0.0.1:5678/webhook/ragnar-events
-```
-
-Or use upstream directly:
-
-```bash
-git clone https://github.com/n8n-io/n8n.git
-# or: npm install -g n8n && n8n start
-```
+Then set `N8N_WEBHOOK_URL=http://127.0.0.1:5678/webhook/ragnar-events`.
 
 ## 1. Configure RAGNAR
 
