@@ -94,3 +94,26 @@ def test_v1_orders_requires_auth():
         json={"listing_id": "00000000-0000-0000-0000-000000000001"},
     )
     assert r.status_code == 401
+
+
+def test_v1_marketplace_browse():
+    r = client.get("/api/v1/marketplace/browse?page_size=4")
+    assert r.status_code == 200
+    body = r.json()
+    assert "items" in body
+    assert "total" in body
+
+
+def test_v1_marketplace_pulse():
+    r = client.get("/api/v1/marketplace/pulse")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["organism"] == "birdman"
+    assert body["surface"] == "marketplace"
+    assert "/api/v1/marketplace/browse" in body["api"]
+
+
+def test_listing_query_service_import():
+    from app.services import search_listings_page
+
+    assert callable(search_listings_page)

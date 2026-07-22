@@ -21,8 +21,12 @@ function toast(message) {
 }
 
 async function api(path, options = {}) {
+  if (window.Birdman && typeof window.Birdman.api === "function") {
+    return window.Birdman.api(path, options);
+  }
   const response = await fetch(path, {
     ...options,
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json", ...(options.headers || {}) },
   });
   const data = await response.json().catch(() => null);
@@ -305,12 +309,18 @@ function renderPulse(streams, rides, listings, stores) {
 }
 
 async function loadArena() {
+  const featuredPromise = window.Birdman
+    ? window.Birdman.browseListings({ featured: true, page_size: 8 })
+    : api("/api/listings?featured=true&page_size=8");
+  const recentPromise = window.Birdman
+    ? window.Birdman.browseListings({ page_size: 8, sort: "newest" })
+    : api("/api/listings?page_size=8&sort=newest");
   const [streamsResult, ridesResult, storesResult, featuredResult, recentResult] = await Promise.allSettled([
     api("/api/streams"),
     api("/api/rides"),
     api("/api/stores"),
-    api("/api/listings?featured=true&page_size=8"),
-    api("/api/listings?page_size=8&sort=newest"),
+    featuredPromise,
+    recentPromise,
   ]);
   const streams = streamsResult.status === "fulfilled" ? streamsResult.value : [];
   const rides = ridesResult.status === "fulfilled" ? ridesResult.value : { items: [] };

@@ -12,6 +12,7 @@ from .action_service import (
     enqueue_user_action,
 )
 from .content_service import get_site_content, search_listings_content
+from .listing_query_service import search_listings_page
 from .marketplace import (
     effective_platform_rate,
     founding_intro_active,
@@ -46,6 +47,7 @@ __all__ = [
     "record_sale",
     "sale_to_comp",
     "search_listings_content",
+    "search_listings_page",
     "seller_state",
     "summarize_comps",
     "summarize_sales",

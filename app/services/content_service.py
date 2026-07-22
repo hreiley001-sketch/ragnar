@@ -32,24 +32,14 @@ def search_listings_content(
     page_size: int = 24,
 ) -> ContentPage:
     """Thin wrap over marketplace listing search with Redis TTL."""
-    from app.routers.listings import _search_listings_page
+    from app.services import listing_query_service
 
     cache_key = f"listings:search:v1:q={q or ''}|page={page}|ps={page_size}"
 
     def load() -> dict[str, Any]:
-        page_obj = _search_listings_page(
+        page_obj = listing_query_service.search_listings_page(
             session,
             q=q,
-            category=None,
-            set_name=None,
-            condition=None,
-            grading_company=None,
-            graded=None,
-            min_grade=None,
-            min_price=None,
-            max_price=None,
-            founding_only=False,
-            featured=False,
             sort=SortOption.newest,
             page=page,
             page_size=page_size,

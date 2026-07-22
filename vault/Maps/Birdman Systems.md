@@ -42,7 +42,9 @@ FastAPI nodes (stateless, async)
 - `supabase/schema.sql` — Birdman core + marketplace memory (users · cards · listings · orders · events)
 - [[Maps/Birdman Supabase Schema]]
 - [[Architecture/Birdman Marketplace Stack]]
+- [[Playbooks/Site Remap]]
 - `n8n/workflows/` — modular automations (incl. `market-*`)
+- `GET /api/v1/marketplace/browse` · `GET /api/v1/marketplace/pulse` — storefront BFF
 - `docs/BIRDMAN_ARCHITECTURE.md` — diagram + edge notes
 - `GET /api/v1/realtime/pulse` · `GET /api/platform/status` — organ health
 - [[Evergreen/Birdman FastAPI Structure]]

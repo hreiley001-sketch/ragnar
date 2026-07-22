@@ -233,6 +233,13 @@ def _handle_checkout_completed(session: Session, obj: dict) -> None:
     ops_alert(f"Order paid: {listing.title} (${price_cents / 100:,.2f})")
     logger.info("Listing %s sold via Stripe; order %s created", listing_id, order.id)
 
+    try:
+        from ..services.market_bridge import mirror_order_paid
+
+        mirror_order_paid(order, listing, buyer=buyer_user)
+    except Exception:  # noqa: BLE001
+        logger.exception("Birdman order mirror skipped")
+
 
 @router.post("/webhook")
 async def webhook(request: Request, session: Session = Depends(get_session)) -> dict:

@@ -110,8 +110,10 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="RAGNAR API",
     version=settings.version,
-    description="A trust-first trading-card marketplace. "
-    "Guided by counsel, driven by conquest.",
+    description=(
+        "RAGNAR — trust-first trading-card marketplace on the Birdman stack. "
+        "Storefront `/api/*` + Birdman spine `/api/v1/*` (FastAPI · Supabase · Redis · n8n)."
+    ),
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
     lifespan=lifespan,
