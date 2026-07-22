@@ -72,14 +72,33 @@ If `N8N_WEBHOOK_SECRET` is set, verify header `X-Ragnar-Signature: sha256=<hmac>
 
 ## 3. Wire Obsidian
 
-### Option A — via n8n (works anywhere)
-n8n receives `knowledge.updated` / vault sync and writes markdown into the vault
-path (e.g. `RAGNAR/policy/refund-policy.md`).
+### Install the plugin
+Open this in Obsidian (or Community plugins → search **Local REST API**):
 
-### Option B — Local REST API (desktop)
-1. Install [Obsidian Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api).
+`obsidian://show-plugin?id=obsidian-local-rest-api`
+
+Then: **Enable** → **Settings → Local REST API** → copy the **API key**.
+
+| Mode | URL | Notes |
+|---|---|---|
+| HTTPS (default) | `https://127.0.0.1:27124` | Self-signed cert — RAGNAR skips verify |
+| HTTP (optional) | `http://127.0.0.1:27123` | Enable under Settings → Local REST API → **Enable HTTP server** |
+
+### Important: localhost only
+The plugin listens on **your computer**. A cloud/Render RAGNAR cannot reach `127.0.0.1` on your desk.
+
+- **Local RAGNAR** (uvicorn on the same machine as Obsidian): set `OBSIDIAN_API_URL` + `OBSIDIAN_API_KEY` and call `POST /api/integrations/obsidian/sync`.
+- **Hosted RAGNAR**: keep Obsidian sync in **n8n on your machine** (or any runner that can hit localhost / your vault folder). RAGNAR still emits `knowledge.updated` / `knowledge.vault_synced` to n8n; n8n writes the notes.
+
+### Option A — via n8n (recommended for hosted apps)
+n8n receives `knowledge.updated` / vault sync and writes markdown into the vault
+path (e.g. `RAGNAR/policy/refund-policy.md`), either with a file Write node or
+HTTP → `PUT https://127.0.0.1:27124/vault/...`.
+
+### Option B — Local REST API direct (desktop RAGNAR)
+1. Install/enable the plugin (link above).
 2. Copy the API key → `OBSIDIAN_API_KEY`.
-3. Set `OBSIDIAN_API_URL` (often `https://127.0.0.1:27124`).
+3. Set `OBSIDIAN_API_URL=https://127.0.0.1:27124`.
 4. Call `POST /api/integrations/obsidian/sync` (or edit a knowledge article) —
    notes land under `OBSIDIAN_VAULT_PREFIX/`.
 

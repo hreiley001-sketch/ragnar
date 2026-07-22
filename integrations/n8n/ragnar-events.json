@@ -71,7 +71,8 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=http://127.0.0.1:27123/vault/{{ $json.data.path || ('RAGNAR/Inbox/' + $json.event + '.md') }}",
+        "url": "=https://127.0.0.1:27124/vault/{{ $json.data.path || ('RAGNAR/Inbox/' + $json.event + '.md') }}",
+        "allowUnauthorizedCerts": true,
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
