@@ -1,9 +1,13 @@
-"""Accounts & auth: password hashing (stdlib pbkdf2), session cookies, the
-current-user dependency, role logic, and Google sign-in helpers.
+"""Accounts & auth: password hashing (stdlib pbkdf2), session cookies,
+Supabase JWTs (stateless multi-node), the current-user dependency, role logic,
+and Google sign-in helpers.
 
 Security note: an @ragnarips.com address only grants staff/Command-Hub access
 when it's **Google-verified**. Email+password signup never grants admin (the
 address isn't proven), which prevents anyone from self-registering as staff.
+
+Architecture: FastAPI nodes are stateless. Prefer ``Authorization: Bearer``
+Supabase JWTs at scale; cookie sessions hit shared Postgres (not process RAM).
 """
 from __future__ import annotations
 
@@ -68,9 +72,82 @@ def destroy_session(session: Session, token: str) -> None:
         session.commit()
 
 
+# --------------------------- Supabase JWT --------------------------- #
+
+def supabase_jwt_configured() -> bool:
+    return bool(settings.supabase_jwt_secret)
+
+
+def _bearer_token(request: Request) -> Optional[str]:
+    auth = request.headers.get("authorization") or request.headers.get("Authorization") or ""
+    if auth.lower().startswith("bearer "):
+        return auth[7:].strip() or None
+    return None
+
+
+def decode_supabase_jwt(token: str) -> Optional[dict]:
+    """Verify a Supabase Auth access token (HS256 with project JWT secret)."""
+    if not supabase_jwt_configured():
+        return None
+    try:
+        import jwt  # PyJWT
+    except ImportError:
+        logger.warning("PyJWT not installed — cannot verify Supabase JWTs")
+        return None
+    try:
+        return jwt.decode(
+            token,
+            settings.supabase_jwt_secret,
+            algorithms=["HS256"],
+            audience=settings.supabase_jwt_audience,
+            options={"require": ["exp", "sub"]},
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("Supabase JWT rejected: %s", exc)
+        return None
+
+
+def user_from_supabase_claims(session: Session, claims: dict) -> Optional[User]:
+    """Map Supabase JWT claims to a local User row (create-on-first-seen)."""
+    email = (claims.get("email") or "").strip().lower()
+    sub = str(claims.get("sub") or "").strip()
+    if not email and not sub:
+        return None
+    user = None
+    if email:
+        user = session.exec(select(User).where(User.email == email)).first()
+    if user is None and sub:
+        # Prefer google_sub-style link field for external ids when present.
+        user = session.exec(select(User).where(User.google_sub == sub)).first()
+    if user is None and email:
+        # First-seen JWT user — create a lightweight local profile (no password).
+        meta = claims.get("user_metadata") or {}
+        user = User(
+            email=email,
+            name=meta.get("full_name") or meta.get("name") or email.split("@")[0],
+            email_verified=True,  # Supabase Auth already verified the inbox
+            google_sub=sub or None,
+            role=UserRole.user.value,
+        )
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+    return user
+
+
 def get_current_user(
     request: Request, session: Session = Depends(get_session)
 ) -> Optional[User]:
+    # 1) Stateless Supabase JWT (preferred for horizontal scale).
+    bearer = _bearer_token(request)
+    if bearer and supabase_jwt_configured():
+        claims = decode_supabase_jwt(bearer)
+        if claims:
+            user = user_from_supabase_claims(session, claims)
+            if user:
+                return user
+
+    # 2) Legacy cookie session (shared Postgres — not in-process memory).
     token = request.cookies.get(settings.session_cookie)
     if not token:
         return None

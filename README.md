@@ -95,12 +95,23 @@ uvicorn app.main:app --reload
 Then open **http://127.0.0.1:8000** (storefront) and **/api/docs** (Swagger).
 The database (SQLite) is created and seeded with sample listings on first run.
 
+**Supabase:** set `DATABASE_URL` to the **PgBouncer pooler** URI (paste the
+dashboard `postgresql://…` string — driver + SSL are normalized automatically),
+set `SCHEMA_BOOTSTRAP=alembic`, run `alembic upgrade head`, then start uvicorn.
+Details in [DEPLOY.md](DEPLOY.md#supabase-postgres-recommended-for-production-db).
+
+**n8n + Obsidian:** set `N8N_WEBHOOK_URL` (events are **async-enqueued** — FastAPI
+never waits for n8n). Obsidian is docs/content only. See
+[integrations/README.md](integrations/README.md) and the scale map in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Probe: `GET /health/architecture`.
+
 ## API
 
 | Endpoint | Method | Purpose |
 |---|---|---|
 | `/` | GET | Storefront |
 | `/health`, `/version` | GET | Liveness / build info |
+| `/health/architecture` | GET | Scale boundaries (CDN→LB→API→Supabase; n8n async; Obsidian docs-only) |
 | `/api/meta` | GET | Categories, conditions, graders, sort options, fee config, payments status |
 | `/api/fees/quote?price=&founding=&founding_intro=` | GET | Fee breakdown + eBay comparison |
 | `/api/listings` | GET | Search/filter listings (see query params in `/api/docs`) |

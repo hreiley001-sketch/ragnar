@@ -1,23 +1,71 @@
-"""Database engine and session management (SQLModel over SQLite by default)."""
+"""Database engine and session management (SQLModel).
+
+Postgres (including Supabase) **must** go through PgBouncer at scale.
+``normalize_database_url`` / ``is_supabase_pooler_url`` in ``config.py`` enforce
+pooler-friendly URLs. Engine pools are sized for transaction/session mode so
+app nodes never open unbounded direct connections to Postgres.
+"""
 from __future__ import annotations
 
 from collections.abc import Iterator
+from urllib.parse import urlparse
 
+from sqlalchemy.pool import NullPool
 from sqlmodel import Session, SQLModel, create_engine
 
 from .config import settings
 
-# SQLite needs check_same_thread=False when used with FastAPI's threadpool.
-_connect_args = (
-    {"check_same_thread": False}
-    if settings.database_url.startswith("sqlite")
-    else {}
-)
+_is_sqlite = settings.database_url.startswith("sqlite")
 
-engine = create_engine(
-    settings.database_url,
-    echo=settings.debug,
-    connect_args=_connect_args,
+
+def _uses_transaction_pooler(url: str) -> bool:
+    """Supabase transaction pooler listens on :6543 (PgBouncer transaction mode)."""
+    try:
+        parsed = urlparse(url)
+        return (parsed.port == 6543) or ("pooler.supabase.com" in (parsed.hostname or "") and parsed.port == 6543)
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _build_engine(url: str, *, read_only: bool = False):
+    connect_args: dict = {}
+    engine_kwargs: dict = {"echo": settings.debug and not read_only}
+
+    if url.startswith("sqlite"):
+        connect_args["check_same_thread"] = False
+        engine_kwargs["connect_args"] = connect_args
+        return create_engine(url, **engine_kwargs)
+
+    # Managed Postgres / Supabase — always pre-ping.
+    engine_kwargs["pool_pre_ping"] = True
+
+    # PgBouncer transaction mode cannot use server-side prepared statements /
+    # sticky connections. Prefer NullPool (one connection per checkout) or a
+    # tiny pool with statement_cache_size=0 (psycopg3).
+    txn_mode = _uses_transaction_pooler(url) or settings.db_pool_mode == "transaction"
+    if txn_mode or settings.db_pool_mode == "null":
+        engine_kwargs["poolclass"] = NullPool
+        # psycopg3: disable prepared statement cache when going through PgBouncer.
+        connect_args["prepare_threshold"] = None
+    else:
+        # Session pooler / direct: small shared pool per process.
+        engine_kwargs["pool_size"] = settings.db_pool_size
+        engine_kwargs["max_overflow"] = settings.db_max_overflow
+        engine_kwargs["pool_timeout"] = settings.db_pool_timeout
+        engine_kwargs["pool_recycle"] = settings.db_pool_recycle
+
+    if connect_args:
+        engine_kwargs["connect_args"] = connect_args
+    return create_engine(url, **engine_kwargs)
+
+
+engine = _build_engine(settings.database_url)
+
+# Optional read replica / read-heavy URL (Supabase read replica via pooler).
+read_engine = (
+    _build_engine(settings.database_read_url, read_only=True)
+    if settings.database_read_url
+    else engine
 )
 
 
@@ -110,5 +158,15 @@ def init_db() -> None:
 
 
 def get_session() -> Iterator[Session]:
+    """Primary (read/write) session — transactional path."""
     with Session(engine) as session:
+        yield session
+
+
+def get_read_session() -> Iterator[Session]:
+    """Read-heavy session — routes to replica when ``DATABASE_READ_URL`` is set.
+
+    Use for public search, meta, founding counters, etc. Never use for writes.
+    """
+    with Session(read_engine) as session:
         yield session

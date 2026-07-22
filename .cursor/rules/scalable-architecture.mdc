@@ -1,0 +1,20 @@
+---
+description: Enforce RAGNAR 100k-viewer scalable architecture boundaries
+globs:
+  - app/**/*.py
+  - integrations/**/*
+  - docs/**/*
+alwaysApply: true
+---
+
+# Scalable architecture (100k concurrent viewers)
+
+Follow `docs/ARCHITECTURE.md`. Hard rules when generating or editing code:
+
+1. **FastAPI must be stateless** — no in-memory sessions; prefer Supabase JWTs; async I/O; safe behind a load balancer.
+2. **Supabase via PgBouncer only** — use pooled `DATABASE_URL` / `DATABASE_READ_URL`; never bypass the pooler at scale; size SQLAlchemy pools for transaction/session mode.
+3. **n8n never in the hot path** — only `platform_events.emit` / `webhooks_out.enqueue` (fire-and-forget). Never `await` n8n completion inside a request handler.
+4. **Obsidian is not runtime** — docs/specs only; vault sync is admin/async/pre-generated.
+5. **CDN first** — static at edge; API via LB → FastAPI.
+6. **Cache high-traffic reads** — use `app.cache` with explicit TTLs and invalidation keys.
+7. **Diagrams** must match: Client → CDN → LB → FastAPI → Supabase (pooled); FastAPI → n8n (async); Realtime separate; Obsidian docs-only.

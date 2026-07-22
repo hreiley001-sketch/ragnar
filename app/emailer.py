@@ -109,7 +109,13 @@ def send_password_reset_email(to: str, name: str, link: str) -> bool:
 
 
 def ops_alert(subject: str, body: str = "") -> None:
-    """Best-effort alert to the admin emails + Discord ops channel."""
+    """Best-effort alert to the admin emails + Discord ops channel + n8n."""
     if settings.admin_emails:
         send_email(settings.admin_emails, subject, f"<p>{body or subject}</p>")
     discord_alert(f"**{subject}**\n{body}" if body else f"**{subject}**")
+    try:
+        from . import platform_events
+
+        platform_events.emit("ops.alert", {"subject": subject, "body": body or ""})
+    except Exception:  # noqa: BLE001
+        pass

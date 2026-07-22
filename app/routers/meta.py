@@ -31,37 +31,58 @@ router = APIRouter(prefix="/api", tags=["meta"])
 
 @router.get("/meta")
 def meta() -> dict:
-    """Everything the UI needs to render structured listing controls."""
-    return {
-        "app": {
-            "name": settings.app_name,
-            "version": settings.version,
-            "tagline": settings.tagline,
-        },
-        "categories": [c.value for c in Category],
-        "conditions": [c.value for c in Condition],
-        "grading_companies": [g.value for g in GradingCompany],
-        "sort_options": [s.value for s in SortOption],
-        "fees": fee_config(),
-        "payments": payments_status(),
-        "integrations": {
-            "recognition": active_provider(),
-            "live_pricing": pricing_configured(),
-            "external_comps": comps_configured(),
-            "ai": ai_configured(),
-            "catalog": True,
-            "psa": bool(settings.psa_access_token),
-            "email": email_configured(),
-            "discord": discord_configured(),
-            "shipping": shipping_configured(),
-            "livekit": video_configured(),
-            "media_cdn": cloudinary_configured(),
-            "background_removal": background_removal_available(),
-            "image_enhance": replicate_configured(),
-            "web_extract": firecrawl_configured(),
-            "fonts": google_fonts_configured(),
-        },
-    }
+    """Everything the UI needs to render structured listing controls.
+
+    Cached (Redis when configured) — high-traffic first-paint endpoint.
+    Invalidation: ``cache.invalidate_meta()`` / restart / TTL expiry.
+    """
+    from .. import cache
+
+    def _build() -> dict:
+        return {
+            "app": {
+                "name": settings.app_name,
+                "version": settings.version,
+                "tagline": settings.tagline,
+            },
+            "categories": [c.value for c in Category],
+            "conditions": [c.value for c in Condition],
+            "grading_companies": [g.value for g in GradingCompany],
+            "sort_options": [s.value for s in SortOption],
+            "fees": fee_config(),
+            "payments": payments_status(),
+            "integrations": {
+                "recognition": active_provider(),
+                "live_pricing": pricing_configured(),
+                "external_comps": comps_configured(),
+                "ai": ai_configured(),
+                "catalog": True,
+                "psa": bool(settings.psa_access_token),
+                "email": email_configured(),
+                "discord": discord_configured(),
+                "shipping": shipping_configured(),
+                "livekit": video_configured(),
+                "media_cdn": cloudinary_configured(),
+                "background_removal": background_removal_available(),
+                "image_enhance": replicate_configured(),
+                "web_extract": firecrawl_configured(),
+                "fonts": google_fonts_configured(),
+                "n8n": bool(settings.n8n_webhook_url),
+                "obsidian": bool(settings.obsidian_api_url and settings.obsidian_api_key),
+                "redis": bool(settings.redis_url),
+                "supabase_jwt": bool(settings.supabase_jwt_secret),
+            },
+            "architecture": {
+                "stateless": True,
+                "n8n_hot_path": False,
+                "obsidian_runtime": False,
+                "docs": "/docs/ARCHITECTURE.md",
+            },
+        }
+
+    return cache.cached_json(
+        cache.NS_META, _build, ttl=settings.cache_meta_ttl_seconds
+    )
 
 
 @router.get("/meta/fonts")

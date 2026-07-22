@@ -74,5 +74,64 @@ Optional but recommended for password-reset / verification emails:
 - **Azure App Service / Container Apps** — use the `Dockerfile`; set the same env vars.
 - **Your own VPS** — run behind Caddy/Nginx for TLS; `Dockerfile` works as-is.
 
-For scale later, swap SQLite for managed Postgres: add `psycopg[binary]` to
-`requirements.txt` and set `DATABASE_URL=postgresql+psycopg://…`.
+## Supabase Postgres (recommended for production DB)
+
+`psycopg[binary]` is already in `requirements.txt`. RAGNAR accepts the Supabase
+URI as-is.
+
+1. In Supabase: click **Connect** (or **Project Settings → Database**) and copy a
+   connection string.
+   - Prefer **Session pooler** (host like `aws-*-<region>.pooler.supabase.com`,
+     port **5432**, user `postgres.<project-ref>`). Free-tier **direct** hosts
+     (`db.<ref>.supabase.co`) are **IPv6-only** and fail on many cloud/IPv4 networks.
+   - Replace `[YOUR-PASSWORD]` with the database password (reset it in Database
+     settings if needed). URL-encode special characters (`$` → `%24`, `!` → `%21`).
+2. Set env (local `.env` or Render → Environment):
+   ```
+   DATABASE_URL=postgresql://postgres.<project-ref>:YOUR_PASSWORD@aws-1-<region>.pooler.supabase.com:5432/postgres
+   SCHEMA_BOOTSTRAP=alembic
+   ```
+   You can paste `postgresql://…` — the app upgrades the driver to
+   `postgresql+psycopg` and adds `sslmode=require` for Supabase hosts.
+   Copy the **exact** pooler hostname from the dashboard (`aws-0-…` vs `aws-1-…`
+   are not interchangeable).
+3. Apply schema once (from the repo root, with that `DATABASE_URL` loaded):
+   ```
+   alembic upgrade head
+   ```
+4. On Render: set `DATABASE_URL` to the same URI, set `SCHEMA_BOOTSTRAP=alembic`,
+   and prefer a start command that migrates then boots:
+   `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   You can drop the SQLite disk once Supabase is the source of truth (keep a disk
+   or object storage for `UPLOAD_DIR` scan photos).
+
+**Do not commit** the real password. Rotate the DB password if it was ever pasted
+into chat, tickets, or a public repo.
+
+## Scale path (≈100k concurrent viewers)
+
+Full map: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+```
+Client → CDN (Cloudflare) → Load Balancer → FastAPI (N replicas)
+                              → Supabase via PgBouncer
+                              → Redis (cache + n8n queue)
+FastAPI ──async enqueue──► n8n
+Obsidian = docs only
+Supabase Realtime = separate WS layer
+```
+
+1. **CDN first** — Put Cloudflare (orange-cloud) in front of the origin. Cache
+   `/static/*` and HTML aggressively; bypass cache for `/api/*` (or short TTL
+   for public GETs). Enable Bot Fight / rate limiting / DDoS.
+2. **Horizontal FastAPI** — Run multiple uvicorn/gunicorn workers behind a load
+   balancer. Nodes are **stateless**: auth via Supabase JWTs (`SUPABASE_JWT_SECRET`)
+   or shared DB cookie sessions; set `REDIS_URL` so cache + rate limits + n8n
+   queues are shared.
+3. **Supabase pooler** — Always use `*.pooler.supabase.com` (never direct
+   `db.*.supabase.co` at scale). Optional `DATABASE_READ_URL` for read replicas.
+   Set `DB_POOL_MODE=transaction` when using port **6543**.
+4. **n8n off hot path** — `platform_events.emit` only enqueues. Never await an
+   n8n workflow inside a request handler.
+5. **Obsidian** — documentation / vault export only; not required to serve traffic.
+6. Probe: `GET /health/architecture` reports whether these boundaries hold.

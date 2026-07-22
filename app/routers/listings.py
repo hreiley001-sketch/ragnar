@@ -161,6 +161,30 @@ def _persist_listing(payload: ListingCreate, session: Session, seller: Seller) -
         )
     except Exception:  # noqa: BLE001
         pass
+    try:
+        from .. import platform_events
+
+        platform_events.emit(
+            "listing.created",
+            {
+                "listing_id": listing.id,
+                "title": listing.title,
+                "price_cents": listing.price_cents,
+                "category": listing.category,
+                "seller_handle": seller.handle,
+                "seller_id": seller.id,
+                "image_url": listing.image_url,
+                "link": f"/listing/{listing.id}",
+            },
+        )
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        from .. import cache
+
+        cache.invalidate_listings()
+    except Exception:  # noqa: BLE001
+        pass
 
     return ListingRead.from_listing(listing)
 
@@ -395,6 +419,35 @@ def search_listings(
     page: int = Query(1, ge=1),
     page_size: int = Query(24, ge=1, le=100),
 ) -> ListingPage:
+    """Public listing search — cached per filter set; uses indexed columns.
+
+    Invalidation: ``cache.invalidate_listings()`` on create/update/sell.
+    """
+    from .. import cache
+    from ..config import settings as _settings
+
+    cache_key = cache.cache_key(
+        cache.NS_LISTINGS,
+        "search",
+        q or "",
+        category.value if category else "",
+        set_name or "",
+        condition.value if condition else "",
+        grading_company.value if grading_company else "",
+        graded,
+        min_grade,
+        min_price,
+        max_price,
+        founding_only,
+        featured,
+        sort.value,
+        page,
+        page_size,
+    )
+    hit = cache.get_json(cache_key)
+    if hit is not None:
+        return ListingPage(**hit)
+
     filters = [Listing.status == ListingStatus.active.value]
 
     if q:
@@ -445,13 +498,19 @@ def search_listings(
     statement = statement.offset((page - 1) * page_size).limit(page_size)
     rows = session.exec(statement).all()
 
-    return ListingPage(
+    page_obj = ListingPage(
         items=[ListingRead.from_listing(r) for r in rows],
         total=total,
         page=page,
         page_size=page_size,
         pages=max(1, math.ceil(total / page_size)) if total else 0,
     )
+    cache.set_json(
+        cache_key,
+        page_obj.model_dump(),
+        ttl=_settings.cache_listings_ttl_seconds,
+    )
+    return page_obj
 
 
 @router.get("/{listing_id}", response_model=ListingRead)

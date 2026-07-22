@@ -14,7 +14,16 @@ router = APIRouter(prefix="/api/founding", tags=["founding"])
 
 @router.get("/status", response_model=FoundingStatus)
 def status_(session: Session = Depends(get_session)) -> FoundingStatus:
-    return FoundingStatus(**founding_status(session))
+    """Public Founding 250 counter — cached; invalidate on seller apply."""
+    from .. import cache
+    from ..config import settings
+
+    hit = cache.get_json(cache.NS_FOUNDING)
+    if hit is not None:
+        return FoundingStatus(**hit)
+    payload = founding_status(session)
+    cache.set_json(cache.NS_FOUNDING, payload, ttl=settings.cache_founding_ttl_seconds)
+    return FoundingStatus(**payload)
 
 
 @router.post("/apply", response_model=FoundingApplicationRead, status_code=status.HTTP_201_CREATED)
@@ -45,6 +54,19 @@ def apply(payload: FoundingApplicationCreate, session: Session = Depends(get_ses
         ops_alert(
             f"New Founding 250 application: {application.name} ({application.email})",
             f"Sells: {application.categories or '—'} | Volume: {application.monthly_volume or '—'}",
+        )
+        from .. import platform_events
+
+        platform_events.emit(
+            "founding.applied",
+            {
+                "id": application.id,
+                "name": application.name,
+                "email": application.email,
+                "handle_wanted": application.handle_wanted,
+                "categories": application.categories,
+                "monthly_volume": application.monthly_volume,
+            },
         )
     except Exception:  # noqa: BLE001
         pass
