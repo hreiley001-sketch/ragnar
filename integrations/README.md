@@ -3,10 +3,38 @@
 Automation bridge so marketplace events and Counsel knowledge flow into your
 ops stack.
 
+Upstream n8n: **https://github.com/n8n-io/n8n.git** (we run the published
+`n8n` npm package — same project, no need to build the monorepo).
+
 ```
 RAGNAR  --webhook-->  n8n  --write notes-->  Obsidian vault
    |                    |
    +-- Local REST API --+  (optional direct push)
+```
+
+## 0. Run n8n locally (this repo)
+
+Requires **Node ≥ 22.22**.
+
+```bash
+cd integrations/n8n
+./start.sh
+# UI: http://127.0.0.1:5678
+
+./import-workflow.sh   # creates + activates "RAGNAR → Obsidian events"
+```
+
+Then set in RAGNAR `.env`:
+
+```bash
+N8N_WEBHOOK_URL=http://127.0.0.1:5678/webhook/ragnar-events
+```
+
+Or use upstream directly:
+
+```bash
+git clone https://github.com/n8n-io/n8n.git
+# or: npm install -g n8n && n8n start
 ```
 
 ## 1. Configure RAGNAR
@@ -15,11 +43,12 @@ Add to `.env` (never commit secrets):
 
 ```bash
 # n8n — paste the Production URL from a Webhook node
-N8N_WEBHOOK_URL=https://your-n8n.example/webhook/ragnar-events
+N8N_WEBHOOK_URL=http://127.0.0.1:5678/webhook/ragnar-events
 # Optional HMAC verification in n8n
 N8N_WEBHOOK_SECRET=choose-a-long-random-string
 
 # Obsidian Local REST API plugin (optional; n8n can write files instead)
+# Install: obsidian://show-plugin?id=obsidian-local-rest-api
 OBSIDIAN_API_URL=https://127.0.0.1:27124
 OBSIDIAN_API_KEY=your-obsidian-api-key
 OBSIDIAN_VAULT_PREFIX=RAGNAR
