@@ -57,3 +57,40 @@ def test_core_imports():
     assert like["workflow"] == "actions/user-like"
     assert like["payload"]["type"] == "user_action_like"
     assert "timestamp" in like["payload"]
+
+    listing = enqueue_job(
+        "listing_created",
+        user_id="u1",
+        extra={"listing_id": "l1", "price": 9.99},
+    )
+    assert listing["workflow"] == "market/listing-created"
+    order = enqueue_job("order_placed", user_id="u1", extra={"order_id": "o1"})
+    assert order["workflow"] == "market/order-placed"
+
+
+def test_v1_listings_public():
+    r = client.get("/api/v1/listings")
+    assert r.status_code == 200
+    body = r.json()
+    assert "items" in body
+    assert "total" in body
+
+
+def test_v1_market_events_public():
+    r = client.get("/api/v1/market-events")
+    assert r.status_code == 200
+    body = r.json()
+    assert "items" in body
+
+
+def test_v1_cards_requires_auth():
+    r = client.post("/api/v1/cards", json={"name": "Test Card"})
+    assert r.status_code == 401
+
+
+def test_v1_orders_requires_auth():
+    r = client.post(
+        "/api/v1/orders",
+        json={"listing_id": "00000000-0000-0000-0000-000000000001"},
+    )
+    assert r.status_code == 401

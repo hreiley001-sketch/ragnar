@@ -39,12 +39,14 @@ FastAPI nodes (stateless, async)
 - `app/services/` — flow engine
 - `app/models/` — SQLModel tables + pydantic map
 - `app/utils/` — smoothness
-- `supabase/schema.sql` — Birdman core memory (users · content · actions · realtime · logs)
+- `supabase/schema.sql` — Birdman core + marketplace memory (users · cards · listings · orders · events)
 - [[Maps/Birdman Supabase Schema]]
-- `n8n/workflows/` — modular automations
+- [[Architecture/Birdman Marketplace Stack]]
+- `n8n/workflows/` — modular automations (incl. `market-*`)
 - `docs/BIRDMAN_ARCHITECTURE.md` — diagram + edge notes
 - `GET /api/v1/realtime/pulse` · `GET /api/platform/status` — organ health
 - [[Evergreen/Birdman FastAPI Structure]]
+- [[Architecture/FastAPI Marketplace Modules]]
 
 ## Knowledge links
 
@@ -54,11 +56,12 @@ FastAPI nodes (stateless, async)
 - [[Evergreen/Dual Auth Path]]
 - [[Evergreen/Schema Drift SQLModel vs Supabase]]
 - [[Evergreen/Cache Keys and TTLs]]
+- [[Features/Live Selling]]
+- [[Playbooks/Scaling Strategy]]
 - [[Maps/BirdmanOS]]
 - [[Maps/RAGNAR]]
 - [[System/Platform Principles]]
 - [[Projects/Birdman Platform]]
-
 ## Open questions
 
 - ~~Migrate session cookies → Supabase JWT gradually or cut over?~~ → [[Evergreen/Dual Auth Path]] (both, gradual)

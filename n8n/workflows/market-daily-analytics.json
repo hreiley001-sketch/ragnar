@@ -1,0 +1,72 @@
+{
+  "name": "Birdman — Daily Marketplace Analytics",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 24 }]
+        }
+      },
+      "id": "cron",
+      "name": "Daily cron",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "market/daily-analytics",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Manual webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 520]
+    },
+    {
+      "parameters": {
+        "functionCode": "const day = new Date().toISOString().slice(0, 10);\nreturn [{ json: { type: 'market_daily_analytics', day, source: 'cron_or_webhook' } }];"
+      },
+      "id": "normalize",
+      "name": "Normalize day",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [520, 400]
+    },
+    {
+      "parameters": {},
+      "id": "aggregate",
+      "name": "Aggregate orders / listings",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 400]
+    },
+    {
+      "parameters": {},
+      "id": "write_stats",
+      "name": "Upsert market_stats",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 400]
+    },
+    {
+      "parameters": {},
+      "id": "log",
+      "name": "Write system_logs",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1240, 400]
+    }
+  ],
+  "connections": {
+    "Daily cron": { "main": [[{ "node": "Normalize day", "type": "main", "index": 0 }]] },
+    "Manual webhook": { "main": [[{ "node": "Normalize day", "type": "main", "index": 0 }]] },
+    "Normalize day": { "main": [[{ "node": "Aggregate orders / listings", "type": "main", "index": 0 }]] },
+    "Aggregate orders / listings": { "main": [[{ "node": "Upsert market_stats", "type": "main", "index": 0 }]] },
+    "Upsert market_stats": { "main": [[{ "node": "Write system_logs", "type": "main", "index": 0 }]] }
+  },
+  "meta": { "birdman": { "type": "market_daily_analytics", "category": "marketplace" } }
+}

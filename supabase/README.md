@@ -13,11 +13,21 @@ identity → content → interaction → realtime → system memory
 
 | Table | Purpose | FastAPI mirror |
 |---|---|---|
-| `users` | Identity + profile (`id` = `auth.users.id`) | `api/v1/users` · `services/user_service` |
+| `users` | Identity + profile (`id` = `auth.users.id`); roles buyer/seller/admin | `api/v1/users` · `services/user_service` |
 | `content` | Atomic content units | `api/v1/content` · Redis cache |
 | `actions` | Likes / views / triggers | `api/v1/actions` → queue → n8n |
 | `realtime_events` | SSE / WebSocket payloads | `api/v1/realtime` |
 | `system_logs` | Organism memory | n8n + FastAPI audit |
+
+## Marketplace tables
+
+| Table | Purpose | FastAPI mirror |
+|---|---|---|
+| `cards` | Collectibles + metadata | `api/v1/cards` |
+| `listings` | Offers to sell | `api/v1/listings` · Redis `market:listings:active` |
+| `orders` | Purchases | `api/v1/orders` → n8n |
+| `market_events` | Activity feed | `api/v1/market-events` |
+| `market_stats` | Daily rollups | n8n `market/daily-analytics` |
 
 ## Connection
 
@@ -29,7 +39,7 @@ identity → content → interaction → realtime → system memory
 
 1. Supabase Dashboard → SQL → run `schema.sql`
 2. Confirm tables under **Table Editor**
-3. Keep marketplace SQLModel on SQLite until domain tables are layered on later
+3. Keep product SQLModel on SQLite until cutover is intentional
 
 ## Principles
 
@@ -39,4 +49,4 @@ identity → content → interaction → realtime → system memory
 4. Index high-traffic columns  
 5. Schema mirrors FastAPI modules  
 
-Vault: [[Evergreen/Birdman Supabase Schema]] · [[Evergreen/Birdman FastAPI Structure]] · [[Maps/Birdman Systems]]
+Vault: [[Architecture/Supabase Marketplace Schema]] · [[Architecture/Birdman Marketplace Stack]] · [[Maps/Birdman Systems]]

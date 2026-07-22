@@ -25,9 +25,10 @@ from .marketplace import (
     summarize_sales,
 )
 from .realtime_service import organism_pulse
-from .user_service import profile_from_request
+from .user_service import actor_id, onboard_seller, profile_from_request
 
 __all__ = [
+    "actor_id",
     "effective_platform_rate",
     "enqueue_action",
     "enqueue_broadcast",
@@ -39,6 +40,7 @@ __all__ = [
     "get_site_content",
     "grant_founding_if_available",
     "match_sales",
+    "onboard_seller",
     "organism_pulse",
     "profile_from_request",
     "record_sale",

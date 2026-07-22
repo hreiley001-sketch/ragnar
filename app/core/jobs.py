@@ -19,6 +19,13 @@ WORKFLOW_PATHS: dict[str, str] = {
     "maintenance": "maintenance/run",
     "user_action": "actions/user-action",
     "user_action_like": "actions/user-like",
+    # marketplace
+    "listing_created": "market/listing-created",
+    "order_placed": "market/order-placed",
+    "order_status_changed": "market/order-status-changed",
+    "seller_notification": "market/seller-notification",
+    "buyer_notification": "market/buyer-notification",
+    "market_daily_analytics": "market/daily-analytics",
     # legacy / product topics
     "ops.notify": "ops/notify",
     "media.enhance": "media/enhance",

@@ -32,6 +32,11 @@ Supabase (system_logs · realtime_events · content)
 | Realtime | `broadcast_event` | [[Workflows/Realtime Broadcast]] |
 | Maintenance | `maintenance` | [[Workflows/Maintenance Run]] |
 | Ripple | `user_action_like` | [[Workflows/User Like Ripple]] |
+| Marketplace | `listing_created` | [[Workflows/Listing Created]] |
+| Marketplace | `order_placed` | [[Workflows/Order Placed]] |
+| Marketplace | `order_status_changed` | [[Workflows/Order Status Changed]] |
+| Marketplace | `buyer_notification` / `seller_notification` | [[Workflows/Buyer Notification]] · [[Workflows/Seller Notification]] |
+| Marketplace | `market_daily_analytics` | [[Workflows/Daily Marketplace Analytics]] |
 
 ## Design rules
 
@@ -45,13 +50,16 @@ Supabase (system_logs · realtime_events · content)
 
 - `app/core/jobs.py` — envelope + type → path map  
 - `app/services/action_service.py` — enqueue helpers  
+- `app/services/{listing,order}_service.py` — marketplace enqueue  
 - `POST /api/v1/actions/like` — like ripple entry  
-- `n8n/workflows/` — importable stubs  
+- `n8n/workflows/` — importable stubs (`market-*.json`)  
+- [[Architecture/n8n Marketplace Catalog]]
 
 ## Links
 
 - [[Evergreen/Async Boundary]]
 - [[Maps/Birdman Systems]]
+- [[Architecture/Birdman Marketplace Stack]]
 - [[Maps/Birdman Supabase Schema]]
 - [[Evergreen/Birdman FastAPI Structure]]
 - [[Templates/n8n Workflow]]
