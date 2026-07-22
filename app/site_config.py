@@ -87,7 +87,7 @@ SITE_FIELDS: list[dict] = [
         "label": "Accent color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#8ecae6",
+        "default": "#8a6510",
         "help": "Primary highlight — buttons, links, prices.",
     },
     {
@@ -95,21 +95,21 @@ SITE_FIELDS: list[dict] = [
         "label": "Gold / badge color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#d4a574",
+        "default": "#b8791a",
     },
     {
         "key": "theme_bg",
         "label": "Background",
         "type": "color",
         "group": "Look & feel",
-        "default": "#2f4d68",
+        "default": "#f5f1e8",
     },
     {
         "key": "theme_text",
         "label": "Text color",
         "type": "color",
         "group": "Look & feel",
-        "default": "#f4f8fb",
+        "default": "#221a10",
     },
     {
         "key": "theme_font",
@@ -127,6 +127,34 @@ COLOR_KEYS: set[str] = {f["key"] for f in SITE_FIELDS if f["type"] == "color"}
 DEFAULTS: dict[str, str] = {f["key"]: f["default"] for f in SITE_FIELDS}
 ALLOWED: set[str] = set(DEFAULTS)
 _MAX_LEN = 4000
+
+
+# Theme values shipped as defaults in earlier brand eras (blue → glacial dark →
+# interim gold). Stored rows matching these were written by a past deploy, not
+# hand-picked by staff, so we retire them on startup and let the current DEFAULTS
+# apply. Deliberately custom colors (anything not in this set) are preserved.
+_LEGACY_THEME_VALUES: dict[str, set[str]] = {
+    "theme_accent": {"#2563eb", "#8ecae6", "#9a6b12", "#6fd6ff"},
+    "theme_gold": {"#b8791a", "#d4a574", "#f0c674"},
+    "theme_bg": {"#f5f7fa", "#2f4d68", "#1a2d42", "#0a0f16", "#05070b", "#12161d"},
+    "theme_text": {"#131a24", "#f4f8fb", "#dfe8f2"},
+}
+
+
+def retire_legacy_theme_values(session: Session) -> int:
+    """Delete stored ``theme_*`` rows whose value matches a known prior-era
+    default, so the current DEFAULTS take effect after a rebrand deploy. Rows a
+    staff member deliberately customized (values not in the legacy set) survive.
+    Returns the number of rows removed."""
+    removed = 0
+    for row in session.exec(select(SiteSetting)).all():
+        legacy = _LEGACY_THEME_VALUES.get(row.key)
+        if legacy is not None and row.value in legacy:
+            session.delete(row)
+            removed += 1
+    if removed:
+        session.commit()
+    return removed
 
 
 def get_all(session: Session) -> dict[str, str]:

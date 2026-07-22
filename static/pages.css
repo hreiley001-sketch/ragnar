@@ -87,7 +87,7 @@
 .live-chip,
 .metric-chip {
   color: var(--color-text-secondary);
-  background: rgba(14,27,41,.88);
+  background: rgba(247,241,230,.88);
   border: 1px solid var(--color-border-default);
 }
 .notify-btn {
@@ -134,7 +134,7 @@
   padding: 5px;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-sm);
-  background: rgba(14,27,41,.54);
+  background: rgba(247,241,230,.54);
 }
 .tab {
   display: inline-flex;
@@ -394,7 +394,7 @@ body.page-store .design-swatch {
   border-radius: 3px;
   vertical-align: middle;
   margin-right: 5px;
-  border: 1px solid rgba(255,255,255,.3);
+  border: 1px solid rgba(58,44,20,.3);
 }
 body.page-store .design-row {
   display: grid;
@@ -456,7 +456,8 @@ body.page-listing .photo-box::after {
   pointer-events: none;
   border: 1px solid rgba(255,255,255,.04);
   background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.06) 48%, transparent 64%);
-  mix-blend-mode: screen;
+  mix-blend-mode: multiply;
+  opacity: 0.18;
 }
 body.page-listing .photo-box img { width: 100%; height: 100%; object-fit: contain; }
 body.page-listing .photo-box .placeholder-crest { width: 54%; opacity: .28; }
@@ -687,7 +688,7 @@ body.page-login .auth-wrap {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-xs);
   background:
-    linear-gradient(160deg, rgba(86, 200, 242, 0.06), transparent 42%),
+    linear-gradient(160deg, rgba(184, 121, 26, 0.06), transparent 42%),
     var(--color-bg-panel);
   box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(3, 9, 15, 0.08);
 }
@@ -722,7 +723,7 @@ body.page-login .auth-tab.active {
   background: var(--color-accent-primary);
   border-color: var(--color-accent-primary);
   font-weight: 700;
-  box-shadow: 0 0 20px rgba(86, 200, 242, 0.25);
+  box-shadow: 0 0 20px rgba(184, 121, 26, 0.25);
 }
 body.page-login .gbtn {
   display: flex;
@@ -780,7 +781,7 @@ body.page-login #authForm .btn-primary {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   font-size: 12px;
-  box-shadow: 0 0 28px rgba(86, 200, 242, 0.28);
+  box-shadow: 0 0 28px rgba(184, 121, 26, 0.28);
 }
 body.page-login .staff-note {
   font-size: 12px;
@@ -812,7 +813,7 @@ body.page-verify .vwrap img {
 body.page-login .pw-meter {
   height: 5px;
   border-radius: var(--radius-pill);
-  background: rgba(255,255,255,.08);
+  background: rgba(58,44,20,0.10);
   margin: -6px 0 12px;
   overflow: hidden;
 }

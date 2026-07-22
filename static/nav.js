@@ -279,10 +279,18 @@
     r = Math.max(0, Math.min(255, r + d)); g = Math.max(0, Math.min(255, g + d)); b = Math.max(0, Math.min(255, b + d));
     return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   }
+  function darken(hex, amt) {
+    // Always steps a color toward black — for accent hover/pressed (--ice-strong).
+    const m = /^#([0-9a-fA-F]{6})$/.exec(hex || ""); if (!m) return hex;
+    const n = parseInt(m[1], 16);
+    let r = (n >> 16) - amt, g = ((n >> 8) & 255) - amt, b = (n & 255) - amt;
+    r = Math.max(0, r); g = Math.max(0, g); b = Math.max(0, b);
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
   function applyTheme(c) {
     if (!c) return;
     const s = document.documentElement.style;
-    if (c.theme_accent) { s.setProperty("--ice", c.theme_accent); s.setProperty("--ice-strong", c.theme_accent); }
+    if (c.theme_accent) { s.setProperty("--ice", c.theme_accent); s.setProperty("--ice-strong", darken(c.theme_accent, 26)); }
     if (c.theme_gold) s.setProperty("--gold", c.theme_gold);
     if (c.theme_bg) { s.setProperty("--bg", c.theme_bg); s.setProperty("--bg-2", shade(c.theme_bg, 12)); }
     if (c.theme_text) s.setProperty("--text", c.theme_text);
@@ -295,7 +303,7 @@
     if (!bar) {
       bar = document.createElement("div");
       bar.id = "navAnnounce";
-      bar.style.cssText = "position:sticky;top:0;z-index:80;background:linear-gradient(90deg,#0f1620,#16202c);color:var(--ice,#6fd6ff);border-bottom:1px solid rgba(111,214,255,0.25);font-size:13px;font-weight:600;padding:8px 14px;text-align:center;";
+      bar.style.cssText = "position:sticky;top:0;z-index:80;background:linear-gradient(90deg,var(--gold,#b8791a),var(--color-accent-gold-strong,#d8a13f));color:#2a1e08;border-bottom:1px solid rgba(58,44,20,0.22);font-size:13px;font-weight:700;letter-spacing:.01em;padding:8px 14px;text-align:center;";
       document.body.insertBefore(bar, document.body.firstChild);
     }
     bar.innerHTML = c.announcement_link
