@@ -3,7 +3,7 @@
    Homepage keeps its own vault-env; this is the shared hall. */
 
 body.asgard-realm {
-  color-scheme: dark;
+  color-scheme: light;
   background: #f5f1e8;
   color: var(--color-text-primary);
 }
@@ -97,16 +97,16 @@ body.asgard-realm > .aurora {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  opacity: 0.28;
+  opacity: 0.55;
   font-family: var(--font-mono);
-  font-size: clamp(16px, 2vw, 24px);
-  color: rgba(184, 121, 26, 0.42);
-  letter-spacing: 0.4em;
+  font-size: clamp(18px, 2.2vw, 28px);
+  color: rgba(138, 101, 16, 0.55);
+  letter-spacing: 0.45em;
   pointer-events: none;
 }
 .asgard-atmosphere-runes span {
   position: absolute;
-  text-shadow: 0 0 18px rgba(184, 121, 26, 0.3);
+  text-shadow: 0 0 22px rgba(184, 121, 26, 0.45);
   animation: asgardRune 24s ease-in-out infinite;
 }
 .asgard-atmosphere-runes span:nth-child(1) { left: 7%; top: 16%; }
@@ -188,13 +188,13 @@ body.asgard-realm .nav-link:hover,
 body.asgard-realm .nav-link.active {
   background: rgba(184, 121, 26, 0.1);
   border-color: rgba(58, 44, 20, 0.22);
-  color: var(--color-frost);
+  color: var(--color-text-primary);
 }
 body.asgard-realm .nav-foot {
   font-family: var(--font-mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  letter-spacing: var(--tracking-rune);
+  text-transform: none;
+  color: var(--color-accent-gold);
 }
 
 /* ——— Surfaces: frost glass panels ——— */
@@ -277,14 +277,16 @@ body.asgard-realm .asgard-kicker {
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--color-crystal);
-  border: 1px solid rgba(184, 121, 26, 0.3);
+  border: 1px solid rgba(184, 121, 26, 0.38);
   border-radius: var(--radius-pill);
-  background: rgba(255, 253, 248, 0.55);
+  background: rgba(255, 253, 248, 0.72);
+  box-shadow: 0 0 0 1px rgba(184, 121, 26, 0.08), 0 4px 16px rgba(184, 121, 26, 0.08);
 }
 body.asgard-realm .asgard-kicker .runes {
   display: inline;
   letter-spacing: var(--tracking-rune);
-  color: var(--color-accent-primary);
+  color: var(--color-accent-gold-strong);
+  text-shadow: 0 0 12px rgba(184, 121, 26, 0.35);
 }
 
 /* Page heroes — brand-first chamber */
@@ -446,10 +448,10 @@ body.premium-room.asgard-realm .asgard-atmosphere-runes {
   align-items: center;
   justify-content: space-evenly;
   font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.2em;
-  color: rgba(184, 121, 26, 0.38);
-  text-shadow: 0 0 14px rgba(184, 121, 26, 0.35);
+  font-size: 14px;
+  letter-spacing: 0.22em;
+  color: rgba(138, 101, 16, 0.55);
+  text-shadow: 0 0 16px rgba(184, 121, 26, 0.45);
 }
 .asgard-rail::before {
   content: "";
@@ -599,14 +601,14 @@ body.asgard-realm .auth-wrap .logo-c {
   height: 22px;
   margin-right: 2px;
   border-radius: 50%;
-  border: 1px solid rgba(184, 121, 26, 0.35);
-  background: rgba(184, 121, 26, 0.08);
-  color: var(--color-accent-primary);
+  border: 1px solid rgba(184, 121, 26, 0.45);
+  background: rgba(184, 121, 26, 0.12);
+  color: var(--color-accent-gold-strong);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0;
   text-transform: none;
-  box-shadow: 0 0 12px rgba(184, 121, 26, 0.2);
+  box-shadow: 0 0 14px rgba(184, 121, 26, 0.28);
 }
 
 /* Foil sheen on panels */
