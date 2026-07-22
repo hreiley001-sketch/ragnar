@@ -40,7 +40,15 @@
 
 /* ---------- Magical realm layer: color fills, jewels, runes, knots ---------- */
 .realm-jewels {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+}
+body.arena-home .arena-main,
+body.arena-home .site-header,
+body.asgard-realm > main,
+body.asgard-realm > header,
+body.asgard-realm .site-header {
+  position: relative;
+  z-index: 1;
 }
 
 /* Full-page color wash */
