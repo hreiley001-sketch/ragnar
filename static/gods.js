@@ -1,6 +1,6 @@
 // RAGNAR — Realm riches.
-// Per-page Asgard color, gems, and runic glow — no statues.
-// Each realm keeps a patron palette (Freyr gold, Thor ice, …) for treasure accents.
+// Per-page Asgard color, gems, and runic glow — no statues, no gate cards.
+// Gems are the pops of color in the Asgard atmosphere.
 "use strict";
 (function () {
   const path = (location.pathname.replace(/\/+$/, "") || "/");
@@ -55,30 +55,31 @@
   function gemHTML(g, i) {
     const tone = i % 3 === 0 ? g.jewel : i % 3 === 1 ? g.jewel2 : g.rcSoft;
     const kinds = ["rj-diamond", "rj-round", "rj-facet", "rj-ember", "rj-teardrop", "rj-cluster"];
-    return `<span class="rj ${kinds[i % kinds.length]} rj-${i}" style="--j:${tone};--rc:${g.rc};--jewel-2:${g.jewel2}"></span>`;
+    const size = i % 7 === 0 ? "rj-lg" : i % 5 === 0 ? "rj-sm" : "";
+    return `<span class="rj ${kinds[i % kinds.length]} ${size} rj-${i}" style="--j:${tone};--rc:${g.rc};--jewel-2:${g.jewel2};--rc-deep:${g.rcDeep};--rc-soft:${g.rcSoft}"></span>`;
   }
 
   function injectRealmRiches(g, multi) {
     if (document.querySelector(".realm-jewels")) return;
     const el = document.createElement("div");
-    el.className = "realm-jewels" + (multi ? " realm-jewels--pantheon" : "");
+    el.className = "realm-jewels" + (multi ? " realm-jewels--pantheon" : " realm-jewels--realm");
     el.setAttribute("aria-hidden", "true");
 
     const gods = multi ? GODS : [g, g, g, g];
+    const count = multi ? 36 : 24;
     const gems = [];
-    for (let i = 0; i < 28; i++) gems.push(gemHTML(gods[i % gods.length], i));
+    for (let i = 0; i < count; i++) gems.push(gemHTML(gods[i % gods.length], i));
 
     const runes = multi
       ? GODS.map((x, i) => `<span class="realm-rune-glow rr-${i}" style="--rc:${x.rc};--jewel:${x.jewel}">${x.rune}</span>`).join("")
       : [0, 1, 2, 3, 4, 5].map((i) => `<span class="realm-rune-glow rr-${i}">${g.rune}</span>`).join("");
 
+    // Soft ambient pools only — gems carry the color pops
     const pools = multi
       ? GODS.map((x, i) => `<span class="realm-color-pool pool-${i}" style="--rc:${x.rc};--jewel:${x.jewel};--jewel-2:${x.jewel2}"></span>`).join("")
       : `<span class="realm-color-pool pool-0"></span>
          <span class="realm-color-pool pool-1" style="--rc:var(--jewel-2);--jewel:var(--rc-soft)"></span>
-         <span class="realm-color-pool pool-2" style="--rc:var(--jewel);--jewel:var(--rc)"></span>
-         <span class="realm-color-pool pool-3"></span>
-         <span class="realm-color-pool pool-4" style="--rc:var(--rc-soft);--jewel:var(--jewel-2)"></span>`;
+         <span class="realm-color-pool pool-3"></span>`;
 
     el.innerHTML = `
       <div class="realm-color-fill"></div>
@@ -86,31 +87,37 @@
       <div class="realm-gold-vein vein-b"></div>
       <div class="realm-treasure-glow"></div>
       ${pools}
-      <div class="realm-knot-band band-top"></div>
-      <div class="realm-knot-band band-bot"></div>
       <div class="realm-norse-ring ring-a"></div>
       <div class="realm-norse-ring ring-b"></div>
-      <div class="realm-norse-ring ring-c"></div>
       ${gems.join("")}
       ${runes}
       <span class="realm-ember e1"></span><span class="realm-ember e2"></span>
       <span class="realm-ember e3"></span><span class="realm-ember e4"></span>
       <span class="realm-ember e5"></span><span class="realm-ember e6"></span>`;
-    document.body.appendChild(el);
+
+    // Home: nest in vault-env (above haze) so gems read as clear color pops
+    const vaultEnv = multi && document.getElementById("vaultEnv");
+    if (vaultEnv) {
+      el.classList.add("realm-jewels--in-vault");
+      vaultEnv.appendChild(el);
+    } else {
+      document.body.appendChild(el);
+    }
   }
 
-  // Home: all-realm treasure wash
+  // Home: all-realm treasure wash — gems are the color language
   if (onHome) {
     document.body.dataset.patron = "pantheon";
-    injectRealmRiches(ODIN, true);
+    const mount = () => injectRealmRiches(ODIN, true);
+    if (document.getElementById("vaultEnv") || document.readyState !== "loading") mount();
+    else document.addEventListener("DOMContentLoaded", mount);
   }
 
-  // Realm pages: patron color + riches (no statues)
+  // Realm pages: patron color + riches (no statues, no gate cards)
   if (!onHome) {
     const g = patronFor(path);
     applyRealmTheme(g);
     injectRealmRiches(g, false);
-    // Soft light bloom only — no figure
     if (!document.querySelector(".realm-bloom")) {
       const bloom = document.createElement("div");
       bloom.className = "realm-bloom";
@@ -120,35 +127,5 @@
     }
   }
 
-  // Pantheon → realm treasure gates (gem altars, no statues)
-  function buildPantheon(host) {
-    if (!host) return;
-    host.innerHTML = GODS.map((g) => `
-      <a class="realm-gate realm-gate--${g.key}" style="--rc:${g.rc};--rc-deep:${g.rcDeep};--rc-soft:${g.rcSoft};--jewel:${g.jewel};--jewel-2:${g.jewel2}" href="${g.paths[0]}" aria-label="${g.god} — ${g.realm}">
-        <div class="gate-vault">
-          <span class="halo"></span>
-          <span class="rays"></span>
-          <span class="gate-rune">${g.rune}</span>
-          <span class="gem gem-core"></span>
-          <span class="gem gem-a"></span>
-          <span class="gem gem-b"></span>
-          <span class="gem gem-c"></span>
-          <span class="gem gem-d"></span>
-          <span class="gem gem-e"></span>
-          <span class="treasure-arc"></span>
-          <span class="gate-base"></span>
-        </div>
-        <div class="plate">
-          <div class="nm">${g.god}</div>
-          <div class="ti">${g.title} · ${g.realm}</div>
-        </div>
-      </a>`).join("");
-  }
-  window.RagnarGods = { list: GODS, buildPantheon, patronFor };
-
-  const host = document.getElementById("pantheonWall");
-  if (host) {
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => buildPantheon(host));
-    else buildPantheon(host);
-  }
+  window.RagnarGods = { list: GODS, patronFor };
 })();
