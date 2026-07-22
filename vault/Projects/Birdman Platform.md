@@ -26,22 +26,30 @@ Product logic (BirdmanOS) needs a body that scales without fragmenting: cache, a
 - [x] Cache listings search + site-config
 - [x] Enqueue media.enhance + ops.notify
 - [x] Birdman FastAPI folder spine (`core` / `api/v1` / `services` / `models` / `utils`)
-- [ ] Provision Redis + n8n in staging
-- [ ] Reconcile SQLModel ↔ Supabase schema (then `USE_SUPABASE_DB=true`)
+- [x] Birdman Supabase core schema (users · content · actions · realtime_events · system_logs)
+- [x] Birdman workflow system (jobs envelope + n8n categories + Obsidian specs)
+- [ ] Apply `supabase/schema.sql` in Supabase SQL editor
+- [ ] Provision Redis + n8n in staging; import `n8n/workflows/`
+- [ ] Point services at Supabase core tables (then `USE_SUPABASE_DB` as needed)
 - [ ] Cache ride state / catalog (tiny TTLs)
 - [ ] Migrate marketplace routers into `api/v1` + services gradually
 
 ## Linked ideas
 
 - [[Maps/Birdman Systems]]
+- [[Maps/Birdman Supabase Schema]]
+- [[Maps/Birdman Workflows]]
+- [[Workflows/User Like Ripple]]
 - [[System/Platform Principles]]
 - [[Evergreen/Async Boundary]]
 - [[Evergreen/Dual Auth Path]]
 - [[Evergreen/Schema Drift SQLModel vs Supabase]]
+- [[Evergreen/Birdman Supabase Schema]]
+- [[Evergreen/Birdman FastAPI Structure]]
 - [[Evergreen/Cache Keys and TTLs]]
 - [[Evergreen/Platform as One Organism]]
 - [[Maps/BirdmanOS]]
 
 ## Next move
 
-Set `REDIS_URL` + `N8N_WEBHOOK_BASE` in staging; import `n8n/workflows/`; confirm `GET /api/platform/status`.
+Import n8n workflow JSONs; set `N8N_WEBHOOK_BASE` + `REDIS_URL`; hit `POST /api/v1/actions/like`.

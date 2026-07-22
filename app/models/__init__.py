@@ -1,20 +1,28 @@
 """Models package — SQLModel tables + Birdman Pydantic conceptual map.
 
 ``from app.models import User`` keeps working (tables).
-Pydantic API shapes live alongside: PublicUser, ContentPage, ActionRequest…
+Pydantic API + Supabase shapes live alongside.
 """
 from __future__ import annotations
 
-from .actions import ActionRequest, ActionResult
-from .content import ContentItem, ContentPage
+from .actions import ActionRequest, ActionResult, BirdmanAction
+from .content import BirdmanContent, ContentItem, ContentPage
+from .realtime import BirdmanRealtimeEvent, RealtimePulse
+from .system_log import BirdmanSystemLog
 from .tables import *  # noqa: F403
-from .user import PublicUser, UserProfile
+from .user import BirdmanUser, PublicUser, UserProfile
 
 __all__ = [
     "ActionRequest",
     "ActionResult",
+    "BirdmanAction",
+    "BirdmanContent",
+    "BirdmanRealtimeEvent",
+    "BirdmanSystemLog",
+    "BirdmanUser",
     "ContentItem",
     "ContentPage",
     "PublicUser",
+    "RealtimePulse",
     "UserProfile",
 ]

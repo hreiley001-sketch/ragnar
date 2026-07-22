@@ -10,16 +10,21 @@ n8n workflow note. Modular. Reusable. Never on the hot path.
 
 ## Trigger
 
-- [ ] Redis queue topic
-- [ ] FastAPI webhook (fire-and-forget)
+- [ ] Redis queue topic / FastAPI webhook
 - [ ] Schedule (cron)
 
-Topic / webhook path:
+Job `type`:
+Webhook path:
 
 ## Inputs
 
-JSON fields expected:
+JSON fields (Birdman envelope):
 
+- `type`
+- `user_id` (optional)
+- `content_id` (optional)
+- `action_type` (optional)
+- `timestamp`
 -
 
 ## Steps (modular)
@@ -27,8 +32,14 @@ JSON fields expected:
 1.
 2.
 3.
+4. Write `system_logs`
 
 ## Outputs / side effects
+
+- Tables:
+- External:
+
+## Failure modes
 
 -
 
@@ -36,8 +47,9 @@ JSON fields expected:
 
 How do we avoid double-runs?
 
-## Related code
+## Related
 
 - Enqueue from:
+- [[Maps/Birdman Workflows]]
 - [[Evergreen/Async Boundary]]
-- [[Maps/Birdman Systems]]
+- [[Maps/Birdman Supabase Schema]]

@@ -1,30 +1,45 @@
-# n8n workflows (automation layer)
+# Birdman n8n workflows
 
-**Never in the hot path.** FastAPI enqueues via `app.platform.queue.enqueue` or fires webhooks in a daemon thread.
-
-## Import
-
-1. Open n8n → Workflows → Import from File
-2. Import each JSON in this folder
-3. Activate webhooks
-4. Set env `BIRDMAN_SHARED_SECRET` to match `N8N_SHARED_SECRET` on FastAPI
-
-## Base URL
+**Never in the hot path.** FastAPI → Redis queue → webhook fire-and-forget.
 
 ```
 N8N_WEBHOOK_BASE=https://<n8n-host>/webhook
+N8N_SHARED_SECRET=<same as FastAPI>
 ```
 
-Topics map to paths:
+## Categories
 
-| Topic | Webhook path |
-|---|---|
-| `ride.phase_changed` | `ride/phase-changed` |
-| `media.enhance` | `media/enhance` |
-| `ops.notify` | `ops/notify` |
+| Category | Job `type` | Webhook path | File |
+|---|---|---|---|
+| Notification | `notification` | `notification/send` | `notification-send.json` |
+| Enrichment | `enrich_content` | `enrich/content` | `enrich-content.json` |
+| Analytics | `aggregate_actions` | `analytics/aggregate` | `analytics-aggregate.json` |
+| Realtime | `broadcast_event` | `realtime/broadcast` | `realtime-broadcast.json` |
+| Maintenance | `maintenance` | `maintenance/run` | `maintenance-run.json` |
+| Ripple | `user_action_like` | `actions/user-like` | `actions-user-like.json` |
 
-## Modular rule
+Legacy product topics still map: `ops.notify`, `media.enhance`, `ride.phase_changed`.
 
-One workflow = one job. Reuse via sub-workflows later; do not monolith.
+## Job payload
 
-Vault: [[Templates/n8n Workflow]] · [[Evergreen/Async Boundary]]
+```json
+{
+  "type": "user_action_like",
+  "user_id": "uuid",
+  "content_id": "uuid",
+  "action_type": "like",
+  "timestamp": "2026-07-22T13:52:00Z"
+}
+```
+
+Envelope also includes `id`, `topic`, `workflow`, `payload`, `enqueued_at` from FastAPI.
+
+## Rules
+
+1. Atomic — one clear job per workflow  
+2. Composable — bigger flows call smaller ones  
+3. Async only — no request waits  
+4. Logged — every run writes `system_logs`  
+5. Documented — Obsidian note per workflow  
+
+Vault: [[Maps/Birdman Workflows]] · [[Templates/n8n Workflow]] · [[Evergreen/Async Boundary]]

@@ -1,29 +1,42 @@
-# Supabase (data + auth + realtime)
+# Birdman Supabase Schema — memory layer
 
 Schema: [`schema.sql`](./schema.sql)
 
+Flow:
+
+```
+users → content → actions → realtime_events → system_logs
+identity → content → interaction → realtime → system memory
+```
+
+## Core tables
+
+| Table | Purpose | FastAPI mirror |
+|---|---|---|
+| `users` | Identity + profile (`id` = `auth.users.id`) | `api/v1/users` · `services/user_service` |
+| `content` | Atomic content units | `api/v1/content` · Redis cache |
+| `actions` | Likes / views / triggers | `api/v1/actions` → queue → n8n |
+| `realtime_events` | SSE / WebSocket payloads | `api/v1/realtime` |
+| `system_logs` | Organism memory | n8n + FastAPI audit |
+
 ## Connection
 
-- **App writes/reads (FastAPI):** transaction pooler URL on port `6543` → `SUPABASE_DB_URL`
-- **Auth:** Supabase JWT → `SUPABASE_JWT_SECRET` (verify in `app/platform/supabase_client.py`)
-- **Realtime:** subscribe from clients to `ride_events` / listing changes when enabled
+- **Pooler:** `SUPABASE_DB_URL` port `6543` (transaction mode)
+- **Auth JWT:** `SUPABASE_JWT_SECRET` via `app/core/security.py`
+- **Flip data plane:** `USE_SUPABASE_DB=true` only after this schema is applied
 
-## Birdman flow mapping
+## Apply
 
-| Concept | Table |
-|---|---|
-| Seller vessel | `sellers` |
-| Structured listing | `listings` |
-| Ride | `rides` |
-| Nervous system | `ride_events` |
-| Async boundary audit | `automation_jobs` |
+1. Supabase Dashboard → SQL → run `schema.sql`
+2. Confirm tables under **Table Editor**
+3. Keep marketplace SQLModel on SQLite until domain tables are layered on later
 
-## Cutover path
+## Principles
 
-1. Keep `USE_SUPABASE_DB=false` while SQLModel remains source of truth
-2. Dual auth is live: cookie **or** Supabase Bearer JWT → local `User` (`supabase_sub`)
-3. Treat `schema.sql` as **target** — see vault [[Evergreen/Schema Drift SQLModel vs Supabase]]
-4. Reconcile via Alembic / migration before flipping `USE_SUPABASE_DB=true`
-5. Prefer JWT clients gradually; cookie sessions remain for the storefront
+1. Atomic tables — one concept each  
+2. Clean FKs — no circular deps  
+3. JSONB for flexible metadata  
+4. Index high-traffic columns  
+5. Schema mirrors FastAPI modules  
 
-See vault: [[Maps/Birdman Systems]] · [[Evergreen/Async Boundary]] · [[Evergreen/Dual Auth Path]]
+Vault: [[Evergreen/Birdman Supabase Schema]] · [[Evergreen/Birdman FastAPI Structure]] · [[Maps/Birdman Systems]]

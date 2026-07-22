@@ -39,7 +39,8 @@ FastAPI nodes (stateless, async)
 - `app/services/` — flow engine
 - `app/models/` — SQLModel tables + pydantic map
 - `app/utils/` — smoothness
-- `supabase/schema.sql` — conceptual schema (target)
+- `supabase/schema.sql` — Birdman core memory (users · content · actions · realtime · logs)
+- [[Maps/Birdman Supabase Schema]]
 - `n8n/workflows/` — modular automations
 - `docs/BIRDMAN_ARCHITECTURE.md` — diagram + edge notes
 - `GET /api/v1/realtime/pulse` · `GET /api/platform/status` — organ health

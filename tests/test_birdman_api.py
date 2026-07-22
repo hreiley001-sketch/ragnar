@@ -43,8 +43,17 @@ def test_v1_actions_requires_auth():
 
 
 def test_core_imports():
-    from app.core import cached_json, enqueue, settings
+    from app.core import cached_json, enqueue, enqueue_job, settings
 
     assert settings.app_name
     job = enqueue("ops.notify", {"message": "spine"}, workflow="ops/notify")
     assert job["id"]
+    like = enqueue_job(
+        "user_action_like",
+        user_id="u1",
+        content_id="c1",
+        action_type="like",
+    )
+    assert like["workflow"] == "actions/user-like"
+    assert like["payload"]["type"] == "user_action_like"
+    assert "timestamp" in like["payload"]

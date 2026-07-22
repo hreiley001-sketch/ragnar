@@ -1,146 +1,140 @@
--- Birdman Systems — Supabase schema (conceptual + deployable)
--- Mirrors product flow: atomic tables, linked relationships, minimal clutter.
--- Apply in Supabase SQL editor or via migration tooling.
--- Indexes target high-traffic read columns. Prefer transaction pooler (6543) for FastAPI.
+-- Birdman Supabase Schema — core memory layer
+-- Flow: identity → content → interaction → realtime → system memory
+-- Mirrors FastAPI: api/v1 users · content · actions · realtime
+-- Apply in Supabase SQL editor. Prefer transaction pooler (:6543) for FastAPI.
+-- Atomic tables. Clean FKs. JSONB for flexible metadata. Index what scales.
 
--- Extensions
 create extension if not exists "pgcrypto";
 
 -- ---------------------------------------------------------------------------
--- Identity (Supabase Auth owns auth.users; we mirror profile)
+-- updated_at helper
 -- ---------------------------------------------------------------------------
-create table if not exists public.profiles (
+create or replace function public.birdman_set_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- 1. users — atomic identity + profile (PK = auth.users.id)
+-- ---------------------------------------------------------------------------
+create table if not exists public.users (
   id uuid primary key references auth.users (id) on delete cascade,
-  handle text unique,
-  display_name text,
-  avatar_url text,
-  is_staff boolean not null default false,
+  email text not null unique,
+  username text not null unique,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  profile_data jsonb not null default '{}'::jsonb
+);
+
+create index if not exists users_email_idx on public.users (email);
+create index if not exists users_username_idx on public.users (username);
+
+drop trigger if exists users_set_updated_at on public.users;
+create trigger users_set_updated_at
+  before update on public.users
+  for each row execute function public.birdman_set_updated_at();
+
+comment on table public.users is 'Birdman identity — mirrors auth.users; FastAPI api/v1/users';
+
+-- ---------------------------------------------------------------------------
+-- 2. content — atomic content units (posts, pages, data objects)
+-- ---------------------------------------------------------------------------
+create table if not exists public.content (
+  id uuid primary key default gen_random_uuid(),
+  author_id uuid not null references public.users (id) on delete cascade,
+  title text not null,
+  body text not null default '',
+  metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-create index if not exists profiles_handle_idx on public.profiles (handle);
+create index if not exists content_author_id_idx on public.content (author_id);
+create index if not exists content_title_idx on public.content (title);
+create index if not exists content_metadata_gin_idx on public.content using gin (metadata);
+create index if not exists content_created_at_idx on public.content (created_at desc);
+
+drop trigger if exists content_set_updated_at on public.content;
+create trigger content_set_updated_at
+  before update on public.content
+  for each row execute function public.birdman_set_updated_at();
+
+comment on table public.content is 'Birdman content units — FastAPI api/v1/content + Redis cache';
 
 -- ---------------------------------------------------------------------------
--- Marketplace — sellers & listings
+-- 3. actions — atomic user actions (like, view, trigger → n8n)
 -- ---------------------------------------------------------------------------
-create table if not exists public.sellers (
-  id bigserial primary key,
-  owner_id uuid references public.profiles (id) on delete set null,
-  handle text not null unique,
-  display_name text not null,
-  founding boolean not null default false,
-  stripe_account_id text,
-  stripe_charges_enabled boolean not null default false,
+create table if not exists public.actions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.users (id) on delete cascade,
+  content_id uuid references public.content (id) on delete set null,
+  action_type text not null,
+  payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 
-create index if not exists sellers_owner_idx on public.sellers (owner_id);
-create index if not exists sellers_founding_idx on public.sellers (founding) where founding;
+create index if not exists actions_user_id_idx on public.actions (user_id);
+create index if not exists actions_content_id_idx on public.actions (content_id);
+create index if not exists actions_action_type_idx on public.actions (action_type);
+create index if not exists actions_created_at_idx on public.actions (created_at desc);
 
-create table if not exists public.listings (
-  id bigserial primary key,
-  seller_id bigint not null references public.sellers (id) on delete cascade,
-  title text not null,
-  category text,
-  set_name text,
-  card_number text,
-  condition text,
-  grader text,
-  grade text,
-  price_cents integer not null check (price_cents >= 0),
-  status text not null default 'active',
-  image_url text,
-  is_featured boolean not null default false,
-  view_count integer not null default 0,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create index if not exists listings_seller_idx on public.listings (seller_id);
-create index if not exists listings_status_created_idx on public.listings (status, created_at desc);
-create index if not exists listings_category_idx on public.listings (category);
-create index if not exists listings_featured_idx on public.listings (is_featured) where is_featured;
+comment on table public.actions is 'Birdman actions — FastAPI api/v1/actions → Redis queue → n8n';
 
 -- ---------------------------------------------------------------------------
--- BirdmanOS — rides (phase machine)
+-- 4. realtime_events — atomic SSE / WebSocket broadcast units
 -- ---------------------------------------------------------------------------
-create table if not exists public.rides (
-  id bigserial primary key,
-  seller_id bigint references public.sellers (id) on delete set null,
-  title text not null,
-  phase text not null default 'idle',
-  bidding_ends_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create index if not exists rides_phase_idx on public.rides (phase);
-create index if not exists rides_seller_idx on public.rides (seller_id);
-
-create table if not exists public.ride_events (
-  id bigserial primary key,
-  ride_id bigint references public.rides (id) on delete cascade,
-  type text not null,
+create table if not exists public.realtime_events (
+  id uuid primary key default gen_random_uuid(),
+  channel text not null,
+  event_type text not null,
   data jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 
-create index if not exists ride_events_ride_created_idx on public.ride_events (ride_id, created_at desc);
-create index if not exists ride_events_type_idx on public.ride_events (type);
+create index if not exists realtime_events_channel_idx on public.realtime_events (channel);
+create index if not exists realtime_events_event_type_idx on public.realtime_events (event_type);
+create index if not exists realtime_events_channel_created_idx
+  on public.realtime_events (channel, created_at desc);
 
-create table if not exists public.bids (
-  id bigserial primary key,
-  ride_id bigint not null references public.rides (id) on delete cascade,
-  bidder_id uuid references public.profiles (id) on delete set null,
-  amount_cents integer not null check (amount_cents > 0),
-  created_at timestamptz not null default now()
+comment on table public.realtime_events is 'Birdman realtime — FastAPI api/v1/realtime';
+
+-- ---------------------------------------------------------------------------
+-- 5. system_logs — atomic system memory (fastapi / n8n / supabase)
+-- ---------------------------------------------------------------------------
+create table if not exists public.system_logs (
+  id uuid primary key default gen_random_uuid(),
+  source text not null,
+  level text not null default 'info',
+  message text not null,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  constraint system_logs_level_check
+    check (level in ('info', 'warn', 'error', 'debug'))
 );
 
-create index if not exists bids_ride_created_idx on public.bids (ride_id, created_at desc);
+create index if not exists system_logs_source_idx on public.system_logs (source);
+create index if not exists system_logs_level_idx on public.system_logs (level);
+create index if not exists system_logs_created_at_idx on public.system_logs (created_at desc);
+
+comment on table public.system_logs is 'Birdman system memory — debugging, analytics, n8n audit';
 
 -- ---------------------------------------------------------------------------
--- Commerce — orders (write-heavy; keep lean)
+-- RLS sketch (enable on Auth cutover)
 -- ---------------------------------------------------------------------------
-create table if not exists public.orders (
-  id bigserial primary key,
-  buyer_id uuid references public.profiles (id) on delete set null,
-  seller_id bigint references public.sellers (id) on delete set null,
-  listing_id bigint references public.listings (id) on delete set null,
-  amount_cents integer not null,
-  platform_fee_cents integer not null default 0,
-  status text not null default 'pending',
-  stripe_session_id text unique,
-  created_at timestamptz not null default now()
-);
-
-create index if not exists orders_buyer_idx on public.orders (buyer_id);
-create index if not exists orders_seller_idx on public.orders (seller_id);
-create index if not exists orders_status_idx on public.orders (status);
-
--- ---------------------------------------------------------------------------
--- Jobs mirror (optional audit of Redis → n8n pipeline)
--- ---------------------------------------------------------------------------
-create table if not exists public.automation_jobs (
-  id uuid primary key,
-  topic text not null,
-  workflow text not null,
-  payload jsonb not null default '{}'::jsonb,
-  status text not null default 'enqueued',
-  enqueued_at timestamptz not null default now(),
-  finished_at timestamptz
-);
-
-create index if not exists automation_jobs_topic_idx on public.automation_jobs (topic, enqueued_at desc);
-create index if not exists automation_jobs_status_idx on public.automation_jobs (status);
-
--- ---------------------------------------------------------------------------
--- RLS sketch (enable when cutting over auth)
--- ---------------------------------------------------------------------------
--- alter table public.profiles enable row level security;
--- create policy "profiles are viewable by owner"
---   on public.profiles for select using (auth.uid() = id);
-
-comment on table public.rides is 'BirdmanOS ride phase machine';
-comment on table public.ride_events is 'Nervous system — Command Hub + analytics';
-comment on table public.automation_jobs is 'Async boundary audit — FastAPI enqueue → n8n';
+-- alter table public.users enable row level security;
+-- alter table public.content enable row level security;
+-- alter table public.actions enable row level security;
+--
+-- create policy "users read own row"
+--   on public.users for select using (auth.uid() = id);
+-- create policy "content is readable"
+--   on public.content for select using (true);
+-- create policy "authors write content"
+--   on public.content for insert with check (auth.uid() = author_id);
+-- create policy "users write own actions"
+--   on public.actions for insert with check (auth.uid() = user_id);

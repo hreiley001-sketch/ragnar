@@ -21,6 +21,7 @@ Permanent notes. Atomic. Link-rich. Alive.
 - [[Evergreen/Async Boundary]]
 - [[Evergreen/Dual Auth Path]]
 - [[Evergreen/Schema Drift SQLModel vs Supabase]]
+- [[Evergreen/Birdman Supabase Schema]]
 - [[Evergreen/Cache Keys and TTLs]]
 - [[Evergreen/Birdman FastAPI Structure]]
 

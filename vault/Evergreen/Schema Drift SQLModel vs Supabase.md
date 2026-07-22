@@ -6,26 +6,40 @@ updated: 2026-07-22
 
 # Schema Drift SQLModel vs Supabase
 
-`supabase/schema.sql` is the **target** conceptual schema — not a drop-in mirror of live SQLModel tables.
+Two memory planes until cutover is intentional.
 
-## Live today
+## Live today (product)
 
-- SQLModel + SQLite (or Postgres via `DATABASE_URL`)
-- Integer PKs, `user` / `usersession`, rich commerce + rides columns
-- `USE_SUPABASE_DB=false` until cutover is intentional
+- SQLModel + SQLite (`app/models/tables.py`)
+- Integer PKs, marketplace + rides + support
+- `USE_SUPABASE_DB=false`
 
-## Target (Supabase)
+## Birdman core (Supabase target)
 
-- UUID profiles linked to `auth.users`
-- Lean sellers / listings / rides / ride_events / orders
-- `automation_jobs` for async audit
+`supabase/schema.sql` — mirrors FastAPI v1:
+
+| Table | Role |
+|---|---|
+| `users` | Identity (`auth.users.id`) |
+| `content` | Content units |
+| `actions` | Interactions / n8n triggers |
+| `realtime_events` | SSE / WS payloads |
+| `system_logs` | System memory |
+
+See [[Maps/Birdman Supabase Schema]] · [[Evergreen/Birdman Supabase Schema]]
 
 ## Cutover rule
 
-Do not set `USE_SUPABASE_DB=true` until Alembic (or a migration plan) reconciles both. Credentials can be linked early; data plane flips last.
+1. Apply Birdman core schema in Supabase  
+2. Point services at these tables  
+3. Layer marketplace domain tables later (or keep SQLModel until migrated)  
+4. Only then set `USE_SUPABASE_DB=true`
+
+Credentials can be linked early; data plane flips last.
 
 ## Links
 
 - [[Maps/Birdman Systems]]
 - [[Evergreen/Dual Auth Path]]
+- [[Evergreen/Birdman FastAPI Structure]]
 - [[Projects/Birdman Platform]]
