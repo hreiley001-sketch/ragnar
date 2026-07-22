@@ -12,7 +12,9 @@ in the Asgard atmosphere — not from gate cards or statues.
 | `heimdall`  | Heimdall | Stores & Halls   | Teal · bifrost |
 | `odin`      | Odin     | Command Hub / default | Steel-gold · steel |
 
-Homepage: pantheon wash + multi-realm gem constellation nested in the vault camera.
-Realm pages: single-patron theme + gems + soft bloom.
+Homepage: pantheon wash + **found gem caches** (one tight pile per patron palette) nested in the vault.
+Realm pages: 3–4 patron caches + soft bloom.
+
+Gems sit in clustered piles with a shared shimmer — not a random float field.
 
 Optional: drop illustrated gem/art assets here later; CSS paints richly alone.

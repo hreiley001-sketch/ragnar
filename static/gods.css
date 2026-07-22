@@ -129,94 +129,104 @@ body.asgard-realm .site-header {
 .ring-b { right: 5%; top: 12%; animation-direction: reverse; width: min(18vw, 170px); height: min(18vw, 170px); opacity: .22; }
 @keyframes ring-spin { to { transform: rotate(360deg); } }
 
-/* ——— Gems: the color pops of Asgard ——— */
-.realm-jewels .rj {
-  position: absolute; display: block;
-  --j: var(--jewel);
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--j) 90%, transparent))
-          drop-shadow(0 0 22px color-mix(in srgb, var(--rc) 55%, transparent));
-  animation: jewel-float 7.5s ease-in-out infinite;
-  opacity: .95;
-  will-change: transform, opacity;
+/* ——— Found gem caches: tight piles, gentle shared shimmer ——— */
+.gem-cache {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  translate: -50% -50%;
+  animation: cache-breathe 9s ease-in-out infinite;
+  animation-delay: var(--cache-delay, 0s);
 }
-.realm-jewels .rj-sm { transform: scale(.72); }
-.realm-jewels .rj-lg { transform: scale(1.35); }
-.realm-jewels .rj-round {
-  width: 14px; height: 14px; border-radius: 50%;
-  background: radial-gradient(circle at 30% 26%, #fff 0 18%, var(--j) 42%, var(--rc-deep) 100%);
-  box-shadow: inset -2px -3px 5px rgba(0,0,0,.25), 0 0 18px color-mix(in srgb, var(--j) 75%, transparent);
+.gem-cache-glow {
+  position: absolute;
+  left: 50%; top: 55%;
+  width: 72px; height: 52px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse,
+    color-mix(in srgb, var(--jewel) 55%, transparent),
+    color-mix(in srgb, var(--rc) 28%, transparent) 45%,
+    transparent 72%);
+  filter: blur(10px);
+  opacity: .85;
 }
-.realm-jewels .rj-diamond {
-  width: 16px; height: 16px;
-  background: linear-gradient(135deg, #fff 0%, var(--j) 32%, var(--rc) 68%, var(--rc-deep) 100%);
-  transform: rotate(45deg); border-radius: 2px;
-  box-shadow: inset 1px 1px 0 rgba(255,255,255,.7), 0 0 20px color-mix(in srgb, var(--j) 65%, transparent);
-  animation-name: jewel-float-diamond;
-}
-.realm-jewels .rj-lg.rj-diamond { animation-name: jewel-float-diamond-lg; }
-.realm-jewels .rj-facet {
-  width: 18px; height: 13px;
-  background: linear-gradient(120deg, var(--jewel-2), var(--j), var(--rc));
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--jewel-2) 80%, transparent));
-}
-.realm-jewels .rj-ember {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: var(--j);
-  box-shadow: 0 0 16px var(--j), 0 0 32px color-mix(in srgb, var(--rc) 70%, transparent);
-}
-.realm-jewels .rj-teardrop {
-  width: 12px; height: 16px;
-  background: radial-gradient(circle at 35% 30%, #fff 0 14%, var(--j) 40%, var(--rc) 100%);
-  border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--j) 75%, transparent);
-}
-.realm-jewels .rj-cluster {
-  width: 20px; height: 20px;
-  background:
-    radial-gradient(circle at 30% 30%, var(--j) 0 28%, transparent 30%),
-    radial-gradient(circle at 70% 40%, var(--jewel-2) 0 22%, transparent 24%),
-    radial-gradient(circle at 45% 70%, var(--rc-soft) 0 20%, transparent 22%);
-  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--j) 65%, transparent));
+.gem-cache-base {
+  position: absolute;
+  left: 50%; bottom: 4px;
+  width: 42px; height: 6px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--rc) 55%, transparent),
+    var(--jewel),
+    color-mix(in srgb, var(--jewel-2) 70%, transparent),
+    transparent);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--rc) 50%, transparent);
+  opacity: .7;
 }
 
-/* Spread gems across the hall — intentional constellation */
-.rj-0  { left: 5%;  top: 14%; }
-.rj-1  { left: 12%; top: 42%; animation-delay: -1s; }
-.rj-2  { left: 22%; top: 16%; animation-delay: -2s; }
-.rj-3  { left: 8%;  top: 70%; animation-delay: -3s; }
-.rj-4  { left: 34%; top: 9%;  animation-delay: -4s; }
-.rj-5  { left: 48%; top: 82%; animation-delay: -1.4s; }
-.rj-6  { left: 62%; top: 12%; animation-delay: -5s; }
-.rj-7  { left: 72%; top: 38%; animation-delay: -2.6s; }
-.rj-8  { left: 88%; top: 11%; animation-delay: -6s; }
-.rj-9  { left: 92%; top: 50%; animation-delay: -3.4s; }
-.rj-10 { left: 78%; top: 74%; animation-delay: -4.4s; }
-.rj-11 { left: 54%; top: 48%; animation-delay: -7s; opacity: .55; }
-.rj-12 { left: 18%; top: 56%; animation-delay: -.7s; }
-.rj-13 { left: 40%; top: 28%; animation-delay: -5.4s; }
-.rj-14 { left: 68%; top: 64%; animation-delay: -2s; }
-.rj-15 { left: 30%; top: 84%; animation-delay: -6.4s; }
-.rj-16 { left: 84%; top: 28%; animation-delay: -1.1s; }
-.rj-17 { left: 3%;  top: 32%; animation-delay: -4.1s; }
-.rj-18 { left: 44%; top: 14%; animation-delay: -3.8s; }
-.rj-19 { left: 58%; top: 26%; animation-delay: -5.8s; }
-.rj-20 { left: 26%; top: 38%; animation-delay: -2.3s; }
-.rj-21 { left: 80%; top: 56%; animation-delay: -6.8s; }
-.rj-22 { left: 15%; top: 86%; animation-delay: -0.4s; }
-.rj-23 { left: 95%; top: 76%; animation-delay: -7.2s; }
-.rj-24 { left: 50%; top: 5%;  animation-delay: -1.8s; }
-.rj-25 { left: 36%; top: 62%; animation-delay: -4.8s; }
-.rj-26 { left: 66%; top: 86%; animation-delay: -3.1s; }
-.rj-27 { left: 9%;  top: 22%; animation-delay: -5.2s; }
-.rj-28 { left: 74%; top: 18%; animation-delay: -2.9s; }
-.rj-29 { left: 28%; top: 48%; animation-delay: -6.1s; }
-.rj-30 { left: 56%; top: 72%; animation-delay: -0.9s; }
-.rj-31 { left: 90%; top: 36%; animation-delay: -4.6s; }
-.rj-32 { left: 42%; top: 90%; animation-delay: -3.6s; }
-.rj-33 { left: 6%;  top: 58%; animation-delay: -7.5s; }
-.rj-34 { left: 64%; top: 44%; animation-delay: -1.6s; }
-.rj-35 { left: 82%; top: 88%; animation-delay: -5.5s; }
+.gem-cache .rj {
+  position: absolute;
+  left: 50%; top: 50%;
+  display: block;
+  --j: var(--jewel);
+  --ox: 0px; --oy: 0px; --d: 0s;
+  margin: 0;
+  transform: translate(calc(-50% + var(--ox)), calc(-50% + var(--oy)));
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--j) 90%, transparent))
+          drop-shadow(0 0 16px color-mix(in srgb, var(--rc) 45%, transparent));
+  animation: gem-glint 4.8s ease-in-out infinite;
+  animation-delay: calc(var(--cache-delay, 0s) + var(--d));
+  opacity: .95;
+}
+.gem-cache .rj-lg { --gem-scale: 1.35; }
+.gem-cache .rj-sm { --gem-scale: 0.72; }
+.gem-cache .rj {
+  --gem-scale: 1;
+  transform: translate(calc(-50% + var(--ox)), calc(-50% + var(--oy))) scale(var(--gem-scale));
+}
+
+.gem-cache .rj-round {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 26%, #fff 0 18%, var(--j) 42%, var(--rc-deep) 100%);
+  box-shadow: inset -2px -3px 5px rgba(0,0,0,.25), 0 0 14px color-mix(in srgb, var(--j) 75%, transparent);
+}
+.gem-cache .rj-diamond {
+  width: 14px; height: 14px;
+  background: linear-gradient(135deg, #fff 0%, var(--j) 32%, var(--rc) 68%, var(--rc-deep) 100%);
+  border-radius: 2px;
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,.7), 0 0 16px color-mix(in srgb, var(--j) 65%, transparent);
+  transform: translate(calc(-50% + var(--ox)), calc(-50% + var(--oy))) rotate(45deg) scale(var(--gem-scale, 1));
+}
+.gem-cache .rj-facet {
+  width: 16px; height: 12px;
+  background: linear-gradient(120deg, var(--jewel-2), var(--j), var(--rc));
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--jewel-2) 80%, transparent));
+}
+.gem-cache .rj-ember {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--j);
+  box-shadow: 0 0 12px var(--j), 0 0 22px color-mix(in srgb, var(--rc) 65%, transparent);
+}
+.gem-cache .rj-teardrop {
+  width: 11px; height: 15px;
+  background: radial-gradient(circle at 35% 30%, #fff 0 14%, var(--j) 40%, var(--rc) 100%);
+  border-radius: 50% 50% 50% 0;
+  transform: translate(calc(-50% + var(--ox)), calc(-50% + var(--oy))) rotate(-45deg) scale(var(--gem-scale, 1));
+  box-shadow: 0 0 14px color-mix(in srgb, var(--j) 75%, transparent);
+}
+
+@keyframes cache-breathe {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.04); filter: brightness(1.08); }
+}
+@keyframes gem-glint {
+  0%, 100% { opacity: .78; filter: brightness(1) drop-shadow(0 0 8px color-mix(in srgb, var(--j) 80%, transparent)); }
+  50% { opacity: 1; filter: brightness(1.28) drop-shadow(0 0 14px color-mix(in srgb, var(--j) 95%, transparent)); }
+}
 
 .realm-jewels .realm-rune-glow {
   position: absolute;
@@ -236,43 +246,12 @@ body.asgard-realm .site-header {
 .rr-4 { left: 44%; top: 8%; animation-delay: -2.2s; font-size: clamp(18px, 2.2vw, 28px); opacity: .35; }
 .rr-5 { left: 40%; top: 78%; animation-delay: -5.5s; font-size: clamp(18px, 2.4vw, 30px); }
 
-.realm-ember {
-  position: absolute; width: 4px; height: 4px; border-radius: 50%;
-  background: var(--jewel);
-  box-shadow: 0 0 10px var(--jewel), 0 0 20px var(--rc);
-  animation: ember-rise 12s ease-in-out infinite;
-  opacity: .65;
-}
-.e1 { left: 18%; bottom: 6%; }
-.e2 { left: 52%; bottom: 10%; animation-delay: -2s; background: var(--jewel-2); }
-.e3 { left: 74%; bottom: 5%; animation-delay: -5s; }
-.e4 { left: 36%; bottom: 16%; animation-delay: -8s; width: 3px; height: 3px; }
-.e5 { left: 88%; bottom: 20%; animation-delay: -3.5s; background: var(--rc-soft); }
-.e6 { left: 8%;  bottom: 28%; animation-delay: -6.5s; width: 3px; height: 3px; }
-@keyframes ember-rise {
-  0% { transform: translateY(0) scale(1); opacity: 0; }
-  15% { opacity: .75; }
-  100% { transform: translateY(-55vh) scale(.35); opacity: 0; }
-}
-
-@keyframes jewel-float {
-  0%, 100% { transform: translateY(0) scale(1); opacity: .72; }
-  50% { transform: translateY(-18px) scale(1.12); opacity: 1; }
-}
-@keyframes jewel-float-diamond {
-  0%, 100% { transform: rotate(45deg) translateY(0) scale(1); opacity: .72; }
-  50% { transform: rotate(45deg) translateY(-18px) scale(1.14); opacity: 1; }
-}
-@keyframes jewel-float-diamond-lg {
-  0%, 100% { transform: rotate(45deg) translateY(0) scale(1.35); opacity: .78; }
-  50% { transform: rotate(45deg) translateY(-20px) scale(1.5); opacity: 1; }
-}
 @keyframes rune-pulse {
   0%, 100% { opacity: .28; filter: brightness(1); }
   50% { opacity: .62; filter: brightness(1.25); }
 }
 
-/* Home pantheon wash — soft multi-realm tint; gems do the vivid work */
+/* Home pantheon wash — soft multi-realm tint; caches do the vivid work */
 .realm-jewels--pantheon .realm-color-fill {
   background:
     radial-gradient(ellipse 48% 42% at 10% 20%, color-mix(in srgb, #c8901f 22%, transparent), transparent 58%),
@@ -284,20 +263,20 @@ body.asgard-realm .site-header {
 }
 .realm-jewels--in-vault .realm-color-fill { opacity: .7; }
 .realm-jewels--in-vault .realm-color-pool { opacity: .32; }
-.realm-jewels--in-vault .rj {
-  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--j) 95%, transparent))
-          drop-shadow(0 0 28px color-mix(in srgb, var(--rc) 60%, transparent));
+.realm-jewels--in-vault .gem-cache .rj {
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--j) 95%, transparent))
+          drop-shadow(0 0 22px color-mix(in srgb, var(--rc) 55%, transparent));
 }
 
 @media (max-width: 720px) {
-  .rj-11, .rj-13, .rj-18, .rj-19, .rj-20, .rj-24, .rj-25,
-  .rj-28, .rj-29, .rj-30, .rj-34, .rr-4, .ring-b, .e4, .e6 { display: none; }
+  .gem-cache-2, .gem-cache-5, .rr-4, .ring-b { display: none; }
+  .gem-cache { transform: scale(.9); }
   .realm-color-pool { opacity: .28; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .realm-jewels .rj, .realm-jewels .realm-rune-glow,
+  .gem-cache, .gem-cache .rj, .realm-jewels .realm-rune-glow,
   .realm-color-fill, .realm-color-pool, .realm-norse-ring,
-  .realm-ember, .realm-gold-vein, .realm-treasure-glow { animation: none; }
+  .realm-gold-vein, .realm-treasure-glow { animation: none; }
 }
 
 /* Strong per-patron atmosphere — gems tint the halls */
