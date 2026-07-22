@@ -284,58 +284,43 @@
   padding: 10px 16px !important;
 }
 
-/* Open perk row — gem accents, not boxed cards */
-body.arena-home--concise .breaker-benefits {
-  background: transparent !important;
-  border: none !important;
-  gap: clamp(16px, 3vw, 28px) !important;
-  margin-top: 28px;
+/* Open fee line — no perk cards */
+body.arena-home--concise .founders-fee-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  color: var(--color-text-secondary);
+  font: 600 12px/1.4 var(--font-mono, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-body.arena-home--concise .nordic-perk {
-  position: relative;
-  border: none !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 4px 2px 16px !important;
-  overflow: visible !important;
+body.arena-home--concise .founders-fee-line b {
+  color: var(--color-accent-primary-strong);
+  font-size: 18px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
 }
-body.arena-home--concise .nordic-perk::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 20%;
-  bottom: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #c8901f, #e8c46a, transparent);
-  opacity: 0.7;
-}
-body.arena-home--concise .nordic-perk:nth-child(2)::after {
-  background: linear-gradient(90deg, #2f93c4, #7ec8e8, transparent);
-}
-body.arena-home--concise .nordic-perk-hot::after {
-  background: linear-gradient(90deg, #a67c1a, #e8c050, transparent);
-}
-body.arena-home--concise .nordic-perk::before {
-  content: "";
-  display: block;
-  width: 9px;
-  height: 9px;
-  margin-bottom: 12px;
+body.arena-home--concise .founders-fee-line .fee-dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #fff, #f0d878 45%, #c8901f);
-  box-shadow: 0 0 12px rgba(200, 144, 31, 0.7);
+  box-shadow: 0 0 10px rgba(200, 144, 31, 0.65);
+  flex-shrink: 0;
 }
-body.arena-home--concise .nordic-perk:nth-child(2)::before {
+body.arena-home--concise .founders-fee-line span:nth-child(3) + .fee-dot,
+body.arena-home--concise .founders-fee-line .fee-dot:nth-of-type(2) {
   background: radial-gradient(circle at 30% 30%, #fff, #5eb8e0 45%, #2f93c4);
-  box-shadow: 0 0 12px rgba(47, 147, 196, 0.65);
+  box-shadow: 0 0 10px rgba(47, 147, 196, 0.6);
 }
-body.arena-home--concise .nordic-perk-hot::before {
+body.arena-home--concise .founders-fee-line .fee-dot:last-of-type {
   background: radial-gradient(circle at 30% 30%, #fff, #e8c050 40%, #a67c1a);
-  box-shadow: 0 0 14px rgba(232, 192, 80, 0.75);
-}
-body.arena-home--concise .nordic-perk-rune {
-  opacity: 0.4;
+  box-shadow: 0 0 10px rgba(232, 192, 80, 0.65);
 }
 
 .apply-panel {
