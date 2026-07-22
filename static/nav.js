@@ -32,6 +32,20 @@
       css.href = "/static/asgard-shell.css";
       document.head.appendChild(css);
     }
+    if (!document.getElementById("gods-css")) {
+      const css = document.createElement("link");
+      css.id = "gods-css";
+      css.rel = "stylesheet";
+      css.href = "/static/gods.css";
+      document.head.appendChild(css);
+    }
+    if (!document.getElementById("gods-js")) {
+      const s = document.createElement("script");
+      s.id = "gods-js";
+      s.src = "/static/gods.js";
+      s.defer = true;
+      document.head.appendChild(s);
+    }
   }
   function mountAsgardRealm() {
     // Homepage owns the full vault-env; other pages enter the shared hall.
