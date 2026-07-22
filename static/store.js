@@ -10,7 +10,11 @@ let toastTimer;
 function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2600); }
 
 async function api(p, o = {}) {
-  const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
+  if (window.Birdman && typeof window.Birdman.api === "function") {
+    return window.Birdman.api(p, o);
+  }
+
+  const r = await fetch(p, { credentials: "same-origin",  ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
   let d = null; try { d = await r.json(); } catch (_) {}
   if (!r.ok) throw new Error((d && (d.detail || d.error)) || `Request failed (${r.status})`);
   return d;

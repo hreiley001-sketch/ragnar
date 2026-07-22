@@ -5,7 +5,11 @@
   const slug = decodeURIComponent((location.pathname.split("/").pop() || "").replace(/\/+$/, ""));
 
   async function api(path, opts = {}) {
-    const r = await fetch(path, {
+    if (window.Birdman && typeof window.Birdman.api === "function") {
+      return window.Birdman.api(path, opts);
+    }
+
+    const r = await fetch(path, { credentials: "same-origin", 
       ...opts,
       headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
     });

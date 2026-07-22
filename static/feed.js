@@ -6,6 +6,10 @@
   let followingOnly = false;
 
   async function api(path, opts) {
+    if (window.Birdman && typeof window.Birdman.api === "function") {
+      return window.Birdman.api(path, opts);
+    }
+
     const r = await fetch(path, opts);
     const data = await r.json().catch(() => null);
     if (!r.ok) throw new Error((data && data.detail) || "Request failed");

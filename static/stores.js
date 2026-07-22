@@ -14,7 +14,11 @@ function toast(msg) {
 }
 
 async function api(p, o = {}) {
-  const r = await fetch(p, { ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
+  if (window.Birdman && typeof window.Birdman.api === "function") {
+    return window.Birdman.api(p, o);
+  }
+
+  const r = await fetch(p, { credentials: "same-origin",  ...o, headers: { "Content-Type": "application/json", ...(o.headers || {}) } });
   const d = await r.json().catch(() => null);
   if (!r.ok) throw new Error((d && (d.detail || d.error)) || "Request failed");
   return d;
