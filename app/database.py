@@ -1,4 +1,8 @@
-"""Database engine and session management (SQLModel over SQLite by default)."""
+"""Database engine and session management (SQLModel over SQLite by default).
+
+Postgres (including Supabase) is supported via ``DATABASE_URL`` — see
+``normalize_database_url`` in ``config.py``.
+"""
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -7,18 +11,20 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from .config import settings
 
-# SQLite needs check_same_thread=False when used with FastAPI's threadpool.
-_connect_args = (
-    {"check_same_thread": False}
-    if settings.database_url.startswith("sqlite")
-    else {}
-)
+_is_sqlite = settings.database_url.startswith("sqlite")
 
-engine = create_engine(
-    settings.database_url,
-    echo=settings.debug,
-    connect_args=_connect_args,
-)
+# SQLite needs check_same_thread=False when used with FastAPI's threadpool.
+_connect_args = {"check_same_thread": False} if _is_sqlite else {}
+
+# pool_pre_ping drops stale connections (common with managed Postgres / Supabase).
+_engine_kwargs: dict = {
+    "echo": settings.debug,
+    "connect_args": _connect_args,
+}
+if not _is_sqlite:
+    _engine_kwargs["pool_pre_ping"] = True
+
+engine = create_engine(settings.database_url, **_engine_kwargs)
 
 
 # Columns added after each table originally shipped. On SQLite we add them in

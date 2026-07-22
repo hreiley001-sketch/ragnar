@@ -1,7 +1,9 @@
 # Render blueprint for RAGNAR — https://render.com
 # Deploy: push this repo to GitHub, then in Render: New → Blueprint → pick the repo.
 # A 1GB persistent disk keeps the SQLite DB and uploaded scan photos across deploys.
-# (For scale, swap to a managed Postgres and set DATABASE_URL accordingly.)
+# For Supabase: override DATABASE_URL in the Render dashboard, set
+# SCHEMA_BOOTSTRAP=alembic, and change startCommand to:
+#   alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
 services:
   - type: web
     name: ragnar
@@ -26,6 +28,7 @@ services:
         value: create_all
       - key: SEED_DEMO
         value: "false"
+      # Override in the dashboard with your Supabase URI to cut over.
       - key: DATABASE_URL
         value: sqlite:////var/data/ragnar.db
       - key: UPLOAD_DIR
