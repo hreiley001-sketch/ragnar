@@ -72,6 +72,13 @@ def apply(payload: SellerApply, session: Session = Depends(get_session),
         )
     except Exception:  # noqa: BLE001
         pass
+    if seller.is_founding:
+        try:
+            from .. import cache
+
+            cache.invalidate_founding()
+        except Exception:  # noqa: BLE001
+            pass
     # store_edit_token is returned ONCE here so the seller can customize their store.
     return SellerApplyResult(**seller_state(seller), store_edit_token=seller.store_edit_token)
 

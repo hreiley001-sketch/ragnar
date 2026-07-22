@@ -49,6 +49,24 @@ def normalize_database_url(url: str) -> str:
     return urlunparse(parsed._replace(query=urlencode(query)))
 
 
+def is_supabase_pooler_url(url: str) -> bool:
+    """True when the URL points at Supabase PgBouncer (session or transaction)."""
+    try:
+        host = (urlparse(url).hostname or "").lower()
+    except Exception:  # noqa: BLE001
+        return False
+    return "pooler.supabase.com" in host
+
+
+def is_supabase_direct_db_url(url: str) -> bool:
+    """True for ``db.<ref>.supabase.co`` — bypasses PgBouncer (avoid at scale)."""
+    try:
+        host = (urlparse(url).hostname or "").lower()
+    except Exception:  # noqa: BLE001
+        return False
+    return host.startswith("db.") and host.endswith(".supabase.co")
+
+
 class Settings:
     # Identity
     app_name: str = "RAGNAR"
@@ -56,9 +74,34 @@ class Settings:
     tagline: str = "Guided by counsel, driven by conquest."
 
     # Storage — paste a Supabase URI; scheme/SSL are normalized automatically.
+    # Prefer PgBouncer pooler hosts (see docs/ARCHITECTURE.md).
     database_url: str = normalize_database_url(
         os.getenv("DATABASE_URL", "sqlite:///./ragnar.db")
     )
+    # Optional read replica / read-heavy pooler URL (same normalize rules).
+    database_read_url: str = normalize_database_url(os.getenv("DATABASE_READ_URL", "").strip()) if os.getenv("DATABASE_READ_URL", "").strip() else ""
+
+    # SQLAlchemy ↔ PgBouncer pool mode:
+    #   session     — small shared pool (Supabase session pooler :5432)
+    #   transaction — NullPool + no prepared statements (:6543)
+    #   null        — force NullPool regardless of port
+    db_pool_mode: str = os.getenv("DB_POOL_MODE", "session").strip().lower() or "session"
+    db_pool_size: int = int(os.getenv("DB_POOL_SIZE", "5"))
+    db_max_overflow: int = int(os.getenv("DB_MAX_OVERFLOW", "10"))
+    db_pool_timeout: int = int(os.getenv("DB_POOL_TIMEOUT", "30"))
+    db_pool_recycle: int = int(os.getenv("DB_POOL_RECYCLE", "300"))
+
+    # Redis — shared cache + n8n queue (required for multi-node / 100k viewers).
+    redis_url: str = os.getenv("REDIS_URL", "").strip()
+    cache_default_ttl_seconds: int = int(os.getenv("CACHE_DEFAULT_TTL_SECONDS", "30"))
+    cache_meta_ttl_seconds: int = int(os.getenv("CACHE_META_TTL_SECONDS", "60"))
+    cache_listings_ttl_seconds: int = int(os.getenv("CACHE_LISTINGS_TTL_SECONDS", "15"))
+    cache_founding_ttl_seconds: int = int(os.getenv("CACHE_FOUNDING_TTL_SECONDS", "20"))
+
+    # Supabase Auth JWTs (stateless multi-node auth). Project Settings → API → JWT Secret.
+    supabase_url: str = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
+    supabase_jwt_secret: str = os.getenv("SUPABASE_JWT_SECRET", "").strip()
+    supabase_jwt_audience: str = os.getenv("SUPABASE_JWT_AUDIENCE", "authenticated").strip() or "authenticated"
 
     # CORS — comma separated. Default "*" for easy local dev; lock down in prod.
     allowed_origins: list[str] = [
@@ -153,7 +196,8 @@ class Settings:
     # Optional HMAC secret → X-Ragnar-Signature: sha256=…
     n8n_webhook_secret: str = os.getenv("N8N_WEBHOOK_SECRET", "").strip()
 
-    # --- Obsidian (Local REST API plugin) — key-gated ---
+    # --- Obsidian (docs / content specs only — NOT a runtime dependency) ---
+    # Local REST API is optional for desktop vault sync; never call from hot paths.
     # https://github.com/coddingtonbear/obsidian-local-rest-api
     obsidian_api_url: str = os.getenv("OBSIDIAN_API_URL", "").strip().rstrip("/")
     obsidian_api_key: str = os.getenv("OBSIDIAN_API_KEY", "").strip()
@@ -403,7 +447,22 @@ def validate_launch_config() -> dict:
     db = settings.database_url
     using_postgres = db.startswith("postgresql")
     if using_postgres:
-        _ok("DATABASE", "postgres" + (" (supabase)" if "supabase.co" in db else ""))
+        label = "postgres"
+        if is_supabase_pooler_url(db):
+            label = "postgres (supabase pooler)"
+            _ok("DATABASE", label)
+        elif is_supabase_direct_db_url(db):
+            label = "postgres (supabase DIRECT — bypasses PgBouncer)"
+            if settings.is_production:
+                _err(
+                    "DATABASE_URL",
+                    "use Supabase PgBouncer pooler (*.pooler.supabase.com), not db.*.supabase.co",
+                )
+            else:
+                _warn("DATABASE_URL", "direct Supabase host — switch to pooler before scale")
+            _ok("DATABASE", label)
+        else:
+            _ok("DATABASE", label + (" (supabase)" if "supabase.co" in db else ""))
         if settings.use_create_all:
             _warn(
                 "SCHEMA_BOOTSTRAP",
@@ -412,6 +471,10 @@ def validate_launch_config() -> dict:
             )
         else:
             _ok("SCHEMA_BOOTSTRAP", "alembic")
+        if settings.database_read_url:
+            _ok("DATABASE_READ_URL", "set (read replica / pooled reads)")
+        elif settings.is_production:
+            _warn("DATABASE_READ_URL", "unset — heavy reads share the primary pool")
     elif settings.is_production and settings.use_create_all:
         _warn(
             "SCHEMA_BOOTSTRAP",
@@ -421,6 +484,24 @@ def validate_launch_config() -> dict:
     else:
         _ok("SCHEMA_BOOTSTRAP", "create_all" if settings.use_create_all else "alembic")
         _ok("DATABASE", "sqlite" if db.startswith("sqlite") else "other")
+
+    if settings.redis_url:
+        _ok("REDIS_URL", "set")
+    elif settings.is_production:
+        _warn("REDIS_URL", "unset — cache/rate-limit/n8n queue are not shared across nodes")
+    else:
+        _warn("REDIS_URL", "unset — using process-local cache (dev only)")
+
+    if settings.supabase_jwt_secret:
+        _ok("SUPABASE_JWT_SECRET", "set (stateless JWT auth enabled)")
+    elif settings.is_production:
+        _warn("SUPABASE_JWT_SECRET", "unset — multi-node auth relies on DB cookie sessions only")
+
+    if settings.obsidian_api_url and settings.is_production:
+        _warn(
+            "OBSIDIAN_API_URL",
+            "set in production — Obsidian must not be a runtime dependency; prefer n8n vault writes",
+        )
 
     if settings.seed_demo and settings.is_production:
         _err("SEED_DEMO", "must be false in production")

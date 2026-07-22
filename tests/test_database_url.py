@@ -30,3 +30,17 @@ def test_existing_sslmode_preserved():
     out = normalize_database_url(raw)
     assert "sslmode=verify-full" in out
     assert out.count("sslmode=") == 1
+
+
+def test_pooler_helpers():
+    from app.config import is_supabase_direct_db_url, is_supabase_pooler_url
+
+    pooler = normalize_database_url(
+        "postgresql://u:p@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
+    )
+    direct = normalize_database_url(
+        "postgresql://u:p@db.xyz.supabase.co:5432/postgres"
+    )
+    assert is_supabase_pooler_url(pooler)
+    assert is_supabase_direct_db_url(direct)
+    assert not is_supabase_pooler_url(direct)

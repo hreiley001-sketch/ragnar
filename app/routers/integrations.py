@@ -25,11 +25,15 @@ def integrations_hub_status(_: None = Depends(require_admin)) -> dict:
         "n8n": {
             "configured": webhooks_out.n8n_configured(),
             "signed": bool(settings.n8n_webhook_secret),
+            "hot_path": False,
+            "delivery": "async enqueue (never awaited on request path)",
         },
         "obsidian": {
             "configured": obsidian.obsidian_configured(),
+            "runtime_dependency": False,
             "vault_prefix": settings.obsidian_vault_prefix,
             "api_url": settings.obsidian_api_url or None,
+            "note": "Docs/content only — publish via pre-gen/cache or n8n, not request path",
         },
         "events": [
             "listing.created",
@@ -46,11 +50,15 @@ def integrations_hub_status(_: None = Depends(require_admin)) -> dict:
 
 @router.post("/events/test")
 def test_n8n_webhook(payload: dict | None = None, _: None = Depends(require_admin)) -> dict:
-    """Fire a synthetic event so you can verify the n8n workflow is listening."""
+    """Enqueue a synthetic event — returns immediately (n8n is not awaited)."""
     data = {"hello": "ragnar", **(payload or {})}
-    ok = webhooks_out.dispatch("integrations.test", data)
-    return {"ok": ok, "configured": webhooks_out.n8n_configured(), "event": "integrations.test"}
-
+    ok = webhooks_out.enqueue("integrations.test", data)
+    return {
+        "ok": ok,
+        "configured": webhooks_out.n8n_configured(),
+        "event": "integrations.test",
+        "awaited_n8n": False,
+    }
 
 @router.get("/obsidian/export")
 def export_obsidian_vault(

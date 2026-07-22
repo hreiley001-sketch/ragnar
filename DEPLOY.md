@@ -107,3 +107,31 @@ URI as-is.
 
 **Do not commit** the real password. Rotate the DB password if it was ever pasted
 into chat, tickets, or a public repo.
+
+## Scale path (≈100k concurrent viewers)
+
+Full map: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+```
+Client → CDN (Cloudflare) → Load Balancer → FastAPI (N replicas)
+                              → Supabase via PgBouncer
+                              → Redis (cache + n8n queue)
+FastAPI ──async enqueue──► n8n
+Obsidian = docs only
+Supabase Realtime = separate WS layer
+```
+
+1. **CDN first** — Put Cloudflare (orange-cloud) in front of the origin. Cache
+   `/static/*` and HTML aggressively; bypass cache for `/api/*` (or short TTL
+   for public GETs). Enable Bot Fight / rate limiting / DDoS.
+2. **Horizontal FastAPI** — Run multiple uvicorn/gunicorn workers behind a load
+   balancer. Nodes are **stateless**: auth via Supabase JWTs (`SUPABASE_JWT_SECRET`)
+   or shared DB cookie sessions; set `REDIS_URL` so cache + rate limits + n8n
+   queues are shared.
+3. **Supabase pooler** — Always use `*.pooler.supabase.com` (never direct
+   `db.*.supabase.co` at scale). Optional `DATABASE_READ_URL` for read replicas.
+   Set `DB_POOL_MODE=transaction` when using port **6543**.
+4. **n8n off hot path** — `platform_events.emit` only enqueues. Never await an
+   n8n workflow inside a request handler.
+5. **Obsidian** — documentation / vault export only; not required to serve traffic.
+6. Probe: `GET /health/architecture` reports whether these boundaries hold.

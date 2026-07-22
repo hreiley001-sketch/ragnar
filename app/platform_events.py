@@ -1,7 +1,8 @@
-"""Platform-wide event fan-out (marketplace ops → n8n / Obsidian).
+"""Platform-wide event fan-out (marketplace ops → n8n).
 
 Distinct from the ride-scoped ``event_bus`` (which persists ``RideEvent`` rows).
-This helper is intentionally thin and fail-soft.
+This helper is intentionally thin and **always asynchronous** — FastAPI never
+waits for n8n. See ``docs/ARCHITECTURE.md``.
 """
 from __future__ import annotations
 
@@ -14,8 +15,8 @@ logger = logging.getLogger("ragnar.platform_events")
 
 
 def emit(event: str, data: dict[str, Any] | None = None) -> None:
-    """Notify external automation (n8n). Never raises."""
+    """Enqueue an external automation event. Never raises. Never blocks on n8n."""
     try:
-        webhooks_out.dispatch(event, data)
+        webhooks_out.enqueue(event, data)
     except Exception as exc:  # noqa: BLE001
         logger.warning("platform emit failed (%s): %s", event, exc)

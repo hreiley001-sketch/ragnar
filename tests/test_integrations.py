@@ -41,23 +41,24 @@ def test_n8n_dispatch_posts_signed_payload(monkeypatch):
         status_code = 200
         text = "ok"
 
-    class FakeClient:
+    class FakeAsync:
         def __init__(self, *a, **k):
             pass
 
-        def __enter__(self):
+        async def __aenter__(self):
             return self
 
-        def __exit__(self, *a):
+        async def __aexit__(self, *a):
             return False
 
-        def post(self, url, content=None, headers=None):
+        async def post(self, url, content=None, headers=None):
             captured["url"] = url
             captured["content"] = content
             captured["headers"] = headers
             return FakeResp()
 
-    monkeypatch.setattr(webhooks_out.httpx, "Client", FakeClient)
+    monkeypatch.setattr(webhooks_out.httpx, "AsyncClient", FakeAsync)
+    # enqueue schedules a task; with no running loop it uses asyncio.run(_post_webhook).
     assert webhooks_out.dispatch("order.paid", {"order_id": 7}) is True
     assert captured["url"].endswith("/webhook/ragnar")
     body = json.loads(captured["content"].decode())

@@ -14,7 +14,16 @@ router = APIRouter(prefix="/api/founding", tags=["founding"])
 
 @router.get("/status", response_model=FoundingStatus)
 def status_(session: Session = Depends(get_session)) -> FoundingStatus:
-    return FoundingStatus(**founding_status(session))
+    """Public Founding 250 counter — cached; invalidate on seller apply."""
+    from .. import cache
+    from ..config import settings
+
+    hit = cache.get_json(cache.NS_FOUNDING)
+    if hit is not None:
+        return FoundingStatus(**hit)
+    payload = founding_status(session)
+    cache.set_json(cache.NS_FOUNDING, payload, ttl=settings.cache_founding_ttl_seconds)
+    return FoundingStatus(**payload)
 
 
 @router.post("/apply", response_model=FoundingApplicationRead, status_code=status.HTTP_201_CREATED)

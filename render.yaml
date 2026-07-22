@@ -84,3 +84,16 @@ services:
         sync: false
       - key: ADMIN_TOKEN
         sync: false
+      # Scale (see docs/ARCHITECTURE.md): Redis + Supabase JWT for multi-node.
+      - key: REDIS_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: DATABASE_READ_URL
+        sync: false
+      - key: N8N_WEBHOOK_URL
+        sync: false
+      - key: N8N_WEBHOOK_SECRET
+        sync: false

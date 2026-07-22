@@ -1,15 +1,19 @@
 # RAGNAR ↔ n8n ↔ Obsidian
 
 Automation bridge so marketplace events and Counsel knowledge flow into your
-ops stack.
+ops stack. **n8n is never on the FastAPI hot path** — events are enqueued
+(Redis list or background HTTP) and return immediately. Obsidian is **docs /
+content only**, not a runtime dependency.
+
+Full architecture: [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md).
 
 Upstream n8n: **https://github.com/n8n-io/n8n.git** (we run the published
 `n8n` npm package — same project, no need to build the monorepo).
 
 ```
-RAGNAR  --webhook-->  n8n  --write notes-->  Obsidian vault
-   |                    |
-   +-- Local REST API --+  (optional direct push)
+RAGNAR  --async enqueue-->  n8n  --write notes-->  Obsidian vault
+   |                          |
+   +-- (admin export only) ---+  (optional; not request-path)
 ```
 
 ## 0. Run n8n locally (this repo)
