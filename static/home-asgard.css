@@ -1,17 +1,26 @@
 /* RAGNAR — Asgard atmosphere · wolf & raven · mystical power */
 
-/* ——— Nordic fjord background (homepage only) ——— */
+/* ——— Nordic fjord background (homepage only) — pantheon of god colors ——— */
 .vault-env-sky {
   background:
-    radial-gradient(ellipse 110% 58% at 50% -14%,
-      rgba(184, 121, 26, 0.38),
-      transparent 58%),
-    radial-gradient(ellipse 55% 40% at 12% 28%,
-      rgba(184, 121, 26, 0.16),
-      transparent 62%),
-    radial-gradient(ellipse 48% 36% at 88% 22%,
-      rgba(184, 121, 26, 0.12),
+    radial-gradient(ellipse 100% 55% at 50% -12%,
+      rgba(200, 144, 31, 0.42),
+      transparent 55%),
+    radial-gradient(ellipse 50% 38% at 10% 25%,
+      rgba(47, 147, 196, 0.28),
       transparent 60%),
+    radial-gradient(ellipse 45% 35% at 88% 20%,
+      rgba(122, 92, 196, 0.26),
+      transparent 58%),
+    radial-gradient(ellipse 40% 32% at 22% 70%,
+      rgba(47, 143, 107, 0.22),
+      transparent 58%),
+    radial-gradient(ellipse 42% 34% at 78% 72%,
+      rgba(31, 143, 154, 0.24),
+      transparent 58%),
+    radial-gradient(ellipse 35% 30% at 50% 45%,
+      rgba(166, 124, 26, 0.14),
+      transparent 62%),
     linear-gradient(175deg,
       #f2ece0 0%,
       #fdfbf6 28%,
@@ -66,9 +75,11 @@
 .vault-env-aurora-c {
   inset: -18% -40%;
   background:
-    radial-gradient(ellipse 60% 14% at 48% 18%, rgba(106, 200, 170, 0.32), transparent 70%),
-    radial-gradient(ellipse 42% 10% at 72% 28%, rgba(184, 121, 26, 0.18), transparent 68%);
-  opacity: 0.15;
+    radial-gradient(ellipse 60% 14% at 48% 18%, rgba(47, 143, 107, 0.4), transparent 70%),
+    radial-gradient(ellipse 42% 10% at 72% 28%, rgba(122, 92, 196, 0.32), transparent 68%),
+    radial-gradient(ellipse 38% 12% at 22% 32%, rgba(47, 147, 196, 0.3), transparent 68%),
+    radial-gradient(ellipse 36% 10% at 88% 40%, rgba(31, 143, 154, 0.28), transparent 68%);
+  opacity: 0.32;
   animation: auroraDrift 26s ease-in-out infinite alternate;
   filter: blur(22px);
   mix-blend-mode: multiply;
@@ -77,15 +88,15 @@
 .vault-env-frost {
   position: absolute;
   inset: 0;
-  opacity: calc(0.28 + var(--vault-p) * 0.14);
+  opacity: calc(0.38 + var(--vault-p) * 0.16);
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 18% 22%, rgba(184, 121, 26, 0.45) 0 1.2px, transparent 2.2px),
-    radial-gradient(circle at 72% 18%, rgba(184, 121, 26, 0.4) 0 1.2px, transparent 2.2px),
-    radial-gradient(circle at 44% 48%, rgba(184, 121, 26, 0.3) 0 1px, transparent 2px),
-    radial-gradient(circle at 86% 62%, rgba(184, 121, 26, 0.35) 0 1.2px, transparent 2.2px),
-    radial-gradient(circle at 28% 78%, rgba(184, 121, 26, 0.28) 0 1px, transparent 2px),
-    radial-gradient(circle at 58% 34%, rgba(184, 121, 26, 0.28) 0 1.2px, transparent 2.2px);
+    radial-gradient(circle at 18% 22%, rgba(200, 144, 31, 0.65) 0 1.3px, transparent 2.3px),
+    radial-gradient(circle at 72% 18%, rgba(47, 147, 196, 0.6) 0 1.3px, transparent 2.3px),
+    radial-gradient(circle at 44% 48%, rgba(122, 92, 196, 0.5) 0 1.1px, transparent 2.1px),
+    radial-gradient(circle at 86% 62%, rgba(31, 143, 154, 0.55) 0 1.3px, transparent 2.3px),
+    radial-gradient(circle at 28% 78%, rgba(47, 143, 107, 0.5) 0 1.1px, transparent 2.1px),
+    radial-gradient(circle at 58% 34%, rgba(166, 124, 26, 0.48) 0 1.2px, transparent 2.2px);
   background-size: 180px 180px, 220px 220px, 160px 160px, 200px 200px, 240px 240px, 190px 190px;
   animation: frostDrift 40s linear infinite;
 }
@@ -108,19 +119,21 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
 .asgard-bifrost {
   position: absolute;
   inset: -25% -35%;
-  opacity: 0.15;
+  opacity: 0.32;
   pointer-events: none;
   background: linear-gradient(
     118deg,
-    transparent 28%,
-    rgba(232, 122, 58, 0.06) 36%,
-    rgba(255, 198, 92, 0.14) 42%,
-    rgba(184, 121, 26, 0.22) 48%,
-    rgba(184, 121, 26, 0.16) 54%,
-    rgba(106, 158, 184, 0.08) 60%,
-    transparent 68%
+    transparent 22%,
+    rgba(232, 122, 58, 0.14) 30%,
+    rgba(200, 144, 31, 0.28) 36%,
+    rgba(47, 143, 107, 0.22) 42%,
+    rgba(47, 147, 196, 0.26) 48%,
+    rgba(122, 92, 196, 0.24) 54%,
+    rgba(31, 143, 154, 0.2) 60%,
+    rgba(166, 124, 26, 0.18) 66%,
+    transparent 76%
   );
-  filter: blur(10px) saturate(1.35);
+  filter: blur(10px) saturate(1.55);
   mix-blend-mode: multiply;
   animation: bifrostDrift 18s ease-in-out infinite alternate;
 }
@@ -128,16 +141,20 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
 .asgard-godrays {
   position: absolute;
   inset: -10%;
-  opacity: 0.15;
+  opacity: 0.28;
   background:
     conic-gradient(from 248deg at 50% -6%,
       transparent 0deg,
-      rgba(255, 214, 140, 0.12) 18deg,
-      transparent 42deg,
-      rgba(184, 121, 26, 0.14) 58deg,
-      transparent 88deg),
+      rgba(200, 144, 31, 0.22) 14deg,
+      transparent 32deg,
+      rgba(47, 147, 196, 0.2) 48deg,
+      transparent 68deg,
+      rgba(122, 92, 196, 0.18) 84deg,
+      transparent 104deg,
+      rgba(47, 143, 107, 0.16) 120deg,
+      transparent 140deg),
     radial-gradient(ellipse 90% 55% at 50% -4%,
-      rgba(255, 220, 160, 0.14),
+      rgba(255, 220, 160, 0.2),
       transparent 62%);
   mix-blend-mode: multiply;
   animation: godrayPulse 14s ease-in-out infinite alternate;
@@ -147,10 +164,9 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  opacity: 0.62;
+  opacity: 0.78;
   font-family: var(--font-mono);
   font-size: clamp(20px, 2.6vw, 32px);
-  color: rgba(138, 101, 16, 0.58);
   letter-spacing: 0.45em;
   pointer-events: none;
 }
@@ -158,14 +174,33 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
 .asgard-runes-float span {
   position: absolute;
   animation: runeFloat 22s ease-in-out infinite;
-  text-shadow: 0 0 24px rgba(184, 121, 26, 0.5);
 }
 
-.asgard-runes-float span:nth-child(1) { left: 8%; top: 18%; animation-delay: 0s; }
-.asgard-runes-float span:nth-child(2) { left: 84%; top: 22%; animation-delay: -4s; }
-.asgard-runes-float span:nth-child(3) { left: 14%; top: 72%; animation-delay: -9s; }
-.asgard-runes-float span:nth-child(4) { left: 78%; top: 68%; animation-delay: -14s; }
-.asgard-runes-float span:nth-child(5) { left: 48%; top: 8%; animation-delay: -6s; opacity: 0.6; }
+.asgard-runes-float span:nth-child(1) {
+  left: 8%; top: 18%; animation-delay: 0s;
+  color: rgba(200, 144, 31, 0.75);
+  text-shadow: 0 0 24px rgba(200, 144, 31, 0.7);
+}
+.asgard-runes-float span:nth-child(2) {
+  left: 84%; top: 22%; animation-delay: -4s;
+  color: rgba(47, 147, 196, 0.75);
+  text-shadow: 0 0 24px rgba(47, 147, 196, 0.7);
+}
+.asgard-runes-float span:nth-child(3) {
+  left: 14%; top: 72%; animation-delay: -9s;
+  color: rgba(47, 143, 107, 0.72);
+  text-shadow: 0 0 24px rgba(47, 143, 107, 0.65);
+}
+.asgard-runes-float span:nth-child(4) {
+  left: 78%; top: 68%; animation-delay: -14s;
+  color: rgba(122, 92, 196, 0.75);
+  text-shadow: 0 0 24px rgba(122, 92, 196, 0.7);
+}
+.asgard-runes-float span:nth-child(5) {
+  left: 48%; top: 8%; animation-delay: -6s; opacity: 0.7;
+  color: rgba(31, 143, 154, 0.72);
+  text-shadow: 0 0 24px rgba(31, 143, 154, 0.65);
+}
 
 @keyframes bifrostDrift {
   from { transform: translate3d(-2%, -1%, 0) rotate(-1deg); }
@@ -173,8 +208,8 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
 }
 
 @keyframes godrayPulse {
-  from { opacity: 0.1; }
-  to { opacity: 0.15; }
+  from { opacity: 0.18; }
+  to { opacity: 0.32; }
 }
 
 @keyframes runeFloat {

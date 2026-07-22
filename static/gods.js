@@ -313,36 +313,68 @@
     root.style.setProperty("--color-active-surface", `color-mix(in srgb, ${g.rc} 18%, transparent)`);
   }
 
-  function injectRealmJewels(g) {
+  function jewelRow(g, i) {
+    const tone = i % 3 === 0 ? g.jewel : i % 3 === 1 ? g.jewel2 : g.rcSoft;
+    const kinds = ["rj-diamond", "rj-round", "rj-facet", "rj-ember"];
+    return `<span class="rj ${kinds[i % kinds.length]} rj-${i}" style="--j:${tone};--rc:${g.rc}"></span>`;
+  }
+
+  function injectRealmMagic(g, multi) {
     if (document.querySelector(".realm-jewels")) return;
     const el = document.createElement("div");
-    el.className = "realm-jewels";
+    el.className = "realm-jewels" + (multi ? " realm-jewels--pantheon" : "");
     el.setAttribute("aria-hidden", "true");
+
+    const gods = multi ? GODS : [g, g, g];
+    const jewels = [];
+    for (let i = 0; i < 18; i++) jewels.push(jewelRow(gods[i % gods.length], i));
+
+    const runes = multi
+      ? GODS.map((x, i) => `<span class="realm-rune-glow rr-${i}" style="--rc:${x.rc};--jewel:${x.jewel}">${x.rune}</span>`).join("")
+      : [0, 1, 2, 3, 4].map((i) => `<span class="realm-rune-glow rr-${i}">${g.rune}</span>`).join("");
+
+    const pools = multi
+      ? GODS.map((x, i) => `<span class="realm-color-pool pool-${i}" style="--rc:${x.rc};--jewel:${x.jewel};--jewel-2:${x.jewel2}"></span>`).join("")
+      : `<span class="realm-color-pool pool-0"></span>
+         <span class="realm-color-pool pool-1" style="--rc:var(--jewel-2);--jewel:var(--rc-soft)"></span>
+         <span class="realm-color-pool pool-2" style="--rc:var(--jewel);--jewel:var(--rc)"></span>
+         <span class="realm-color-pool pool-3"></span>`;
+
     el.innerHTML = `
-      <span class="rj rj-diamond rj-a"></span>
-      <span class="rj rj-round rj-b"></span>
-      <span class="rj rj-diamond rj-c"></span>
-      <span class="rj rj-round rj-d"></span>
-      <span class="rj rj-diamond rj-e"></span>
-      <span class="rj rj-facet rj-f"></span>
-      <span class="rj rj-round rj-g"></span>
-      <span class="realm-rune-glow">${g.rune}</span>
-      <span class="realm-rune-glow rr-2">${g.rune}</span>
-      <span class="realm-rune-glow rr-3">${g.rune}</span>`;
+      <div class="realm-color-fill"></div>
+      ${pools}
+      <div class="realm-knot-band band-top"></div>
+      <div class="realm-knot-band band-bot"></div>
+      <div class="realm-norse-ring ring-a"></div>
+      <div class="realm-norse-ring ring-b"></div>
+      ${jewels.join("")}
+      ${runes}
+      <span class="realm-ember e1"></span><span class="realm-ember e2"></span>
+      <span class="realm-ember e3"></span><span class="realm-ember e4"></span>`;
     document.body.appendChild(el);
+  }
+
+  // ---- Home: full pantheon magic (all god colors) ----
+  if (onHome) {
+    document.body.dataset.patron = "pantheon";
+    injectRealmMagic(ODIN, true);
   }
 
   // ---- Background patron + realm theme (every page except home vault) ----
   if (!onHome) {
     const g = patronFor(path);
     applyRealmTheme(g);
-    injectRealmJewels(g);
+    injectRealmMagic(g, false);
     if (!document.querySelector(".realm-patron")) {
       const el = document.createElement("div");
       el.className = "realm-patron";
       el.setAttribute("aria-hidden", "true");
       el.style.setProperty("--rc", g.rc);
-      el.innerHTML = `<span class="rp-glow"></span><span class="rp-fig">${figureHTML(g)}</span>`;
+      el.style.setProperty("--jewel", g.jewel);
+      el.innerHTML = `
+        <span class="rp-glow"></span>
+        <span class="rp-glow rp-glow-2"></span>
+        <span class="rp-fig">${figureHTML(g)}</span>`;
       document.body.appendChild(el);
     }
   }
@@ -351,13 +383,16 @@
   function buildPantheon(host) {
     if (!host) return;
     host.innerHTML = GODS.map((g) => `
-      <a class="god-shrine" style="--rc:${g.rc};--rc-soft:${g.rcSoft};--jewel:${g.jewel};--jewel-2:${g.jewel2}" href="${g.paths[0]}" aria-label="${g.god} — ${g.realm}">
+      <a class="god-shrine god-shrine--${g.key}" style="--rc:${g.rc};--rc-deep:${g.rcDeep};--rc-soft:${g.rcSoft};--jewel:${g.jewel};--jewel-2:${g.jewel2}" href="${g.paths[0]}" aria-label="${g.god} — ${g.realm}">
         <div class="altar">
           <span class="halo"></span><span class="rays"></span>
+          <span class="altar-mist"></span>
           <span class="jewel-tl"></span><span class="jewel-tr"></span>
           <span class="jewel-bl"></span><span class="jewel-br"></span>
+          <span class="jewel-mid"></span>
           <span class="runemark">${g.rune}</span>
           ${figureHTML(g)}
+          <span class="altar-base"></span>
         </div>
         <div class="plate">
           <div class="nm">${g.god}</div>
