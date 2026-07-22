@@ -1,52 +1,62 @@
-# Birdman Supabase Schema — memory layer
+# Birdman Supabase Schema — telemetry / event firehose
 
-Schema: [`schema.sql`](./schema.sql)
+Schema: [`schema.sql`](./schema.sql) — idempotent, safe to re-run.
 
-Flow:
+## What this is (and isn't)
 
-```
-users → content → actions → realtime_events → system_logs
-identity → content → interaction → realtime → system memory
-```
+After the SQLite → Supabase cutover (see
+[`docs/SUPABASE_MIGRATION_PLAN.md`](../docs/SUPABASE_MIGRATION_PLAN.md)), there is
+**one source of truth for domain data: Supabase Postgres, owned by Alembic**
+(`alembic upgrade head`, 40 product tables in `app/models/tables.py`).
 
-## Core tables
+`schema.sql` therefore no longer describes domain data. It defines only the
+**append-only firehose** that feeds n8n automations and Supabase Realtime:
 
-| Table | Purpose | FastAPI mirror |
+| Table | Purpose | Access |
 |---|---|---|
-| `users` | Identity + profile (`id` = `auth.users.id`); roles buyer/seller/admin | `api/v1/users` · `services/user_service` |
-| `content` | Atomic content units | `api/v1/content` · Redis cache |
-| `actions` | Likes / views / triggers | `api/v1/actions` → queue → n8n |
-| `realtime_events` | SSE / WebSocket payloads | `api/v1/realtime` |
-| `system_logs` | Organism memory | n8n + FastAPI audit |
+| `system_logs` | Organism memory — fastapi / n8n / supabase audit | service-role only |
+| `market_events` | Public marketplace activity feed | public read, service-role write |
+| `realtime_events` | SSE / WebSocket broadcast units | public read, service-role write |
 
-## Marketplace tables
+No dual-write. No domain duplication. The firehose has **no foreign keys into the
+product schema** — a telemetry stream must never block on an FK.
 
-| Table | Purpose | FastAPI mirror |
-|---|---|---|
-| `cards` | Collectibles + metadata | `api/v1/cards` |
-| `listings` | Offers to sell | `api/v1/listings` · Redis `market:listings:active` |
-| `orders` | Purchases | `api/v1/orders` → n8n |
-| `market_events` | Activity feed | `api/v1/market-events` |
-| `market_stats` | Daily rollups | n8n `market/daily-analytics` |
+## Security
+
+FastAPI connects with the **service-role key**, which **bypasses RLS**. RLS +
+grants here protect only *direct* anon / authenticated access (Supabase client SDK,
+Realtime). Default-deny: `system_logs` has no client policy (invisible to clients);
+`market_events` / `realtime_events` are read-only for `anon` / `authenticated`.
+
+## Realtime
+
+`realtime_events` and `market_events` are added to the `supabase_realtime`
+publication (guarded, re-run safe).
+
+## Product schema (elsewhere)
+
+The real 40-table marketplace schema is **not** here — it is managed by Alembic:
+
+```bash
+# migrations run against the Supabase session pooler (:5432) / direct connection
+SUPABASE_MIGRATION_DB_URL="postgresql+psycopg://…:5432/postgres" alembic upgrade head
+```
+
+RLS on those product tables is enabled as defense-in-depth by revision
+`b2c3d4e5f6a7`; `sa.JSON()` → `jsonb` by revision `a1b2c3d4e5f6`.
+
+## Phase 5 teardown
+
+The bottom of `schema.sql` has a **commented** teardown block that drops the old
+dual-write mirror tables (`users`, `content`, `actions`, `cards`, `listings`,
+`orders`, `market_stats`) + the auth trigger/view. Left commented so a re-run never
+destroys data — uncomment and run intentionally at cutover.
 
 ## Connection
 
-- **Pooler:** `SUPABASE_DB_URL` port `6543` (transaction mode)
-- **Auth JWT:** `SUPABASE_JWT_SECRET` via `app/core/security.py`
-- **Flip data plane:** `USE_SUPABASE_DB=true` only after this schema is applied
+- **App runtime:** transaction pooler `:6543` via `SUPABASE_DB_URL` (+ `USE_SUPABASE_DB=true`)
+- **Migrations:** session pooler `:5432` / direct via `SUPABASE_MIGRATION_DB_URL`
+- **REST (firehose writes):** `SUPABASE_URL` + `SUPABASE_SECRET_KEY` (service role)
+- **Auth JWT:** `SUPABASE_JWT_SECRET`
 
-## Apply
-
-1. Supabase Dashboard → SQL → run `schema.sql`
-2. Confirm tables under **Table Editor**
-3. Keep product SQLModel on SQLite until cutover is intentional
-
-## Principles
-
-1. Atomic tables — one concept each  
-2. Clean FKs — no circular deps  
-3. JSONB for flexible metadata  
-4. Index high-traffic columns  
-5. Schema mirrors FastAPI modules  
-
-Vault: [[Architecture/Supabase Marketplace Schema]] · [[Architecture/Birdman Marketplace Stack]] · [[Maps/Birdman Systems]]
+Vault: [[Supabase Migration/Migration Plan]] · [[Database Architecture/40-Table Schema Overview]] · [[Backend Architecture/Event Firehose Map]]

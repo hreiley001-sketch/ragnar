@@ -39,7 +39,9 @@ FastAPI nodes (stateless, async)
 - `app/services/` — flow engine
 - `app/models/` — SQLModel tables + pydantic map
 - `app/utils/` — smoothness
-- `supabase/schema.sql` — Birdman core + marketplace memory (users · cards · listings · orders · events)
+- Product truth: **Supabase Postgres, owned by Alembic** (`app/models/tables.py`, 40 tables) — [[Database Architecture/40-Table Schema Overview]]
+- `supabase/schema.sql` — telemetry firehose only (system_logs · market_events · realtime_events) — [[Database Architecture/Telemetry Schema Explanation]]
+- [[Supabase Migration/Migration Plan]] · [[Backend Architecture/FastAPI Module Map]]
 - [[Maps/Birdman Supabase Schema]]
 - [[Architecture/Birdman Marketplace Stack]]
 - [[Playbooks/Site Remap]]

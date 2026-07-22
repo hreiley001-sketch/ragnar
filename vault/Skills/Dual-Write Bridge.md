@@ -6,7 +6,14 @@ updated: 2026-07-22
 
 # Skill — Dual-Write Bridge
 
-SQLModel stays truth until cutover. Birdman memory stays warm.
+> [!warning] Superseded by single-write.
+> The migration ([[Supabase Migration/Migration Plan]]) makes Supabase Postgres the
+> single source of truth, so the dual-write of domain rows is **retired**. `market_bridge`
+> becomes single-write + event **emit** — see [[Backend Architecture/Service Flow Diagrams]]
+> and [[Backend Architecture/REST Endpoint Retirement]]. Kept as the record of the
+> transitional pattern.
+
+SQLModel stayed truth until cutover; Birdman memory stayed warm via best-effort mirror.
 
 ## Pattern
 
