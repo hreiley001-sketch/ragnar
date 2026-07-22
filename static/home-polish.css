@@ -1,15 +1,24 @@
 
 /* Nordic UX pass — readable hero, lit environment, frost panels */
 
-/* ——— Environment: lighter, content-first ——— */
+/* ——— Environment: lit, magical, pantheon-colored ——— */
 .vault-env-sky {
   background:
     radial-gradient(ellipse 100% 55% at 50% -8%,
-      rgba(184, 121, 26, 0.35),
-      transparent 58%),
-    radial-gradient(ellipse 70% 40% at 88% 18%,
-      rgba(184, 121, 26, 0.15),
+      rgba(200, 144, 31, 0.4),
       transparent 55%),
+    radial-gradient(ellipse 55% 38% at 12% 28%,
+      rgba(47, 147, 196, 0.26),
+      transparent 58%),
+    radial-gradient(ellipse 50% 36% at 88% 18%,
+      rgba(122, 92, 196, 0.24),
+      transparent 55%),
+    radial-gradient(ellipse 42% 32% at 25% 72%,
+      rgba(47, 143, 107, 0.2),
+      transparent 58%),
+    radial-gradient(ellipse 44% 34% at 78% 70%,
+      rgba(31, 143, 154, 0.22),
+      transparent 58%),
     linear-gradient(165deg, #f2ece0 0%, var(--color-bg-mid) 42%, var(--color-bg-base) 100%) !important;
 }
 
@@ -35,7 +44,19 @@
 
 .vault-env-aurora-a,
 .vault-env-aurora-b {
-  opacity: 0.15 !important;
+  opacity: 0.28 !important;
+}
+.vault-env-aurora-a {
+  background:
+    radial-gradient(ellipse 44% 15% at 28% 20%, rgba(200, 144, 31, .55), transparent 68%),
+    radial-gradient(ellipse 56% 12% at 66% 12%, rgba(47, 147, 196, .42), transparent 70%),
+    radial-gradient(ellipse 40% 10% at 80% 30%, rgba(122, 92, 196, .32), transparent 70%) !important;
+}
+.vault-env-aurora-b {
+  background:
+    radial-gradient(ellipse 50% 11% at 62% 26%, rgba(47, 143, 107, .4), transparent 70%),
+    radial-gradient(ellipse 38% 9% at 24% 34%, rgba(31, 143, 154, .38), transparent 68%),
+    radial-gradient(ellipse 36% 10% at 48% 18%, rgba(232, 120, 80, .22), transparent 70%) !important;
 }
 
 .vault-aperture-core {

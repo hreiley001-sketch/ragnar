@@ -1,85 +1,619 @@
-/* RAGNAR — Gods of the realms.
-   A faint patron statue glows in the background of every realm, and a
-   "Pantheon" wall shows the full set as dramatic altar shrines. Real
-   illustrated god art (PNG, transparent bg) drops into /static/gods/<key>.png;
-   until it exists, a carved silhouette stands in its place. */
+/* RAGNAR — Realm riches.
+   Asgard treasure: gems, gold veins, runic glow, color fills — no statues. */
 
-/* ---------- Background patron (behind ALL content, like the atmosphere) ---------- */
-.realm-patron { position: fixed !important; inset: 0 !important; z-index: -1 !important; pointer-events: none !important; overflow: hidden; }
-.realm-patron .rp-glow {
-  position: absolute; right: 3vw; bottom: 4vh; width: 44vw; max-width: 620px; height: 66vh;
+:root {
+  --rc: var(--color-accent-gold, #b8791a);
+  --rc-deep: var(--color-accent-primary, #8a6510);
+  --rc-soft: var(--color-accent-gold-strong, #d8a13f);
+  --jewel: #e8c050;
+  --jewel-2: #7ec8a0;
+}
+
+/* Soft light bloom (replaces statue patron) */
+.realm-bloom {
+  position: fixed !important; inset: 0 !important; z-index: -1 !important;
+  pointer-events: none !important; overflow: hidden;
+}
+.realm-bloom .rb-glow {
+  position: absolute; right: -4vw; bottom: -8vh; width: 62vw; max-width: 820px; height: 72vh;
   border-radius: 50%;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--rc) 42%, transparent), transparent 72%);
-  filter: blur(14px); opacity: .5; animation: rp-breathe 8s ease-in-out infinite;
+  background:
+    radial-gradient(closest-side, color-mix(in srgb, var(--rc) 58%, transparent), transparent 72%),
+    radial-gradient(closest-side at 40% 40%, color-mix(in srgb, var(--jewel) 45%, transparent), transparent 65%);
+  filter: blur(22px); opacity: .78; animation: rp-breathe 8s ease-in-out infinite;
 }
-.realm-patron .rp-fig { position: absolute; right: -1vw; bottom: 0; height: min(76vh, 780px); width: auto; display: flex; align-items: flex-end; }
-.realm-patron .rp-fig img, .realm-patron .rp-fig svg {
-  height: min(76vh, 780px); width: auto; opacity: .14;
-  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--rc) 55%, transparent))
-          drop-shadow(0 0 40px color-mix(in srgb, var(--rc) 30%, transparent));
+.realm-bloom .rb-glow-2 {
+  left: -10vw; right: auto; top: 8vh; bottom: auto; width: 48vw; max-width: 560px; height: 48vh;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--jewel-2) 50%, transparent), transparent 70%);
+  opacity: .55; animation-delay: -3s;
 }
-:root[data-theme="dark"] .realm-patron .rp-fig img,
-:root[data-theme="dark"] .realm-patron .rp-fig svg { opacity: .28; }
-@keyframes rp-breathe { 0%,100% { opacity:.4; transform:scale(.97);} 50% { opacity:.62; transform:scale(1.03);} }
-@media (max-width: 1080px) { .realm-patron { display: none; } }
-@media (prefers-reduced-motion: reduce) { .realm-patron .rp-glow { animation: none; } }
+@keyframes rp-breathe { 0%,100% { opacity:.58; transform:scale(.96);} 50% { opacity:.92; transform:scale(1.06);} }
+@media (prefers-reduced-motion: reduce) { .realm-bloom .rb-glow { animation: none; } }
 
-/* ---------- Pantheon wall (collectible showcase) ---------- */
-.pantheon-stage { padding: clamp(40px,7vw,84px) 0; text-align: center; }
+/* Magical riches layer */
+.realm-jewels {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+}
+body.arena-home .arena-main,
+body.arena-home .site-header,
+body.asgard-realm > main,
+body.asgard-realm > header,
+body.asgard-realm .site-header {
+  position: relative;
+  z-index: 1;
+}
+
+.realm-color-fill {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 95% 65% at 10% 6%, color-mix(in srgb, var(--rc) 38%, transparent), transparent 58%),
+    radial-gradient(ellipse 75% 58% at 94% 14%, color-mix(in srgb, var(--jewel) 34%, transparent), transparent 55%),
+    radial-gradient(ellipse 70% 55% at 82% 90%, color-mix(in srgb, var(--jewel-2) 32%, transparent), transparent 56%),
+    radial-gradient(ellipse 85% 50% at 18% 94%, color-mix(in srgb, var(--rc-soft) 30%, transparent), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 50% 42%, color-mix(in srgb, var(--rc) 18%, transparent), transparent 62%),
+    linear-gradient(155deg,
+      color-mix(in srgb, var(--rc) 14%, transparent) 0%,
+      transparent 32%,
+      color-mix(in srgb, var(--jewel-2) 12%, transparent) 68%,
+      color-mix(in srgb, var(--jewel) 16%, transparent) 100%);
+  animation: color-drift 16s ease-in-out infinite alternate;
+}
+@keyframes color-drift {
+  from { filter: saturate(1.05) brightness(1); opacity: .95; }
+  to { filter: saturate(1.35) brightness(1.06); opacity: 1; }
+}
+
+/* Treasure bloom behind content */
+.realm-treasure-glow {
+  position: absolute; left: 50%; top: 42%; width: min(90vw, 900px); height: min(70vh, 640px);
+  translate: -50% -50%; border-radius: 50%;
+  background:
+    radial-gradient(ellipse, color-mix(in srgb, var(--jewel) 28%, transparent), transparent 62%),
+    radial-gradient(ellipse at 30% 60%, color-mix(in srgb, var(--rc) 22%, transparent), transparent 55%),
+    radial-gradient(ellipse at 70% 40%, color-mix(in srgb, var(--jewel-2) 20%, transparent), transparent 55%);
+  filter: blur(40px); opacity: .7; animation: pool-breathe 12s ease-in-out infinite;
+}
+
+/* Gold / treasure veins */
+.realm-gold-vein {
+  position: absolute; width: 140%; height: 2px; left: -20%;
+  background: linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--jewel) 20%, transparent) 15%,
+    var(--jewel) 35%,
+    var(--rc-soft) 50%,
+    var(--jewel-2) 65%,
+    color-mix(in srgb, var(--rc) 30%, transparent) 80%,
+    transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--jewel) 65%, transparent),
+              0 0 40px color-mix(in srgb, var(--rc) 35%, transparent);
+  opacity: .55; transform-origin: center;
+  animation: vein-shimmer 9s ease-in-out infinite;
+}
+.vein-a { top: 28%; transform: rotate(-8deg); }
+.vein-b { top: 68%; transform: rotate(6deg); opacity: .4; animation-delay: -4s; }
+@keyframes vein-shimmer {
+  0%,100% { opacity: .35; filter: brightness(1); }
+  50% { opacity: .7; filter: brightness(1.4); }
+}
+
+.realm-color-pool {
+  position: absolute; width: min(48vw, 480px); height: min(48vw, 480px); border-radius: 50%;
+  background: radial-gradient(circle,
+    color-mix(in srgb, var(--rc) 52%, transparent),
+    color-mix(in srgb, var(--jewel) 28%, transparent) 42%,
+    transparent 70%);
+  filter: blur(30px); opacity: .65; animation: pool-breathe 9s ease-in-out infinite;
+}
+.pool-0 { left: -8%; top: 4%; }
+.pool-1 { right: -6%; top: 22%; animation-delay: -2s; width: min(40vw, 400px); height: min(40vw, 400px); }
+.pool-2 { left: 14%; bottom: -10%; animation-delay: -5s; }
+.pool-3 { right: 10%; bottom: 14%; animation-delay: -7s; width: min(32vw, 320px); height: min(32vw, 320px); }
+.pool-4 { left: 38%; top: 32%; animation-delay: -3s; width: min(34vw, 340px); height: min(34vw, 340px); opacity: .42; }
+.pool-5 { left: 58%; top: 6%; animation-delay: -6s; width: min(28vw, 280px); height: min(28vw, 280px); }
+@keyframes pool-breathe {
+  0%,100% { transform: scale(.9); opacity: .45; }
+  50% { transform: scale(1.14); opacity: .78; }
+}
+
+.realm-knot-band {
+  position: absolute; left: 0; right: 0; height: 4px;
+  background: repeating-linear-gradient(90deg,
+    var(--rc) 0 12px,
+    var(--jewel) 12px 22px,
+    var(--jewel-2) 22px 32px,
+    var(--rc-soft) 32px 40px,
+    transparent 40px 52px);
+  opacity: .7;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--rc) 55%, transparent),
+              0 0 8px color-mix(in srgb, var(--jewel) 50%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.band-top { top: 64px; }
+.band-bot { bottom: 24px; opacity: .5; }
+
+.realm-norse-ring {
+  position: absolute; width: min(32vw, 300px); height: min(32vw, 300px); border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--rc) 42%, transparent);
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--rc) 35%, transparent),
+    inset 0 0 36px color-mix(in srgb, var(--jewel) 22%, transparent),
+    0 0 60px color-mix(in srgb, var(--jewel) 18%, transparent);
+  opacity: .48;
+  animation: ring-spin 55s linear infinite;
+}
+.realm-norse-ring::before {
+  content: ""; position: absolute; inset: 14%; border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--jewel) 55%, transparent);
+}
+.realm-norse-ring::after {
+  content: ""; position: absolute; inset: 28%; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--jewel-2) 40%, transparent);
+  box-shadow: inset 0 0 20px color-mix(in srgb, var(--rc) 15%, transparent);
+}
+.ring-a { left: 3%; top: 40%; }
+.ring-b { right: 4%; top: 10%; animation-direction: reverse; width: min(22vw, 200px); height: min(22vw, 200px); opacity: .38; }
+.ring-c { left: 42%; bottom: 8%; width: min(18vw, 160px); height: min(18vw, 160px); opacity: .3; animation-duration: 80s; }
+@keyframes ring-spin { to { transform: rotate(360deg); } }
+
+/* Gems — larger, richer, more of them */
+.realm-jewels .rj {
+  position: absolute; display: block;
+  --j: var(--jewel);
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--j) 85%, transparent))
+          drop-shadow(0 0 26px color-mix(in srgb, var(--rc) 55%, transparent));
+  animation: jewel-float 7.5s ease-in-out infinite;
+  opacity: .92;
+}
+.realm-jewels .rj-round {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 26%, #fff 0 16%, var(--j) 40%, var(--rc-deep) 100%);
+  box-shadow: inset -2px -3px 5px rgba(0,0,0,.28), 0 0 16px color-mix(in srgb, var(--j) 70%, transparent);
+}
+.realm-jewels .rj-diamond {
+  width: 18px; height: 18px;
+  background: linear-gradient(135deg, #fff 0%, var(--j) 32%, var(--rc) 68%, var(--rc-deep) 100%);
+  transform: rotate(45deg); border-radius: 2px;
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,.65), 0 0 18px color-mix(in srgb, var(--j) 60%, transparent);
+  animation-name: jewel-float-diamond;
+}
+.realm-jewels .rj-facet {
+  width: 20px; height: 14px;
+  background: linear-gradient(120deg, var(--jewel-2), var(--j), var(--rc));
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--jewel-2) 75%, transparent));
+}
+.realm-jewels .rj-ember {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--j);
+  box-shadow: 0 0 14px var(--j), 0 0 28px color-mix(in srgb, var(--rc) 65%, transparent);
+}
+.realm-jewels .rj-teardrop {
+  width: 14px; height: 18px;
+  background: radial-gradient(circle at 35% 30%, #fff 0 12%, var(--j) 38%, var(--rc) 100%);
+  border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--j) 70%, transparent);
+}
+.realm-jewels .rj-cluster {
+  width: 22px; height: 22px;
+  background:
+    radial-gradient(circle at 30% 30%, var(--j) 0 28%, transparent 30%),
+    radial-gradient(circle at 70% 40%, var(--jewel-2) 0 22%, transparent 24%),
+    radial-gradient(circle at 45% 70%, var(--rc-soft) 0 20%, transparent 22%);
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--j) 60%, transparent));
+}
+
+.rj-0  { left: 4%;  top: 12%; }
+.rj-1  { left: 11%; top: 44%; animation-delay: -1s; }
+.rj-2  { left: 20%; top: 18%; animation-delay: -2s; }
+.rj-3  { left: 7%;  top: 72%; animation-delay: -3s; }
+.rj-4  { left: 32%; top: 8%;  animation-delay: -4s; }
+.rj-5  { left: 46%; top: 84%; animation-delay: -1.4s; }
+.rj-6  { left: 60%; top: 14%; animation-delay: -5s; }
+.rj-7  { left: 70%; top: 40%; animation-delay: -2.6s; }
+.rj-8  { left: 86%; top: 10%; animation-delay: -6s; }
+.rj-9  { left: 91%; top: 52%; animation-delay: -3.4s; }
+.rj-10 { left: 76%; top: 76%; animation-delay: -4.4s; }
+.rj-11 { left: 52%; top: 52%; animation-delay: -7s; opacity: .65; }
+.rj-12 { left: 16%; top: 58%; animation-delay: -.7s; }
+.rj-13 { left: 38%; top: 30%; animation-delay: -5.4s; }
+.rj-14 { left: 66%; top: 66%; animation-delay: -2s; }
+.rj-15 { left: 28%; top: 86%; animation-delay: -6.4s; }
+.rj-16 { left: 84%; top: 30%; animation-delay: -1.1s; }
+.rj-17 { left: 2%;  top: 34%; animation-delay: -4.1s; }
+.rj-18 { left: 42%; top: 16%; animation-delay: -3.8s; }
+.rj-19 { left: 58%; top: 28%; animation-delay: -5.8s; }
+.rj-20 { left: 24%; top: 40%; animation-delay: -2.3s; }
+.rj-21 { left: 78%; top: 58%; animation-delay: -6.8s; }
+.rj-22 { left: 14%; top: 88%; animation-delay: -0.4s; }
+.rj-23 { left: 94%; top: 78%; animation-delay: -7.2s; }
+.rj-24 { left: 50%; top: 6%;  animation-delay: -1.8s; }
+.rj-25 { left: 34%; top: 64%; animation-delay: -4.8s; }
+.rj-26 { left: 64%; top: 88%; animation-delay: -3.1s; }
+.rj-27 { left: 8%;  top: 22%; animation-delay: -5.2s; }
+
+.realm-jewels .realm-rune-glow {
+  position: absolute;
+  font-family: var(--font-rune, var(--font-display, Georgia, serif));
+  font-size: clamp(28px, 4vw, 56px);
+  color: color-mix(in srgb, var(--rc) 75%, transparent);
+  text-shadow:
+    0 0 16px color-mix(in srgb, var(--rc) 85%, transparent),
+    0 0 36px color-mix(in srgb, var(--jewel) 65%, transparent),
+    0 0 70px color-mix(in srgb, var(--rc) 40%, transparent);
+  animation: rune-pulse 6s ease-in-out infinite;
+  opacity: .7;
+}
+.rr-0 { left: 6%;  top: 26%; }
+.rr-1 { left: auto; right: 7%; top: 20%; animation-delay: -1.5s; font-size: clamp(24px, 3.2vw, 44px); }
+.rr-2 { left: 12%; top: 68%; animation-delay: -3s; font-size: clamp(22px, 2.8vw, 36px); }
+.rr-3 { left: auto; right: 12%; top: 66%; animation-delay: -4.5s; font-size: clamp(26px, 3.4vw, 46px); }
+.rr-4 { left: 44%; top: 7%; animation-delay: -2.2s; font-size: clamp(20px, 2.4vw, 32px); opacity: .55; }
+.rr-5 { left: 40%; top: 76%; animation-delay: -5.5s; font-size: clamp(22px, 2.6vw, 34px); }
+
+.realm-ember {
+  position: absolute; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--jewel);
+  box-shadow: 0 0 12px var(--jewel), 0 0 24px var(--rc);
+  animation: ember-rise 11s ease-in-out infinite;
+  opacity: .7;
+}
+.e1 { left: 18%; bottom: 6%; }
+.e2 { left: 52%; bottom: 10%; animation-delay: -2s; background: var(--jewel-2); }
+.e3 { left: 74%; bottom: 5%; animation-delay: -5s; }
+.e4 { left: 36%; bottom: 16%; animation-delay: -8s; width: 4px; height: 4px; }
+.e5 { left: 88%; bottom: 20%; animation-delay: -3.5s; background: var(--rc-soft); }
+.e6 { left: 8%;  bottom: 28%; animation-delay: -6.5s; width: 3px; height: 3px; }
+@keyframes ember-rise {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  15% { opacity: .8; }
+  100% { transform: translateY(-60vh) scale(.35); opacity: 0; }
+}
+
+@keyframes jewel-float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: .7; }
+  50% { transform: translateY(-16px) scale(1.14); opacity: 1; }
+}
+@keyframes jewel-float-diamond {
+  0%, 100% { transform: rotate(45deg) translateY(0) scale(1); opacity: .7; }
+  50% { transform: rotate(45deg) translateY(-16px) scale(1.16); opacity: 1; }
+}
+@keyframes rune-pulse {
+  0%, 100% { opacity: .42; filter: brightness(1); }
+  50% { opacity: .9; filter: brightness(1.4); }
+}
+
+.realm-jewels--pantheon .realm-color-fill {
+  background:
+    radial-gradient(ellipse 55% 48% at 8% 18%, color-mix(in srgb, #c8901f 42%, transparent), transparent 58%),
+    radial-gradient(ellipse 52% 44% at 26% 78%, color-mix(in srgb, #2f93c4 36%, transparent), transparent 56%),
+    radial-gradient(ellipse 50% 46% at 50% 16%, color-mix(in srgb, #2f8f6b 34%, transparent), transparent 56%),
+    radial-gradient(ellipse 54% 48% at 74% 72%, color-mix(in srgb, #7a5cc4 38%, transparent), transparent 56%),
+    radial-gradient(ellipse 52% 44% at 92% 26%, color-mix(in srgb, #1f8f9a 36%, transparent), transparent 56%),
+    radial-gradient(ellipse 48% 38% at 48% 52%, color-mix(in srgb, #a67c1a 24%, transparent), transparent 60%);
+}
+.realm-jewels--pantheon .realm-knot-band {
+  background: repeating-linear-gradient(90deg,
+    #c8901f 0 10px, #2f93c4 10px 20px, #2f8f6b 20px 30px,
+    #7a5cc4 30px 40px, #1f8f9a 40px 50px, #a67c1a 50px 60px,
+    transparent 60px 72px);
+}
+
+@media (max-width: 720px) {
+  .rj-11, .rj-13, .rj-18, .rj-19, .rj-20, .rj-24, .rj-25, .rr-4, .ring-b, .ring-c, .e4, .e6 { display: none; }
+  .realm-color-pool { opacity: .48; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .realm-jewels .rj, .realm-jewels .realm-rune-glow,
+  .realm-color-fill, .realm-color-pool, .realm-norse-ring,
+  .realm-ember, .realm-gold-vein, .realm-treasure-glow { animation: none; }
+}
+
+/* Strong per-patron atmosphere */
+body.asgard-realm[data-patron] .asgard-atmosphere {
+  background:
+    radial-gradient(ellipse 125% 68% at 50% -8%, color-mix(in srgb, var(--rc) 62%, transparent), transparent 56%),
+    radial-gradient(ellipse 65% 48% at 6% 28%, color-mix(in srgb, var(--jewel) 40%, transparent), transparent 58%),
+    radial-gradient(ellipse 60% 45% at 94% 22%, color-mix(in srgb, var(--jewel-2) 36%, transparent), transparent 56%),
+    radial-gradient(ellipse 55% 42% at 72% 78%, color-mix(in srgb, var(--rc-soft) 32%, transparent), transparent 58%),
+    radial-gradient(ellipse 50% 38% at 22% 82%, color-mix(in srgb, var(--rc) 26%, transparent), transparent 60%),
+    linear-gradient(175deg,
+      color-mix(in srgb, var(--rc) 18%, #f2ece0) 0%,
+      #fdfbf6 28%,
+      color-mix(in srgb, var(--jewel-2) 12%, #efe8d9) 58%,
+      color-mix(in srgb, var(--rc) 10%, #f5f1e8) 100%) !important;
+}
+body.asgard-realm[data-patron] .asgard-atmosphere::before {
+  opacity: .36 !important;
+  background: linear-gradient(
+    118deg,
+    transparent 18%,
+    color-mix(in srgb, var(--jewel-2) 28%, transparent) 32%,
+    color-mix(in srgb, var(--rc-soft) 40%, transparent) 42%,
+    color-mix(in srgb, var(--rc) 48%, transparent) 50%,
+    color-mix(in srgb, var(--jewel) 36%, transparent) 58%,
+    color-mix(in srgb, var(--jewel-2) 24%, transparent) 68%,
+    transparent 80%
+  ) !important;
+}
+body.asgard-realm[data-patron] .asgard-atmosphere-rays {
+  opacity: .36 !important;
+  background:
+    conic-gradient(from 248deg at 50% -6%,
+      transparent 0deg,
+      color-mix(in srgb, var(--rc-soft) 42%, transparent) 14deg,
+      transparent 36deg,
+      color-mix(in srgb, var(--rc) 40%, transparent) 52deg,
+      transparent 78deg,
+      color-mix(in srgb, var(--jewel) 36%, transparent) 96deg,
+      transparent 118deg),
+    radial-gradient(ellipse 90% 55% at 50% -4%, color-mix(in srgb, var(--jewel) 34%, transparent), transparent 62%) !important;
+}
+body.asgard-realm[data-patron] .asgard-atmosphere-frost {
+  opacity: .48 !important;
+  background-image:
+    radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--rc) 80%, transparent) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 72% 18%, color-mix(in srgb, var(--jewel) 75%, transparent) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 44% 48%, color-mix(in srgb, var(--jewel-2) 65%, transparent) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 86% 62%, color-mix(in srgb, var(--rc) 70%, transparent) 0 1.4px, transparent 2.4px),
+    radial-gradient(circle at 30% 75%, color-mix(in srgb, var(--jewel) 60%, transparent) 0 1.1px, transparent 2.1px) !important;
+}
+body.asgard-realm[data-patron] .asgard-atmosphere-runes {
+  color: color-mix(in srgb, var(--rc) 85%, transparent) !important;
+  opacity: .82 !important;
+}
+body.asgard-realm[data-patron] .asgard-atmosphere-runes span {
+  text-shadow: 0 0 26px color-mix(in srgb, var(--rc) 75%, transparent),
+               0 0 52px color-mix(in srgb, var(--jewel) 50%, transparent) !important;
+}
+
+body.asgard-realm[data-patron] .site-header::before,
+body.asgard-realm[data-patron] .site-header--asgard::before {
+  height: 3px !important;
+  background: linear-gradient(90deg,
+    transparent, var(--jewel-2), var(--jewel), var(--rc), var(--rc-soft), var(--jewel-2), transparent) !important;
+  opacity: 1;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rc) 50%, transparent);
+}
+body.asgard-realm[data-patron] .asgard-kicker {
+  color: var(--rc-deep);
+  border-color: color-mix(in srgb, var(--rc) 60%, transparent);
+  background: color-mix(in srgb, var(--rc) 12%, rgba(255,253,248,.78));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--rc) 20%, transparent),
+              0 4px 22px color-mix(in srgb, var(--rc) 22%, transparent);
+}
+body.asgard-realm[data-patron] .asgard-kicker .runes {
+  color: var(--rc);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--rc) 60%, transparent);
+}
+body.asgard-realm[data-patron] .nav-link:hover,
+body.asgard-realm[data-patron] .nav-link.active {
+  background: color-mix(in srgb, var(--rc) 18%, transparent);
+  border-color: color-mix(in srgb, var(--rc) 40%, transparent);
+}
+body.asgard-realm[data-patron] .mkt-hero::after,
+body.asgard-realm[data-patron] .platform-hero::after {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--jewel-2), var(--jewel), var(--rc), var(--jewel-2), transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--rc) 40%, transparent);
+}
+body.asgard-realm[data-patron] .btn-primary {
+  background: linear-gradient(135deg, var(--rc-soft), var(--rc) 45%, var(--rc-deep));
+  box-shadow: 0 6px 26px color-mix(in srgb, var(--rc) 48%, transparent),
+              0 0 24px color-mix(in srgb, var(--jewel) 35%, transparent);
+}
+body.asgard-realm[data-patron] .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--rc), var(--rc-deep));
+}
+body.asgard-realm[data-patron] .listing:hover,
+body.asgard-realm[data-patron] .live-card:hover,
+body.asgard-realm[data-patron] .store-card:hover,
+body.asgard-realm[data-patron] .rcard:hover {
+  border-color: color-mix(in srgb, var(--rc) 65%, transparent) !important;
+  box-shadow: var(--shadow-md), 0 0 32px color-mix(in srgb, var(--rc) 35%, transparent);
+}
+body.asgard-realm[data-patron] .cat-chip.active {
+  background: linear-gradient(135deg, var(--rc), var(--rc-deep));
+}
+body.asgard-realm[data-patron] .asgard-rail span {
+  color: color-mix(in srgb, var(--rc) 90%, transparent);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--rc) 55%, transparent);
+}
+body.asgard-realm[data-patron] .asgard-spark {
+  background: radial-gradient(circle, var(--jewel), transparent 70%);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--rc) 70%, transparent);
+  opacity: .95;
+}
+body.asgard-realm[data-patron] .asgard-frame {
+  border-color: color-mix(in srgb, var(--rc) 38%, transparent);
+  box-shadow: inset 0 0 50px color-mix(in srgb, var(--rc) 12%, transparent);
+}
+body.asgard-realm[data-patron] .card,
+body.asgard-realm[data-patron] .filters,
+body.asgard-realm[data-patron] .panel,
+body.asgard-realm[data-patron] .listing,
+body.asgard-realm[data-patron] .live-card,
+body.asgard-realm[data-patron] .store-card,
+body.asgard-realm[data-patron] .mkt-search,
+body.asgard-realm[data-patron] .auth-wrap {
+  box-shadow: var(--shadow-md),
+    inset 0 1px 0 color-mix(in srgb, var(--rc-soft) 35%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--rc) 16%, transparent),
+    0 0 24px color-mix(in srgb, var(--jewel) 10%, transparent);
+  border-color: color-mix(in srgb, var(--rc) 32%, rgba(58,44,20,.16)) !important;
+  background:
+    linear-gradient(155deg,
+      color-mix(in srgb, var(--rc) 12%, rgba(247,241,230,.62)),
+      color-mix(in srgb, var(--jewel-2) 8%, rgba(247,241,230,.78)) 70%),
+    rgba(255, 253, 248, 0.55) !important;
+}
+
+body.asgard-realm[data-patron]::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 58% at 12% 8%, color-mix(in srgb, var(--rc) 28%, transparent), transparent 55%),
+    radial-gradient(ellipse 75% 52% at 92% 88%, color-mix(in srgb, var(--jewel-2) 26%, transparent), transparent 55%),
+    radial-gradient(ellipse 65% 48% at 50% 48%, color-mix(in srgb, var(--jewel) 18%, transparent), transparent 58%),
+    radial-gradient(ellipse 55% 42% at 82% 18%, color-mix(in srgb, var(--rc-soft) 22%, transparent), transparent 56%);
+}
+
+/* ---------- Realm treasure gates (pantheon without statues) ---------- */
+.pantheon-stage {
+  position: relative;
+  padding: clamp(48px, 8vw, 96px) 0;
+  text-align: center;
+  overflow: hidden;
+}
+.pantheon-stage::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 40% 50% at 8% 40%, color-mix(in srgb, #c8901f 28%, transparent), transparent),
+    radial-gradient(ellipse 35% 45% at 28% 60%, color-mix(in srgb, #2f93c4 24%, transparent), transparent),
+    radial-gradient(ellipse 35% 45% at 50% 35%, color-mix(in srgb, #2f8f6b 24%, transparent), transparent),
+    radial-gradient(ellipse 35% 45% at 72% 60%, color-mix(in srgb, #7a5cc4 26%, transparent), transparent),
+    radial-gradient(ellipse 35% 45% at 92% 40%, color-mix(in srgb, #1f8f9a 24%, transparent), transparent);
+}
+.pantheon-stage > * { position: relative; z-index: 1; }
 .pantheon-stage .p-kicker {
   font: 600 12px/1 var(--font-mono, monospace); letter-spacing: .32em; text-transform: uppercase;
-  color: var(--color-accent-gold, #b8791a); display: inline-flex; gap: 10px; align-items: center;
+  color: #a67c1a; display: inline-flex; gap: 10px; align-items: center;
+  text-shadow: 0 0 20px color-mix(in srgb, #c8901f 55%, transparent);
 }
-.pantheon-stage .p-kicker::before, .pantheon-stage .p-kicker::after { content: "ᛝ"; font-family: var(--font-rune, serif); }
+.pantheon-stage .p-kicker::before, .pantheon-stage .p-kicker::after {
+  content: "ᛝ"; font-family: var(--font-rune, serif);
+  color: #7a5cc4;
+  filter: drop-shadow(0 0 10px #7a5cc4);
+}
 .pantheon-stage h2 {
   font-family: var(--font-display, Georgia, serif); font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
   font-size: clamp(26px,4.4vw,44px); margin: 14px 0 6px; color: var(--color-text-primary, #221a10);
 }
 .pantheon-stage .p-sub { color: var(--color-text-muted, #655a41); max-width: 60ch; margin: 0 auto; }
 .pantheon-wall {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 20px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 22px;
   max-width: 1120px; margin: 34px auto 0; padding: 0 clamp(16px,4vw,40px);
 }
-.god-shrine {
-  --rc: var(--color-accent-gold, #b8791a); position: relative; border-radius: 18px; padding: 8px;
-  background: linear-gradient(160deg, var(--color-accent-gold-strong,#d8a13f), var(--color-accent-gold,#b8791a) 42%, var(--color-accent-primary-strong,#6d4f0a));
-  box-shadow: var(--shadow-md, 0 12px 30px rgba(58,44,20,.14)); text-decoration: none; color: inherit;
+
+.realm-gate {
+  --rc: #b8791a; --rc-deep: #6d5010; --rc-soft: #d8a13f; --jewel: #e8c050; --jewel-2: #7ec8a0;
+  position: relative; border-radius: 18px; padding: 9px;
+  background: linear-gradient(160deg, var(--rc-soft), var(--rc) 40%, var(--rc-deep));
+  box-shadow:
+    var(--shadow-md, 0 12px 30px rgba(58,44,20,.14)),
+    0 0 0 1px color-mix(in srgb, var(--jewel) 45%, transparent),
+    0 0 32px color-mix(in srgb, var(--rc) 40%, transparent);
+  text-decoration: none; color: inherit;
   transition: transform .5s cubic-bezier(.22,1,.36,1), box-shadow .5s;
 }
-.god-shrine:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg), 0 0 40px color-mix(in srgb,var(--rc) 45%,transparent); }
-.god-shrine .altar {
-  position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 3 / 4;
-  background: radial-gradient(120% 78% at 50% 100%, color-mix(in srgb,var(--rc) 40%,#0a0c0b), #06080a 66%);
-  border: 1px solid rgba(0,0,0,.5); box-shadow: inset 0 0 34px rgba(0,0,0,.8);
+.realm-gate:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-lg),
+    0 0 56px color-mix(in srgb,var(--rc) 60%,transparent),
+    0 0 30px color-mix(in srgb,var(--jewel) 50%,transparent);
 }
-.god-shrine .altar .halo {
-  position: absolute; left: 50%; top: 42%; translate: -50% -50%; width: 78%; height: 66%; border-radius: 50%;
-  background: radial-gradient(closest-side, color-mix(in srgb,var(--rc) 82%,transparent), transparent);
-  filter: blur(6px); opacity: .66; animation: shrine-pulse 5s ease-in-out infinite;
+.realm-gate .gate-vault {
+  position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 1;
+  background:
+    radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--rc) 35%, #0a0c0b), #06080a 70%),
+    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--jewel) 30%, transparent), transparent);
+  border: 1px solid color-mix(in srgb, var(--rc) 45%, #000);
+  box-shadow: inset 0 0 40px rgba(0,0,0,.7), inset 0 0 70px color-mix(in srgb, var(--rc) 18%, transparent);
 }
-@keyframes shrine-pulse { 0%,100%{opacity:.48;transform:translate(-50%,-50%) scale(.95)} 50%{opacity:.8;transform:translate(-50%,-50%) scale(1.05)} }
-.god-shrine .altar .rays {
-  position: absolute; inset: 0; mix-blend-mode: screen; opacity: .45; animation: shrine-swirl 44s linear infinite;
-  background: conic-gradient(from 180deg at 50% 46%,
-    transparent 0deg, color-mix(in srgb,var(--rc) 42%,transparent) 8deg, transparent 16deg,
-    transparent 62deg, color-mix(in srgb,var(--rc) 32%,transparent) 68deg, transparent 76deg,
-    transparent 150deg, color-mix(in srgb,var(--rc) 36%,transparent) 156deg, transparent 164deg);
+.realm-gate .halo {
+  position: absolute; left: 50%; top: 48%; translate: -50% -50%; width: 70%; height: 70%; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb,var(--rc) 88%,transparent), color-mix(in srgb,var(--jewel) 45%,transparent) 50%, transparent);
+  filter: blur(6px); opacity: .8; animation: shrine-pulse 5s ease-in-out infinite;
+}
+@keyframes shrine-pulse { 0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.94)} 50%{opacity:.95;transform:translate(-50%,-50%) scale(1.08)} }
+.realm-gate .rays {
+  position: absolute; inset: 0; mix-blend-mode: screen; opacity: .65; animation: shrine-swirl 36s linear infinite;
+  background: conic-gradient(from 180deg at 50% 50%,
+    transparent 0deg, color-mix(in srgb,var(--rc) 55%,transparent) 8deg, transparent 16deg,
+    transparent 50deg, color-mix(in srgb,var(--jewel) 50%,transparent) 58deg, transparent 68deg,
+    transparent 120deg, color-mix(in srgb,var(--jewel-2) 45%,transparent) 128deg, transparent 140deg,
+    transparent 190deg, color-mix(in srgb,var(--rc-soft) 42%,transparent) 198deg, transparent 210deg);
 }
 @keyframes shrine-swirl { to { transform: rotate(360deg); } }
-.god-shrine .altar .god-figure { position: absolute; inset: 0; display: grid; place-items: end center; }
-.god-shrine .altar .god-figure img,
-.god-shrine .altar .god-figure svg {
-  height: 92%; width: auto; position: relative; z-index: 1;
-  filter: drop-shadow(0 0 5px color-mix(in srgb,var(--rc) 90%,transparent))
-          drop-shadow(0 0 16px color-mix(in srgb,var(--rc) 65%,transparent))
-          drop-shadow(0 0 32px color-mix(in srgb,var(--rc) 42%,transparent));
+
+.realm-gate .gate-rune {
+  position: absolute; left: 50%; top: 42%; translate: -50% -50%; z-index: 2;
+  font-family: var(--font-rune, var(--font-display, Georgia, serif));
+  font-size: clamp(42px, 6vw, 64px);
+  color: var(--rc-soft);
+  text-shadow:
+    0 0 18px color-mix(in srgb, var(--rc) 90%, transparent),
+    0 0 40px color-mix(in srgb, var(--jewel) 70%, transparent),
+    0 0 70px color-mix(in srgb, var(--rc) 45%, transparent);
+  filter: drop-shadow(0 0 8px var(--jewel));
+  animation: rune-pulse 5s ease-in-out infinite;
 }
-.god-shrine .altar .runemark { position: absolute; top: 9px; right: 11px; z-index: 2;
-  font-family: var(--font-rune, serif); color: var(--rc); font-size: 15px; opacity: .85;
-  filter: drop-shadow(0 0 6px color-mix(in srgb,var(--rc) 70%,transparent)); }
-.god-shrine .plate { padding: 12px 6px 6px; text-align: center; }
-.god-shrine .plate .nm { font-family: var(--font-display, Georgia, serif); font-weight: 600; letter-spacing: .14em;
-  text-transform: uppercase; font-size: 20px; color: #241a0b; text-shadow: 0 1px 0 rgba(255,255,255,.3); }
-.god-shrine .plate .ti { font: 600 10px/1.3 var(--font-mono, monospace); letter-spacing: .12em; text-transform: uppercase;
-  color: #4a3410; margin-top: 3px; }
-@media (prefers-reduced-motion: reduce) { .god-shrine .altar .halo, .god-shrine .altar .rays { animation: none; } }
+
+.realm-gate .gem {
+  position: absolute; z-index: 3;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--jewel) 85%, transparent),
+              0 0 28px color-mix(in srgb, var(--rc) 45%, transparent);
+}
+.realm-gate .gem-core {
+  left: 50%; top: 58%; translate: -50% -50%;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #fff 0 14%, var(--jewel) 38%, var(--rc) 72%, var(--rc-deep) 100%);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--jewel) 90%, transparent),
+              0 0 40px color-mix(in srgb, var(--rc) 55%, transparent),
+              inset -3px -4px 8px rgba(0,0,0,.35);
+  animation: jewel-float 6s ease-in-out infinite;
+}
+.realm-gate .gem-a {
+  top: 14%; left: 14%; width: 12px; height: 12px; transform: rotate(45deg);
+  background: linear-gradient(135deg, #fff, var(--jewel), var(--rc));
+}
+.realm-gate .gem-b {
+  top: 14%; right: 14%; width: 11px; height: 11px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--jewel-2) 50%, var(--rc));
+}
+.realm-gate .gem-c {
+  bottom: 16%; left: 16%; width: 10px; height: 14px;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--jewel) 45%, var(--rc));
+  border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+}
+.realm-gate .gem-d {
+  bottom: 16%; right: 16%; width: 14px; height: 10px;
+  background: linear-gradient(120deg, var(--jewel-2), var(--jewel), var(--rc));
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+.realm-gate .gem-e {
+  top: 28%; left: 50%; translate: -50% 0; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--rc-soft);
+  box-shadow: 0 0 12px var(--jewel);
+  opacity: .85;
+}
+.realm-gate .treasure-arc {
+  position: absolute; left: 18%; right: 18%; bottom: 22%; height: 40%;
+  border: 2px solid color-mix(in srgb, var(--jewel) 45%, transparent);
+  border-top: none; border-radius: 0 0 50% 50%;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--rc) 25%, transparent),
+              inset 0 -10px 24px color-mix(in srgb, var(--jewel) 15%, transparent);
+  opacity: .7;
+}
+.realm-gate .gate-base {
+  position: absolute; left: 18%; right: 18%; bottom: 8%; height: 5px; border-radius: 3px; z-index: 2;
+  background: linear-gradient(90deg, transparent, var(--jewel-2), var(--jewel), var(--rc), var(--jewel-2), transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--rc) 75%, transparent);
+}
+
+.realm-gate .plate { padding: 12px 6px 6px; text-align: center; }
+.realm-gate .plate .nm {
+  font-family: var(--font-display, Georgia, serif); font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; font-size: 20px; color: #241a0b;
+  text-shadow: 0 1px 0 rgba(255,255,255,.35), 0 0 14px color-mix(in srgb, var(--jewel) 35%, transparent);
+}
+.realm-gate .plate .ti {
+  font: 600 10px/1.3 var(--font-mono, monospace); letter-spacing: .12em; text-transform: uppercase;
+  color: #4a3410; margin-top: 3px;
+}
+.realm-gate:hover .gate-rune { color: var(--jewel); }
+@media (prefers-reduced-motion: reduce) {
+  .realm-gate .halo, .realm-gate .rays, .realm-gate .gate-rune, .realm-gate .gem-core { animation: none; }
+}
