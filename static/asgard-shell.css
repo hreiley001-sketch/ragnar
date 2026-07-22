@@ -194,7 +194,7 @@ body.asgard-realm .nav-foot {
   font-family: var(--font-mono);
   letter-spacing: var(--tracking-rune);
   text-transform: none;
-  color: var(--color-accent-gold);
+  color: var(--color-crystal);
 }
 
 /* ——— Surfaces: frost glass panels ——— */
@@ -285,7 +285,7 @@ body.asgard-realm .asgard-kicker {
 body.asgard-realm .asgard-kicker .runes {
   display: inline;
   letter-spacing: var(--tracking-rune);
-  color: var(--color-accent-gold-strong);
+  color: var(--color-crystal);
   text-shadow: 0 0 12px rgba(184, 121, 26, 0.35);
 }
 
@@ -316,7 +316,7 @@ body.asgard-realm .cat-chip {
   color: var(--color-text-secondary);
 }
 body.asgard-realm .cat-chip.active {
-  background: linear-gradient(135deg, var(--color-accent-primary), #d8a13f);
+  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-strong));
   border-color: transparent;
   color: var(--color-on-accent);
 }
@@ -340,7 +340,7 @@ body.asgard-realm .watch-heart {
 
 /* Buttons stay icy */
 body.asgard-realm .btn-primary {
-  background: linear-gradient(135deg, var(--color-accent-primary), #d8a13f);
+  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-strong));
   border-color: transparent;
   color: var(--color-on-accent);
   box-shadow: 0 6px 20px rgba(184, 121, 26, 0.28);
@@ -603,7 +603,7 @@ body.asgard-realm .auth-wrap .logo-c {
   border-radius: 50%;
   border: 1px solid rgba(184, 121, 26, 0.45);
   background: rgba(184, 121, 26, 0.12);
-  color: var(--color-accent-gold-strong);
+  color: var(--color-crystal);
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0;

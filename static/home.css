@@ -517,7 +517,7 @@ body.arena-home[data-vault-stage="4"] .vault-aperture {
   letter-spacing: var(--tracking-tight);
   color: var(--arena-frost);
 }
-.fee-pillar.hot strong { color: var(--color-accent-gold); }
+.fee-pillar.hot strong { color: var(--color-crystal); }
 .fee-pillar.hot { border-color: var(--color-border-gold); background: rgba(201, 162, 39, 0.08); }
 .fee-pillar span {
   display: block;

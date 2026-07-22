@@ -27,10 +27,10 @@
   /* Deep ink text — high contrast on ivory surfaces */
   --color-text-primary: #221a10;
   --color-text-secondary: #5a4f3d;
-  --color-text-muted: #8a7f6a;
-  --color-text-subtle: #a99e88;
+  --color-text-muted: #655a41;
+  --color-text-subtle: #756843;
   --color-text-disabled: #c2b9a6;
-  --color-on-accent: #2a1e08;
+  --color-on-accent: #fdf3e2;
   --color-on-gold: #2a1e08;
   --color-on-danger: #fff5f3;
 
@@ -39,12 +39,12 @@
   --color-accent-primary-strong: #6d4f0a;
   --color-accent-gold: #b8791a;
   --color-accent-gold-strong: #d8a13f;
-  --color-accent-secondary: #6a8fa6;
+  --color-accent-secondary: #4c7488;
   --color-accent-fallback: #b08d57;
   --color-glacier: #4f96b3;
   /* frost = ink on light halls (legacy name from dark theme "frost-white") */
   --color-frost: #221a10;
-  --color-titanium: #8a7f6a;
+  --color-titanium: #655a41;
   /* crystal = readable rune/kicker accent (never near-white on ivory) */
   --color-crystal: #7a5a14;
   --color-midnight: #efe8d9;
@@ -53,7 +53,7 @@
   --color-birch: #2b2416;
 
   --color-live: var(--color-accent-gold);
-  --color-success: #1f8a5b;
+  --color-success: #1a7a50;
   --color-warning: #b5851f;
   --color-error: #c0392b;
   --color-info: #3f7fa0;

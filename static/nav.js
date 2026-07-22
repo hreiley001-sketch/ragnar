@@ -482,13 +482,14 @@
     if (conciergeBuilt) return;
     conciergeBuilt = true;
     const w = createChatWidget({ key: "concierge", icon: "💬", label: "Ask RAGNAR", footNote: "What are you hunting for?" });
+    w.msg("The hall is open, traveler. Tell me what you're hunting — a player, a set, a grail — and I'll point the way. 🐺");
 
     function personalize(text) {
       const low = text.toLowerCase();
       const theme = {};
       for (const [kws, hex] of VIBES) { if (kws.some((k) => low.includes(k))) { theme.theme_accent = hex; break; } }
-      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#05070b";
-      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#12161d";
+      if (/\b(dark|darker|midnight|black|night)\b/.test(low)) theme.theme_bg = "#0a0f16";
+      else if (/\b(light|lighter|bright|brighter|white|day)\b/.test(low)) theme.theme_bg = "#fbf7ee";
       const fm = text.match(/font\s*(?:to|:|=)?\s*['"]?([A-Z][A-Za-z ]{2,30})['"]?/);
       if (fm) theme.theme_font = fm[1].trim();
       if (/reset|default|normal|undo/.test(low)) {

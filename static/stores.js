@@ -90,7 +90,7 @@ async function loadLive() {
     LAST_STREAMS = await api("/api/streams");
     renderLive(LAST_STREAMS);
   } catch (err) {
-    $("liveRow").innerHTML = `<div class="empty-state"><p>No live rooms right now.</p><span>Check back soon — new sessions go live throughout the day.</span></div>`;
+    $("liveRow").innerHTML = `<div class="empty-state"><p>No halls are live right now.</p><span>The horns are quiet — new rooms open throughout the day.</span></div>`;
   }
 }
 

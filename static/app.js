@@ -292,7 +292,7 @@ async function loadListings() {
     const data = await api(`/api/listings?${currentQuery()}`, { signal: activeListingsRequest.signal });
     state.lastItems = data.items || [];
     if (!data.items.length) {
-      grid.innerHTML = `<div class="empty">No cards match your search. Try widening the filters.</div>`;
+      grid.innerHTML = `<div class="empty">No cards match your search — widen the filters to see more of the hoard.</div>`;
       $("resultCount").textContent = "0 cards";
     } else {
       grid.innerHTML = data.items.map(listingCard).join("");

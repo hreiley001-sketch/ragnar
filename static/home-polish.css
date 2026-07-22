@@ -131,7 +131,7 @@
 }
 
 .section-label {
-  color: var(--color-accent-gold) !important;
+  color: var(--color-crystal) !important;
   letter-spacing: var(--tracking-label);
 }
 
@@ -166,7 +166,7 @@
 
 .arena-btn.primary {
   color: var(--color-on-accent) !important;
-  background: linear-gradient(135deg, var(--color-accent-primary), #d8a13f) !important;
+  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-strong)) !important;
   border-color: transparent !important;
   box-shadow: 0 6px 20px rgba(184, 121, 26, 0.28) !important;
 }
@@ -213,7 +213,7 @@
     rgba(247, 241, 230, 0.88) !important;
 }
 
-.fee-pillar.hot strong { color: var(--color-accent-gold-strong); }
+.fee-pillar.hot strong { color: var(--color-crystal); }
 
 /* ——— Marketplace gateway (Nordic birch) ——— */
 .theme-utility-panel {
@@ -245,7 +245,7 @@
 /* ——— Founders ——— */
 .founding-counter-premium {
   border-color: var(--color-border-gold) !important;
-  color: var(--color-accent-gold-strong) !important;
+  color: var(--color-crystal) !important;
   background: rgba(184, 121, 26, 0.12) !important;
 }
 

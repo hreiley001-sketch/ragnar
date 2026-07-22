@@ -103,7 +103,7 @@ body.counsel-page .counsel-brand-name {
   font-size: 11px;
   letter-spacing: var(--tracking-rune);
   text-transform: none;
-  color: var(--color-accent-gold);
+  color: var(--color-crystal);
 }
 .counsel-hero h1 {
   margin: 0 0 14px;
@@ -136,7 +136,7 @@ body.counsel-page .counsel-brand-name {
   border: 1px solid rgba(184, 121, 26, 0.6);
   border-radius: var(--radius-xs);
   background: var(--counsel-ice);
-  color: var(--color-on-accent);
+  color: #fdf3e2;
   font-weight: 700; font-size: 12px;
   letter-spacing: 0.05em; text-transform: uppercase;
   cursor: pointer;
@@ -380,7 +380,7 @@ body.counsel-page .counsel-brand-name {
   padding: 0 18px;
   border: 1px solid rgba(184, 121, 26, 0.55);
   background: var(--counsel-ice);
-  color: var(--color-on-accent);
+  color: #fdf3e2;
   font-weight: 700;
   cursor: pointer;
   transition: background 140ms ease, transform 120ms ease;

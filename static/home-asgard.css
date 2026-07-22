@@ -304,7 +304,7 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
 .vault-kicker .runes-kicker {
   font-family: var(--font-mono);
   letter-spacing: var(--tracking-rune);
-  color: var(--color-accent-gold-strong);
+  color: var(--color-crystal);
   margin-right: 6px;
 }
 
@@ -365,13 +365,13 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: var(--tracking-rune);
-  color: var(--color-accent-gold);
+  color: var(--color-crystal);
   opacity: 0.85;
 }
 
 /* ——— Asgard gold CTAs ——— */
 .arena-btn.primary {
-  background: linear-gradient(135deg, var(--color-accent-primary), #d8a13f) !important;
+  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-primary-strong)) !important;
   color: var(--color-on-accent) !important;
   box-shadow:
     0 6px 22px rgba(184, 121, 26, 0.32),

@@ -311,7 +311,7 @@ function renderHistory(h) {
   if (!h || !h.count) {
     wrap.innerHTML = `<div class="card history-card">
       <div class="history-head"><span>Sold history</span></div>
-      <p class="muted flush">No recorded sales for this card yet — you might be holding the first.</p>
+      <p class="muted flush">No recorded sales for this card yet — you may hold the first of its name.</p>
     </div>`;
     wrap.hidden = false;
     return;
