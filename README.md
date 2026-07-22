@@ -95,6 +95,11 @@ uvicorn app.main:app --reload
 Then open **http://127.0.0.1:8000** (storefront) and **/api/docs** (Swagger).
 The database (SQLite) is created and seeded with sample listings on first run.
 
+**Supabase:** set `DATABASE_URL` to your project URI (paste the dashboard
+`postgresql://…` string — driver + SSL are normalized automatically), set
+`SCHEMA_BOOTSTRAP=alembic`, run `alembic upgrade head`, then start uvicorn.
+Details in [DEPLOY.md](DEPLOY.md#supabase-postgres-recommended-for-production-db).
+
 ## API
 
 | Endpoint | Method | Purpose |

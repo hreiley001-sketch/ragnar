@@ -74,5 +74,31 @@ Optional but recommended for password-reset / verification emails:
 - **Azure App Service / Container Apps** — use the `Dockerfile`; set the same env vars.
 - **Your own VPS** — run behind Caddy/Nginx for TLS; `Dockerfile` works as-is.
 
-For scale later, swap SQLite for managed Postgres: add `psycopg[binary]` to
-`requirements.txt` and set `DATABASE_URL=postgresql+psycopg://…`.
+## Supabase Postgres (recommended for production DB)
+
+`psycopg[binary]` is already in `requirements.txt`. RAGNAR accepts the Supabase
+URI as-is.
+
+1. In Supabase: **Project Settings → Database** → copy the **URI** connection
+   string. Replace `[YOUR-PASSWORD]` with the database password you set at
+   project creation (reset it there if you lost it).
+2. Set env (local `.env` or Render → Environment):
+   ```
+   DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.<project-ref>.supabase.co:5432/postgres
+   SCHEMA_BOOTSTRAP=alembic
+   ```
+   You can paste `postgresql://…` — the app upgrades the driver to
+   `postgresql+psycopg` and adds `sslmode=require` for `*.supabase.co`.
+3. Apply schema once (from the repo root, with that `DATABASE_URL` loaded):
+   ```
+   alembic upgrade head
+   ```
+4. On Render: set `DATABASE_URL` to the same URI, set `SCHEMA_BOOTSTRAP=alembic`,
+   and prefer a start command that migrates then boots:
+   `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   You can drop the SQLite disk once Supabase is the source of truth (keep a disk
+   or object storage for `UPLOAD_DIR` scan photos).
+
+**Do not commit** the real password. Prefer Supabase's **Session mode** pooler
+host if your project shows one (stable for SQLAlchemy). Rotate the DB password
+if it was ever pasted into chat, tickets, or a public repo.
