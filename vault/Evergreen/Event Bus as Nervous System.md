@@ -14,7 +14,7 @@ Without a nervous system, features become isolated organs. The bus lets rides, p
 
 ## Vault parallel
 
-Links are the vault’s event bus. Meaningful `[[wikilinks]]` propagate awareness across notes the way events propagate across BirdmanOS.
+Links are the vault’s event bus. Meaningful wikilinks propagate awareness across notes the way events propagate across BirdmanOS.
 
 ## Links
 

@@ -9,7 +9,7 @@ How ideas talk to each other.
 
 ## Always
 
-- Prefer `[[Note Title]]` over folder paths in prose
+- Prefer wikilinks by note title over folder paths in prose
 - Link concepts, not just parents
 - Bidirectional thinking: if A points to B, ask whether B should acknowledge A
 

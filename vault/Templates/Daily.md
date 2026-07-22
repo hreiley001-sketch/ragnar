@@ -16,7 +16,7 @@ One sentence. What’s the energy of today?
 
 ## Links forming
 
-- 
+- <!-- at least one [[Note]] when something wants to last -->
 
 ## Open thread
 
