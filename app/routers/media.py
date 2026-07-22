@@ -210,6 +210,23 @@ def media_enhance(
                                    "(set REPLICATE_API_TOKEN and/or REMOVEBG_API_KEY).")
 
     background.add_task(_enhance_job, listing_id, payload.remove_bg, payload.upscale)
+    # Async boundary — n8n may mirror/orchestrate external providers later.
+    try:
+        from ..platform.queue import enqueue
+
+        enqueue(
+            "media.enhance",
+            {
+                "listing_id": listing_id,
+                "image_url": listing.image_url,
+                "remove_bg": payload.remove_bg,
+                "upscale": payload.upscale,
+            },
+            workflow="media/enhance",
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("media.enhance enqueue failed: %s", exc)
+
     return {"queued": True, "listing_id": listing_id,
             "remove_bg": payload.remove_bg and media.removebg_configured(),
             "upscale": payload.upscale and media.replicate_configured()}

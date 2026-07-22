@@ -14,6 +14,7 @@ One mind. One flow. Everything connects here.
 - [[Maps/Atlas]] — the knowledge map
 - [[Projects/Index]] — active vessels
 - [[System/Flow Principles]] — how this vault thinks
+- [[System/Platform Principles]] — how the backend organism thinks
 
 ## Now
 
@@ -25,6 +26,7 @@ One mind. One flow. Everything connects here.
 
 - [[Maps/Atlas]]
 - [[Maps/BirdmanOS]]
+- [[Maps/Birdman Systems]]
 - [[Maps/Creative Flow]]
 - [[Maps/RAGNAR]]
 

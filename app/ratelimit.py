@@ -1,4 +1,7 @@
-"""Simple in-process sliding-window rate limiter for auth and checkout."""
+"""Simple rate limiter — Redis when available, else in-process.
+
+Shared across FastAPI nodes only when REDIS_URL is set (required for LB fleets).
+"""
 from __future__ import annotations
 
 import threading
@@ -16,6 +19,8 @@ class RateLimiter:
 
     def hit(self, key: str, *, limit: int, window_seconds: int) -> None:
         """Record a hit; raise 429 if more than ``limit`` in the window."""
+        if self._hit_redis(key, limit=limit, window_seconds=window_seconds):
+            return
         now = time.monotonic()
         cutoff = now - window_seconds
         with self._lock:
@@ -28,6 +33,29 @@ class RateLimiter:
                     detail=f"Too many requests. Try again in {window_seconds // 60 or 1} minute(s).",
                 )
             q.append(now)
+
+    def _hit_redis(self, key: str, *, limit: int, window_seconds: int) -> bool:
+        """Return True if Redis handled the check (success or 429). False = fallback."""
+        try:
+            from app.core.cache import get_redis
+
+            r = get_redis()
+            if r is None:
+                return False
+            rk = f"birdman:ratelimit:{key}"
+            count = int(r.incr(rk))
+            if count == 1:
+                r.expire(rk, window_seconds)
+            if count > limit:
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail=f"Too many requests. Try again in {window_seconds // 60 or 1} minute(s).",
+                )
+            return True
+        except HTTPException:
+            raise
+        except Exception:
+            return False
 
     def reset(self) -> None:
         with self._lock:

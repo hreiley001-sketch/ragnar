@@ -8,3 +8,6 @@ stripe==11.4.0
 alembic==1.16.5
 pytest==8.4.2
 eval_type_backport==0.4.0
+redis==5.2.1
+PyJWT==2.10.1
+psycopg[binary]==2.9.10

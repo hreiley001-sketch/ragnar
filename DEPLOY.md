@@ -68,11 +68,25 @@ Use **test** keys first (`sk_test_…` / `pk_test_…`); leave `PAYMENTS_LIVE=fa
 Optional but recommended for password-reset / verification emails:
 `RESEND_API_KEY` + verified `EMAIL_FROM`.
 
+## 4. Birdman platform (Redis · n8n · Supabase · edge)
+
+Architecture: [`docs/BIRDMAN_ARCHITECTURE.md`](docs/BIRDMAN_ARCHITECTURE.md).
+All organs are **key-gated** — the app boots without them.
+
+| Organ | Env | Notes |
+|---|---|---|
+| Redis | `REDIS_URL` | Shared cache, queue, rate limits (required for multi-node) |
+| n8n | `N8N_WEBHOOK_BASE`, `N8N_SHARED_SECRET` | Import workflows from `n8n/workflows/` |
+| Supabase | `SUPABASE_*` | Apply `supabase/schema.sql`; prefer pooler port 6543 |
+| CDN | `CLOUDINARY_*` | Image edge; put `/static` behind CDN at the LB |
+
+Check: `GET /api/platform/status`
+
 ## Alternatives
 - **Railway / Fly.io** — same app; use the `Procfile` (Railway) or `fly launch` with the
   `Dockerfile` (Fly). Custom-domain steps are equivalent.
 - **Azure App Service / Container Apps** — use the `Dockerfile`; set the same env vars.
-- **Your own VPS** — run behind Caddy/Nginx for TLS; `Dockerfile` works as-is.
+- **Your own VPS** — run behind Caddy/Nginx for TLS; `Dockerfile` works as-is. LB → N× uvicorn; Redis required for shared rate limits.
 
-For scale later, swap SQLite for managed Postgres: add `psycopg[binary]` to
-`requirements.txt` and set `DATABASE_URL=postgresql+psycopg://…`.
+For scale later, swap SQLite for managed Postgres / Supabase: add `psycopg[binary]` to
+`requirements.txt` and set `DATABASE_URL` or `SUPABASE_DB_URL`.

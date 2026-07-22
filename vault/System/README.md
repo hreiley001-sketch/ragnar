@@ -9,11 +9,11 @@ updated: 2026-07-22
 
 Minimal Obsidian ecosystem for cohesive thinking — personal creative flow and RAGNAR / BirdmanOS knowledge in one mind.
 
-## Open in Obsidian
+## Live vault
 
-1. Obsidian → **Open folder as vault**
-2. Choose `vault/` (this folder)
-3. Start at [[Home]]
+Primary home is **Valhalla** in Obsidian. This `vault/` folder is the repo mirror.
+
+Start at [[Home]].
 
 ## Layout (six homes)
 

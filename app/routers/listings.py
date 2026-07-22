@@ -24,6 +24,7 @@ from ..auth import (
     require_can_act_for_seller,
     require_user,
 )
+from ..config import settings
 from ..database import get_session
 from ..fees import quote
 from ..models import (
@@ -36,6 +37,7 @@ from ..models import (
     User,
 )
 from ..payments import compute_split
+from ..platform.cache import cached_json
 from ..schemas import ListingCreate, ListingPage, ListingRead, ListingUpdate, MarkSold, SortOption
 from ..services import record_sale
 
@@ -394,6 +396,61 @@ def search_listings(
     sort: SortOption = Query(SortOption.newest),
     page: int = Query(1, ge=1),
     page_size: int = Query(24, ge=1, le=100),
+) -> ListingPage:
+    cache_key = (
+        "listings:search:"
+        f"q={q or ''}|cat={category.value if category else ''}|"
+        f"set={set_name or ''}|cond={condition.value if condition else ''}|"
+        f"gc={grading_company.value if grading_company else ''}|"
+        f"graded={graded}|ming={min_grade}|minp={min_price}|maxp={max_price}|"
+        f"founding={founding_only}|feat={featured}|sort={sort.value}|"
+        f"page={page}|ps={page_size}"
+    )
+
+    def load() -> dict:
+        return _search_listings_page(
+            session,
+            q=q,
+            category=category,
+            set_name=set_name,
+            condition=condition,
+            grading_company=grading_company,
+            graded=graded,
+            min_grade=min_grade,
+            min_price=min_price,
+            max_price=max_price,
+            founding_only=founding_only,
+            featured=featured,
+            sort=sort,
+            page=page,
+            page_size=page_size,
+        ).model_dump(mode="json")
+
+    data = cached_json(
+        cache_key,
+        ttl_seconds=settings.cache_ttl_listings_seconds,
+        loader=load,
+    )
+    return ListingPage.model_validate(data)
+
+
+def _search_listings_page(
+    session: Session,
+    *,
+    q: str | None,
+    category: Category | None,
+    set_name: str | None,
+    condition: Condition | None,
+    grading_company: GradingCompany | None,
+    graded: bool | None,
+    min_grade: float | None,
+    min_price: float | None,
+    max_price: float | None,
+    founding_only: bool,
+    featured: bool,
+    sort: SortOption,
+    page: int,
+    page_size: int,
 ) -> ListingPage:
     filters = [Listing.status == ListingStatus.active.value]
 

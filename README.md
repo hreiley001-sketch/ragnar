@@ -38,6 +38,10 @@ a branded storefront.
 Not yet built (next slices): bulk CSV import from eBay/TCGplayer, and (with keys)
 validating the recognition/comps adapters against live APIs.
 
+**Birdman platform** — cohesive stack behind the product (FastAPI · Redis · Supabase · n8n · CDN/LB).
+See [`docs/BIRDMAN_ARCHITECTURE.md`](docs/BIRDMAN_ARCHITECTURE.md). Organs are key-gated;
+`GET /api/platform/status` reports health. Design maps live in Obsidian (`vault/Maps/Birdman Systems.md`).
+
 **AI Support OS (Counsel)** — AI owns intake → policy → action → resolution.
 Full counsel chamber at `/support`; floating Counsel portal on every other page;
 Command Hub → Counsel for the human review desk. APIs: `/api/support/*`.

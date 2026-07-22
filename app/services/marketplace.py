@@ -14,8 +14,8 @@ from typing import Optional
 
 from sqlmodel import Session, func, select
 
-from .config import settings
-from .models import Listing, ListingStatus, Sale, Seller, utcnow
+from app.config import settings
+from app.models import Listing, ListingStatus, Sale, Seller, utcnow
 
 # --------------------------------------------------------------------------- #
 # Founding 250 / fee state

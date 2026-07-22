@@ -211,6 +211,36 @@ class Settings:
     support_conf_review: float = float(os.getenv("SUPPORT_CONF_REVIEW", "0.70"))
     support_ai_max_refund_cents: int = int(os.getenv("SUPPORT_AI_MAX_REFUND_CENTS", "50000"))
 
+    # --- Birdman platform: Redis (cache + queue) ---
+    # Key-gated. When unset, cache misses through and the queue uses an
+    # in-process deque (fine for single-node / local).
+    redis_url: str = os.getenv("REDIS_URL", "").strip()
+    # Default TTLs (seconds) — explicit, minimal.
+    cache_ttl_listings_seconds: int = int(os.getenv("CACHE_TTL_LISTINGS", "30"))
+    cache_ttl_ride_seconds: int = int(os.getenv("CACHE_TTL_RIDE", "5"))
+    cache_ttl_catalog_seconds: int = int(os.getenv("CACHE_TTL_CATALOG", "300"))
+
+    # --- Birdman platform: n8n (automation — never hot path) ---
+    # Base webhook URL, e.g. https://n8n.example.com/webhook
+    n8n_webhook_base: str = os.getenv("N8N_WEBHOOK_BASE", "").strip()
+    n8n_shared_secret: str = os.getenv("N8N_SHARED_SECRET", "").strip()
+    n8n_timeout_seconds: float = float(os.getenv("N8N_TIMEOUT_SECONDS", "4"))
+
+    # --- Birdman platform: Supabase (data + JWT auth) ---
+    supabase_url: str = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
+    supabase_anon_key: str = os.getenv("SUPABASE_ANON_KEY", "").strip()
+    # New-format server secret (sb_secret_…) — never ship to the browser.
+    # Also accepts legacy SUPABASE_SERVICE_ROLE_KEY.
+    supabase_secret_key: str = (
+        os.getenv("SUPABASE_SECRET_KEY", "").strip()
+        or os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    )
+    supabase_jwt_secret: str = os.getenv("SUPABASE_JWT_SECRET", "").strip()
+    # Prefer transaction pooler (port 6543) for FastAPI nodes.
+    supabase_db_url: str = os.getenv("SUPABASE_DB_URL", "").strip()
+    # When true, FastAPI uses SUPABASE_DB_URL instead of DATABASE_URL.
+    use_supabase_db: bool = _flag("USE_SUPABASE_DB", False)
+
     debug: bool = _flag("DEBUG", False)
     # development | production — drives CORS hardening and schema bootstrap mode.
     environment: str = os.getenv("ENVIRONMENT", "development").strip().lower()
@@ -363,6 +393,33 @@ def validate_launch_config() -> dict:
 
     if settings.seed_demo and settings.is_production:
         _err("SEED_DEMO", "must be false in production")
+
+    # Birdman platform organs — optional; warn when partially configured.
+    if settings.redis_url:
+        _ok("REDIS_URL", "set")
+    elif settings.is_production:
+        _warn("REDIS_URL", "unset — cache/queue in-process (not multi-node safe)")
+    else:
+        _warn("REDIS_URL", "unset — local queue fallback")
+
+    if settings.n8n_webhook_base:
+        _ok("N8N_WEBHOOK_BASE", "set")
+    else:
+        _warn("N8N_WEBHOOK_BASE", "unset — automation enqueue is local-only")
+
+    if settings.supabase_url:
+        if not settings.supabase_anon_key and not settings.supabase_secret_key:
+            _warn("SUPABASE_ANON_KEY", "SUPABASE_URL set but no anon/secret key")
+        elif not settings.supabase_jwt_secret:
+            _warn(
+                "SUPABASE_JWT_SECRET",
+                "optional for now — needed to verify user JWTs (Dashboard → API → JWT Secret)",
+            )
+            _ok("SUPABASE", "url + api key configured")
+        else:
+            _ok("SUPABASE", "url + jwt configured")
+    else:
+        _ok("SUPABASE", "optional — using SQLModel DATABASE_URL")
 
     return {
         "ok": len(errors) == 0,

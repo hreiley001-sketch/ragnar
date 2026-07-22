@@ -71,13 +71,86 @@ def destroy_session(session: Session, token: str) -> None:
 def get_current_user(
     request: Request, session: Session = Depends(get_session)
 ) -> Optional[User]:
+    """Resolve the caller via cookie session, then Supabase Bearer JWT.
+
+    Cookie path stays primary for the storefront. Bearer enables stateless
+    FastAPI nodes + future Supabase Auth clients without dropping sessions.
+    """
     token = request.cookies.get(settings.session_cookie)
-    if not token:
+    if token:
+        us = session.exec(select(UserSession).where(UserSession.token == token)).first()
+        if us and us.expires_at >= utcnow():
+            user = session.get(User, us.user_id)
+            if user:
+                return user
+
+    auth_header = request.headers.get("authorization") or request.headers.get("Authorization") or ""
+    if auth_header.lower().startswith("bearer "):
+        bearer = auth_header[7:].strip()
+        if bearer:
+            user = user_from_supabase_bearer(session, bearer)
+            if user:
+                return user
+    return None
+
+
+def user_from_supabase_bearer(session: Session, token: str) -> Optional[User]:
+    """Map a verified Supabase JWT onto a local User row (create-on-first-seen)."""
+    try:
+        from .platform.supabase_client import verify_jwt
+    except Exception:  # noqa: BLE001
         return None
-    us = session.exec(select(UserSession).where(UserSession.token == token)).first()
-    if not us or us.expires_at < utcnow():
+
+    claims = verify_jwt(token)
+    if not claims:
         return None
-    return session.get(User, us.user_id)
+
+    sub = str(claims.get("sub") or "").strip()
+    email = (claims.get("email") or "").strip().lower()
+    if not email and not sub:
+        return None
+
+    user: Optional[User] = None
+    if sub:
+        user = session.exec(select(User).where(User.supabase_sub == sub)).first()
+    if user is None and email:
+        user = session.exec(select(User).where(User.email == email)).first()
+
+    if user is None:
+        if not email:
+            return None
+        user = User(
+            email=email,
+            name=(claims.get("user_metadata") or {}).get("full_name")
+            if isinstance(claims.get("user_metadata"), dict)
+            else None,
+            supabase_sub=sub or None,
+            email_verified=True,
+            password_hash=None,
+        )
+        # Staff domain still requires Google-verified path; JWT email alone
+        # never auto-promotes to admin.
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return user
+
+    changed = False
+    if sub and not user.supabase_sub:
+        user.supabase_sub = sub
+        changed = True
+    if email and not user.email_verified and claims.get("email_confirmed_at"):
+        user.email_verified = True
+        changed = True
+    elif email and claims.get("email") and user.email_verified is False:
+        # Supabase access tokens imply a verified session for that email.
+        user.email_verified = True
+        changed = True
+    if changed:
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+    return user
 
 
 def require_user(user: Optional[User] = Depends(get_current_user)) -> User:

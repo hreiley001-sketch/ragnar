@@ -37,7 +37,12 @@ idle → lobby → showcase → bidding → cooldown → archived
 - Where does ride energy meet trust (fees, grading, buyer protection)?
 - Which ride phases deserve evergreen principles vs. implementation notes?
 
+## Platform body
+
+Product OS rides on [[Maps/Birdman Systems]] (FastAPI · Supabase · Redis · n8n · edge).
+
 ## Related projects
 
 - [[Projects/Vault Genesis]]
+- [[Projects/Birdman Platform]]
 - [[Projects/Index]]
