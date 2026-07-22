@@ -1,0 +1,11 @@
+{
+  "name": "ragnar-n8n-runtime",
+  "private": true,
+  "description": "Local n8n runtime for RAGNAR. Upstream: https://github.com/n8n-io/n8n.git",
+  "scripts": {
+    "start": "n8n start"
+  },
+  "engines": {
+    "node": ">=22.22"
+  }
+}

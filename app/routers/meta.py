@@ -60,6 +60,8 @@ def meta() -> dict:
             "image_enhance": replicate_configured(),
             "web_extract": firecrawl_configured(),
             "fonts": google_fonts_configured(),
+            "n8n": bool(settings.n8n_webhook_url),
+            "obsidian": bool(settings.obsidian_api_url and settings.obsidian_api_key),
         },
     }
 

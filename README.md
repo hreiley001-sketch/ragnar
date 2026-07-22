@@ -95,6 +95,19 @@ uvicorn app.main:app --reload
 Then open **http://127.0.0.1:8000** (storefront) and **/api/docs** (Swagger).
 The database (SQLite) is created and seeded with sample listings on first run.
 
+**Docker Compose:** `docker compose up --build` runs RAGNAR + n8n together
+(Compose V2 — https://github.com/docker/compose). See
+[integrations/docker/README.md](integrations/docker/README.md).
+
+**Supabase:** set `DATABASE_URL` to your project URI (paste the dashboard
+`postgresql://…` string — driver + SSL are normalized automatically), set
+`SCHEMA_BOOTSTRAP=alembic`, run `alembic upgrade head`, then start uvicorn.
+Details in [DEPLOY.md](DEPLOY.md#supabase-postgres-recommended-for-production-db).
+
+**n8n + Obsidian:** set `N8N_WEBHOOK_URL` (and optionally Obsidian Local REST API
+keys). Marketplace events and Counsel knowledge sync into your automation vault —
+see [integrations/README.md](integrations/README.md).
+
 ## API
 
 | Endpoint | Method | Purpose |

@@ -161,6 +161,24 @@ def _persist_listing(payload: ListingCreate, session: Session, seller: Seller) -
         )
     except Exception:  # noqa: BLE001
         pass
+    try:
+        from .. import platform_events
+
+        platform_events.emit(
+            "listing.created",
+            {
+                "listing_id": listing.id,
+                "title": listing.title,
+                "price_cents": listing.price_cents,
+                "category": listing.category,
+                "seller_handle": seller.handle,
+                "seller_id": seller.id,
+                "image_url": listing.image_url,
+                "link": f"/listing/{listing.id}",
+            },
+        )
+    except Exception:  # noqa: BLE001
+        pass
 
     return ListingRead.from_listing(listing)
 

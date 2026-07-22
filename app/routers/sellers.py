@@ -56,6 +56,22 @@ def apply(payload: SellerApply, session: Session = Depends(get_session),
         session.add(user)
     session.commit()
     session.refresh(seller)
+    try:
+        from .. import platform_events
+
+        platform_events.emit(
+            "seller.applied",
+            {
+                "seller_id": seller.id,
+                "handle": seller.handle,
+                "display_name": seller.display_name,
+                "is_founding": seller.is_founding,
+                "founding_number": getattr(seller, "founding_number", None),
+                "email": seller.email,
+            },
+        )
+    except Exception:  # noqa: BLE001
+        pass
     # store_edit_token is returned ONCE here so the seller can customize their store.
     return SellerApplyResult(**seller_state(seller), store_edit_token=seller.store_edit_token)
 

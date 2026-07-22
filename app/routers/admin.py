@@ -66,6 +66,8 @@ def integrations_status() -> dict:
         "email": emailer.email_configured(),
         "psa": bool(settings.psa_access_token),
         "seo": seo_tools.providers_status(),
+        "n8n": bool(settings.n8n_webhook_url),
+        "obsidian": bool(settings.obsidian_api_url and settings.obsidian_api_key),
     }
 
 

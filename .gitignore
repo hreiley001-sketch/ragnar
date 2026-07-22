@@ -32,3 +32,8 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# n8n local runtime (npm install + user data — not source)
+integrations/n8n/runtime/node_modules/
+integrations/n8n/runtime/.n8n/
+integrations/n8n/runtime/package-lock.json

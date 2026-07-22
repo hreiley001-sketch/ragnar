@@ -1,0 +1,130 @@
+{
+  "name": "RAGNAR → Obsidian events",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ragnar-events",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-ragnar",
+      "name": "RAGNAR Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "ragnar-events"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "knowledge.updated",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "knowledge"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "knowledge.vault_synced",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "vault"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "order.paid",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "order"
+            }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      },
+      "id": "switch-event",
+      "name": "Route by event",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://127.0.0.1:27124/vault/{{ $json.data.path || ('RAGNAR/Inbox/' + $json.event + '.md') }}",
+        "allowUnauthorizedCerts": true,
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer ={{ $env.OBSIDIAN_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "text/markdown"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/markdown",
+        "body": "=---\nsource: ragnar\nevent: {{ $json.event }}\nts: {{ $json.ts }}\n---\n\n# {{ $json.event }}\n\n```json\n{{ JSON.stringify($json.data, null, 2) }}\n```\n"
+      },
+      "id": "obsidian-write",
+      "name": "Write Obsidian note",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [820, 200],
+      "notes": "Requires Obsidian Local REST API. Or replace with a Write File node pointed at your vault path."
+    },
+    {
+      "parameters": {
+        "content": "## Setup\n1. Activate this workflow and copy the Webhook Production URL into RAGNAR `N8N_WEBHOOK_URL`.\n2. Set Obsidian Local REST API key as n8n env `OBSIDIAN_API_KEY`, **or** swap the HTTP node for a filesystem Write that targets your vault folder.\n3. From RAGNAR: `POST /api/integrations/events/test` with `X-Admin-Token`.",
+        "height": 280,
+        "width": 420
+      },
+      "id": "note-setup",
+      "name": "Setup notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [200, 40]
+    }
+  ],
+  "connections": {
+    "RAGNAR Webhook": {
+      "main": [[{ "node": "Route by event", "type": "main", "index": 0 }]]
+    },
+    "Route by event": {
+      "main": [
+        [{ "node": "Write Obsidian note", "type": "main", "index": 0 }],
+        [{ "node": "Write Obsidian note", "type": "main", "index": 0 }],
+        [{ "node": "Write Obsidian note", "type": "main", "index": 0 }],
+        [{ "node": "Write Obsidian note", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

@@ -1,11 +1,12 @@
 """Application configuration, sourced from environment variables.
 
 Kept dependency-light on purpose (plain os.getenv + dotenv) so the MVP stays
-easy to run anywhere — locally, in Docker, on Render, or on Azure.
+easy to run anywhere — locally, in Docker, on Render, Azure, or Supabase.
 """
 from __future__ import annotations
 
 import os
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from dotenv import load_dotenv
 
@@ -16,14 +17,48 @@ def _flag(name: str, default: bool = False) -> bool:
     return os.getenv(name, str(default)).strip().lower() in {"1", "true", "yes", "on"}
 
 
+def normalize_database_url(url: str) -> str:
+    """Make a DATABASE_URL SQLAlchemy/psycopg-ready.
+
+    Accepts the Supabase dashboard URI as-is (``postgresql://…`` or
+    ``postgres://…``) and rewrites it to ``postgresql+psycopg://…``.
+    Supabase (and most managed Postgres) require TLS — we add
+    ``sslmode=require`` when missing.
+    """
+    raw = (url or "").strip()
+    if not raw:
+        return "sqlite:///./ragnar.db"
+
+    # Heroku / Supabase often hand out postgres:// — SQLAlchemy wants postgresql://
+    if raw.startswith("postgres://"):
+        raw = "postgresql://" + raw[len("postgres://") :]
+
+    if raw.startswith("postgresql://") and "+psycopg" not in raw.split("://", 1)[0]:
+        raw = "postgresql+psycopg://" + raw[len("postgresql://") :]
+
+    if not raw.startswith("postgresql"):
+        return raw
+
+    parsed = urlparse(raw)
+    host = (parsed.hostname or "").lower()
+    query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    # Managed Postgres rejects non-TLS; leave local Postgres alone.
+    managed = any(s in host for s in ("supabase.co", "neon.tech", "amazonaws.com"))
+    if managed and "sslmode" not in {k.lower() for k in query}:
+        query["sslmode"] = "require"
+    return urlunparse(parsed._replace(query=urlencode(query)))
+
+
 class Settings:
     # Identity
     app_name: str = "RAGNAR"
     version: str = "0.1.0"
     tagline: str = "Guided by counsel, driven by conquest."
 
-    # Storage
-    database_url: str = os.getenv("DATABASE_URL", "sqlite:///./ragnar.db")
+    # Storage — paste a Supabase URI; scheme/SSL are normalized automatically.
+    database_url: str = normalize_database_url(
+        os.getenv("DATABASE_URL", "sqlite:///./ragnar.db")
+    )
 
     # CORS — comma separated. Default "*" for easy local dev; lock down in prod.
     allowed_origins: list[str] = [
@@ -111,6 +146,18 @@ class Settings:
 
     # --- Discord webhook alerts (ops channel) — key-gated ---
     discord_webhook_url: str = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
+
+    # --- n8n automation hub — key-gated outbound webhook ---
+    # Paste a Production/Test Webhook URL from an n8n Webhook node.
+    n8n_webhook_url: str = os.getenv("N8N_WEBHOOK_URL", "").strip()
+    # Optional HMAC secret → X-Ragnar-Signature: sha256=…
+    n8n_webhook_secret: str = os.getenv("N8N_WEBHOOK_SECRET", "").strip()
+
+    # --- Obsidian (Local REST API plugin) — key-gated ---
+    # https://github.com/coddingtonbear/obsidian-local-rest-api
+    obsidian_api_url: str = os.getenv("OBSIDIAN_API_URL", "").strip().rstrip("/")
+    obsidian_api_key: str = os.getenv("OBSIDIAN_API_KEY", "").strip()
+    obsidian_vault_prefix: str = os.getenv("OBSIDIAN_VAULT_PREFIX", "RAGNAR").strip() or "RAGNAR"
 
     # --- Shipping (Shippo) — key-gated ---
     shippo_api_key: str = os.getenv("SHIPPO_API_KEY", "").strip()
@@ -352,14 +399,28 @@ def validate_launch_config() -> dict:
     else:
         _ok("EMAIL_FROM", settings.email_from)
 
-    # Schema — SQLite on Render still uses create_all + ALTER unless forced to alembic
-    if settings.is_production and settings.use_create_all:
+    # Schema — SQLite may use create_all; Postgres/Supabase must use Alembic.
+    db = settings.database_url
+    using_postgres = db.startswith("postgresql")
+    if using_postgres:
+        _ok("DATABASE", "postgres" + (" (supabase)" if "supabase.co" in db else ""))
+        if settings.use_create_all:
+            _warn(
+                "SCHEMA_BOOTSTRAP",
+                "Postgres detected — prefer SCHEMA_BOOTSTRAP=alembic and "
+                "`alembic upgrade head` before boot",
+            )
+        else:
+            _ok("SCHEMA_BOOTSTRAP", "alembic")
+    elif settings.is_production and settings.use_create_all:
         _warn(
             "SCHEMA_BOOTSTRAP",
             "using create_all (OK for SQLite disk). Set SCHEMA_BOOTSTRAP=alembic after Postgres.",
         )
+        _ok("DATABASE", "sqlite")
     else:
         _ok("SCHEMA_BOOTSTRAP", "create_all" if settings.use_create_all else "alembic")
+        _ok("DATABASE", "sqlite" if db.startswith("sqlite") else "other")
 
     if settings.seed_demo and settings.is_production:
         _err("SEED_DEMO", "must be false in production")

@@ -264,3 +264,18 @@ def flag_human_review(
         body=(reason or conv.intent or "escalated")[:200],
         link="/admin",
     )
+    try:
+        from .. import platform_events
+
+        platform_events.emit(
+            "support.escalated",
+            {
+                "conversation_id": conv.id,
+                "public_id": conv.public_id,
+                "intent": conv.intent,
+                "reason": reason,
+                "status": conv.status,
+            },
+        )
+    except Exception:  # noqa: BLE001
+        pass
