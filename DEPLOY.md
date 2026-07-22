@@ -79,16 +79,22 @@ Optional but recommended for password-reset / verification emails:
 `psycopg[binary]` is already in `requirements.txt`. RAGNAR accepts the Supabase
 URI as-is.
 
-1. In Supabase: **Project Settings → Database** → copy the **URI** connection
-   string. Replace `[YOUR-PASSWORD]` with the database password you set at
-   project creation (reset it there if you lost it).
+1. In Supabase: click **Connect** (or **Project Settings → Database**) and copy a
+   connection string.
+   - Prefer **Session pooler** (host like `aws-*-<region>.pooler.supabase.com`,
+     port **5432**, user `postgres.<project-ref>`). Free-tier **direct** hosts
+     (`db.<ref>.supabase.co`) are **IPv6-only** and fail on many cloud/IPv4 networks.
+   - Replace `[YOUR-PASSWORD]` with the database password (reset it in Database
+     settings if needed). URL-encode special characters (`$` → `%24`, `!` → `%21`).
 2. Set env (local `.env` or Render → Environment):
    ```
-   DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.<project-ref>.supabase.co:5432/postgres
+   DATABASE_URL=postgresql://postgres.<project-ref>:YOUR_PASSWORD@aws-1-<region>.pooler.supabase.com:5432/postgres
    SCHEMA_BOOTSTRAP=alembic
    ```
    You can paste `postgresql://…` — the app upgrades the driver to
-   `postgresql+psycopg` and adds `sslmode=require` for `*.supabase.co`.
+   `postgresql+psycopg` and adds `sslmode=require` for Supabase hosts.
+   Copy the **exact** pooler hostname from the dashboard (`aws-0-…` vs `aws-1-…`
+   are not interchangeable).
 3. Apply schema once (from the repo root, with that `DATABASE_URL` loaded):
    ```
    alembic upgrade head
@@ -99,6 +105,5 @@ URI as-is.
    You can drop the SQLite disk once Supabase is the source of truth (keep a disk
    or object storage for `UPLOAD_DIR` scan photos).
 
-**Do not commit** the real password. Prefer Supabase's **Session mode** pooler
-host if your project shows one (stable for SQLAlchemy). Rotate the DB password
-if it was ever pasted into chat, tickets, or a public repo.
+**Do not commit** the real password. Rotate the DB password if it was ever pasted
+into chat, tickets, or a public repo.
