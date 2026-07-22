@@ -100,6 +100,10 @@ The database (SQLite) is created and seeded with sample listings on first run.
 `SCHEMA_BOOTSTRAP=alembic`, run `alembic upgrade head`, then start uvicorn.
 Details in [DEPLOY.md](DEPLOY.md#supabase-postgres-recommended-for-production-db).
 
+**n8n + Obsidian:** set `N8N_WEBHOOK_URL` (and optionally Obsidian Local REST API
+keys). Marketplace events and Counsel knowledge sync into your automation vault —
+see [integrations/README.md](integrations/README.md).
+
 ## API
 
 | Endpoint | Method | Purpose |

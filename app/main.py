@@ -26,6 +26,7 @@ from .routers import (
     founding,
     groups,
     health,
+    integrations,
     listings,
     media,
     meta,
@@ -154,6 +155,7 @@ app.include_router(groups.router)
 app.include_router(cart.router)
 app.include_router(cart.collection_router)
 app.include_router(media.router)
+app.include_router(integrations.router)
 app.include_router(admin.router)
 
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)

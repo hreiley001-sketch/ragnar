@@ -289,4 +289,21 @@ def upsert_article(session: Session, data: dict, *, by: str | None = None) -> Kn
     session.add(art)
     session.commit()
     session.refresh(art)
+    try:
+        from .. import platform_events
+        from . import obsidian
+
+        payload = {
+            "slug": art.slug,
+            "title": art.title,
+            "category": art.category,
+            "tags": art.tags or [],
+            "path": obsidian.article_path(art),
+            "by": by,
+        }
+        platform_events.emit("knowledge.updated", payload)
+        # Best-effort direct push when Local REST API is configured.
+        obsidian.sync_article(art)
+    except Exception:  # noqa: BLE001
+        pass
     return art

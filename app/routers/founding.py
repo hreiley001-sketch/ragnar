@@ -46,6 +46,19 @@ def apply(payload: FoundingApplicationCreate, session: Session = Depends(get_ses
             f"New Founding 250 application: {application.name} ({application.email})",
             f"Sells: {application.categories or '—'} | Volume: {application.monthly_volume or '—'}",
         )
+        from .. import platform_events
+
+        platform_events.emit(
+            "founding.applied",
+            {
+                "id": application.id,
+                "name": application.name,
+                "email": application.email,
+                "handle_wanted": application.handle_wanted,
+                "categories": application.categories,
+                "monthly_volume": application.monthly_volume,
+            },
+        )
     except Exception:  # noqa: BLE001
         pass
 

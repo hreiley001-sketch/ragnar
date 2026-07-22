@@ -231,6 +231,23 @@ def _handle_checkout_completed(session: Session, obj: dict) -> None:
                f"Order confirmed — {listing.title}",
                body="You'll get tracking once it ships.", link="/account#orders")
     ops_alert(f"Order paid: {listing.title} (${price_cents / 100:,.2f})")
+    try:
+        from .. import platform_events
+
+        platform_events.emit(
+            "order.paid",
+            {
+                "order_id": order.id,
+                "listing_id": listing.id,
+                "title": listing.title,
+                "price_cents": price_cents,
+                "seller_id": listing.seller_id,
+                "seller_handle": seller.handle if seller else None,
+                "buyer_email": order.buyer_email,
+            },
+        )
+    except Exception:  # noqa: BLE001
+        pass
     logger.info("Listing %s sold via Stripe; order %s created", listing_id, order.id)
 
 

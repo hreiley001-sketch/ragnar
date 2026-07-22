@@ -147,6 +147,18 @@ class Settings:
     # --- Discord webhook alerts (ops channel) — key-gated ---
     discord_webhook_url: str = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
 
+    # --- n8n automation hub — key-gated outbound webhook ---
+    # Paste a Production/Test Webhook URL from an n8n Webhook node.
+    n8n_webhook_url: str = os.getenv("N8N_WEBHOOK_URL", "").strip()
+    # Optional HMAC secret → X-Ragnar-Signature: sha256=…
+    n8n_webhook_secret: str = os.getenv("N8N_WEBHOOK_SECRET", "").strip()
+
+    # --- Obsidian (Local REST API plugin) — key-gated ---
+    # https://github.com/coddingtonbear/obsidian-local-rest-api
+    obsidian_api_url: str = os.getenv("OBSIDIAN_API_URL", "").strip().rstrip("/")
+    obsidian_api_key: str = os.getenv("OBSIDIAN_API_KEY", "").strip()
+    obsidian_vault_prefix: str = os.getenv("OBSIDIAN_VAULT_PREFIX", "RAGNAR").strip() or "RAGNAR"
+
     # --- Shipping (Shippo) — key-gated ---
     shippo_api_key: str = os.getenv("SHIPPO_API_KEY", "").strip()
 
