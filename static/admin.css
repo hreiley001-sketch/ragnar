@@ -26,7 +26,7 @@ body.page-admin {
     radial-gradient(980px 540px at 78% -12%, color-mix(in srgb, var(--cmd-accent) 16%, transparent), transparent 58%),
     radial-gradient(720px 480px at 4% 18%, color-mix(in srgb, var(--cmd-gold) 8%, transparent), transparent 55%),
     radial-gradient(640px 420px at 90% 100%, color-mix(in srgb, var(--cmd-accent) 7%, transparent), transparent 50%),
-    linear-gradient(180deg, #0d1d2e 0%, #0a141f 42%, #071019 100%);
+    linear-gradient(180deg, #f0ead9 0%, #efe8d9 42%, #e7dfce 100%);
 }
 .cmd-atmosphere::before {
   content: "";
@@ -111,7 +111,7 @@ body.page-admin .cmd-brand-mark {
 }
 body.page-admin .cmd-brand-mark span {
   color: var(--cmd-accent);
-  text-shadow: 0 0 18px rgba(86, 200, 242, 0.35);
+  text-shadow: 0 0 18px rgba(184, 121, 26, 0.35);
 }
 body.page-admin .cmd-title {
   margin: 0;
@@ -243,7 +243,7 @@ body.page-admin .hub-main {
   font-weight: 800;
   letter-spacing: var(--tracking-display);
   line-height: 0.8;
-  color: rgba(191, 234, 255, 0.04);
+  color: rgba(184, 121, 26, 0.04);
   pointer-events: none;
 }
 .cmd-brief-kicker {
@@ -509,7 +509,7 @@ body.page-admin .tab-panel > .card h3 {
 body.page-admin .tbl-wrap {
   border-radius: 0;
   border-color: var(--cmd-line);
-  background: color-mix(in srgb, var(--color-bg-glass) 90%, #0c1927);
+  background: color-mix(in srgb, var(--color-bg-glass) 90%, #e0d8c4);
   box-shadow: var(--shadow-sm);
 }
 body.page-admin table.hub th {

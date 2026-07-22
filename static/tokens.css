@@ -1,69 +1,69 @@
-/* RAGNAR — Nordic dawn vault / Asgard realm.
-   Lit slate-fjord navy · frost type · glacier ice · warm brass.
-   Broadcast = :root (sitewide). .theme-utility kept as legacy light override only. */
+/* RAGNAR — Celestial Asgard (light).
+   Ivory & marble halls · deep ink type · Asgardian gold · Bifrost glacier accent.
+   Broadcast = :root (sitewide, light). .theme-utility kept as legacy override only. */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* Surfaces — lit Nordic slate (not near-black) */
-  --color-bg-base: #1a2d42;
-  --color-bg-mid: #243d56;
-  --color-bg-lit: #2f4d68;
-  --color-bg-elevated: #2a4158;
-  --color-bg-panel: #324d66;
-  --color-bg-panel-strong: #3a5872;
-  --color-bg-glass: rgba(42, 65, 88, 0.72);
-  --color-bg-glass-soft: rgba(38, 58, 78, 0.55);
-  --color-bg-input: #2a4158;
-  --color-bg-overlay: rgba(22, 36, 52, 0.65);
-  --color-surface-deep: #152536;
+  /* Surfaces — warm ivory & marble (not stark white) */
+  --color-bg-base: #f5f1e8;
+  --color-bg-mid: #efe8d9;
+  --color-bg-lit: #fdfbf6;
+  --color-bg-elevated: #ffffff;
+  --color-bg-panel: #fffdf9;
+  --color-bg-panel-strong: #f7f1e6;
+  --color-bg-glass: rgba(255, 253, 248, 0.82);
+  --color-bg-glass-soft: rgba(250, 246, 238, 0.72);
+  --color-bg-input: #fffdf9;
+  --color-bg-overlay: rgba(40, 32, 18, 0.42);
+  --color-surface-deep: #e7dfce;
   --color-bg-gradient: linear-gradient(
     165deg,
-    #3a5f7d 0%,
-    var(--color-bg-mid) 38%,
+    #fdfbf6 0%,
+    var(--color-bg-mid) 46%,
     var(--color-bg-base) 100%
   );
 
-  /* Frost text — high contrast on lit surfaces */
-  --color-text-primary: #f4f8fb;
-  --color-text-secondary: #c5d4e2;
-  --color-text-muted: #9eb3c7;
-  --color-text-subtle: #849ab0;
-  --color-text-disabled: #6a8094;
-  --color-on-accent: #0f2433;
-  --color-on-gold: #1f1608;
-  --color-on-danger: #1a0808;
+  /* Deep ink text — high contrast on ivory surfaces */
+  --color-text-primary: #221a10;
+  --color-text-secondary: #5a4f3d;
+  --color-text-muted: #8a7f6a;
+  --color-text-subtle: #a99e88;
+  --color-text-disabled: #c2b9a6;
+  --color-on-accent: #2a1e08;
+  --color-on-gold: #2a1e08;
+  --color-on-danger: #fff5f3;
 
-  /* Nordic brand */
-  --color-accent-primary: #8ecae6;
-  --color-accent-primary-strong: #b8dff0;
-  --color-accent-gold: #d4a574;
-  --color-accent-gold-strong: #e4bb8a;
-  --color-accent-secondary: #a8bcc9;
-  --color-accent-fallback: #6a9eb8;
-  --color-glacier: #7eb8d4;
-  --color-frost: #f8fbfd;
-  --color-titanium: #b0c4d4;
-  --color-crystal: #d4eaf5;
-  --color-midnight: #152536;
-  --color-ice-deep: #2a5068;
-  --color-arctic: #1e3850;
-  --color-birch: #e8eef3;
+  /* Asgardian brand — gold-forward, Bifrost glacier as celestial secondary */
+  --color-accent-primary: #8a6510;
+  --color-accent-primary-strong: #6d4f0a;
+  --color-accent-gold: #b8791a;
+  --color-accent-gold-strong: #d8a13f;
+  --color-accent-secondary: #6a8fa6;
+  --color-accent-fallback: #b08d57;
+  --color-glacier: #4f96b3;
+  --color-frost: #fbf7ee;
+  --color-titanium: #8a7f6a;
+  --color-crystal: #e9dfca;
+  --color-midnight: #efe8d9;
+  --color-ice-deep: #cbb98f;
+  --color-arctic: #f0ead9;
+  --color-birch: #2b2416;
 
   --color-live: var(--color-accent-gold);
-  --color-success: #6bc9a8;
-  --color-warning: #d4b87a;
-  --color-error: #e88a8e;
-  --color-info: #9ed4f0;
+  --color-success: #1f8a5b;
+  --color-warning: #b5851f;
+  --color-error: #c0392b;
+  --color-info: #3f7fa0;
 
-  --color-border-subtle: rgba(212, 234, 245, 0.16);
-  --color-border-default: rgba(212, 234, 245, 0.28);
-  --color-border-strong: rgba(212, 180, 130, 0.42);
-  --color-border-gold: rgba(212, 165, 116, 0.5);
+  --color-border-subtle: rgba(58, 44, 20, 0.12);
+  --color-border-default: rgba(58, 44, 20, 0.20);
+  --color-border-strong: rgba(169, 123, 22, 0.42);
+  --color-border-gold: rgba(184, 121, 26, 0.5);
   --color-focus: var(--color-accent-primary);
-  --color-hover-surface: rgba(142, 202, 230, 0.12);
-  --color-active-surface: rgba(142, 202, 230, 0.18);
-  --color-disabled-surface: rgba(212, 234, 245, 0.06);
+  --color-hover-surface: rgba(169, 123, 22, 0.10);
+  --color-active-surface: rgba(169, 123, 22, 0.16);
+  --color-disabled-surface: rgba(58, 44, 20, 0.05);
 
   --font-display: "Space Grotesk", "Helvetica Neue", system-ui, sans-serif;
   --font-body: "Inter", "Helvetica Neue", system-ui, -apple-system, sans-serif;
@@ -95,32 +95,32 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-pill: 999px;
-  --shadow-sm: 0 2px 8px rgba(15, 28, 42, 0.2), 0 1px 2px rgba(15, 28, 42, 0.12);
-  --shadow-md: 0 10px 28px rgba(15, 28, 42, 0.22);
-  --shadow-lg: 0 20px 48px rgba(15, 28, 42, 0.28);
-  --shadow-focus: 0 0 0 3px rgba(142, 202, 230, 0.35);
-  --glow-ice: 0 0 32px rgba(142, 202, 230, 0.2);
-  --glow-crystal: 0 0 48px rgba(184, 223, 240, 0.14);
-  --glow-gold: 0 0 28px rgba(212, 165, 116, 0.25);
+  --shadow-sm: 0 1px 3px rgba(58, 44, 20, 0.06), 0 4px 12px rgba(58, 44, 20, 0.05);
+  --shadow-md: 0 10px 28px rgba(58, 44, 20, 0.10);
+  --shadow-lg: 0 20px 48px rgba(58, 44, 20, 0.14);
+  --shadow-focus: 0 0 0 3px rgba(169, 123, 22, 0.28);
+  --glow-ice: 0 6px 24px rgba(79, 150, 179, 0.14);
+  --glow-crystal: 0 8px 30px rgba(184, 121, 26, 0.10);
+  --glow-gold: 0 6px 24px rgba(184, 121, 26, 0.22);
 
   --card-foil: linear-gradient(
     125deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(212, 165, 116, 0.1) 24%,
-    rgba(142, 202, 230, 0.12) 48%,
-    rgba(255, 255, 255, 0.06) 72%,
-    rgba(212, 165, 116, 0.08) 100%
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(184, 121, 26, 0.12) 24%,
+    rgba(79, 150, 179, 0.10) 48%,
+    rgba(255, 255, 255, 0.55) 72%,
+    rgba(184, 121, 26, 0.10) 100%
   );
-  --card-surface: linear-gradient(155deg, var(--color-bg-panel-strong), var(--color-bg-mid) 70%);
-  --card-surface-live: linear-gradient(155deg, #3d6280 0%, var(--color-bg-mid) 55%, var(--color-bg-base) 100%);
-  --card-surface-archive: linear-gradient(165deg, #3a5872 0%, #2a4158 50%, var(--color-bg-base) 100%);
+  --card-surface: linear-gradient(155deg, var(--color-bg-panel), var(--color-bg-panel-strong) 70%);
+  --card-surface-live: linear-gradient(155deg, #fff6e6 0%, var(--color-bg-panel-strong) 55%, var(--color-bg-mid) 100%);
+  --card-surface-archive: linear-gradient(165deg, #f2ece0 0%, #ece4d2 50%, var(--color-bg-base) 100%);
 
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 110ms;
   --duration-medium: 220ms;
   --duration-slow: 480ms;
 
-  --crest-primary: #b0c4d4;
+  --crest-primary: #b08d57;
   --crest-accent: var(--color-accent-primary);
   --moment-fallback: var(--card-surface-archive);
   --store-accent: var(--color-accent-primary);
