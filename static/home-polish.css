@@ -67,17 +67,25 @@
       transparent 72%) !important;
 }
 
-/* ——— Hero: always readable ——— */
+/* ——— Hero: open throne — Asgard + gems show through ——— */
 .vault-arrival-copy.asgard-throne,
 .vault-arrival-copy {
   position: relative;
   z-index: 4;
-  padding: clamp(28px, 4vw, 48px) clamp(24px, 5vw, 56px);
-  border-radius: var(--radius-lg);
-  background: rgba(247, 241, 230, 0.82);
-  border: 1px solid rgba(58, 44, 20, 0.22);
-  backdrop-filter: blur(18px) saturate(1.25);
-  box-shadow: var(--shadow-lg), 0 0 80px rgba(184, 121, 26, 0.08);
+  padding: clamp(20px, 3vw, 36px) clamp(16px, 4vw, 40px);
+  border-radius: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(253, 251, 246, 0.28) 0%,
+      rgba(253, 251, 246, 0.55) 45%,
+      rgba(253, 251, 246, 0.22) 100%);
+  border: none;
+  border-top: 1px solid rgba(184, 121, 26, 0.18);
+  border-bottom: 1px solid rgba(184, 121, 26, 0.12);
+  backdrop-filter: blur(10px) saturate(1.15);
+  box-shadow: none;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
 .vault-arrival-copy h1,
@@ -98,13 +106,17 @@
   filter: none;
   font-family: var(--font-display) !important;
   font-weight: 400 !important;
-  letter-spacing: var(--tracking-display);
-  text-shadow: 0 1px 0 rgba(255, 253, 248, 0.65), 0 8px 28px rgba(184, 121, 26, 0.16);
-  font-size: clamp(40px, 7vw, 88px) !important;
-  line-height: 1.06 !important;
+  letter-spacing: 0.08em !important;
+  text-shadow:
+    0 1px 0 rgba(255, 253, 248, 0.7),
+    0 0 40px rgba(200, 144, 31, 0.22),
+    0 12px 36px rgba(184, 121, 26, 0.14);
+  font-size: clamp(52px, 9vw, 104px) !important;
+  line-height: 0.95 !important;
 }
 
-.vault-arrival-copy h1 em {
+.vault-arrival-copy h1 em,
+.vault-hero-tagline em {
   color: var(--color-accent-primary-strong) !important;
   background: none !important;
   -webkit-background-clip: unset !important;
@@ -267,14 +279,74 @@
 .founding-counter-premium {
   border-color: var(--color-border-gold) !important;
   color: var(--color-crystal) !important;
-  background: rgba(184, 121, 26, 0.12) !important;
+  background: rgba(184, 121, 26, 0.1) !important;
+  border-radius: 999px;
+  padding: 10px 16px !important;
+}
+
+/* Open fee line — no perk cards */
+body.arena-home--concise .founders-fee-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  color: var(--color-text-secondary);
+  font: 600 12px/1.4 var(--font-mono, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+body.arena-home--concise .founders-fee-line b {
+  color: var(--color-accent-primary-strong);
+  font-size: 18px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+}
+body.arena-home--concise .founders-fee-line .fee-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #f0d878 45%, #c8901f);
+  box-shadow: 0 0 10px rgba(200, 144, 31, 0.65);
+  flex-shrink: 0;
+}
+body.arena-home--concise .founders-fee-line span:nth-child(3) + .fee-dot,
+body.arena-home--concise .founders-fee-line .fee-dot:nth-of-type(2) {
+  background: radial-gradient(circle at 30% 30%, #fff, #5eb8e0 45%, #2f93c4);
+  box-shadow: 0 0 10px rgba(47, 147, 196, 0.6);
+}
+body.arena-home--concise .founders-fee-line .fee-dot:last-of-type {
+  background: radial-gradient(circle at 30% 30%, #fff, #e8c050 40%, #a67c1a);
+  box-shadow: 0 0 10px rgba(232, 192, 80, 0.65);
 }
 
 .apply-panel {
-  background: rgba(255, 253, 248, 0.55) !important;
-  border-color: var(--color-border-default) !important;
+  background: rgba(255, 253, 248, 0.62) !important;
+  border: 1px solid rgba(184, 121, 26, 0.22) !important;
   border-radius: var(--radius-md);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow:
+    0 20px 50px rgba(58, 44, 20, 0.08),
+    inset 0 1px 0 rgba(255, 253, 248, 0.7);
+}
+body.arena-home--concise .home-apply {
+  position: relative;
+}
+body.arena-home--concise .home-apply::before {
+  content: "";
+  position: absolute;
+  inset: 8% 10% auto;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(200, 144, 31, 0.35),
+    rgba(47, 147, 196, 0.25),
+    rgba(122, 92, 196, 0.25),
+    transparent);
+  pointer-events: none;
 }
 
 .arena-field input,
