@@ -7,8 +7,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from sqlalchemy import func
 from sqlmodel import Session, select
 
-from ..auth import get_current_user, require_can_act_for_seller
-from ..config import settings
+from ..auth import admin_token_ok, get_current_user, require_can_act_for_seller
 from ..database import get_session
 from ..models import Listing, ListingStatus, LiveStream, Seller, User
 from ..schemas import ListingRead, StoreProfile, StoreSummary, StoreUpdate
@@ -139,7 +138,7 @@ def update_store(
     x_admin_token: str = Header(default=""),
 ) -> StoreProfile:
     s = _seller_or_404(handle, session)
-    is_admin = bool(settings.admin_token) and x_admin_token == settings.admin_token
+    is_admin = admin_token_ok(x_admin_token)
     if not is_admin:
         require_can_act_for_seller(
             user, s, x_store_token,

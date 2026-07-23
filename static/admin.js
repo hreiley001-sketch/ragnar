@@ -5,7 +5,12 @@ const $ = (id) => document.getElementById(id);
 const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fmtDate = (s) => s ? new Date(s).toLocaleDateString() : "—";
-let TOKEN = localStorage.getItem("ragnar_admin_token") || "";
+// Prefer sessionStorage so a break-glass token does not survive browser restarts.
+let TOKEN = sessionStorage.getItem("ragnar_admin_token") || localStorage.getItem("ragnar_admin_token") || "";
+if (TOKEN && !sessionStorage.getItem("ragnar_admin_token")) {
+  sessionStorage.setItem("ragnar_admin_token", TOKEN);
+  localStorage.removeItem("ragnar_admin_token");
+}
 let SITE_ACCESS = { allowed: false, role: null };
 
 let toastTimer = null;
@@ -63,7 +68,10 @@ function stopCmdChrome() {
 async function tryLogin(token) {
   TOKEN = token;
   await api("/api/admin/check");           // throws if bad
-  if (token) localStorage.setItem("ragnar_admin_token", token);
+  if (token) {
+    sessionStorage.setItem("ragnar_admin_token", token);
+    localStorage.removeItem("ragnar_admin_token");
+  }
   $("loginGate").hidden = true;
   $("hub").hidden = false;
   $("logoutBtn").hidden = false;
@@ -72,6 +80,7 @@ async function tryLogin(token) {
 }
 
 function logout() {
+  sessionStorage.removeItem("ragnar_admin_token");
   localStorage.removeItem("ragnar_admin_token");
   TOKEN = "";
   stopCmdChrome();

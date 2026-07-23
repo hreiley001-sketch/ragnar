@@ -111,8 +111,9 @@ app = FastAPI(
     version=settings.version,
     description="A trust-first trading-card marketplace. "
     "Guided by counsel, driven by conquest.",
-    docs_url="/api/docs",
-    openapi_url="/api/openapi.json",
+    # Hide OpenAPI surface in production (recon aid).
+    docs_url=None if settings.is_production else "/api/docs",
+    openapi_url=None if settings.is_production else "/api/openapi.json",
     lifespan=lifespan,
 )
 
@@ -343,3 +344,19 @@ def cart_page():
     if page.exists():
         return FileResponse(str(page))
     return {"error": "cart UI not found"}
+
+
+@app.get("/privacy", include_in_schema=False)
+def privacy_page():
+    page = STATIC_DIR / "privacy.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "privacy page not found"}
+
+
+@app.get("/terms", include_in_schema=False)
+def terms_page():
+    page = STATIC_DIR / "terms.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "terms page not found"}

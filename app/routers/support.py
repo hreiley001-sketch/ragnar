@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlmodel import Session, select
 
@@ -17,6 +17,7 @@ from ..models import (
     utcnow,
 )
 from ..notify import notify
+from .. import ratelimit
 from ..routers.admin import require_admin
 from ..support import brain, knowledge
 from ..support import governance as gov
@@ -32,7 +33,7 @@ class StartPayload(BaseModel):
 
 class MessagePayload(BaseModel):
     message: str = Field(min_length=1, max_length=4000)
-    conversation_id: Optional[str] = Field(default=None, max_length=32)
+    conversation_id: Optional[str] = Field(default=None, max_length=48)
 
 
 class ResolvePayload(BaseModel):
@@ -50,7 +51,15 @@ class KbUpsert(BaseModel):
     active: bool = True
 
 
-def _conv_dict(session: Session, conv: SupportConversation, *, with_messages: bool = False) -> dict:
+def _conv_dict(
+    session: Session,
+    conv: SupportConversation,
+    *,
+    with_messages: bool = False,
+    include_access_token: bool = False,
+) -> dict:
+    ctx = dict(conv.context or {})
+    access_secret = ctx.pop("access_secret", None)
     d = {
         "id": conv.public_id,
         "status": conv.status,
@@ -62,13 +71,15 @@ def _conv_dict(session: Session, conv: SupportConversation, *, with_messages: bo
         "workflow": conv.workflow,
         "workflow_step": conv.workflow_step,
         "entities": conv.entities or {},
-        "context": conv.context or {},
+        "context": ctx,
         "channel": conv.channel,
         "user_id": conv.user_id,
         "created_at": conv.created_at.isoformat() if conv.created_at else None,
         "updated_at": conv.updated_at.isoformat() if conv.updated_at else None,
         "resolved_at": conv.resolved_at.isoformat() if conv.resolved_at else None,
     }
+    if include_access_token and access_secret and conv.user_id is None:
+        d["access_token"] = access_secret
     if with_messages:
         d["messages"] = brain.messages_for(session, conv)
     return d
@@ -76,14 +87,21 @@ def _conv_dict(session: Session, conv: SupportConversation, *, with_messages: bo
 
 @router.post("/conversations")
 def start_support(
+    request: Request,
     payload: StartPayload | None = None,
     session: Session = Depends(get_session),
     user: Optional[User] = Depends(get_current_user),
 ) -> dict:
+    ip = ratelimit.client_ip(request)
+    ratelimit.limiter.hit(
+        f"support:start:{ip}",
+        limit=ratelimit.SUPPORT_IP_LIMIT,
+        window_seconds=ratelimit.SUPPORT_IP_WINDOW,
+    )
     channel = (payload.channel if payload else "web") or "web"
     conv = brain.start_conversation(session, user=user, channel=channel)
     return {
-        **_conv_dict(session, conv, with_messages=True),
+        **_conv_dict(session, conv, with_messages=True, include_access_token=True),
         "reply": brain.messages_for(session, conv)[-1]["body"] if brain.messages_for(session, conv) else "",
         "chips": ["Track my order", "I need a refund", "How do fees work?", "I want to sell"],
     }
@@ -94,8 +112,11 @@ def get_support_conversation(
     public_id: str,
     session: Session = Depends(get_session),
     user: Optional[User] = Depends(get_current_user),
+    x_support_token: str = Header(default="", alias="X-Support-Token"),
 ) -> dict:
-    conv = brain.get_conversation(session, public_id, user=user, staff=is_staff(user))
+    conv = brain.get_conversation(
+        session, public_id, user=user, staff=is_staff(user), access_token=x_support_token,
+    )
     if not conv:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
     return _conv_dict(session, conv, with_messages=True)
@@ -103,15 +124,27 @@ def get_support_conversation(
 
 @router.post("/chat")
 def support_chat(
+    request: Request,
     payload: MessagePayload,
     session: Session = Depends(get_session),
     user: Optional[User] = Depends(get_current_user),
+    x_support_token: str = Header(default="", alias="X-Support-Token"),
 ) -> dict:
     """Main intake endpoint: send a message, get AI reply + actions taken."""
+    ip = ratelimit.client_ip(request)
+    ratelimit.limiter.hit(
+        f"support:chat:{ip}",
+        limit=ratelimit.SUPPORT_IP_LIMIT,
+        window_seconds=ratelimit.SUPPORT_IP_WINDOW,
+    )
     text = payload.message.strip()
     if payload.conversation_id:
         conv = brain.get_conversation(
-            session, payload.conversation_id, user=user, staff=is_staff(user),
+            session,
+            payload.conversation_id,
+            user=user,
+            staff=is_staff(user),
+            access_token=x_support_token,
         )
         if not conv:
             raise HTTPException(status_code=404, detail="Conversation not found")
@@ -130,7 +163,7 @@ def support_chat(
         brain.add_message(session, conv, "user", text)
         brain.add_message(session, conv, "assistant", reply, meta={"escalated": True})
         return {
-            **_conv_dict(session, conv),
+            **_conv_dict(session, conv, include_access_token=True),
             "reply": reply,
             "decision": "escalate",
             "chips": [],
@@ -138,7 +171,7 @@ def support_chat(
 
     result = brain.handle_message(session, conv, text, user=user)
     return {
-        **_conv_dict(session, conv),
+        **_conv_dict(session, conv, include_access_token=True),
         **result,
         "chips": result.get("chips") or [
             "Track my order", "I need a refund", "Talk to a human",

@@ -1,11 +1,12 @@
 """Request/response schemas for the API (separate from the DB table model)."""
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .models import Category, Condition, GradingCompany, Listing
 
@@ -213,6 +214,32 @@ class StoreUpdate(BaseModel):
     accent_color: Optional[str] = Field(default=None, max_length=16)
     font_family: Optional[str] = Field(default=None, max_length=80)
     store_public: Optional[bool] = None
+
+    @field_validator("accent_color")
+    @classmethod
+    def _accent(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        c = v.strip()
+        if not c:
+            return None
+        if not re.fullmatch(r"#[0-9a-fA-F]{6}", c):
+            raise ValueError("accent_color must be #RRGGBB")
+        return c
+
+    @field_validator("banner_url", "avatar_url")
+    @classmethod
+    def _media_url(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        raw = v.strip()
+        if not raw:
+            return None
+        from urllib.parse import urlparse
+        parsed = urlparse(raw)
+        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+            raise ValueError("URL must be http(s)")
+        return raw
 
 
 class SellerApplyResult(SellerState):

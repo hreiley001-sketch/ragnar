@@ -10,7 +10,7 @@ from sqlalchemy import func
 from sqlmodel import Session, select
 
 from .. import rides_engine as engine
-from ..auth import get_current_user
+from ..auth import get_current_user, require_user
 from ..config import settings
 from ..database import engine as db_engine
 from ..database import get_session
@@ -93,20 +93,17 @@ def join_ride(ride_id: int, session: Session = Depends(get_session)) -> dict:
 
 @router.post("/{ride_id}/bid")
 def place_bid(ride_id: int, payload: dict, session: Session = Depends(get_session),
-              user=Depends(get_current_user)) -> dict:
+              user=Depends(require_user)) -> dict:
     ride = _get_ride(session, ride_id)
-    bidder = (payload.get("bidder") or "").strip()
-    if not bidder and user:
-        bidder = user.name or user.email.split("@")[0]
-    if not bidder:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="bidder is required")
+    # Bidder display name is derived from the signed-in account (not client-forged).
+    bidder = (user.name or (user.email.split("@")[0] if user.email else "bidder")).strip()
     try:
         amount_cents = round(float(payload["amount"]) * 100)
     except (KeyError, TypeError, ValueError):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="amount (dollars) is required")
     try:
         bid = engine.place_bid(session, ride, bidder, amount_cents,
-                               bidder_user_id=user.id if user else None)
+                               bidder_user_id=user.id)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     return {"status": "ok", "bid_id": bid.id, "current_bid": ride.current_bid_cents / 100,

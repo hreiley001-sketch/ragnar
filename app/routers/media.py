@@ -75,9 +75,22 @@ def media_thumb(
     w: int = Query(400, ge=16, le=4000),
     h: Optional[int] = Query(None, ge=16, le=4000),
     remove_bg: bool = Query(False),
+    user=Depends(auth.require_user),
 ) -> RedirectResponse:
     """302 to a Cloudinary-optimized URL (or the original if unconfigured)."""
-    target = media.cdn_url(url, width=w, height=h, remove_bg=remove_bg)
+    from ..security_net import require_safe_media_url
+    try:
+        safe = require_safe_media_url(url)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    # Relative /uploads paths stay on-site — never open-redirect off-origin.
+    if safe.startswith("/uploads/"):
+        return RedirectResponse(url=safe, status_code=302)
+    target = media.cdn_url(safe, width=w, height=h, remove_bg=remove_bg)
+    try:
+        require_safe_media_url(target)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsafe media target")
     return RedirectResponse(url=target, status_code=302)
 
 
@@ -85,14 +98,21 @@ def media_thumb(
 # Ingest — raw image URL -> optimized (optionally background-stripped) CDN URL
 # --------------------------------------------------------------------------- #
 @router.post("/ingest")
-async def media_ingest(payload: IngestRequest) -> dict:
+async def media_ingest(
+    payload: IngestRequest,
+    user=Depends(auth.require_user),
+) -> dict:
     """Return an optimized delivery URL for a raw image.
 
     When Cloudinary is configured the asset is uploaded (so it lives on the CDN
     and gets a stable ``public_id``); otherwise a transform/fetch URL — or the
     original — is returned. WebP/auto compression is applied via ``f_auto``.
     """
-    src = payload.image_url
+    from ..security_net import require_safe_media_url
+    try:
+        src = require_safe_media_url(payload.image_url)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     if media.cloudinary_configured():
         up = await media.cloudinary_upload_url(src)
         if up and up.get("public_id"):
@@ -195,9 +215,7 @@ def media_enhance(
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found.")
 
-    is_admin = auth.is_staff(user) or (
-        bool(settings.admin_token) and x_admin_token == settings.admin_token
-    )
+    is_admin = auth.is_staff(user) or auth.admin_token_ok(x_admin_token)
     if not (is_admin or _owns_listing(session, user, listing)):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail="Only the listing owner or staff can enhance this photo.")

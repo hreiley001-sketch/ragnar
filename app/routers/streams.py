@@ -40,7 +40,7 @@ def _authz(
     x_store_token: str = "",
     x_admin_token: str = "",
 ) -> None:
-    if settings.admin_token and x_admin_token and x_admin_token == settings.admin_token:
+    if auth.admin_token_ok(x_admin_token):
         return
     auth.require_can_act_for_seller(
         user,

@@ -7,12 +7,15 @@ import logging
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 from sqlmodel import Session
 
+from .. import ratelimit
+from ..auth import require_user
 from ..comps import build_keyword, external_sold
 from ..config import settings
 from ..database import get_session
+from ..models import User
 from ..pricing import market_price
 from ..recognition import recognize
 from ..schemas import MarketPrice, ScanFields, ScanResponse, SalesHistory
@@ -30,15 +33,47 @@ _EXT_BY_TYPE = {
     "image/webp": ".webp",
     "image/gif": ".gif",
 }
+_MAGIC = {
+    b"\x89PNG\r\n\x1a\n": ".png",
+    b"\xff\xd8\xff": ".jpg",
+    b"GIF87a": ".gif",
+    b"GIF89a": ".gif",
+    b"RIFF": ".webp",  # WEBP has RIFF....WEBP
+}
 # Below this, skip paid/external enrich — recognition didn't find a real card.
 _MIN_ENRICH_CONFIDENCE = 0.35
 
 
+def _sniff_image_ext(data: bytes) -> str | None:
+    if data.startswith(b"\x89PNG\r\n\x1a\n"):
+        return ".png"
+    if data.startswith(b"\xff\xd8\xff"):
+        return ".jpg"
+    if data.startswith(b"GIF87a") or data.startswith(b"GIF89a"):
+        return ".gif"
+    if len(data) >= 12 and data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return ".webp"
+    return None
+
+
 @router.post("", response_model=ScanResponse)
 async def scan(
+    request: Request,
     file: UploadFile = File(...),
     session: Session = Depends(get_session),
+    user: User = Depends(require_user),
 ) -> ScanResponse:
+    ip = ratelimit.client_ip(request)
+    ratelimit.limiter.hit(
+        f"scan:ip:{ip}",
+        limit=ratelimit.SCAN_IP_LIMIT,
+        window_seconds=ratelimit.SCAN_IP_WINDOW,
+    )
+    ratelimit.limiter.hit(
+        f"scan:user:{user.id}",
+        limit=ratelimit.SCAN_IP_LIMIT,
+        window_seconds=ratelimit.SCAN_IP_WINDOW,
+    )
     if not (file.content_type or "").startswith("image/"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -54,10 +89,16 @@ async def scan(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail=f"Image exceeds {settings.max_upload_mb} MB limit.",
         )
+    sniffed = _sniff_image_ext(data)
+    if not sniffed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Upload must be a real PNG, JPEG, WEBP, or GIF image.",
+        )
 
     ext = Path(file.filename or "").suffix.lower()
     if ext not in _ALLOWED_EXT:
-        ext = _EXT_BY_TYPE.get(file.content_type or "", ".jpg")
+        ext = sniffed
 
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     name = f"scan-{uuid.uuid4().hex[:12]}{ext}"

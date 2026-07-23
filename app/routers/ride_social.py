@@ -52,8 +52,8 @@ def _host_auth(session: Session, ride: Ride, user: Optional[User], x_store_token
     admin token, or the ride's seller (owner account or store edit token)."""
     if is_staff(user):
         return True
-    from ..config import settings
-    if settings.admin_token and x_admin_token == settings.admin_token:
+    from ..auth import admin_token_ok
+    if admin_token_ok(x_admin_token):
         return True
     if ride.seller_id:
         seller = session.get(Seller, ride.seller_id)

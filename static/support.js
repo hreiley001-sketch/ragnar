@@ -7,7 +7,25 @@
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   let convId = localStorage.getItem("ragnar_support_id") || null;
+  let accessToken = localStorage.getItem("ragnar_support_token") || null;
   let busy = false;
+
+  function supportHeaders(extra) {
+    const h = { "Content-Type": "application/json", ...(extra || {}) };
+    if (accessToken) h["X-Support-Token"] = accessToken;
+    return h;
+  }
+
+  function persistConv(data) {
+    if (data && data.id) {
+      convId = data.id;
+      localStorage.setItem("ragnar_support_id", convId);
+    }
+    if (data && data.access_token) {
+      accessToken = data.access_token;
+      localStorage.setItem("ragnar_support_token", accessToken);
+    }
+  }
 
   const DEFAULT_CHIPS = [
     "Track my order",
@@ -137,20 +155,27 @@
   async function ensureConv() {
     if (convId) {
       try {
-        const r = await fetch(`/api/support/conversations/${encodeURIComponent(convId)}`);
-        if (r.ok) return await r.json();
+        const r = await fetch(`/api/support/conversations/${encodeURIComponent(convId)}`, {
+          headers: supportHeaders(),
+        });
+        if (r.ok) {
+          const data = await r.json();
+          persistConv(data);
+          return data;
+        }
       } catch (_) {}
       convId = null;
+      accessToken = null;
       localStorage.removeItem("ragnar_support_id");
+      localStorage.removeItem("ragnar_support_token");
     }
     const r = await fetch("/api/support/conversations", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: supportHeaders(),
       body: JSON.stringify({ channel: "web" }),
     });
     const data = await r.json();
-    convId = data.id;
-    localStorage.setItem("ragnar_support_id", convId);
+    persistConv(data);
     return data;
   }
 
@@ -183,15 +208,12 @@
       await ensureConv();
       const r = await fetch("/api/support/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: supportHeaders(),
         body: JSON.stringify({ message: text, conversation_id: convId }),
       });
       const data = await r.json();
       hideTyping();
-      if (data.id) {
-        convId = data.id;
-        localStorage.setItem("ragnar_support_id", convId);
-      }
+      persistConv(data);
       const extra = receiptHtml(data.workflow);
       addMsg(data.reply || "Done.", "bot", extra);
       renderChips(data.chips || DEFAULT_CHIPS);
