@@ -1,6 +1,6 @@
 /**
- * Birdman client — shared fetch + v1 marketplace surface.
- * Loaded before page scripts. Keeps cookie credentials; never blocks on n8n.
+ * RAGNAR client (Birdman spine) — shared fetch + v1 marketplace surface.
+ * Product = RAGNAR. Organism nickname = Birdman. Loaded before page scripts.
  */
 "use strict";
 
@@ -76,6 +76,9 @@
     me,
     pulse,
     siteContent,
-    version: 1,
+    product: "ragnar",
+    organism: "birdman",
+    version: 2,
   };
+  global.Ragnar = global.Birdman;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1,77 +1,24 @@
 ---
 type: map
 domain: infrastructure
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Birdman Systems
 
-The platform organism. Product mind ([[Maps/BirdmanOS]]) rides on this body.
+**Body of [[Maps/RAGNAR]].** Product mind ([[Maps/BirdmanOS]]) rides on this stack.
 
 ## Essence
 
-One cohesive backend: FastAPI thinks, Supabase remembers, Redis remembers briefly, n8n acts in the background, CDN/LB carries traffic, Obsidian designs before code.
+One cohesive backend for RAGNAR: FastAPI · Supabase · Redis · n8n · CDN/LB · Obsidian (design-time).
 
-```
-Edge (CDN + LB)
-    ↓
-FastAPI nodes (stateless, async)
-    ├── Redis  — cache + job queue
-    ├── Supabase — data + JWT auth + realtime
-    └── n8n   — automation (never hot path)
-```
-
-## Layer contracts
-
-| Layer | Job | Never |
-|---|---|---|
-| FastAPI | Logic, APIs, orchestration | Sync waits on n8n |
-| Supabase | Durable truth + auth | Hot-path automation |
-| Redis | Short memory + queues | Source of truth |
-| n8n | Background workflows | Request latency budget |
-| CDN/LB | Traffic + static | Business logic |
-| Obsidian | System mindspace | Runtime dependency |
-
-## Module anchors (code)
-
-- `app/core/` — spine (config, security, cache, queue, database)
-- `app/api/v1/` — thin versioned surface
-- `app/services/` — flow engine
-- `app/models/` — SQLModel tables + pydantic map
-- `app/utils/` — smoothness
-- Product truth: **Supabase Postgres, owned by Alembic** (`app/models/tables.py`, 40 tables) — [[Database Architecture/40-Table Schema Overview]]
-- `supabase/schema.sql` — telemetry firehose only (system_logs · market_events · realtime_events) — [[Database Architecture/Telemetry Schema Explanation]]
-- [[Supabase Migration/Migration Plan]] · [[Backend Architecture/FastAPI Module Map]]
-- [[Maps/Birdman Supabase Schema]]
-- [[Architecture/Birdman Marketplace Stack]]
-- [[Playbooks/Site Remap]]
-- `n8n/workflows/` — modular automations (incl. `market-*`)
-- `GET /api/v1/marketplace/browse` · `GET /api/v1/marketplace/pulse` — storefront BFF
-- `docs/BIRDMAN_ARCHITECTURE.md` — diagram + edge notes
-- `GET /api/v1/realtime/pulse` · `GET /api/platform/status` — organ health
-- [[Evergreen/Birdman FastAPI Structure]]
-- [[Architecture/FastAPI Marketplace Modules]]
+See `docs/BIRDMAN_ARCHITECTURE.md` · `docs/RAGNAR_MAP.md` · `AGENTS.md`.
 
 ## Knowledge links
 
-- [[Evergreen/Event Bus as Nervous System]]
-- [[Evergreen/Platform as One Organism]]
-- [[Evergreen/Async Boundary]]
-- [[Evergreen/Dual Auth Path]]
-- [[Evergreen/Schema Drift SQLModel vs Supabase]]
-- [[Evergreen/Cache Keys and TTLs]]
-- [[Features/Live Selling]]
-- [[Playbooks/Scaling Strategy]]
+- [[Maps/RAGNAR]] ★
+- [[Architecture/Birdman Marketplace Stack]]
+- [[Playbooks/Site Remap]]
 - [[Maps/BirdmanOS]]
-- [[Maps/RAGNAR]]
+- [[Legal/Index]]
 - [[System/Platform Principles]]
-- [[Projects/Birdman Platform]]
-## Open questions
-
-- ~~Migrate session cookies → Supabase JWT gradually or cut over?~~ → [[Evergreen/Dual Auth Path]] (both, gradual)
-- Which reads deserve Redis first: listings search, ride state, catalog? → listings done; see [[Evergreen/Cache Keys and TTLs]]
-- Schema cutover: keep [[Evergreen/Schema Drift SQLModel vs Supabase]] until Alembic aligns
-
-## Live credentials
-
-Supabase project linked in local `.env` (URL, anon, secret, JWT, pooler). `USE_SUPABASE_DB=false` until schema cutover.

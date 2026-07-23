@@ -11,7 +11,9 @@ from app.core.queue import n8n_status, queue_depth
 def organism_pulse() -> dict[str, Any]:
     """Lightweight organ health for SSE/clients — no secrets."""
     return {
+        "product": "ragnar",
         "organism": "birdman",
+        "hub": "Maps/RAGNAR",
         "redis": redis_ping(),
         "queue": queue_depth(),
         "n8n": n8n_status(),

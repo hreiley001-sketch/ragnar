@@ -18,6 +18,7 @@ def test_v1_pulse():
     assert r.status_code == 200
     body = r.json()
     assert body["organism"] == "birdman"
+    assert body.get("product") == "ragnar"
     assert "redis" in body
     assert "supabase" in body
 
@@ -109,6 +110,7 @@ def test_v1_marketplace_pulse():
     assert r.status_code == 200
     body = r.json()
     assert body["organism"] == "birdman"
+    assert body.get("product") == "ragnar"
     assert body["surface"] == "marketplace"
     assert "/api/v1/marketplace/browse" in body["api"]
 

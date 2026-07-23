@@ -27,9 +27,11 @@ def _require_admin(
 
 @router.get("/status")
 def platform_status() -> dict:
-    """Public-ish readiness of Birdman platform organs (no secrets)."""
+    """Public-ish readiness of Birdman organs powering RAGNAR (no secrets)."""
     return {
+        "product": "ragnar",
         "organism": "birdman",
+        "hub": "Maps/RAGNAR",
         "redis": redis_ping(),
         "queue": queue_depth(),
         "n8n": n8n_mod.status(),

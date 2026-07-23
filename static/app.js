@@ -164,8 +164,8 @@ async function mountPulseChip() {
     const redisOk = pulse && pulse.redis && pulse.redis.ok;
     const chip = document.createElement("div");
     chip.className = "birdman-pulse-chip";
-    chip.textContent = redisOk ? "Birdman · live" : "Birdman · ready";
-    chip.title = "Marketplace spine health";
+    chip.textContent = redisOk ? "RAGNAR · live" : "RAGNAR · ready";
+    chip.title = "RAGNAR marketplace spine (Birdman)";
     hero.appendChild(chip);
   } catch (_) {}
 }

@@ -1,17 +1,20 @@
 ---
 type: hub
-updated: 2026-07-22
+updated: 2026-07-23
 ---
 
 # Home
 
-One mind. One flow. Everything connects here.
+One mind. One product gravity well: **[[Maps/RAGNAR]]**.
+
+Birdman is how we build. Creative flow is how we think. RAGNAR is what everything is becoming.
 
 ## Enter
 
+- [[Maps/RAGNAR]] — **product center**
 - [[Inbox]] — capture without friction
 - [[Daily]] — today’s current
-- [[Maps/Atlas]] — the knowledge map
+- [[Maps/Atlas]] — whole-vault orientation
 - [[Projects/Index]] — active vessels
 - [[System/Flow Principles]] — how this vault thinks
 - [[System/Platform Principles]] — how the backend organism thinks
@@ -19,21 +22,27 @@ One mind. One flow. Everything connects here.
 ## Now
 
 - Open today’s daily note
-- Empty the [[Inbox]] into evergreen or projects
-- Strengthen one weak link in the graph
+- Empty the [[Inbox]] — anything product-shaped links to [[Maps/RAGNAR]]
+- Strengthen one weak link in the RAGNAR constellation
 
 ## Living maps
 
-- [[Maps/Atlas]]
+- [[Maps/RAGNAR]] ★
 - [[Maps/BirdmanOS]]
 - [[Maps/Birdman Systems]]
 - [[Maps/Birdman Supabase Schema]]
 - [[Maps/Birdman Workflows]]
 - [[Maps/Creative Flow]]
-- [[Maps/RAGNAR]]
+- [[Maps/Atlas]]
+- [[Legal/Index]]
 
 ## Practice
 
-- [[System/Skill Path]] — progressive Obsidian mastery
-- [[System/Linking Conventions]] — how ideas talk to each other
-- [[System/Weekly Review]] — keep the ecosystem alive
+- [[System/Skill Path]] — Level 6 = RAGNAR craft
+- [[System/Linking Conventions]]
+- [[Playbooks/Chat Capture Dual Memory]]
+- [[System/Weekly Review]]
+
+## Agent contract
+
+Repo `AGENTS.md` + `.cursor/rules/ragnar-cohesion.mdc` — every Cursor agent builds toward this hub.

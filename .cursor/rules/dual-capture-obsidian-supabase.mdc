@@ -1,0 +1,29 @@
+---
+description: Dual-capture into Obsidian + Supabase. Product notes orbit Maps/RAGNAR. Legal is draft→publish only with approval.
+alwaysApply: true
+---
+
+# Dual Capture — Obsidian + Supabase (RAGNAR-centered)
+
+## Product gravity
+
+**[[Maps/RAGNAR]] is the hub.** Birdman notes are body/OS *of* RAGNAR — not parallel brands.
+
+When meaningful decisions land in chat:
+
+1. **Obsidian** — write/update Valhalla via Obsidian MCP; link product-shaped notes to `Maps/RAGNAR.md` (≤2 hops).
+2. **Supabase** — insert `knowledge_capture` with `obsidian_path`.
+3. **Repo mirror** — update `vault/` for git when RAGNAR-related.
+4. **Legal** — draft in `Legal/` first; Supabase `legal_document` stays `draft` until Henry/counsel publishes. Never overwrite a published version.
+
+## Paths
+
+| Kind | Obsidian | Supabase |
+|---|---|---|
+| Product / remap | under [[Maps/RAGNAR]] constellation | `knowledge_capture` |
+| Legal | `Legal/{doc}.md` | `legal_document` |
+| Craft | `Skills/` · `Playbooks/` | optional capture |
+
+## Closing a session
+
+If it advanced RAGNAR, leave: Obsidian residue + (when online) a `knowledge_capture` row + link to the RAGNAR map.

@@ -75,12 +75,14 @@ def browse(
 
 @router.get("/pulse")
 def marketplace_pulse() -> dict:
-    """Lightweight storefront health — redis + supabase + organism label."""
+    """Lightweight RAGNAR storefront health — redis + supabase + hub label."""
     from app.services.realtime_service import organism_pulse
 
     pulse = organism_pulse()
     return {
+        "product": pulse.get("product", "ragnar"),
         "organism": pulse.get("organism", "birdman"),
+        "hub": pulse.get("hub", "Maps/RAGNAR"),
         "surface": "marketplace",
         "redis": pulse.get("redis"),
         "supabase": pulse.get("supabase"),

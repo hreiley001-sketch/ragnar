@@ -112,8 +112,10 @@ app = FastAPI(
     title="RAGNAR API",
     version=settings.version,
     description=(
-        "RAGNAR — trust-first trading-card marketplace on the Birdman stack. "
-        "Storefront `/api/*` + Birdman spine `/api/v1/*` (FastAPI · Supabase · Redis · n8n)."
+        "RAGNAR — trust-first trading-card marketplace. "
+        "Birdman spine under the hood: FastAPI · Supabase · Redis · n8n. "
+        "Hub map: docs/RAGNAR_MAP.md · vault/Maps/RAGNAR.md. "
+        "Storefront `/api/*` + spine `/api/v1/*`."
     ),
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",

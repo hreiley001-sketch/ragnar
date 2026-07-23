@@ -67,6 +67,7 @@ def test_platform_status_endpoint():
     assert r.status_code == 200
     body = r.json()
     assert body["organism"] == "birdman"
+    assert body.get("product") == "ragnar"
     assert "redis" in body
     assert "n8n" in body
     assert "supabase" in body

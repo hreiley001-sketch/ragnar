@@ -1,0 +1,35 @@
+---
+description: All agents build RAGNAR cohesively — Birdman is the body, Obsidian Maps/RAGNAR is the hub.
+alwaysApply: true
+---
+
+# RAGNAR cohesion (all agents)
+
+## Identity
+
+- **Product:** RAGNAR (trading-card marketplace)
+- **Stack nickname:** Birdman (FastAPI · Supabase · Redis · n8n · CDN)
+- **Mind:** Obsidian Valhalla — hub note `Maps/RAGNAR.md`
+
+Do not invent a second product brand. Platform/spine work is *for* RAGNAR.
+
+## Before shipping a change
+
+1. Name which RAGNAR domain it serves (browse, sell, buy, live, social, trust/legal, ops).
+2. Prefer `app/services/*` + `/api/v1/*` over growing fat routers.
+3. Use `static/birdman.js` for storefront fetches (legacy fallback OK).
+4. Link or update `vault/Maps/RAGNAR.md` constellation notes when architecture shifts.
+5. Leave dual-capture residue (Obsidian + `knowledge_capture`) on substantial sessions.
+
+## Forbidden
+
+- Parallel “Birdman app” UX that doesn’t feel like RAGNAR
+- Publishing legal copy without explicit approval
+- Breaking Stripe / cookie sessions for speculative cutovers
+- Orphan modules with no path to the RAGNAR hub map
+
+## Read first
+
+- `AGENTS.md`
+- `vault/Maps/RAGNAR.md`
+- `docs/RAGNAR_MAP.md`
