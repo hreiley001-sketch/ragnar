@@ -89,7 +89,7 @@ code {
   transform: translateY(-0.5px);
 }
 .logo-img {
-  height: 36px; width: auto; max-width: 132px; display: block;
+  height: 34px; width: auto; max-width: 148px; display: block;
   object-fit: contain; border-radius: 0;
 }
 .hero-logo { display: block; width: min(200px, 42%); margin: 0 auto 18px; }
