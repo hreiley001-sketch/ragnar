@@ -25,12 +25,14 @@ services:
         value: create_all
       - key: SEED_DEMO
         value: "false"
-      # Fallback while USE_SUPABASE_DB is false. After cutover, leave as-is or remove.
+      # Fallback SQLite disk. When SUPABASE_DB_URL is set in the dashboard, the
+      # app uses Supabase instead (unless USE_SUPABASE_DB=false).
       - key: DATABASE_URL
         value: sqlite:////var/data/ragnar.db
-      # Opt-in Supabase cutover (set true only after alembic + backfill):
+      # Set in dashboard: SUPABASE_DB_URL + keys. Optional USE_SUPABASE_DB=false
+      # forces SQLite even if SUPABASE_DB_URL is present.
       - key: USE_SUPABASE_DB
-        value: "false"
+        sync: false
       - key: SUPABASE_DB_URL
         sync: false
       - key: SUPABASE_URL

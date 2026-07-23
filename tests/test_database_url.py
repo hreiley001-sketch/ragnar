@@ -45,7 +45,31 @@ def test_resolve_prefers_supabase_when_flagged(monkeypatch):
     assert "sslmode=require" in out
 
 
+def test_resolve_uses_supabase_url_alone(monkeypatch):
+    """Dashboard UIs often set SUPABASE_DB_URL without the opt-in flag."""
+    monkeypatch.delenv("USE_SUPABASE_DB", raising=False)
+    monkeypatch.setenv(
+        "SUPABASE_DB_URL",
+        "postgresql://postgres:pw@aws-1-us-west-2.pooler.supabase.com:6543/postgres",
+    )
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///./ragnar.db")
+    out = resolve_database_url()
+    assert "pooler.supabase.com" in out
+    assert out.startswith("postgresql+psycopg://")
+
+
+def test_resolve_explicit_false_keeps_sqlite(monkeypatch):
+    monkeypatch.setenv("USE_SUPABASE_DB", "false")
+    monkeypatch.setenv(
+        "SUPABASE_DB_URL",
+        "postgresql://postgres:pw@aws-1-us-west-2.pooler.supabase.com:6543/postgres",
+    )
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///./tmp-connect.db")
+    assert resolve_database_url() == "sqlite:///./tmp-connect.db"
+
+
 def test_resolve_falls_back_to_database_url(monkeypatch):
     monkeypatch.delenv("USE_SUPABASE_DB", raising=False)
+    monkeypatch.delenv("SUPABASE_DB_URL", raising=False)
     monkeypatch.setenv("DATABASE_URL", "sqlite:///./tmp-connect.db")
     assert resolve_database_url() == "sqlite:///./tmp-connect.db"
