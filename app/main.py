@@ -174,6 +174,14 @@ def home():
     return {"name": settings.app_name, "tagline": settings.tagline}
 
 
+@app.get("/ai-tools", include_in_schema=False)
+def ai_tools_page():
+    page = STATIC_DIR / "ai-tools.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "AI tools UI not found"}
+
+
 @app.get("/marketplace", include_in_schema=False)
 def marketplace():
     index = STATIC_DIR / "index.html"

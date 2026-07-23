@@ -125,6 +125,7 @@
     { icon: "🔔", label: "Notifications", href: "/notifications" },
     { icon: "👤", label: "Profile", href: "/account" },
     { icon: "🏠", label: "Home", href: "/" },
+    { icon: "🤖", label: "AI Tools", href: "/ai-tools" },
     { icon: "⭐", label: "Become a Seller", href: "/#apply" },
   ];
 
