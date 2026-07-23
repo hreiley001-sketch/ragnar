@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR Dispatch — AI Shipping</title>
+  <meta name="description" content="RAGNAR Dispatch quotes rates, packs cards, buys labels, and tracks shipments — AI that runs fulfillment." />
+  <link rel="icon" href="/static/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/tokens.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/asgard-shell.css" />
+  <link rel="stylesheet" href="/static/support.css" />
+  <link rel="stylesheet" href="/static/shipping.css" />
+</head>
+<body class="asgard-realm counsel-page dispatch-page">
+  <div class="counsel-atmosphere dispatch-atmosphere" aria-hidden="true"></div>
+  <header id="siteHeader"></header>
+
+  <main class="counsel-shell">
+    <section class="counsel-hero">
+      <div class="counsel-brand">
+        <div class="counsel-crest dispatch-crest" aria-hidden="true">D</div>
+        <div class="counsel-brand-text">
+          <div class="counsel-brand-name">RAGNAR <span>Dispatch</span></div>
+          <div class="counsel-brand-runes">AI shipping agent</div>
+        </div>
+      </div>
+      <h1>Fulfillment without the <em>busywork</em>.</h1>
+      <p class="counsel-hero-sub">
+        Quote rates, pack cards right, buy labels, mark shipped, and chase exceptions.
+        Dispatch owns the pipeline — you only step in for edge cases.
+      </p>
+      <div class="counsel-cta-row">
+        <button class="counsel-cta" id="dispatchStart" type="button">
+          Open Dispatch <span class="arrow">→</span>
+        </button>
+        <button class="counsel-cta ghost" id="dispatchToShip" type="button">
+          Orders to ship
+        </button>
+      </div>
+    </section>
+
+    <section class="counsel-workspace" aria-label="Dispatch workspace">
+      <div class="counsel-stage" id="dispatchStage">
+        <div class="counsel-stage-head">
+          <div class="counsel-stage-title">
+            <span class="counsel-live"><span class="counsel-live-dot" aria-hidden="true"></span> AI active</span>
+            Dispatch session
+          </div>
+          <div class="counsel-case-id" id="dispatchCaseId">—</div>
+        </div>
+        <div class="counsel-feed" id="dispatchFeed" role="log" aria-live="polite"></div>
+        <div class="counsel-composer">
+          <div class="counsel-intents" id="dispatchIntents" aria-label="Quick intents"></div>
+          <div class="counsel-input-row">
+            <input id="dispatchInput" type="text" maxlength="2000"
+              placeholder="e.g. create a label for order #1042 — or paste a ship-from address"
+              aria-label="Message to Dispatch" autocomplete="off" />
+            <button class="counsel-send" id="dispatchSend" type="button">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="counsel-rail" aria-label="Shipment status">
+        <div class="counsel-rail-block">
+          <div class="counsel-rail-kicker">Pipeline state</div>
+          <h3 id="railHeadline">Ready to fulfill</h3>
+          <p id="railCopy">Dispatch owns quote → pack → label → track. Every decision shows here.</p>
+          <div class="counsel-status-grid">
+            <div class="counsel-status-item">
+              <span>Status</span>
+              <strong id="railStatus" class="listening">listening</strong>
+            </div>
+            <div class="counsel-status-item">
+              <span>Intent</span>
+              <strong id="railIntent">—</strong>
+            </div>
+            <div class="counsel-status-item">
+              <span>Confidence</span>
+              <strong id="railConf">—</strong>
+            </div>
+            <div class="counsel-status-item">
+              <span>Order</span>
+              <strong id="railOrder">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="counsel-rail-block">
+          <div class="counsel-rail-kicker">Start here</div>
+          <div class="counsel-lanes" id="dispatchLanes">
+            <button class="counsel-lane" type="button" data-prompt="Orders to ship">
+              <span class="counsel-lane-idx">01</span>
+              <div>
+                <strong>Orders to ship</strong>
+                <span>Paid orders waiting for postage</span>
+              </div>
+            </button>
+            <button class="counsel-lane" type="button" data-prompt="Quote shipping rates">
+              <span class="counsel-lane-idx">02</span>
+              <div>
+                <strong>Quote rates</strong>
+                <span>Cheapest, fastest, or balanced</span>
+              </div>
+            </button>
+            <button class="counsel-lane" type="button" data-prompt="Create a label">
+              <span class="counsel-lane-idx">03</span>
+              <div>
+                <strong>Buy a label</strong>
+                <span>Packaging + postage + mark shipped</span>
+              </div>
+            </button>
+            <button class="counsel-lane" type="button" data-prompt="How should I pack a slab?">
+              <span class="counsel-lane-idx">04</span>
+              <div>
+                <strong>Packing advice</strong>
+                <span>Raw, slab, and high-value vault</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <p class="counsel-footnote">
+      Live postage uses Shippo when <code>SHIPPO_API_KEY</code> is set; otherwise Dispatch
+      runs on demo rates and mock labels so the full pipeline still works.
+      <a href="/ai-tools">AI Tools</a> · <a href="/mystore">My Store</a>
+    </p>
+  </main>
+
+  <script src="/static/nav.js"></script>
+  <script src="/static/shipping.js"></script>
+</body>
+</html>

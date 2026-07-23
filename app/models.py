@@ -662,6 +662,119 @@ class SupportRefund(SQLModel, table=True):
 
 
 # --------------------------------------------------------------------------- #
+# AI Shipping Agent (Dispatch) — quote → pack → label → track → exceptions
+# --------------------------------------------------------------------------- #
+
+
+class ShippingCaseStatus(str, Enum):
+    open = "open"
+    awaiting_user = "awaiting_user"
+    in_workflow = "in_workflow"
+    pending_review = "pending_review"
+    escalated = "escalated"
+    resolved = "resolved"
+    closed = "closed"
+
+
+class SellerShippingProfile(SQLModel, table=True):
+    """Default ship-from address + prefs for a seller store."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    seller_id: int = Field(foreign_key="seller.id", index=True, unique=True)
+    name: str = Field(default="", max_length=120)
+    street1: str = Field(default="", max_length=120)
+    city: str = Field(default="", max_length=80)
+    state: str = Field(default="", max_length=40)
+    zip: str = Field(default="", max_length=20)
+    country: str = Field(default="US", max_length=2)
+    phone: Optional[str] = Field(default=None, max_length=40)
+    prefer: str = Field(default="balanced", max_length=20)  # cheapest | fastest | balanced
+    updated_at: datetime = Field(default_factory=utcnow)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class ShippingConversation(SQLModel, table=True):
+    """Dispatch thread — seller-facing AI shipping agent."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    public_id: str = Field(index=True, unique=True, max_length=32)
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    seller_id: Optional[int] = Field(default=None, foreign_key="seller.id", index=True)
+    channel: str = Field(default="web", index=True, max_length=20)
+    status: str = Field(default=ShippingCaseStatus.open.value, index=True, max_length=32)
+    intent: Optional[str] = Field(default=None, index=True, max_length=64)
+    confidence: Optional[float] = Field(default=None)
+    tone: str = Field(default="normal", max_length=24)
+    queue: Optional[str] = Field(default=None, index=True, max_length=32)
+    order_id: Optional[int] = Field(default=None, foreign_key="order.id", index=True)
+    workflow: Optional[str] = Field(default=None, max_length=64)
+    workflow_step: Optional[str] = Field(default=None, max_length=64)
+    entities: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    context: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    resolved_at: Optional[datetime] = Field(default=None)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    updated_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class ShippingMessage(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    conversation_id: int = Field(foreign_key="shippingconversation.id", index=True)
+    role: str = Field(max_length=16)  # user | assistant | system | human
+    body: str = Field(max_length=4000)
+    meta: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class ShippingAuditLog(SQLModel, table=True):
+    """Immutable trail of Dispatch decisions and label actions."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    conversation_id: Optional[int] = Field(
+        default=None, foreign_key="shippingconversation.id", index=True
+    )
+    user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    seller_id: Optional[int] = Field(default=None, foreign_key="seller.id", index=True)
+    order_id: Optional[int] = Field(default=None, foreign_key="order.id", index=True)
+    actor: str = Field(default="ai", max_length=24)
+    intent: Optional[str] = Field(default=None, max_length=64)
+    decision: Optional[str] = Field(default=None, max_length=64)
+    actions: list = Field(default_factory=list, sa_column=Column(JSON))
+    policy_refs: list = Field(default_factory=list, sa_column=Column(JSON))
+    confidence: Optional[float] = Field(default=None)
+    risk: Optional[str] = Field(default=None, max_length=24)
+    reason: Optional[str] = Field(default=None, max_length=2000)
+    detail: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class ShippingLabel(SQLModel, table=True):
+    """A purchased (or mock) shipping label tied to an order."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    order_id: Optional[int] = Field(default=None, foreign_key="order.id", index=True)
+    seller_id: Optional[int] = Field(default=None, foreign_key="seller.id", index=True)
+    conversation_id: Optional[int] = Field(
+        default=None, foreign_key="shippingconversation.id", index=True
+    )
+    label_id: str = Field(index=True, max_length=80)
+    carrier: Optional[str] = Field(default=None, max_length=40)
+    service: Optional[str] = Field(default=None, max_length=80)
+    tracking_number: Optional[str] = Field(default=None, index=True, max_length=80)
+    amount_cents: int = Field(default=0)
+    currency: str = Field(default="USD", max_length=8)
+    label_url: Optional[str] = Field(default=None, max_length=500)
+    source: str = Field(default="mock", max_length=24)  # shippo | mock
+    status: str = Field(default="created", index=True, max_length=32)
+    # created | purchased | voided | used
+    package_key: Optional[str] = Field(default=None, max_length=40)
+    insurance_cents: int = Field(default=0)
+    address_from: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    address_to: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    meta: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+# --------------------------------------------------------------------------- #
 # Unified platform: social feed, groups, cart, collection
 # --------------------------------------------------------------------------- #
 

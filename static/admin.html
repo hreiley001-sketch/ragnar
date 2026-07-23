@@ -72,6 +72,7 @@
           <div class="cmd-nav-label">Trust</div>
           <div class="tabs" role="tablist" aria-label="Trust">
             <button class="tab" data-tab="support" type="button" role="tab"><span class="tab-ico">CX</span> Counsel</button>
+            <button class="tab" data-tab="dispatch" type="button" role="tab"><span class="tab-ico">SH</span> Dispatch</button>
             <button class="tab" data-tab="disputes" type="button" role="tab"><span class="tab-ico">DP</span> Disputes</button>
             <button class="tab" data-tab="team" type="button" role="tab"><span class="tab-ico">TM</span> Team</button>
           </div>
@@ -94,6 +95,7 @@
         </div>
         <div class="cmd-brief-actions">
           <button type="button" class="cmd-jump hot" data-jump="support">Counsel queue</button>
+          <button type="button" class="cmd-jump" data-jump="dispatch">Dispatch queue</button>
           <button type="button" class="cmd-jump" data-jump="orders">Orders</button>
           <button type="button" class="cmd-jump" data-jump="rides">Launch ride</button>
           <button type="button" class="cmd-jump" data-jump="site">Site editor</button>
@@ -186,6 +188,44 @@
             <div class="ride-form">
               <label class="field"><span>Resolution note</span><input id="supportResolveNote" type="text" placeholder="What you decided…" /></label>
               <button id="supportResolveBtn" class="btn btn-primary" type="button">Mark resolved</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-dispatch" class="tab-panel" hidden>
+      <div class="panel-bar">
+        <h3>Dispatch — shipping review desk</h3>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <select id="dispatchQueueFilter" class="w-auto">
+            <option value="">All queues</option>
+            <option value="shipping">Shipping</option>
+          </select>
+          <button id="dispatchRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+          <a class="btn btn-ghost btn-sm" href="/shipping">Open Dispatch →</a>
+        </div>
+      </div>
+      <p class="muted muted-xs mb-12">AI buys labels and marks shipped alone. This desk is for high-value postage, lost packages, and seller escalations.</p>
+      <div class="support-desk">
+        <div class="support-desk-list">
+          <div class="tbl-wrap"><table class="hub"><thead><tr><th>Case</th><th>Intent</th><th>Conf</th><th>Queue</th><th>Status</th><th>Order</th><th></th></tr></thead><tbody id="dispatchBody"></tbody></table></div>
+        </div>
+        <div id="dispatchDetail" class="support-desk-detail">
+          <div id="dispatchDeskEmpty" class="support-desk-empty">
+            <strong>Select a case</strong>
+            Open a queued Dispatch conversation to review labels, tracking, and resolve.
+          </div>
+          <div id="dispatchDeskActive" hidden>
+            <div class="counsel-rail-kicker">Case detail</div>
+            <h3 class="no-top" id="dispatchDetailTitle" style="margin:0 0 4px;font-size:18px;">—</h3>
+            <p class="muted muted-xs" id="dispatchDetailMeta" style="margin:0 0 8px;"></p>
+            <div id="dispatchThread" class="support-thread"></div>
+            <div class="counsel-rail-kicker">Audit</div>
+            <div id="dispatchAudit" class="mb-12"></div>
+            <div class="ride-form">
+              <label class="field"><span>Resolution note</span><input id="dispatchResolveNote" type="text" placeholder="What you decided…" /></label>
+              <button id="dispatchResolveBtn" class="btn btn-primary" type="button">Mark resolved</button>
             </div>
           </div>
         </div>

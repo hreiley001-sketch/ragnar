@@ -1,0 +1,25 @@
+/* RAGNAR Dispatch — shipping agent accents on Counsel chamber layout. */
+body.dispatch-page .counsel-brand-name span {
+  color: #2a6b7a;
+}
+.dispatch-crest {
+  border-color: rgba(42, 107, 122, 0.55) !important;
+  background:
+    linear-gradient(145deg, rgba(62, 208, 255, 0.22), transparent 55%),
+    rgba(255, 253, 248, 0.92) !important;
+  color: #1a3d48;
+}
+.dispatch-atmosphere {
+  background:
+    radial-gradient(1100px 620px at 18% -8%, color-mix(in srgb, #3ed0ff 18%, transparent), transparent 58%),
+    radial-gradient(900px 520px at 92% 12%, color-mix(in srgb, #2a6b7a 10%, transparent), transparent 55%),
+    radial-gradient(700px 400px at 50% 110%, color-mix(in srgb, #3ed0ff 8%, transparent), transparent 50%),
+    linear-gradient(180deg, #e8f0f2 0%, #efe8d9 48%, #e7dfce 100%) !important;
+}
+body.dispatch-page .counsel-cta {
+  background: linear-gradient(135deg, #1f5a68, #2a7a8c);
+}
+body.dispatch-page .counsel-live-dot {
+  background: #3ed0ff;
+  box-shadow: 0 0 0 4px rgba(62, 208, 255, 0.18);
+}
