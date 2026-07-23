@@ -45,6 +45,7 @@ from .routers import (
     stores,
     streams,
     support,
+    trust,
     watch,
 )
 from .seed import seed_if_empty
@@ -165,6 +166,8 @@ app.include_router(notifications.router)
 app.include_router(offers.router)
 app.include_router(orders.router)
 app.include_router(orders.admin_router)
+app.include_router(trust.router)
+app.include_router(trust.admin_router)
 app.include_router(support.router)
 app.include_router(support.admin_router)
 app.include_router(watch.router)

@@ -49,6 +49,15 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "stripe_account_id": "VARCHAR",
         "stripe_charges_enabled": "BOOLEAN DEFAULT 0",
         "font_family": "VARCHAR",
+        "verification_status": "VARCHAR DEFAULT 'unverified'",
+        "verified_at": "DATETIME",
+        "id_verification_ref": "VARCHAR",
+        "fraud_score": "INTEGER DEFAULT 0",
+        "trust_status": "VARCHAR DEFAULT 'active'",
+        "suspension_reason": "VARCHAR",
+        "suspended_at": "DATETIME",
+        "trust_notes": "VARCHAR",
+        "onboarding_completed_at": "DATETIME",
     },
     "listing": {
         "shipping_cents": "INTEGER DEFAULT 0",
@@ -60,6 +69,7 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
     "order": {
         "stripe_refund_id": "VARCHAR",
         "refunded_cents": "INTEGER DEFAULT 0",
+        "stripe_payment_intent_id": "VARCHAR",
     },
     "bid": {
         "bidder_user_id": "INTEGER",

@@ -6,7 +6,7 @@ import secrets
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlmodel import Session, select
 
-from ..auth import get_current_user, require_user
+from ..auth import get_current_user, require_can_act_for_seller, require_user
 from ..database import get_session
 from ..models import Seller, User
 from ..schemas import FoundingStatus, SellerApply, SellerApplyResult, SellerState
@@ -15,13 +15,80 @@ from ..services import (
     grant_founding_if_available,
     seller_state,
 )
+from .. import onboarding as onboarding_svc
 
 router = APIRouter(prefix="/api/sellers", tags=["sellers"])
+
+
+def _owned_seller(session: Session, user: User) -> Seller:
+    handle = (user.seller_handle or "").strip().lower()
+    if not handle:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No store linked to this account. Apply to sell first.",
+        )
+    seller = session.exec(select(Seller).where(Seller.handle == handle)).first()
+    if not seller:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Seller not found")
+    return seller
 
 
 @router.get("/founding-status", response_model=FoundingStatus)
 def get_founding_status(session: Session = Depends(get_session)) -> FoundingStatus:
     return FoundingStatus(**founding_status(session))
+
+
+@router.get("/me/onboarding")
+def my_onboarding(
+    session: Session = Depends(get_session),
+    user: User = Depends(require_user),
+) -> dict:
+    """Seller checklist: payouts → first listing → verification → first sale."""
+    seller = _owned_seller(session, user)
+    return onboarding_svc.build_checklist(session, seller)
+
+
+@router.post("/me/onboarding/request-verification")
+def request_my_verification(
+    session: Session = Depends(get_session),
+    user: User = Depends(require_user),
+) -> dict:
+    seller = _owned_seller(session, user)
+    onboarding_svc.request_verification(session, seller, actor_user_id=user.id)
+    newly_complete = onboarding_svc.maybe_mark_complete(session, seller)
+    session.commit()
+    session.refresh(seller)
+    try:
+        from ..automation import emit_bg
+        emit_bg("seller.verification_requested", {
+            "seller_id": seller.id,
+            "handle": seller.handle,
+            "verification_status": seller.verification_status,
+        })
+        if newly_complete:
+            emit_bg("seller.onboarding_completed", {
+                "seller_id": seller.id,
+                "handle": seller.handle,
+            })
+    except Exception:  # noqa: BLE001
+        pass
+    return onboarding_svc.build_checklist(session, seller)
+
+
+@router.get("/{handle}/onboarding")
+def seller_onboarding(
+    handle: str,
+    session: Session = Depends(get_session),
+    user=Depends(get_current_user),
+    x_store_token: str = Header(default=""),
+) -> dict:
+    seller = session.exec(
+        select(Seller).where(Seller.handle == handle.strip().lower())
+    ).first()
+    if not seller:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Seller not found")
+    require_can_act_for_seller(user, seller, x_store_token)
+    return onboarding_svc.build_checklist(session, seller)
 
 
 @router.post("/apply", response_model=SellerApplyResult, status_code=status.HTTP_201_CREATED)

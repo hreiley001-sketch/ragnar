@@ -174,6 +174,9 @@ class SellerState(BaseModel):
     intro_days_left: Optional[int]
     intro_sales_remaining: Optional[float]
     effective_rate: float
+    verification_status: str = "unverified"
+    trust_status: str = "active"
+    verified: bool = False
 
 
 class FoundingStatus(BaseModel):

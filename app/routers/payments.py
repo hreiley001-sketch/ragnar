@@ -106,6 +106,9 @@ def checkout(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
     seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
+    if seller:
+        from .. import trust as trust_svc
+        trust_svc.assert_can_sell(seller)
 
     amount_override = None
     offer_id = (payload or {}).get("offer_id")
@@ -215,6 +218,11 @@ def _handle_checkout_completed(session: Session, obj: dict) -> None:
         shipping_cents=listing.shipping_cents or 0,
         status="paid",
         stripe_session_id=session_id,
+        stripe_payment_intent_id=(
+            obj.get("payment_intent")
+            if isinstance(obj.get("payment_intent"), str)
+            else None
+        ),
         source="stripe",
     )
     session.add(order)
@@ -252,6 +260,14 @@ def _handle_checkout_completed(session: Session, obj: dict) -> None:
             "price_cents": price_cents,
             "source": "stripe",
         })
+        if seller:
+            from .. import onboarding as onboarding_svc
+            if onboarding_svc.maybe_mark_complete(session, seller):
+                session.commit()
+                emit_bg("seller.onboarding_completed", {
+                    "seller_id": seller.id,
+                    "handle": seller.handle,
+                })
     except Exception:  # noqa: BLE001
         pass
 
@@ -295,6 +311,15 @@ async def webhook(request: Request, session: Session = Depends(get_session)) -> 
             obj = event["data"]["object"]
             inventory.release_hold(session, obj.get("id"))
             session.commit()
+        elif event_type in {
+            "charge.dispute.created",
+            "charge.dispute.updated",
+            "charge.dispute.closed",
+            "charge.dispute.funds_withdrawn",
+            "charge.dispute.funds_reinstated",
+        }:
+            from .. import chargebacks
+            chargebacks.apply_dispute_event(session, event["data"]["object"], event_type)
     except IntegrityError:
         # Unique stripe_session_id (or similar) — treat as already fulfilled.
         session.rollback()

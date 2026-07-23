@@ -48,6 +48,9 @@ def seller_state(seller: Seller) -> dict:
         "intro_days_left": None,
         "intro_sales_remaining": None,
         "effective_rate": effective_platform_rate(seller),
+        "verification_status": getattr(seller, "verification_status", "unverified") or "unverified",
+        "trust_status": getattr(seller, "trust_status", "active") or "active",
+        "verified": (getattr(seller, "verification_status", None) == "verified"),
     }
 
 

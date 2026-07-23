@@ -30,11 +30,16 @@ logger = logging.getLogger("ragnar.automation")
 EVENTS = {
     "seller.applied",
     "seller.founding_claimed",
+    "seller.payouts_ready",
+    "seller.verification_requested",
+    "seller.onboarding_completed",
     "listing.created",
     "listing.sold",
     "order.paid",
     "order.shipped",
     "dispute.opened",
+    "chargeback.opened",
+    "chargeback.updated",
     "stream.started",
 }
 

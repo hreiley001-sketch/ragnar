@@ -1,13 +1,13 @@
 ---
 title: Knowledge Base
 type: subsystem
-updated: 2026-07-22
+updated: 2026-07-23
 tags: [ragnarips, knowledge, support, rag]
 ---
 
 # 📚 Knowledge Base
 
-Back to [[RAGNARIPS-MASTER]] · Related: [[RAG/README|RAG]], [[AI/README|AI]].
+Back to [[RAGNARIPS-MASTER]] · Related: [[RAG/README|RAG]], [[AI/README|AI]], [[TrustSafety/README|Trust & Safety]].
 
 ## Purpose
 Source-of-truth content that powers the **Support ("Counsel") agent** and RAG answers: policies, fees, shipping, returns/refunds, grading basics, seller onboarding, dispute rules.
@@ -41,8 +41,12 @@ updated: 2026-07-22
 ## Consistency rule
 KB docs are the **canonical wording**; the support agent must cite/apply these, not improvise. Any policy change updates the KB doc → re-embeds → the agent + RAG see it immediately.
 
+## Seeded docs
+- [[Policies/Buyer-Protection]] · [[Disputes/Escalation]]
+
 ## Planned docs
-- Seed `Policies/Fees.md` (5% / 4% founding), `Disputes/Escalation.md`, `Grading/Companies.md`.
+- Seed `Policies/Fees.md` (5% / 4% founding), `Grading/Companies.md`, Seller Agreement.
 
 ## Change log
+- 2026-07-23 — buyer protection + dispute escalation seeds.
 - 2026-07-22 — initial KB structure + template.
