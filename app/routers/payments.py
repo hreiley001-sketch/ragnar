@@ -255,6 +255,14 @@ def _handle_checkout_completed(session: Session, obj: dict) -> None:
             "price_cents": price_cents,
             "source": "stripe",
         })
+        if seller:
+            from .. import onboarding as onboarding_svc
+            if onboarding_svc.maybe_mark_complete(session, seller):
+                session.commit()
+                emit_bg("seller.onboarding_completed", {
+                    "seller_id": seller.id,
+                    "handle": seller.handle,
+                })
     except Exception:  # noqa: BLE001
         pass
 

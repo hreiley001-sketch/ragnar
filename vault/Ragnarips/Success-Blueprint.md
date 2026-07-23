@@ -83,7 +83,7 @@ Ship before scaling paid acquisition or big seller pushes.
 
 ### Wave 1 — Marketplace liquidity
 - Escrow / payout delay by risk tier
-- Seller onboarding checklist (payouts → first listing → first sale)
+- Seller onboarding checklist (payouts → first listing → first sale) — [[SellerOnboarding/README|shipped]]
 - Watchlist alerts + “seller went live” notifications (extend streams)
 - Multi-item cart checkout path
 
@@ -126,12 +126,13 @@ Ship before scaling paid acquisition or big seller pushes.
 
 | Choice | When | Deliverable |
 |---|---|---|
-| **Trust & safety blueprint** | First (this PR) | [[TrustSafety/README]] + enforceable seller trust spine |
-| Seller onboarding system | Immediately after Wave 0 | Checklist API + mystore UX + automation events |
+| **Trust & safety blueprint** | First | [[TrustSafety/README]] + enforceable seller trust spine |
+| **Seller onboarding system** | Next (this PR) | [[SellerOnboarding/README]] + My Store checklist |
 | Full AI architecture | Parallel to Wave 1 data plane | Expand [[AI/README]] + gateway stubs |
 | Marketplace feature roadmap | Continuous | This doc + [[Roadmap/README]] |
 
 ---
 
 ## Change log
+- 2026-07-23 — seller onboarding checklist shipped on My Store.
 - 2026-07-23 — initial success blueprint from beat-Whatnot requirements; Wave 0 trust spine started in code.

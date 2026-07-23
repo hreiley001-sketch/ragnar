@@ -57,6 +57,7 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "suspension_reason": "VARCHAR",
         "suspended_at": "DATETIME",
         "trust_notes": "VARCHAR",
+        "onboarding_completed_at": "DATETIME",
     },
     "listing": {
         "shipping_cents": "INTEGER DEFAULT 0",

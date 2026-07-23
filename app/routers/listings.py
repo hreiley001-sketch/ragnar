@@ -183,6 +183,13 @@ def _persist_listing(payload: ListingCreate, session: Session, seller: Seller) -
             "price_cents": listing.price_cents,
             "category": listing.category,
         })
+        from .. import onboarding as onboarding_svc
+        if onboarding_svc.maybe_mark_complete(session, seller):
+            session.commit()
+            emit_bg("seller.onboarding_completed", {
+                "seller_id": seller.id,
+                "handle": seller.handle,
+            })
     except Exception:  # noqa: BLE001
         pass
 

@@ -144,6 +144,7 @@ class Seller(SQLModel, table=True):
     suspension_reason: Optional[str] = Field(default=None, max_length=1000)
     suspended_at: Optional[datetime] = Field(default=None)
     trust_notes: Optional[str] = Field(default=None, max_length=2000)
+    onboarding_completed_at: Optional[datetime] = Field(default=None)
 
     # --- Storefront customization (the seller's "own little store") ---
     tagline: Optional[str] = Field(default=None, max_length=140)

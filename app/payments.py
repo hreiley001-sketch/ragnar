@@ -126,11 +126,12 @@ def ensure_connect_account(session: Session, seller: Seller) -> str:
 
 def onboarding_link(account_id: str) -> str:
     stripe = _stripe()
-    base = settings.public_base_url
+    base = settings.public_base_url.rstrip("/")
+    # Return to My Store so the checklist can refresh Connect status.
     link = stripe.AccountLink.create(
         account=account_id,
-        refresh_url=f"{base}/?stripe=refresh",
-        return_url=f"{base}/?stripe=return",
+        refresh_url=f"{base}/mystore?stripe=refresh",
+        return_url=f"{base}/mystore?stripe=return",
         type="account_onboarding",
     )
     return link.url
@@ -141,9 +142,28 @@ def refresh_account_status(session: Session, seller: Seller) -> dict:
         return {"connected": False, "charges_enabled": False, "payouts_enabled": False, "details_submitted": False}
     stripe = _stripe()
     acct = stripe.Account.retrieve(seller.stripe_account_id)
+    was_ready = bool(seller.stripe_charges_enabled)
     seller.stripe_charges_enabled = bool(acct.get("charges_enabled"))
     session.add(seller)
     session.commit()
+    newly_ready = bool(seller.stripe_charges_enabled) and not was_ready
+    if newly_ready:
+        try:
+            from .automation import emit_bg
+            emit_bg("seller.payouts_ready", {
+                "seller_id": seller.id,
+                "handle": seller.handle,
+                "account_id": seller.stripe_account_id,
+            })
+            from . import onboarding as onboarding_svc
+            if onboarding_svc.maybe_mark_complete(session, seller):
+                session.commit()
+                emit_bg("seller.onboarding_completed", {
+                    "seller_id": seller.id,
+                    "handle": seller.handle,
+                })
+        except Exception:  # noqa: BLE001
+            pass
     return {
         "connected": True,
         "account_id": seller.stripe_account_id,

@@ -49,13 +49,16 @@ await emit("order.paid", {"order_id": order.id, "total_cents": total, "buyer": u
 ```
 
 ## Event catalog (from `EVENTS` in automation.py)
-`seller.applied` · `seller.founding_claimed` · `listing.created` · `listing.sold` · `order.paid` · `order.shipped` · `dispute.opened` · `stream.started`
+`seller.applied` · `seller.founding_claimed` · `seller.payouts_ready` · `seller.verification_requested` · `seller.onboarding_completed` · `listing.created` · `listing.sold` · `order.paid` · `order.shipped` · `dispute.opened` · `stream.started`
 
 ## Emit points (wired — key-gated via `emit_bg`)
 | Event | Where |
 |---|---|
 | `seller.applied` | `app/routers/founding.py`, `app/routers/sellers.py` |
 | `seller.founding_claimed` | `app/routers/sellers.py` when founding slot granted |
+| `seller.payouts_ready` | `app/payments.py` `refresh_account_status` when charges flip on |
+| `seller.verification_requested` | `app/routers/sellers.py` onboarding request |
+| `seller.onboarding_completed` | checklist completion (listings / payments / onboarding) |
 | `listing.created` | `app/routers/listings.py` `_persist_listing` |
 | `listing.sold` | manual sell + Stripe checkout completed |
 | `order.paid` | Stripe webhook (`app/routers/payments.py`) — background thread |
@@ -71,5 +74,6 @@ await emit("order.paid", {"order_id": order.id, "total_cents": total, "buyer": u
 Emit is best-effort and off the request path. For guaranteed delivery later, route events through **Redis queue → worker → n8n** (retry/DLQ). Run the [[Stability-Checklist]] when wiring the payment event.
 
 ## Change log
+- 2026-07-23 — seller onboarding events (payouts_ready, verification_requested, onboarding_completed).
 - 2026-07-23 — wired `emit_bg` into founding/sellers/listings/payments/streams.
 - 2026-07-22 — initial n8n subsystem; config + `automation.emit()` helper added (off by default).

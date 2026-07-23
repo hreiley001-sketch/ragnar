@@ -15,6 +15,7 @@ tags: [ragnarips, architecture, master, source-of-truth]
 ## Sections
 - [[Success-Blueprint]] — beat Whatnot: three arenas + sequencing
 - [[TrustSafety/README|Trust & Safety]] — verification, fraud, suspension, disputes
+- [[SellerOnboarding/README|Seller Onboarding]] — checklist: payouts → listing → sale
 - [[System-Overview]] — the whole system, data flow, scaling paths
 - [[Frontend/README|Frontend]] · [[Backend/README|Backend]] · [[AI/README|AI Layer]]
 - [[LiveSelling/README|Live Selling]] · [[Stability/README|Stability]]
