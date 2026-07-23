@@ -176,8 +176,24 @@ def seed_knowledge(session: Session) -> int:
     return inserted
 
 
+_knowledge_ready = False
+
+
 def ensure_knowledge(session: Session) -> None:
-    """Ensure support tables exist (old DBs) and seed articles."""
+    """Ensure support tables exist (old DBs) and seed articles.
+
+    Process-level gate: after a successful seed check, later requests skip the
+    DB round-trip so every support message doesn't re-probe/seed. If the table
+    later goes missing (test engine swap / old deploy), the gate resets.
+    """
+    global _knowledge_ready
+    if _knowledge_ready:
+        try:
+            session.exec(select(KnowledgeArticle.id).limit(1)).first()
+            return
+        except Exception:  # noqa: BLE001
+            session.rollback()
+            _knowledge_ready = False
     try:
         has_any = session.exec(select(KnowledgeArticle.id).limit(1)).first() is not None
     except Exception:  # noqa: BLE001 — missing table on pre-Support deploys
@@ -191,6 +207,7 @@ def ensure_knowledge(session: Session) -> None:
     else:
         # Fill any new seed slugs added in later deploys.
         seed_knowledge(session)
+    _knowledge_ready = True
 
 
 def get_by_slug(session: Session, slug: str) -> Optional[KnowledgeArticle]:

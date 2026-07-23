@@ -12,9 +12,8 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 
-import httpx
-
 from .config import settings
+from .http_client import sync_client
 from .models import utcnow
 
 logger = logging.getLogger("ragnar.comps")
@@ -63,8 +62,9 @@ def external_sold(keyword: str, *, limit: int = 50) -> list[dict]:
     headers = {settings.comps_auth_header: settings.comps_provider_key}
     params = {"keyword": keyword, "limit": limit}
     try:
-        with httpx.Client(timeout=25.0) as client:
-            resp = client.get(settings.comps_provider_url, params=params, headers=headers)
+        resp = sync_client(timeout=25.0).get(
+            settings.comps_provider_url, params=params, headers=headers, timeout=25.0
+        )
         if resp.status_code >= 400:
             logger.warning("Comps provider failed %s: %s", resp.status_code, resp.text[:200])
             return []
