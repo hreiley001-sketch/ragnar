@@ -96,6 +96,20 @@ class UserSession(SQLModel, table=True):
     created_at: datetime = Field(default_factory=utcnow)
 
 
+class SellerVerificationStatus(str, Enum):
+    unverified = "unverified"
+    pending = "pending"
+    verified = "verified"
+    rejected = "rejected"
+
+
+class SellerTrustStatus(str, Enum):
+    active = "active"
+    restricted = "restricted"  # fulfill existing stock only; no new listings / live
+    suspended = "suspended"
+    banned = "banned"
+
+
 class Seller(SQLModel, table=True):
     """A seller account. The first 250 sellers to sign up (Founding Sellers)
     get a flat 4% platform rate forever; everyone else pays the standard
@@ -116,6 +130,20 @@ class Seller(SQLModel, table=True):
     # Stripe Connect (Express) — seller's connected account for payouts.
     stripe_account_id: Optional[str] = Field(default=None, index=True)
     stripe_charges_enabled: bool = Field(default=False)
+
+    # --- Trust & Safety spine ---
+    verification_status: str = Field(
+        default=SellerVerificationStatus.unverified.value, index=True, max_length=24
+    )
+    verified_at: Optional[datetime] = Field(default=None)
+    id_verification_ref: Optional[str] = Field(default=None, max_length=120)
+    fraud_score: int = Field(default=0, ge=0, le=100, index=True)
+    trust_status: str = Field(
+        default=SellerTrustStatus.active.value, index=True, max_length=24
+    )
+    suspension_reason: Optional[str] = Field(default=None, max_length=1000)
+    suspended_at: Optional[datetime] = Field(default=None)
+    trust_notes: Optional[str] = Field(default=None, max_length=2000)
 
     # --- Storefront customization (the seller's "own little store") ---
     tagline: Optional[str] = Field(default=None, max_length=140)
@@ -328,6 +356,19 @@ class Dispute(SQLModel, table=True):
     resolution: Optional[str] = Field(default=None, max_length=1000)
     created_at: datetime = Field(default_factory=utcnow, index=True)
     resolved_at: Optional[datetime] = Field(default=None)
+
+
+class TrustEvent(SQLModel, table=True):
+    """Audit log for seller trust actions (verify, suspend, rescore, etc.)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    seller_id: int = Field(foreign_key="seller.id", index=True)
+    actor_user_id: Optional[int] = Field(default=None, foreign_key="user.id", index=True)
+    event_type: str = Field(max_length=64, index=True)
+    detail: Optional[str] = Field(default=None, max_length=2000)
+    score_before: Optional[int] = Field(default=None)
+    score_after: Optional[int] = Field(default=None)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
 
 
 # --------------------------------------------------------------------------- #

@@ -1,26 +1,28 @@
 ---
 title: Roadmap
 type: roadmap
-updated: 2026-07-22
+updated: 2026-07-23
 tags: [ragnarips, roadmap, migration]
 ---
 
 # 🗺️ Roadmap — Current → Target
 
-Back to [[RAGNARIPS-MASTER]]. Sequenced so each phase ships value and de-risks the next.
+Back to [[RAGNARIPS-MASTER]]. Product sequencing (beat Whatnot): [[Success-Blueprint]].
+Trust spine: [[TrustSafety/README]]. Infra phases below stay valid; Wave 0 trust runs **inside** Phase 0.
 
 ```mermaid
 flowchart LR
-  P0[Phase 0<br/>Harden current] --> P1[Phase 1<br/>Supabase + Redis]
+  P0[Phase 0<br/>Harden + Trust spine] --> P1[Phase 1<br/>Supabase + Redis]
   P1 --> P2[Phase 2<br/>Next.js frontend]
   P2 --> P3[Phase 3<br/>AI Gateway + Qdrant]
   P3 --> P4[Phase 4<br/>LiveKit live selling]
   P4 --> P5[Phase 5<br/>Cloudflare + observability + autoscale]
 ```
 
-## Phase 0 — Harden current (now)
+## Phase 0 — Harden current + Trust spine (now)
 - Keep FastAPI; tests green; env/secrets clean. Confirm Stripe live path.
-- **Exit:** stable prod on Render, clean corporate UI (done), 0 console errors.
+- **Trust spine:** seller verification states, fraud score, suspend/ban enforcement, TrustEvent audit, buyer-protection KB.
+- **Exit:** stable prod on Render; ops can suspend a bad seller and block new listings/checkout in one action.
 
 ## Phase 1 — Data + Cache + Automation
 - Migrate Postgres → **Supabase** (hosted, or self-host via the clone's `supabase/docker/`); add read replica + PgBouncer. Guide: [[Backend/Supabase-Integration]].
@@ -50,4 +52,5 @@ flowchart LR
 - Search relevance (rerank), AI cost ceiling, image pipeline throughput, webhook idempotency, replica lag.
 
 ## Change log
+- 2026-07-23 — Phase 0 includes Trust spine; link Success Blueprint.
 - 2026-07-22 — initial phased roadmap.

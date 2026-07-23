@@ -23,9 +23,10 @@ SEED_ARTICLES: list[dict] = [
         "tags": ["refund", "protection", "buyer", "guarantee"],
         "body": (
             "Every paid order on RAGNAR is covered by Buyer Protection. If your item "
-            "never arrives, arrives damaged, or is significantly not as described, "
-            "you can request a refund within the eligibility window. We resolve most "
-            "cases automatically; complex disputes go to a human review queue."
+            "never arrives, arrives damaged, is significantly not as described, or is "
+            "confirmed counterfeit/fraud after evidence review, open a dispute from "
+            "Account → Orders. Counsel auto-escalates fraud keywords; other cases get "
+            "a 72-hour seller evidence window before staff resolve refund or deny."
         ),
         "rules": {"covers": ["not_received", "damaged", "not_as_described"]},
     },

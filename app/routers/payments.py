@@ -106,6 +106,9 @@ def checkout(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
     seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
+    if seller:
+        from .. import trust as trust_svc
+        trust_svc.assert_can_sell(seller)
 
     amount_override = None
     offer_id = (payload or {}).get("offer_id")

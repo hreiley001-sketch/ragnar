@@ -325,6 +325,15 @@ def open_dispute(
         f"Dispute on order #{order.id} — {order.title}",
         body=reason[:200], link="/account#orders",
     )
+    if seller:
+        try:
+            from .. import trust as trust_svc
+            trust_svc.recompute_fraud_score(
+                session, seller, detail=f"dispute opened #{dispute.id}"
+            )
+            session.commit()
+        except Exception:  # noqa: BLE001
+            pass
     return {"status": "disputed", "dispute_id": dispute.id}
 
 
@@ -443,6 +452,15 @@ def resolve_dispute(
             body=dispute.resolution or f"Order: {order.title}",
             link="/account#orders",
         )
+        if seller:
+            try:
+                from .. import trust as trust_svc
+                trust_svc.recompute_fraud_score(
+                    session, seller, detail=f"dispute {payload.status} #{dispute.id}"
+                )
+                session.commit()
+            except Exception:  # noqa: BLE001
+                pass
     out = _dispute_dict(session, dispute)
     if refund_info:
         out["refund"] = {

@@ -168,6 +168,9 @@ def create_ride(payload: dict, session: Session = Depends(get_session), _: None 
     seller = None
     if payload.get("seller_handle"):
         seller = session.exec(select(Seller).where(Seller.handle == str(payload["seller_handle"]).strip().lower())).first()
+        if seller:
+            from .. import trust as trust_svc
+            trust_svc.assert_can_go_live(seller)
     ride = Ride(
         type=payload.get("type", "auction"),
         title=payload.get("title", "Live Auction"),

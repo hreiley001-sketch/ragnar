@@ -3,7 +3,7 @@ title: Ragnarips Master Document
 type: master
 status: living
 owner: Master Architect
-updated: 2026-07-22
+updated: 2026-07-23
 tags: [ragnarips, architecture, master, source-of-truth]
 ---
 
@@ -13,6 +13,8 @@ tags: [ragnarips, architecture, master, source-of-truth]
 > Architect Mode is **permanent**. Every subsystem links back here.
 
 ## Sections
+- [[Success-Blueprint]] — beat Whatnot: three arenas + sequencing
+- [[TrustSafety/README|Trust & Safety]] — verification, fraud, suspension, disputes
 - [[System-Overview]] — the whole system, data flow, scaling paths
 - [[Frontend/README|Frontend]] · [[Backend/README|Backend]] · [[AI/README|AI Layer]]
 - [[LiveSelling/README|Live Selling]] · [[Stability/README|Stability]]

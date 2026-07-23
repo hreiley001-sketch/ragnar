@@ -504,6 +504,9 @@ def admin_sellers(session: Session = Depends(get_session), _: None = Depends(req
         "founding_intro_sales": round(s.founding_intro_sales_cents / 100, 2),
         "stripe_connected": bool(s.stripe_account_id),
         "stripe_charges_enabled": s.stripe_charges_enabled,
+        "verification_status": getattr(s, "verification_status", "unverified") or "unverified",
+        "trust_status": getattr(s, "trust_status", "active") or "active",
+        "fraud_score": int(getattr(s, "fraud_score", 0) or 0),
     } for s in rows]
     return {"items": items, "count": len(items)}
 

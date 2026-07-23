@@ -123,6 +123,8 @@ def _require_listing_owner(
 
 
 def _persist_listing(payload: ListingCreate, session: Session, seller: Seller) -> ListingRead:
+    from .. import trust as trust_svc
+    trust_svc.assert_can_list(seller)
     seller_name = (payload.seller_name or "").strip() or seller.display_name
     listing = Listing(
         seller_id=seller.id,
