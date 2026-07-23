@@ -297,7 +297,7 @@ async function loadListings() {
     } else {
       grid.innerHTML = data.items.map(listingCard).join("");
       if (window.RagnarCard) RagnarCard.enhanceCards(grid, { selector: ".listing.ragnar-card", noTilt: false });
-      $("resultCount").textContent = `${data.total} card${data.total === 1 ? "" : "s"} in the vault`;
+      $("resultCount").textContent = `${data.total} card${data.total === 1 ? "" : "s"} in the marketplace`;
       hydrateWatchHearts(grid);
     }
     renderCompareTray();
@@ -631,7 +631,7 @@ async function aiSearch() {
       }
     } else {
       applyFilters(filters);
-      toast(`Vault Advisor applied (${r.source || "ai"})`);
+      toast(`Smart search applied (${r.source || "ai"})`);
     }
   } catch (e) {
     if (card) { card.classList.remove("loading"); card.hidden = true; }

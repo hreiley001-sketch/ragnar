@@ -1,118 +1,125 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f5f1e8" />
-  <title>RAGNAR — The Future of Sports Card Breaking</title>
-  <meta name="description" content="Enter RAGNAR: the most exclusive trading-card marketplace in the world. Standard fee: 5%. The first 250 sellers to join lock in a flat 4% forever. Live breaks, elite sellers, precision commerce." />
-  <meta name="keywords" content="live card breaks, sports card breaks, TCG live breaks, trading card marketplace, live commerce, card breakers, RAGNAR" />
+  <title>RAGNAR — Trading Card Marketplace</title>
+  <meta name="description" content="RAGNAR is a modern marketplace for buying, selling, and live-selling trading cards. Standard seller fee 5%. The first 250 sellers lock in a flat 4% forever." />
+  <meta name="keywords" content="trading card marketplace, live card breaks, sports cards, TCG, card selling platform, live commerce, RAGNAR" />
   <link rel="canonical" href="https://ragnarips.com/" />
-  <link rel="icon" href="/static/logo.png" />
+  <link rel="icon" href="/static/logo.svg" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="RAGNAR" />
-  <meta property="og:title" content="RAGNAR — The Future of Sports Card Breaking" />
-  <meta property="og:description" content="Standard fee: 5%. Founding 250: flat 4% forever. Live breaks. Elite marketplace." />
+  <meta property="og:title" content="RAGNAR — Trading Card Marketplace" />
+  <meta property="og:description" content="Buy, sell, and live-sell trading cards. Standard fee 5%; founding 250 sellers lock in 4% forever." />
   <meta property="og:url" content="https://ragnarips.com/" />
   <meta property="og:image" content="https://ragnarips.com/static/logo.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://ragnarips.com/static/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Germania+One&family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/tokens.css" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/card.css" />
-  <link rel="stylesheet" href="/static/home.css?v=home2" />
-  <link rel="stylesheet" href="/static/home-polish.css?v=home2" />
-  <link rel="stylesheet" href="/static/home-asgard.css?v=home2" />
-  <link rel="stylesheet" href="/static/nordic-cards.css?v=nordic3" />
+  <link rel="stylesheet" href="/static/home.css?v=corp1" />
+  <link rel="stylesheet" href="/static/home-polish.css?v=corp1" />
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","description":"Premium live-commerce marketplace for trading cards. Standard 5% seller fee; the first 250 sellers to sign up lock in a flat 4% forever."}
+  {"@context":"https://schema.org","@type":"Organization","name":"RAGNAR","url":"https://ragnarips.com","description":"A modern marketplace for buying, selling, and live-selling trading cards. Standard 5% seller fee; the first 250 sellers to sign up lock in a flat 4% forever."}
   </script>
+  <style>
+    /* Clean corporate homepage — self-contained so it never inherits legacy atmosphere. */
+    body.arena-home { background: var(--color-bg-base); color: var(--color-text-primary); }
+    body.arena-home .vault-env, body.arena-home #asgardAtmosphere, body.arena-home #asgardOrnaments { display: none !important; }
+
+    .home-hero {
+      border-bottom: 1px solid var(--color-border-subtle);
+      background: linear-gradient(180deg, var(--color-bg-lit), var(--color-bg-base));
+    }
+    .home-hero-inner {
+      max-width: var(--content-max);
+      margin: 0 auto;
+      padding: clamp(56px, 9vw, 120px) var(--space-page-x) clamp(48px, 7vw, 96px);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .home-hero-logo { width: 76px; height: 76px; display: block; }
+    .home-hero h1 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: clamp(40px, 7vw, 68px);
+      margin: 0;
+      color: var(--color-text-primary);
+    }
+    .home-hero .section-label { color: var(--color-crystal); }
+    .home-hero-sub {
+      max-width: 640px;
+      margin: 0 auto;
+      font-size: var(--text-lg);
+      line-height: var(--leading-body);
+      color: var(--color-text-secondary);
+    }
+    .arena-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+
+    .home-stats {
+      max-width: var(--content-max);
+      margin: 0 auto;
+      padding: clamp(32px, 5vw, 56px) var(--space-page-x);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .home-stat {
+      background: var(--color-bg-panel);
+      border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .home-stat b { display: block; font-size: var(--text-2xl); color: var(--color-text-primary); margin-bottom: 4px; }
+    .home-stat span { color: var(--color-text-muted); font-size: var(--text-sm); }
+  </style>
 </head>
-<body class="arena-home arena-home--concise" data-vault-stage="1">
+<body class="arena-home" data-vault-stage="1">
   <a class="arena-skip" href="#main">Skip to content</a>
 
-  <div class="vault-env" id="vaultEnv" aria-hidden="true">
-    <div class="vault-env-camera" id="vaultCamera">
-      <div class="vault-env-sky"></div>
-      <div class="vault-env-fjord"></div>
-      <div class="vault-env-aurora vault-env-aurora-a"></div>
-      <div class="vault-env-aurora vault-env-aurora-b"></div>
-      <div class="vault-env-aurora vault-env-aurora-c"></div>
-      <div class="vault-aperture">
-        <div class="vault-ring vault-ring-1"></div>
-        <div class="vault-ring vault-ring-2"></div>
-        <div class="vault-ring vault-ring-3"></div>
-        <div class="vault-ring-arc"></div>
-        <div class="vault-aperture-core"></div>
-      </div>
-      <div class="vault-env-horizon"></div>
-      <div class="vault-env-monoliths">
-        <div class="vault-monolith vault-monolith-a"></div>
-        <div class="vault-monolith vault-monolith-b"></div>
-        <div class="vault-monolith vault-monolith-c"></div>
-        <div class="vault-monolith vault-monolith-d"></div>
-        <div class="vault-monolith vault-monolith-e"></div>
-      </div>
-      <div class="vault-env-shaft vault-env-shaft-l"></div>
-      <div class="vault-env-shaft vault-env-shaft-r"></div>
-      <div class="vault-env-arch vault-env-arch-l"></div>
-      <div class="vault-env-arch vault-env-arch-r"></div>
-      <div class="vault-env-glass vault-env-glass-l"></div>
-      <div class="vault-env-glass vault-env-glass-r"></div>
-      <div class="vault-env-reflection"></div>
-      <div class="vault-env-ice"></div>
-      <div class="vault-env-frost"></div>
-      <div class="vault-env-light"></div>
-      <div class="vault-env-floor"></div>
-      <div class="asgard-bifrost"></div>
-      <div class="asgard-godrays"></div>
-      <div class="asgard-runes-float" aria-hidden="true">
-        <span>ᚠ</span><span>ᚦ</span><span>ᛏ</span><span>ᛚ</span><span>ᚺ</span>
-      </div>
-    </div>
-    <div class="vault-env-grain"></div>
-    <div class="vault-env-haze"></div>
-  </div>
+  <header id="siteHeader" class="site-header"></header>
 
-  <header id="siteHeader" class="site-header site-header--arena"></header>
-
-  <main id="main" class="arena-main arena-main--concise">
-    <section class="vault-stage vault-stage-arrival" id="vaultHero" data-stage="1" aria-label="RAGNAR vault entrance">
-      <div class="arena-shell asgard-hero-layout">
-        <div class="asgard-crest">
-          <div class="asgard-crest-halo"></div>
-          <div class="asgard-crest-ring asgard-crest-ring-1"></div>
-          <div class="asgard-crest-ring asgard-crest-ring-2"></div>
-          <img src="/static/logo.png" alt="RAGNAR — wolf and raven crest" class="asgard-crest-logo" width="420" height="420" decoding="async" />
-          <div class="asgard-crest-shimmer"></div>
-        </div>
-        <div class="vault-arrival-copy asgard-throne">
-          <p class="vault-kicker">
-            <span class="runes-kicker" aria-label="Ragnar in runes">ᚱᚨᚷᚾᚨᚱ</span>
-            <span class="vault-kicker-tag">Wolf · Raven · Vault</span>
-          </p>
-          <h1 id="vaultHeroHeadline">RAGNAR</h1>
-          <p class="vault-hero-tagline">Break live. <em>Hunt the grail.</em></p>
-          <p id="vaultHeroSubtitle" class="vault-hero-sub">
-            Live breaks and elite sellers. Standard fee 5% — founding 250 lock in 4% forever.
-          </p>
-          <div class="arena-hero-actions">
-            <a class="arena-btn primary" href="/stores">Enter live rooms <span class="arrow">↗</span></a>
-            <a class="arena-btn" href="/marketplace">Explore marketplace <span class="arrow">→</span></a>
-          </div>
+  <main id="main" class="arena-main">
+    <section class="home-hero" aria-label="RAGNAR">
+      <div class="home-hero-inner">
+        <img src="/static/logo.svg" alt="RAGNAR" class="home-hero-logo" width="76" height="76" decoding="async" />
+        <span class="section-label">Trading card marketplace</span>
+        <h1>RAGNAR</h1>
+        <p class="home-hero-sub">
+          Buy, sell, and live-sell trading cards on one modern platform. Standard seller fee 5% —
+          the first 250 sellers lock in a flat 4% forever.
+        </p>
+        <div class="arena-hero-actions">
+          <a class="arena-btn primary" href="/marketplace">Browse the marketplace <span class="arrow">→</span></a>
+          <a class="arena-btn" href="/live">Watch live sales <span class="arrow">→</span></a>
         </div>
       </div>
     </section>
 
-    <section id="apply" class="vault-stage section section-tight home-apply" data-stage="2" aria-label="Founders Program">
+    <section class="home-stats" aria-label="Why RAGNAR">
+      <div class="home-stat"><b>5%</b><span>Flat standard seller fee — no category tiers, no surprises.</span></div>
+      <div class="home-stat"><b>4%</b><span>Founding rate, locked in forever for the first 250 sellers.</span></div>
+      <div class="home-stat"><b>Live</b><span>Run live breaks and sell singles from your own storefront.</span></div>
+      <div class="home-stat"><b>Reviewed</b><span>Every seller application is reviewed by our team.</span></div>
+    </section>
+
+    <section id="apply" class="section section-tight home-apply" aria-label="Become a seller">
       <div class="arena-shell breaker-cta">
-        <div class="breaker-copy reveal-orchestrated">
-          <span class="section-label">Founders Program</span>
-          <h2>Own the<br>floor.</h2>
-          <p>Run breaks or sell singles with transparent fees and tools built for serious operators.</p>
+        <div class="breaker-copy">
+          <span class="section-label">Sell on RAGNAR</span>
+          <h2>Become a seller.</h2>
+          <p>Run live breaks or sell singles with transparent fees and tools built for serious sellers.</p>
           <div id="counter" class="founding-counter-premium"><span><span id="claimed">—</span> / <span id="cap">250</span> founding positions claimed</span></div>
           <p class="founders-fee-line">
             <span><b id="perkIntro">4%</b> founders forever</span>
@@ -134,16 +141,16 @@
         <div>
           <div class="apply-panel">
             <h3>Apply to sell</h3>
-            <p>Applications are reviewed by hand. Tell us what you sell and where you're taking it.</p>
+            <p>Applications are reviewed by hand. Tell us what you sell and where you're selling it today.</p>
             <form id="applyForm">
               <div class="arena-form-grid">
                 <label class="arena-field"><span>Name *</span><input name="name" required minlength="2" maxlength="120" autocomplete="name" placeholder="Your name" /></label>
                 <label class="arena-field"><span>Email *</span><input name="email" type="email" required maxlength="160" autocomplete="email" placeholder="you@example.com" /></label>
-                <label class="arena-field"><span>Seller / breaker handle</span><input name="handle_wanted" maxlength="40" placeholder="@yourlivestore" /></label>
+                <label class="arena-field"><span>Seller / breaker handle</span><input name="handle_wanted" maxlength="40" placeholder="@yourstore" /></label>
                 <label class="arena-field"><span>Monthly volume</span><input name="monthly_volume" maxlength="80" placeholder="$10,000 / month" /></label>
-                <label class="arena-field full"><span>What do you sell or break?</span><input name="categories" maxlength="300" placeholder="High-end football, basketball, Pokémon, One Piece…" /></label>
+                <label class="arena-field full"><span>What do you sell or break?</span><input name="categories" maxlength="300" placeholder="Football, basketball, Pokémon, One Piece…" /></label>
                 <label class="arena-field full"><span>Where do you sell now?</span><input name="current_platforms" maxlength="300" placeholder="Whatnot, Fanatics Live, eBay, your social channels…" /></label>
-                <label class="arena-field full"><span>Why RAGNAR?</span><textarea name="message" maxlength="2000" placeholder="Tell us about your audience, operation, and vision."></textarea></label>
+                <label class="arena-field full"><span>Why RAGNAR?</span><textarea name="message" maxlength="2000" placeholder="Tell us about your audience, operation, and goals."></textarea></label>
               </div>
               <div class="apply-actions">
                 <button type="submit" class="arena-btn primary">Submit application <span class="arrow">→</span></button>
@@ -153,9 +160,9 @@
           </div>
           <div id="successBox" class="success-panel" hidden>
             <span class="section-label">Application received</span>
-            <h3>You're on our radar.</h3>
+            <h3>Thanks — we've got it.</h3>
             <p>We review every application personally. Watch your inbox.</p>
-            <a class="arena-btn small" href="/stores">Explore the vault <span class="arrow">→</span></a>
+            <a class="arena-btn small" href="/marketplace">Explore the marketplace <span class="arrow">→</span></a>
           </div>
         </div>
       </div>
@@ -165,13 +172,10 @@
   <footer class="arena-footer arena-footer--compact">
     <div>
       <div class="arena-footer-brand">
-        <img src="/static/logo.png" alt="" class="arena-footer-logo" width="52" height="52" decoding="async" />
-        <div>
-          RAGNAR
-          <span class="arena-footer-runes" aria-label="Ragnar in runes">ᚱᚨᚷᚾᚨᚱ</span>
-        </div>
+        <img src="/static/logo.svg" alt="" class="arena-footer-logo" width="40" height="40" decoding="async" />
+        <div>RAGNAR</div>
       </div>
-      <p>Wolf · Raven · Vault. Built for elite collectors.</p>
+      <p>A modern marketplace for trading cards.</p>
     </div>
     <div class="arena-footer-meta">RAGNAR // 2026<br>Standard fee 5% · Founding 250 lock in 4% forever.</div>
   </footer>
@@ -193,8 +197,8 @@
   <div id="momentCategoryLarge" hidden></div>
   <div id="momentGradeLarge" hidden></div>
   <div id="momentValueLarge" hidden></div>
-  <script src="/static/card.js?v=nordic3"></script>
-  <script src="/static/founding.js?v=nordic4"></script>
+  <script src="/static/card.js?v=corp1"></script>
+  <script src="/static/founding.js?v=corp1"></script>
   <script src="/static/nav.js"></script>
   <script src="/static/sell.js"></script>
 </body>

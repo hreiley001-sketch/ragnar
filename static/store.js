@@ -145,7 +145,7 @@ async function loadListings() {
   try {
     const items = await api(`/api/stores/${encodeURIComponent(HANDLE)}/listings?include_sold=true`);
     $("listCount").textContent = `${items.filter((i) => i.status === "active").length} listings`;
-    $("grid").innerHTML = items.length ? items.map(listingCard).join("") : `<div class="empty">This hall stands empty — no cards have been laid out yet.</div>`;
+    $("grid").innerHTML = items.length ? items.map(listingCard).join("") : `<div class="empty">This store is empty — no cards listed yet.</div>`;
     $("grid").querySelectorAll("[data-buy]").forEach((b) => b.addEventListener("click", () => buyListing(b.getAttribute("data-buy"))));
   } catch (err) {
     $("grid").innerHTML = `<div class="empty">Could not load listings: ${esc(err.message || "Unknown error")}.</div>`;

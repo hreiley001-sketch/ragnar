@@ -184,7 +184,7 @@ def _rules_design(prompt: str, current: dict) -> dict:
             break
     pretty = cname.replace("-", " ")
     tagline = (f"{pretty.title()} vibes for {focus} collectors." if focus
-               else f"A {pretty} store, forged on RAGNAR.")
+               else f"A {pretty} store on RAGNAR.")
     bio = ((f"Curated {focus} cards" if focus else "Curated cards")
            + f" with a {pretty} look — grading-aware listings, real sold-price history, "
              "and buyer protection on every sale.")

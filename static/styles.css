@@ -27,7 +27,7 @@ body {
 h1, h2, h3 {
   line-height: var(--leading-tight);
   font-family: var(--font-display);
-  font-weight: 400; /* Germania One is single-weight — avoid faux bold */
+  font-weight: 700;
   letter-spacing: var(--tracking-display);
   text-wrap: balance;
   font-feature-settings: "kern" 1, "liga" 1;

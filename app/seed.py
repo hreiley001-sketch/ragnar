@@ -19,23 +19,23 @@ logger = logging.getLogger("ragnar.seed")
 
 # handle -> (display_name, founding?, customization)
 _SELLERS = [
-    ("yggdrasil", "Yggdrasil Cards", True, {
+    ("summit", "Summit Cards", True, {
         "tagline": "Roots of the hobby.",
         "accent_color": "#4eb6e8",
         "bio": "Vintage Pokémon & Lorcana, graded and raw. Founding Seller since day one.",
-        "store_edit_token": "demo-yggdrasil-token",
+        "store_edit_token": "demo-summit-token",
     }),
-    ("fenrir", "Fenrir Vault", True, {
+    ("apex", "Apex Cards", True, {
         "tagline": "Unleash the grails.",
         "accent_color": "#7dcef2",
         "bio": "High-end vintage and modern grails. Every card slabbed and verified.",
-        "store_edit_token": "demo-fenrir-token",
+        "store_edit_token": "demo-apex-token",
     }),
-    ("muninn", "Muninn Collectibles", False, {
+    ("meridian", "Meridian Collectibles", False, {
         "tagline": "Memory of every card.",
         "accent_color": "#a8bccb",
         "bio": "Sports and TCG singles for every collector. Fair prices, fast shipping.",
-        "store_edit_token": "demo-muninn-token",
+        "store_edit_token": "demo-meridian-token",
     }),
 ]
 
@@ -45,14 +45,14 @@ _SAMPLES: list[dict] = [
         title="Charizard — Base Set Holo", category="Pokémon", set_name="Base Set",
         card_number="4/102", player_or_character="Charizard", year=1999,
         is_graded=True, grading_company="PSA", grade=9.0, price=4200.0,
-        seller="yggdrasil",
+        seller="summit",
         description="Iconic 1999 Base Set Charizard, PSA 9. Sharp corners, clean holo.",
         comps=[(-0.05, 12), (0.02, 40), (-0.09, 78), (0.06, 120)],
     ),
     dict(
         title="Pikachu — Jungle", category="Pokémon", set_name="Jungle",
         card_number="60/64", player_or_character="Pikachu", year=1999,
-        is_graded=False, condition="Near Mint", price=18.0, seller="yggdrasil",
+        is_graded=False, condition="Near Mint", price=18.0, seller="summit",
         description="Raw NM Jungle Pikachu.",
         comps=[(0.1, 20), (-0.05, 55)],
     ),
@@ -60,7 +60,7 @@ _SAMPLES: list[dict] = [
         title="Black Lotus — Unlimited", category="Magic: The Gathering",
         set_name="Unlimited", player_or_character="Black Lotus", year=1993,
         is_graded=True, grading_company="BGS", grade=7.5, price=23500.0,
-        seller="fenrir",
+        seller="apex",
         description="The Power Nine centerpiece. BGS 7.5, strong centering.",
         comps=[(-0.03, 30), (0.04, 95), (-0.07, 160)],
     ),
@@ -69,14 +69,14 @@ _SAMPLES: list[dict] = [
         set_name="Legend of Blue Eyes White Dragon", card_number="LOB-001",
         player_or_character="Blue-Eyes White Dragon", year=2002,
         is_graded=True, grading_company="PSA", grade=8.0, price=1300.0,
-        seller="muninn", description="1st Edition LOB-001, PSA 8.",
+        seller="meridian", description="1st Edition LOB-001, PSA 8.",
         comps=[(0.05, 15), (-0.08, 60), (0.11, 110)],
     ),
     dict(
         title="Luffy — OP01 Leader (Alt Art)", category="One Piece",
         set_name="Romance Dawn (OP-01)", card_number="OP01-003",
         player_or_character="Monkey D. Luffy", year=2022,
-        is_graded=False, condition="Near Mint", price=65.0, seller="muninn",
+        is_graded=False, condition="Near Mint", price=65.0, seller="meridian",
         description="Alt-art Luffy leader, pack-fresh NM.",
         comps=[(0.2, 25), (-0.1, 70)],
     ),
@@ -85,14 +85,14 @@ _SAMPLES: list[dict] = [
         set_name="2023-24 Panini Prizm", card_number="136",
         player_or_character="Victor Wembanyama", year=2023,
         is_graded=True, grading_company="PSA", grade=10.0, price=900.0,
-        seller="fenrir", description="Wemby Silver Prizm rookie, PSA 10 gem mint.",
+        seller="apex", description="Wemby Silver Prizm rookie, PSA 10 gem mint.",
         comps=[(-0.06, 10), (0.09, 45), (-0.12, 90), (0.03, 150)],
     ),
     dict(
         title="Elsa — First Chapter Enchanted", category="Disney Lorcana",
         set_name="The First Chapter", card_number="42/204",
         player_or_character="Elsa", year=2023,
-        is_graded=False, condition="Lightly Played", price=120.0, seller="yggdrasil",
+        is_graded=False, condition="Lightly Played", price=120.0, seller="summit",
         description="Enchanted Elsa, LP with minor edge wear.",
         comps=[(0.08, 18), (-0.04, 65)],
     ),
@@ -101,7 +101,7 @@ _SAMPLES: list[dict] = [
         set_name="2018 Topps Chrome", card_number="150",
         player_or_character="Shohei Ohtani", year=2018,
         is_graded=True, grading_company="SGC", grade=9.5, price=450.0,
-        seller="muninn", description="Ohtani Chrome rookie, SGC 9.5.",
+        seller="meridian", description="Ohtani Chrome rookie, SGC 9.5.",
         comps=[(-0.05, 22), (0.07, 58), (-0.02, 105)],
     ),
 ]
@@ -170,14 +170,14 @@ def seed_if_empty() -> None:
 
         # Demo live streams (video provider plugs into embed_url later).
         session.add(LiveStream(
-            seller_id=sellers["fenrir"].id,
+            seller_id=sellers["apex"].id,
             title="Friday Night Grail Rips 🔥",
             status="live",
             viewer_count=128,
             started_at=now,
         ))
         session.add(LiveStream(
-            seller_id=sellers["yggdrasil"].id,
+            seller_id=sellers["summit"].id,
             title="Vintage Pokémon Break — WOTC pulls",
             status="scheduled",
             scheduled_at=now + timedelta(days=1),
@@ -201,9 +201,9 @@ def seed_platform_content() -> None:
             # Lightweight cold-start sellers so Feed/Groups never look empty
             # even when SEED_DEMO listings are off.
             for handle, name, founding in (
-                ("yggdrasil", "Yggdrasil Cards", True),
-                ("fenrir", "Fenrir Vault", True),
-                ("muninn", "Muninn Collectibles", False),
+                ("summit", "Summit Cards", True),
+                ("apex", "Apex Cards", True),
+                ("meridian", "Meridian Collectibles", False),
             ):
                 s = Seller(
                     handle=handle,
@@ -213,7 +213,7 @@ def seed_platform_content() -> None:
                 )
                 if founding:
                     s.is_founding = True
-                    s.founding_number = 1 if handle == "yggdrasil" else 2
+                    s.founding_number = 1 if handle == "summit" else 2
                     s.founding_activated_at = utcnow()
                 session.add(s)
             session.commit()
@@ -225,11 +225,11 @@ def seed_platform_content() -> None:
 
         if not session.exec(select(FeedPost).limit(1)).first():
             samples = [
-                ("spotlight", "Wolf of the North sealed", "Chase frost foil just entered the vault. AI tagged set + comps attached.", ["chase", "frost", "1/1"], True, 4200),
+                ("spotlight", "Charizard Base Set sealed", "Chase holo foil just listed. AI tagged set + comps attached.", ["chase", "holo", "1/1"], True, 4200),
                 ("live_announce", "Friday Night Grail Rips", "Going live tonight — queue is loaded. Follow for the drop.", ["live", "break"], False, None),
                 ("grading", "PSA returns landed", "Slabs are in. Spotlights hitting the feed after photos.", ["psa", "grading"], False, None),
                 ("pc_highlight", "PC pull of the week", "Jungle Pikachu raw NM — market snapshot refreshed via Intel.", ["pc", "pokemon"], False, 18),
-                ("pickup", "Show pickup — Muninn", "Table finds from the weekend. Listing drafts auto-tagged.", ["pickup", "show"], True, None),
+                ("pickup", "Show pickup — Meridian", "Table finds from the weekend. Listing drafts auto-tagged.", ["pickup", "show"], True, None),
             ]
             for i, (kind, title, body, tags, story, value) in enumerate(samples):
                 seller = sellers[i % len(sellers)]
@@ -251,7 +251,7 @@ def seed_platform_content() -> None:
                 ("sports-grail-league", "Sports Grail League", "Fantasy scoring for modern and vintage sports cards.", "fantasy", 86),
                 ("local-show-meetup", "Local Show Meetup", "Coordinate tables, trades, and carpools.", "meetup", 54),
                 ("seller-ops-circle", "Seller Ops Circle", "Fees, shipping, and AI listing tips for breakers.", "seller_support", 73),
-                ("new-collectors-hall", "New Collectors Hall", "Start here — grading basics and vault etiquette.", "new", 210),
+                ("new-collectors-circle", "New Collectors Circle", "Start here — grading basics and collecting etiquette.", "new", 210),
             ]
             for slug, name, desc, kind, members in groups:
                 g = CommunityGroup(

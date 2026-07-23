@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RAGNAR — My Account</title>
-  <link rel="icon" href="/static/logo.png" />
+  <link rel="icon" href="/static/logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Germania+One&family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/styles.css" />
   <link rel="stylesheet" href="/static/asgard-shell.css" />
   <link rel="stylesheet" href="/static/pages.css" />
@@ -132,7 +132,7 @@
         : `<div class="claim-box">
              <h4>Claim your store</h4>
              <p class="muted mini-note">Already signed up as a seller? Link your store to this account with your handle and store token.</p>
-             <div class="field"><span>Store handle</span><input id="claimHandle" placeholder="e.g. valhalla-cards" /></div>
+             <div class="field"><span>Store handle</span><input id="claimHandle" placeholder="e.g. summit-cards" /></div>
              <div class="field"><span>Store token</span><input id="claimToken" type="password" placeholder="X-Store-Token" /></div>
              <button id="claimBtn" class="btn btn-primary btn-sm" type="button">Claim store</button>
              <span id="claimStatus" class="form-status"></span>
@@ -670,7 +670,7 @@
         <div class="sec-title">Wants — post what you’re hunting for</div>
         ${wants.length
           ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Looking for</th><th>Max price</th><th>Posted</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`
-          : `<div class="empty-sm">No wants posted. Tell the realm what you seek and sellers will come to you.</div>`}
+          : `<div class="empty-sm">No wants posted. Tell the community what you're looking for and sellers will come to you.</div>`}
         <div class="inline-form inline-form-top">
           <input id="wantDesc" class="want-desc" placeholder="What are you hunting for? e.g. PSA 9 Base Set Blastoise" maxlength="300" />
           <input id="wantCat" class="want-cat" placeholder="Category (optional)" maxlength="60" />
@@ -687,7 +687,7 @@
         const body = { description };
         const cat = $("wantCat").value.trim(); if (cat) body.category = cat;
         const mx = $("wantMax").value; if (mx !== "" && !isNaN(Number(mx))) body.max_price = Number(mx);
-        try { await api("/api/social/wants", { method: "POST", body: JSON.stringify(body) }); toast("Want posted to the realm."); loadWants(); }
+        try { await api("/api/social/wants", { method: "POST", body: JSON.stringify(body) }); toast("Want posted."); loadWants(); }
         catch (e) { toast(e.message); }
       });
     }

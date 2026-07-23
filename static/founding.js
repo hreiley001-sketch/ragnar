@@ -141,12 +141,12 @@ function renderLive(streams, rides) {
     $("liveArena").innerHTML = window.RagnarCard
       ? RagnarCard.blankCardHTML({
           title: "The next room is forming.",
-          subtitle: "Explore scheduled breaks or enter the marketplace while the vault resets.",
+          subtitle: "Explore scheduled breaks or browse the marketplace while the room resets.",
           ctaHref: "/stores",
           ctaLabel: "View the lineup",
           variant: "live",
         })
-      : `<div class="arena-empty"><div><strong>The next room is forming.</strong><span>Explore scheduled breaks or enter the marketplace while the vault resets.</span></div></div>`;
+      : `<div class="arena-empty"><div><strong>The next room is forming.</strong><span>Explore scheduled breaks or browse the marketplace while the room resets.</span></div></div>`;
     if (window.RagnarCard) RagnarCard.enhanceCards($("liveArena"));
     return;
   }
@@ -184,10 +184,10 @@ function renderBreakers(stores) {
     const top = (stores || []).slice(0, 5);
     if (!top.length) {
       strip.innerHTML = [
-        { rune: "ᚱ", name: "Frost Hall", tag: "Founding seat open", href: "#apply" },
-        { rune: "ᚹ", name: "Raven Floor", tag: "Break room ready", href: "#apply" },
-        { rune: "ᚦ", name: "Ice Vault", tag: "Applications open", href: "#apply" },
-        { rune: "ᛟ", name: "Claim the floor", tag: "Join Founding 250", href: "#apply" },
+        { rune: "1", name: "Open Seat", tag: "Founding seat open", href: "#apply" },
+        { rune: "2", name: "Break Room", tag: "Break room ready", href: "#apply" },
+        { rune: "3", name: "New Store", tag: "Applications open", href: "#apply" },
+        { rune: "4", name: "Claim a spot", tag: "Join Founding 250", href: "#apply" },
       ].map((seat) => `
         <a class="breaker-chip nordic-breaker" href="${seat.href}">
           <span class="breaker-chip-av nordic-breaker-av">${seat.rune}</span>
@@ -216,7 +216,7 @@ function renderBreakers(stores) {
     $("breakerGrid").innerHTML = `
       <a class="breaker-card ragnar-card ragnar-card--seller" data-rank="01" href="#apply">
         <div class="breaker-avatar-lg">R</div>
-        <div class="breaker-card-body"><span class="section-label">Founding roster</span><h3>Your room could lead the vault.</h3><p>Applications for elite sellers are open.</p></div>
+        <div class="breaker-card-body"><span class="section-label">Founding roster</span><h3>Your store could lead the marketplace.</h3><p>Applications for sellers are open.</p></div>
       </a>`;
     if (window.RagnarCard) RagnarCard.enhanceCards($("breakerGrid"));
     return;
@@ -230,8 +230,8 @@ function renderBreakers(stores) {
       <div class="breaker-card-body">
         <span class="section-label">${store.is_founding ? `Founding // ${String(store.founding_number || 0).padStart(3, "0")}` : `@${esc(store.handle)}`}</span>
         <h3>${esc(store.display_name)}</h3>
-        <p>${esc(store.tagline || "Collect. Break. Conquer.")}</p>
-        <div class="breaker-stats"><div><b>${Number(store.listing_count || 0).toLocaleString()}</b><span>Vault items</span></div><div><b>${store.is_live ? "On" : "Ready"}</b><span>Status</span></div></div>
+        <p>${esc(store.tagline || "Buy, sell, and break cards.")}</p>
+        <div class="breaker-stats"><div><b>${Number(store.listing_count || 0).toLocaleString()}</b><span>Listings</span></div><div><b>${store.is_live ? "On" : "Ready"}</b><span>Status</span></div></div>
       </div>
     </a>`).join("");
   if (window.RagnarCard) RagnarCard.enhanceCards($("breakerGrid"), { selector: ".breaker-card.ragnar-card" });
@@ -244,7 +244,7 @@ function renderMoment(listings) {
     const t = $(titleId); if (t) t.textContent = item.title;
     const d = $(descId);
     if (d) {
-      d.textContent = "A chase-worthy card currently inside the RAGNAR vault. Verified live pulls will preserve the room, reaction, and ownership story here.";
+      d.textContent = "A chase-worthy card currently listed on RAGNAR. Verified live pulls will preserve the room, reaction, and ownership story here.";
     }
     const c = $(catId); if (c) c.textContent = item.category || "Collectible";
     const g = $(gradeId);
@@ -277,7 +277,7 @@ function renderPulse(streams, rides, listings, stores) {
     value: ride.current_bid != null ? money(ride.current_bid) : "Enter",
   }));
   (listings || []).slice(0, 4).forEach((listing) => events.push({
-    code: "ᚱ", time: relativeTime(listing.created_at), title: "New card entered the vault",
+    code: "•", time: relativeTime(listing.created_at), title: "New card listed",
     detail: listing.title, value: money(listing.price),
   }));
   (stores || []).filter((store) => store.is_live).slice(0, 2).forEach((store) => events.push({
@@ -287,11 +287,11 @@ function renderPulse(streams, rides, listings, stores) {
   const visible = events.slice(0, 7);
   if (!visible.length) {
     visible.push(
-      { code: "ᚱ", time: "now", title: "Wolf of the North sealed", detail: "Chase · Frost Vault foil", value: "1/1" },
-      { code: "ᚹ", time: "2m", title: "Raven Mark claimed", detail: "Brass Sigil · Founders foil", value: "Live" },
-      { code: "ᚦ", time: "6m", title: "Vault Relic surfaced", detail: "Ice Key · Archive pull", value: "PSA 10" },
-      { code: "ᛟ", time: "12m", title: "Great Hall doors open", detail: "Waiting rooms forming", value: "Armed" },
-      { code: "ᚢ", time: "18m", title: "Bifröst scan complete", detail: "Intel comps refreshed", value: "Ready" },
+      { code: "•", time: "now", title: "Charizard Base Set sealed", detail: "Chase · holo foil", value: "1/1" },
+      { code: "•", time: "2m", title: "Rookie card claimed", detail: "Silver Prizm · Founders foil", value: "Live" },
+      { code: "•", time: "6m", title: "Archive pull surfaced", detail: "PSA 10 · archive pull", value: "PSA 10" },
+      { code: "•", time: "12m", title: "Live rooms opening", detail: "Waiting rooms forming", value: "Ready" },
+      { code: "•", time: "18m", title: "Comps refreshed", detail: "Market comps updated", value: "Ready" },
     );
   }
   const list = $("pulseList");

@@ -91,7 +91,7 @@ function renderMain(l) {
   const sub = [l.set_name, l.card_number, l.year].filter((v) => v != null && v !== "").map(esc).join(" · ");
   const ship = l.shipping > 0 ? `+ ${money(l.shipping)} shipping` : "Free shipping";
   $("itemMain").innerHTML = `
-    ${sold ? `<div class="sold-banner">⚔ SOLD — this item has found a new hall</div>` : ""}
+    ${sold ? `<div class="sold-banner">SOLD — this item is no longer available</div>` : ""}
     <h1>${esc(l.title)}</h1>
     ${sub ? `<div class="item-sub">${sub}</div>` : ""}
     <div class="price-line"><span class="item-price">${money(l.price)}</span><span class="ship-note">${ship}</span></div>

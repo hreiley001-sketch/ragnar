@@ -304,7 +304,7 @@ async function loadDisputes() {
       <td class="row-actions">${x.status === "open"
         ? `<button class="btn btn-sm btn-primary" data-refund="${x.id}">Refund buyer</button><button class="btn btn-sm" data-deny="${x.id}">Deny</button>`
         : ""}</td>
-    </tr>`).join("") || `<tr><td colspan="7" class="muted" style="padding:20px;text-align:center;">No disputes — the realm is at peace</td></tr>`;
+    </tr>`).join("") || `<tr><td colspan="7" class="muted" style="padding:20px;text-align:center;">No disputes — all clear</td></tr>`;
   } catch (e) { toast(e.message); }
 }
 
@@ -435,7 +435,7 @@ async function ridesAction(e) {
   try {
     if (start) {
       await api(`/api/hub/ride/${start}/start`, { method: "POST", body: JSON.stringify({}) });
-      toast("Ride started — Valhalla awaits"); loadRides();
+      toast("Ride started"); loadRides();
     } else if (adv) {
       const r = await api(`/api/hub/ride/${adv}/advance`, { method: "POST", body: JSON.stringify({}) });
       toast("Phase advanced" + (r && (r.phase || r.status) ? ` → ${r.phase || r.status}` : ""));
@@ -478,7 +478,7 @@ async function nlSearch() {
       <div class="intel-filters">${chips}</div>
       <div class="intel-meta">Source · ${esc(r.source || "ai")}</div>
       <div class="intel-actions">
-        <a class="btn btn-primary btn-sm" href="${esc(href)}" target="_blank" rel="noopener">Open in Vault</a>
+        <a class="btn btn-primary btn-sm" href="${esc(href)}" target="_blank" rel="noopener">Open listing</a>
         <button type="button" class="btn btn-ghost btn-sm" id="nlCopyLink">Copy link</button>
         <button type="button" class="btn btn-ghost btn-sm" id="nlCopyJson">Copy JSON</button>
       </div>`;
