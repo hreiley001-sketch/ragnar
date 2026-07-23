@@ -25,6 +25,40 @@ class Settings:
     # Storage
     database_url: str = os.getenv("DATABASE_URL", "sqlite:///./ragnar.db")
 
+    # --- Supabase (target data platform) ---
+    # See vault/Ragnarips/Backend/Supabase-Integration.md. When adopting Supabase,
+    # point DATABASE_URL at the POOLED connection (PgBouncer, port 6543). These
+    # extra keys enable the Supabase client (auth/storage/realtime) alongside the
+    # SQL connection. Key-gated: unset = off, nothing changes.
+    # Accepts legacy names (ANON / SERVICE_ROLE) and new API key names
+    # (PUBLISHABLE / SECRET). Prefer the new names when both are set.
+    supabase_url: str = os.getenv("SUPABASE_URL", "").strip()
+    supabase_anon_key: str = (
+        os.getenv("SUPABASE_PUBLISHABLE_KEY", "").strip()
+        or os.getenv("SUPABASE_ANON_KEY", "").strip()
+    )
+    supabase_service_role_key: str = (
+        os.getenv("SUPABASE_SECRET_KEY", "").strip()
+        or os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    )
+    supabase_jwks_url: str = os.getenv("SUPABASE_JWKS_URL", "").strip()
+    supabase_enabled: bool = bool(
+        os.getenv("SUPABASE_URL", "").strip()
+        and (
+            os.getenv("SUPABASE_SECRET_KEY", "").strip()
+            or os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+        )
+    )
+
+    # --- Automation (n8n) — domain-event webhooks; key-gated, fire-and-forget ---
+    # Base webhook URL of the n8n instance, e.g. https://n8n.ragnarips.com/webhook
+    # Backend POSTs events (order.paid, seller.applied, listing.created, …) here;
+    # n8n orchestrates emails, notifications, and follow-ups. See
+    # vault/Ragnarips/Automation/README.md. Unset = off (emit() is a no-op).
+    n8n_webhook_base: str = os.getenv("N8N_WEBHOOK_BASE", "").strip().rstrip("/")
+    n8n_webhook_secret: str = os.getenv("N8N_WEBHOOK_SECRET", "").strip()
+    automation_enabled: bool = bool(os.getenv("N8N_WEBHOOK_BASE", "").strip())
+
     # CORS — comma separated. Default "*" for easy local dev; lock down in prod.
     allowed_origins: list[str] = [
         o.strip()
