@@ -32,8 +32,8 @@
       css.href = "/static/asgard-shell.css";
       document.head.appendChild(css);
     }
-    // "How it works" only on home — keep it once, not on every page.
-    if (onHome) {
+    // "How it works" — home path only (shown once; see howto.js).
+    if (path === "/") {
       if (!document.getElementById("howto-css")) {
         const css = document.createElement("link");
         css.id = "howto-css";

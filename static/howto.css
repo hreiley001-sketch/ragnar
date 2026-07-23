@@ -1,5 +1,5 @@
-/* RAGNAR — home-only "How it works" onboarding band.
-   Injected by nav.js on the home page. */
+/* RAGNAR — "How it works" onboarding band (home page, once).
+   Injected by nav.js on "/". */
 
 .howto {
   position: relative;
@@ -24,10 +24,6 @@
   border-radius: var(--radius-md, 14px);
   padding: 16px 18px;
   background: var(--color-bg-lit, #fdfbf6);
-}
-.howto-col[data-focus="1"] {
-  border-color: var(--color-border-gold, rgba(184,121,26,.5));
-  box-shadow: 0 0 0 1px var(--color-border-gold, rgba(184,121,26,.5)) inset;
 }
 .howto-col h3 { margin: 0 0 10px; font-size: var(--text-md, 16px); display: flex; align-items: center; gap: 8px; }
 .howto-col ol { margin: 0; padding-left: 0; list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 10px; }
