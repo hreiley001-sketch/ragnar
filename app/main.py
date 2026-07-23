@@ -118,15 +118,25 @@ app = FastAPI(
 )
 
 class StaticCacheMiddleware(BaseHTTPMiddleware):
-    """Long-lived Cache-Control for /static; shorter for /uploads."""
+    """Cache-Control for /static and /uploads.
+
+    JS/CSS are unversioned filenames — do not mark immutable (stale nav/howto
+    scripts would stick for a week). Images/fonts can stay longer.
+    """
 
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
         path = request.url.path
         if path.startswith("/static/"):
-            response.headers.setdefault(
-                "Cache-Control", "public, max-age=604800, immutable"
-            )
+            lower = path.lower()
+            if lower.endswith((".js", ".css", ".map", ".html")):
+                response.headers["Cache-Control"] = (
+                    "public, max-age=60, must-revalidate"
+                )
+            else:
+                response.headers.setdefault(
+                    "Cache-Control", "public, max-age=604800"
+                )
         elif path.startswith("/uploads/"):
             response.headers.setdefault(
                 "Cache-Control", "public, max-age=3600"

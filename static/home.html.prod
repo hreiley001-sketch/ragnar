@@ -300,7 +300,7 @@
   <div id="momentGrade" hidden></div>
   <div id="momentValue" hidden></div>
   <script src="/static/founding.js"></script>
-  <script src="/static/nav.js"></script>
+  <script src="/static/nav.js?v=home-only"></script>
   <script src="/static/sell.js"></script>
 </body>
 </html>
