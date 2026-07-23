@@ -51,14 +51,17 @@ await emit("order.paid", {"order_id": order.id, "total_cents": total, "buyer": u
 ## Event catalog (from `EVENTS` in automation.py)
 `seller.applied` · `seller.founding_claimed` · `listing.created` · `listing.sold` · `order.paid` · `order.shipped` · `dispute.opened` · `stream.started`
 
-## Emit points to wire (next step — needs your n8n URL)
-| Event | Where to call `emit()` |
+## Emit points (wired — key-gated via `emit_bg`)
+| Event | Where |
 |---|---|
-| `seller.applied` | `app/routers/founding.py` after application saved |
-| `order.paid` | Stripe webhook handler (`app/routers/payments.py`) — **critical path, wire carefully** |
-| `listing.sold` | order fulfillment / live sale settle |
-| `stream.started` | `app/routers/streams.py` go-live |
-> Not wired yet by design — emitting from the payment path needs your live n8n endpoint + a test. Give me the URL and pick events to turn on.
+| `seller.applied` | `app/routers/founding.py`, `app/routers/sellers.py` |
+| `seller.founding_claimed` | `app/routers/sellers.py` when founding slot granted |
+| `listing.created` | `app/routers/listings.py` `_persist_listing` |
+| `listing.sold` | manual sell + Stripe checkout completed |
+| `order.paid` | Stripe webhook (`app/routers/payments.py`) — background thread |
+| `stream.started` | `app/routers/streams.py` when status → live |
+
+> Set `N8N_WEBHOOK_BASE` (+ optional secret) in Render to turn on. Unset = safe no-op.
 
 ## Security
 - n8n verifies `X-Ragnar-Signature` (HMAC-SHA256 of body with the shared secret).
@@ -68,4 +71,5 @@ await emit("order.paid", {"order_id": order.id, "total_cents": total, "buyer": u
 Emit is best-effort and off the request path. For guaranteed delivery later, route events through **Redis queue → worker → n8n** (retry/DLQ). Run the [[Stability-Checklist]] when wiring the payment event.
 
 ## Change log
+- 2026-07-23 — wired `emit_bg` into founding/sellers/listings/payments/streams.
 - 2026-07-22 — initial n8n subsystem; config + `automation.emit()` helper added (off by default).

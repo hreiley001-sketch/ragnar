@@ -49,4 +49,17 @@ def apply(payload: FoundingApplicationCreate, session: Session = Depends(get_ses
     except Exception:  # noqa: BLE001
         pass
 
+    try:
+        from ..automation import emit_bg
+        emit_bg("seller.applied", {
+            "application_id": application.id,
+            "name": application.name,
+            "email": application.email,
+            "handle_wanted": application.handle_wanted,
+            "categories": application.categories,
+            "source": "founding_apply",
+        })
+    except Exception:  # noqa: BLE001
+        pass
+
     return FoundingApplicationRead(**application.model_dump())

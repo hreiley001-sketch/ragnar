@@ -1,14 +1,13 @@
 # Render blueprint for RAGNAR — https://render.com
 # Deploy: push this repo to GitHub, then in Render: New → Blueprint → pick the repo.
-# A 1GB persistent disk keeps the SQLite DB and uploaded scan photos across deploys.
-# (For scale, swap to a managed Postgres and set DATABASE_URL accordingly.)
+# Disk keeps uploads (+ SQLite until Supabase cutover). See DEPLOY.md § Supabase.
 services:
   - type: web
     name: ragnar
     runtime: python
     plan: starter
     buildCommand: pip install -r requirements.txt
-    # create_all stays enabled for the SQLite disk (see SCHEMA_BOOTSTRAP).
+    # After Supabase cutover: run `alembic upgrade head` then set SCHEMA_BOOTSTRAP=alembic.
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     autoDeploy: true
@@ -21,13 +20,31 @@ services:
         value: "3.12.6"
       - key: ENVIRONMENT
         value: production
-      # Keep create_all for SQLite persistent disk until Postgres + Alembic cutover.
+      # Keep create_all for SQLite disk until Postgres + Alembic cutover.
       - key: SCHEMA_BOOTSTRAP
         value: create_all
       - key: SEED_DEMO
         value: "false"
+      # Fallback while USE_SUPABASE_DB is false. After cutover, leave as-is or remove.
       - key: DATABASE_URL
         value: sqlite:////var/data/ragnar.db
+      # Opt-in Supabase cutover (set true only after alembic + backfill):
+      - key: USE_SUPABASE_DB
+        value: "false"
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: SUPABASE_JWKS_URL
+        sync: false
+      - key: N8N_WEBHOOK_BASE
+        sync: false
+      - key: N8N_WEBHOOK_SECRET
+        sync: false
       - key: UPLOAD_DIR
         value: /var/data/uploads
       - key: ALLOWED_ORIGINS
@@ -39,15 +56,13 @@ services:
       - key: PAYMENTS_LIVE
         value: "false"
       # Secrets — set in the Render dashboard (Environment → Edit):
-      # Stripe Dashboard → Developers → API keys (use TEST keys first):
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_PUBLISHABLE_KEY
         sync: false
-      # Stripe Dashboard → Developers → Webhooks → Add endpoint
-      #   URL: https://ragnarips.com/api/payments/webhook
-      #   Events: checkout.session.completed, checkout.session.expired
       - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
         sync: false
       - key: TCG_API_KEY
         sync: false
@@ -80,4 +95,12 @@ services:
       - key: GOOGLE_CLIENT_SECRET
         sync: false
       - key: ADMIN_TOKEN
+        sync: false
+      - key: POSTHOG_API_KEY
+        sync: false
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
         sync: false

@@ -21,20 +21,18 @@ Back to [[Backend/README]] · [[RAGNARIPS-MASTER]] · [[Roadmap/README|Roadmap P
   docker compose up -d      # or docker-compose.pg17.yml
   ```
 
-## How the app connects (already wired, key-gated)
-`app/config.py` now has: `SUPABASE_URL`, publishable/anon key, secret/service-role key, `SUPABASE_JWKS_URL`, `settings.supabase_enabled`. Accepts new API key names (`SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SECRET_KEY`) or legacy (`SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`). Unset = off, nothing changes.
+## How the app connects (wired, key-gated)
+`app/config.py`: `USE_SUPABASE_DB`, `SUPABASE_DB_URL`, `SUPABASE_URL`, publishable/secret keys, `SUPABASE_JWKS_URL`, `settings.supabase_enabled`, `normalize_database_url()` / `resolve_database_url()`.
 
-1. **SQL (primary path):** point `DATABASE_URL` at the **pooled** connection (PgBouncer, port **6543**) so SQLModel/Alembic keep working unchanged:
+1. **SQL (primary path — opt-in cutover):**
    ```
-   DATABASE_URL=postgresql+psycopg://postgres.tmlwajtttnkhkmrsdnie:[PASSWORD]@aws-1-us-west-2.pooler.supabase.com:6543/postgres
+   USE_SUPABASE_DB=true
+   SUPABASE_DB_URL=postgresql://postgres.tmlwajtttnkhkmrsdnie:[PASSWORD]@aws-1-us-west-2.pooler.supabase.com:6543/postgres
    ```
-   Shared pooler: host `aws-1-us-west-2.pooler.supabase.com`, port `6543`, user `postgres.tmlwajtttnkhkmrsdnie`. Percent-encode special characters in the password. SQLAlchemy needs the `postgresql+psycopg://` scheme (not bare `postgresql://`).
-   ```
-2. **Client (optional):** for auth/storage/realtime, add the Python client later:
-   ```python
-   from supabase import create_client
-   sb = create_client(settings.supabase_url, settings.supabase_service_role_key)
-   ```
+   Bare `postgresql://` / `postgres://` URIs are auto-normalized to `postgresql+psycopg://` + `sslmode=require`. Shared pooler: host `aws-1-us-west-2.pooler.supabase.com`, port `6543`, user `postgres.tmlwajtttnkhkmrsdnie`.
+2. **Or** set `DATABASE_URL` directly to the pooled URI (same normalization).
+3. **Client keys:** `SUPABASE_URL` + secret/service-role enable `supabase_enabled` for future auth/storage/realtime.
+4. **Verify:** `GET /health` → `database` / `supabase_db` / `supabase_api`; `GET /api/meta` → `platforms`.
 
 ## Migration path (non-destructive)
 ```mermaid
@@ -58,4 +56,5 @@ Pooling params live in `app/database.py` (`pool_size=5`, `max_overflow=10`, `poo
 - A Supabase project (URL + service-role key), **or** a go-ahead to self-host via the clone's `docker/`.
 
 ## Change log
+- 2026-07-23 — `USE_SUPABASE_DB` + URL normalize/resolve; Render env slots; health/meta status.
 - 2026-07-22 — initial integration guide; config slots added to `app/config.py` + `.env.example`.

@@ -10,7 +10,14 @@ router = APIRouter(tags=["system"])
 
 @router.get("/health")
 def health() -> dict:
-    return {"status": "ok", "environment": settings.environment}
+    return {
+        "status": "ok",
+        "environment": settings.environment,
+        "database": settings.database_dialect,
+        "supabase_db": settings.database_is_supabase,
+        "supabase_api": settings.supabase_enabled,
+        "n8n": settings.automation_enabled,
+    }
 
 
 @router.get("/health/ready")

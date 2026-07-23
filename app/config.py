@@ -1,11 +1,12 @@
 """Application configuration, sourced from environment variables.
 
 Kept dependency-light on purpose (plain os.getenv + dotenv) so the MVP stays
-easy to run anywhere — locally, in Docker, on Render, or on Azure.
+easy to run anywhere — locally, in Docker, on Render, Azure, or Supabase.
 """
 from __future__ import annotations
 
 import os
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from dotenv import load_dotenv
 
@@ -16,22 +17,63 @@ def _flag(name: str, default: bool = False) -> bool:
     return os.getenv(name, str(default)).strip().lower() in {"1", "true", "yes", "on"}
 
 
+def normalize_database_url(url: str) -> str:
+    """Make a DATABASE_URL SQLAlchemy/psycopg-ready.
+
+    Accepts the Supabase dashboard URI as-is (``postgresql://…`` or
+    ``postgres://…``) and rewrites it to ``postgresql+psycopg://…``.
+    Managed Postgres hosts get ``sslmode=require`` when missing.
+    """
+    raw = (url or "").strip()
+    if not raw:
+        return "sqlite:///./ragnar.db"
+
+    if raw.startswith("postgres://"):
+        raw = "postgresql://" + raw[len("postgres://") :]
+
+    if raw.startswith("postgresql://") and "+psycopg" not in raw.split("://", 1)[0]:
+        raw = "postgresql+psycopg://" + raw[len("postgresql://") :]
+
+    if not raw.startswith("postgresql"):
+        return raw
+
+    parsed = urlparse(raw)
+    host = (parsed.hostname or "").lower()
+    query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    managed = any(s in host for s in ("supabase.co", "neon.tech", "amazonaws.com"))
+    if managed and "sslmode" not in {k.lower() for k in query}:
+        query["sslmode"] = "require"
+    return urlunparse(parsed._replace(query=urlencode(query)))
+
+
+def resolve_database_url() -> str:
+    """Pick runtime DB URL.
+
+    When ``USE_SUPABASE_DB=true`` and ``SUPABASE_DB_URL`` is set, prefer the
+    Supabase pooled URL. Otherwise use ``DATABASE_URL`` (SQLite by default).
+    """
+    if _flag("USE_SUPABASE_DB", False):
+        supabase = os.getenv("SUPABASE_DB_URL", "").strip()
+        if supabase:
+            return normalize_database_url(supabase)
+    return normalize_database_url(os.getenv("DATABASE_URL", "sqlite:///./ragnar.db"))
+
+
 class Settings:
     # Identity
     app_name: str = "RAGNAR"
     version: str = "0.1.0"
     tagline: str = "Guided by counsel, driven by conquest."
 
-    # Storage
-    database_url: str = os.getenv("DATABASE_URL", "sqlite:///./ragnar.db")
+    # Storage — paste a Supabase URI; scheme/SSL are normalized automatically.
+    database_url: str = resolve_database_url()
 
     # --- Supabase (target data platform) ---
-    # See vault/Ragnarips/Backend/Supabase-Integration.md. When adopting Supabase,
-    # point DATABASE_URL at the POOLED connection (PgBouncer, port 6543). These
-    # extra keys enable the Supabase client (auth/storage/realtime) alongside the
-    # SQL connection. Key-gated: unset = off, nothing changes.
-    # Accepts legacy names (ANON / SERVICE_ROLE) and new API key names
-    # (PUBLISHABLE / SECRET). Prefer the new names when both are set.
+    # See vault/Ragnarips/Backend/Supabase-Integration.md.
+    # Opt-in cutover: set USE_SUPABASE_DB=true + SUPABASE_DB_URL (pooled :6543).
+    # Client keys enable auth/storage/realtime later. Key-gated: unset = off.
+    use_supabase_db: bool = _flag("USE_SUPABASE_DB", False)
+    supabase_db_url: str = os.getenv("SUPABASE_DB_URL", "").strip()
     supabase_url: str = os.getenv("SUPABASE_URL", "").strip()
     supabase_anon_key: str = (
         os.getenv("SUPABASE_PUBLISHABLE_KEY", "").strip()
@@ -49,6 +91,15 @@ class Settings:
             or os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
         )
     )
+
+    @property
+    def database_dialect(self) -> str:
+        return "sqlite" if self.database_url.startswith("sqlite") else "postgresql"
+
+    @property
+    def database_is_supabase(self) -> bool:
+        host = (urlparse(self.database_url).hostname or "").lower()
+        return "supabase.co" in host
 
     # --- Automation (n8n) — domain-event webhooks; key-gated, fire-and-forget ---
     # Base webhook URL of the n8n instance, e.g. https://n8n.ragnarips.com/webhook
@@ -394,6 +445,32 @@ def validate_launch_config() -> dict:
         )
     else:
         _ok("SCHEMA_BOOTSTRAP", "create_all" if settings.use_create_all else "alembic")
+
+    # Database / Supabase
+    dialect = settings.database_dialect
+    if settings.use_supabase_db and not settings.supabase_db_url:
+        _err("USE_SUPABASE_DB", "true but SUPABASE_DB_URL is empty")
+    elif settings.database_is_supabase:
+        _ok("DATABASE", f"supabase postgres ({dialect})")
+    elif dialect == "postgresql":
+        _ok("DATABASE", "postgres")
+    else:
+        if settings.is_production:
+            _warn("DATABASE", "sqlite — set USE_SUPABASE_DB=true + SUPABASE_DB_URL to cut over")
+        else:
+            _ok("DATABASE", "sqlite")
+
+    if settings.supabase_enabled:
+        _ok("SUPABASE_API", "url + secret key configured")
+    elif settings.supabase_url:
+        _warn("SUPABASE_API", "SUPABASE_URL set but no secret/service-role key")
+    else:
+        _warn("SUPABASE_API", "unset — auth/storage/realtime client off")
+
+    if settings.automation_enabled:
+        _ok("N8N_WEBHOOK_BASE", "set")
+    else:
+        _warn("N8N_WEBHOOK_BASE", "unset — automation emit is a no-op")
 
     if settings.seed_demo and settings.is_production:
         _err("SEED_DEMO", "must be false in production")

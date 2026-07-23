@@ -54,8 +54,12 @@ async def emit(event: str, payload: dict, *, timeout: float = 3.0) -> bool:
         logger.warning("automation: unknown event %r (sending anyway)", event)
 
     url = f"{settings.n8n_webhook_base}/{event}"
-    body = json.dumps({"event": event, "data": payload}).encode()
-    headers = {"Content-Type": "application/json"}
+    body = json.dumps({"event": event, "data": payload}, default=str).encode()
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "RAGNAR-automation/1.0",
+        "X-Ragnar-Event": event,
+    }
     if settings.n8n_webhook_secret:
         headers["X-Ragnar-Signature"] = _sign(body)
 
@@ -67,3 +71,20 @@ async def emit(event: str, payload: dict, *, timeout: float = 3.0) -> bool:
     except Exception:  # noqa: BLE001 — best-effort; log and move on
         logger.exception("automation: failed to emit %s", event)
         return False
+
+
+def emit_bg(event: str, payload: dict) -> None:
+    """Fire-and-forget from sync routers. Never blocks the response path."""
+    if not settings.automation_enabled:
+        return
+
+    import asyncio
+    import threading
+
+    def _run() -> None:
+        try:
+            asyncio.run(emit(event, payload))
+        except Exception:  # noqa: BLE001
+            logger.exception("automation: background emit failed for %s", event)
+
+    threading.Thread(target=_run, daemon=True, name=f"n8n-{event}").start()

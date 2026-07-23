@@ -172,6 +172,18 @@ def _persist_listing(payload: ListingCreate, session: Session, seller: Seller) -
     except Exception:  # noqa: BLE001
         pass
 
+    try:
+        from ..automation import emit_bg
+        emit_bg("listing.created", {
+            "listing_id": listing.id,
+            "title": listing.title,
+            "seller_handle": seller.handle,
+            "price_cents": listing.price_cents,
+            "category": listing.category,
+        })
+    except Exception:  # noqa: BLE001
+        pass
+
     return ListingRead.from_listing(listing)
 
 
@@ -376,6 +388,20 @@ def sell_listing(
     session.commit()
     session.refresh(sale)
     session.refresh(order)
+
+    try:
+        from ..automation import emit_bg
+        emit_bg("listing.sold", {
+            "listing_id": listing.id,
+            "sale_id": sale.id,
+            "order_id": order.id,
+            "title": listing.title,
+            "price_cents": price_cents,
+            "seller_handle": seller.handle if seller else None,
+            "source": "manual",
+        })
+    except Exception:  # noqa: BLE001
+        pass
 
     return {
         "status": "sold",
