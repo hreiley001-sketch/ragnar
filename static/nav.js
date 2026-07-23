@@ -177,6 +177,13 @@
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
+
+    // Admin owns its masthead + cmd-nav — do not replace with marketplace chrome.
+    if (path === "/admin" || header.classList.contains("site-header--admin")) {
+      header.classList.add("site-header");
+      return;
+    }
+
     // Asgard chrome sitewide; arena/room tones keep home + live-room special cases.
     const headerTone = onHome
       ? "site-header site-header--arena site-header--asgard"
@@ -191,31 +198,16 @@
         <div class="header-actions"></div>`;
       return;
     }
-    // Home: one nav channel only — utilities in the bar, full destinations in the drawer.
-    if (onHome) {
-      header.innerHTML = `
-        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
-        <div class="header-actions">
-          <div class="header-extra" id="headerExtra"></div>
-          <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
-          <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
-          <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
-        </div>`;
-      acctLinks.push(header.querySelector("#headerAcctLink"));
-      headerSellBtn = header.querySelector("[data-open-sell]");
-      return;
-    }
+    // One nav channel sitewide — utilities in the bar, full destinations in the drawer.
+    const notifHtml = onHome
+      ? ""
+      : `<a class="btn btn-ghost btn-sm" href="/notifications" title="Notifications">🔔</a>`;
     header.innerHTML = `
       <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
-        <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
-        <a class="btn btn-ghost btn-sm" href="/live">Live</a>
-        <a class="btn btn-ghost btn-sm" href="/feed">Feed</a>
-        <a class="btn btn-ghost btn-sm" href="/groups">Groups</a>
-        <a class="btn btn-ghost btn-sm" href="/mystore">My Store</a>
         <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
-        <a class="btn btn-ghost btn-sm" href="/notifications" title="Notifications">🔔</a>
+        ${notifHtml}
         <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
         <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
       </div>`;
