@@ -86,7 +86,7 @@
         <div class="asgard-rail asgard-rail-l"><span>\u16b1</span><span>\u16a8</span><span>\u16b7</span><span>\u16be</span><span>\u16a8</span><span>\u16b1</span></div>
         <div class="asgard-rail asgard-rail-r"><span>\u16a6</span><span>\u16b1</span><span>\u16a8</span><span>\u16df</span><span>\u16b9</span><span>\u16a2</span></div>
         <div class="asgard-crest-seal">
-          <img src="/static/logo.svg" alt="" width="120" height="120" decoding="async" />
+          <img src="/static/logo.svg" alt="" width="160" height="114" decoding="async" />
         </div>
         <div class="asgard-spark asgard-spark-a"></div>
         <div class="asgard-spark asgard-spark-b"></div>

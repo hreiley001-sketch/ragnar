@@ -437,7 +437,7 @@ body.arena-home--concise .vault-arrival-copy h1 {
       rgba(184, 121, 26, 0.38) 46%,
       rgba(30, 84, 118, 0.8) 72%,
       rgba(12, 30, 47, 0.95) 100%),
-    url("/static/logo.png") center 38% / 42% no-repeat,
+    url("/static/logo.svg") center 38% / 42% no-repeat,
     linear-gradient(210deg, #f0ead9, #e0d8c4) !important;
 }
 
