@@ -13,6 +13,13 @@ End the SQLite-in-production risk and the lossy dual-write.
 
 Canonical plan (code repo): `docs/SUPABASE_MIGRATION_PLAN.md`.
 
+> [!check] Live as of 2026-07-22 — Phases 0–3 done.
+> Schema is applied on the **live** Supabase (`aws-1-us-west-2.pooler.supabase.com`,
+> PG 17.6): head `b2c3d4e5f6a7`, 40 product tables, 14 jsonb, RLS, 3 telemetry tables.
+> Next: Phase 4 backfill (run from Render — prod SQLite is on `/var/data`), then
+> Phase 5 retire dual-write, then Phase 6 cutover. Runtime still on SQLite
+> (`USE_SUPABASE_DB=false`). See [[Supabase Migration/Phase Status]].
+
 ## Four enforced decisions
 
 1. **Retire** the parallel Birdman `api/v1/*` Supabase-REST endpoints — see [[Backend Architecture/REST Endpoint Retirement]].

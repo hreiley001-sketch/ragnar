@@ -4,16 +4,19 @@
 product schema, managed by Alembic. End the SQLite-in-production risk and the
 lossy dual-write between two divergent data models.
 
-**Status:** EXECUTING — Phase 0/2 landed (additive, no runtime change). See vault
-[[Supabase Migration/Phase Status]] for live status.
+**Status:** EXECUTING — Phases 0–3 done (Phase 3 applied on **LIVE Supabase**); no
+runtime change yet. See vault [[Supabase Migration/Phase Status]] for live status.
 **Owner:** Henry · **Drafted:** 2026-07-22
 
 > **Progress (2026-07-22)**
 > - Phase 0: catch-up migration `f407fe8b8649` (+7 drifted tables, `user.supabase_sub`); **40-table parity verified**.
-> - Phase 2: `alembic/env.py` prefers `SUPABASE_MIGRATION_DB_URL`/`ALEMBIC_DB_URL`; `scripts/backfill_sqlite_to_pg.py` written + tested (idempotent, PK-preserving, verified).
-> - Follow-ups authored: `a1b2c3d4e5f6` JSON→JSONB, `b2c3d4e5f6a7` enable-RLS (both Postgres-only, SQLite no-op). Chain has a single head and is reversible.
+> - Phase 1: Supabase reachable — `aws-1-us-west-2.pooler.supabase.com`, **PostgreSQL 17.6**. ✅
+> - Phase 2: `alembic/env.py` prefers `SUPABASE_MIGRATION_DB_URL`/`ALEMBIC_DB_URL` (+ `%`-escapes creds for ConfigParser); `scripts/backfill_sqlite_to_pg.py` written + tested (idempotent, PK-preserving, verified).
+> - Phase 3: **applied on LIVE Supabase** — was at `f9fc4cc130a2` (initial, empty) → upgraded to head `b2c3d4e5f6a7`. Verified: **40 product tables, 14 jsonb columns, RLS enabled, `user.supabase_sub`, 3 telemetry tables**, `market_events`/`realtime_events` in `supabase_realtime`. Driver pin fixed en route (`psycopg[binary]` `2.9.10`→`3.2.13`). ✅
+> - Follow-up revisions (`a1b2…` JSONB, `b2c3…` RLS) confirmed applied on live; both Postgres-only, SQLite no-op. Chain single-head, reversible.
 > - `supabase/schema.sql` trimmed to telemetry-only. Vault updated (Supabase Migration / Database Architecture / Backend Architecture / Operations).
-> - Remaining: Phase 1 (provision), 3 (apply), 4 (run backfill), 5 (retire dual-write code), 6 (cutover), 7 (decommission).
+> - **Phase 4 blocked (by design):** production SQLite lives on Render `/var/data/ragnar.db`, not this machine — run the backfill from the Render shell.
+> - Remaining: Phase 4 (backfill on Render), 5 (retire dual-write code), 6 (cutover — flip `DATABASE_URL`; `USE_SUPABASE_DB` still `false`), 7 (decommission).
 
 ---
 
