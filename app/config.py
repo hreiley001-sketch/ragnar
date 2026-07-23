@@ -49,13 +49,14 @@ def normalize_database_url(url: str) -> str:
 def resolve_database_url() -> str:
     """Pick runtime DB URL.
 
-    When ``USE_SUPABASE_DB=true`` and ``SUPABASE_DB_URL`` is set, prefer the
-    Supabase pooled URL. Otherwise use ``DATABASE_URL`` (SQLite by default).
+    Prefer ``SUPABASE_DB_URL`` when set (Render / Cursor env UIs often use this
+    name). Explicit ``USE_SUPABASE_DB=false`` keeps ``DATABASE_URL`` instead.
+    Otherwise use ``DATABASE_URL`` (SQLite by default).
     """
-    if _flag("USE_SUPABASE_DB", False):
-        supabase = os.getenv("SUPABASE_DB_URL", "").strip()
-        if supabase:
-            return normalize_database_url(supabase)
+    supabase = os.getenv("SUPABASE_DB_URL", "").strip()
+    flagged = os.getenv("USE_SUPABASE_DB")
+    if supabase and (flagged is None or _flag("USE_SUPABASE_DB", True)):
+        return normalize_database_url(supabase)
     return normalize_database_url(os.getenv("DATABASE_URL", "sqlite:///./ragnar.db"))
 
 
@@ -70,11 +71,17 @@ class Settings:
 
     # --- Supabase (target data platform) ---
     # See vault/Ragnarips/Backend/Supabase-Integration.md.
-    # Opt-in cutover: set USE_SUPABASE_DB=true + SUPABASE_DB_URL (pooled :6543).
-    # Client keys enable auth/storage/realtime later. Key-gated: unset = off.
-    use_supabase_db: bool = _flag("USE_SUPABASE_DB", False)
+    # Cutover: set SUPABASE_DB_URL (pooled :6543). Optional USE_SUPABASE_DB=false
+    # keeps DATABASE_URL. Client keys enable auth/storage/realtime. Unset = off.
+    # SUPA_URL is accepted as an alias for SUPABASE_URL (common typo in dashboards).
+    use_supabase_db: bool = bool(os.getenv("SUPABASE_DB_URL", "").strip()) and (
+        os.getenv("USE_SUPABASE_DB") is None or _flag("USE_SUPABASE_DB", True)
+    )
     supabase_db_url: str = os.getenv("SUPABASE_DB_URL", "").strip()
-    supabase_url: str = os.getenv("SUPABASE_URL", "").strip()
+    supabase_url: str = (
+        os.getenv("SUPABASE_URL", "").strip()
+        or os.getenv("SUPA_URL", "").strip()
+    )
     supabase_anon_key: str = (
         os.getenv("SUPABASE_PUBLISHABLE_KEY", "").strip()
         or os.getenv("SUPABASE_ANON_KEY", "").strip()
@@ -85,7 +92,10 @@ class Settings:
     )
     supabase_jwks_url: str = os.getenv("SUPABASE_JWKS_URL", "").strip()
     supabase_enabled: bool = bool(
-        os.getenv("SUPABASE_URL", "").strip()
+        (
+            os.getenv("SUPABASE_URL", "").strip()
+            or os.getenv("SUPA_URL", "").strip()
+        )
         and (
             os.getenv("SUPABASE_SECRET_KEY", "").strip()
             or os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
@@ -449,14 +459,14 @@ def validate_launch_config() -> dict:
     # Database / Supabase
     dialect = settings.database_dialect
     if settings.use_supabase_db and not settings.supabase_db_url:
-        _err("USE_SUPABASE_DB", "true but SUPABASE_DB_URL is empty")
+        _err("USE_SUPABASE_DB", "enabled but SUPABASE_DB_URL is empty")
     elif settings.database_is_supabase:
         _ok("DATABASE", f"supabase postgres ({dialect})")
     elif dialect == "postgresql":
         _ok("DATABASE", "postgres")
     else:
         if settings.is_production:
-            _warn("DATABASE", "sqlite — set USE_SUPABASE_DB=true + SUPABASE_DB_URL to cut over")
+            _warn("DATABASE", "sqlite — set SUPABASE_DB_URL to cut over")
         else:
             _ok("DATABASE", "sqlite")
 

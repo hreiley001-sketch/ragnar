@@ -81,18 +81,20 @@ Supabase project (`tmlwajtttnkhkmrsdnie`, `aws-1-us-west-2`):
 
 1. In Supabase → **Project Settings → Database**, copy the **Session pooler**
    URI (port **6543** for app runtime). Percent-encode special characters in the password.
-2. In Render → Environment, set:
+2. In Render → Environment, set (exact key names — typos are ignored):
    - `SUPABASE_DB_URL` = pooled URI (bare `postgresql://…` is fine — app normalizes)
-   - `SUPABASE_URL` = `https://tmlwajtttnkhkmrsdnie.supabase.co`
+   - `SUPABASE_URL` = `https://tmlwajtttnkhkmrsdnie.supabase.co` (**not** `SUPA_URL`)
    - `SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SECRET_KEY` from API settings
-   - `USE_SUPABASE_DB=true` **only after** schema + backfill are done
-3. From a shell with the migration URL (direct/session, not transaction pooler):
+3. When `SUPABASE_DB_URL` is set, the app uses Supabase automatically. Only set
+   `USE_SUPABASE_DB=false` if you need to force SQLite temporarily.
+4. From a shell with the migration URL (direct/session, not transaction pooler):
    ```bash
    SUPABASE_MIGRATION_DB_URL='postgresql+psycopg://…:5432/postgres' alembic upgrade head
    ```
-4. Backfill prod SQLite → Postgres (run on Render where `/var/data/ragnar.db` lives).
-5. Flip `USE_SUPABASE_DB=true`, set `SCHEMA_BOOTSTRAP=alembic`, redeploy.
-6. Confirm `GET /health` shows `"database":"postgresql"` and `"supabase_db":true`.
+5. Backfill prod SQLite → Postgres if you already have live SQLite data (run on
+   Render where `/var/data/ragnar.db` lives).
+6. Set `SCHEMA_BOOTSTRAP=alembic`, redeploy.
+7. Confirm `GET /health/ready` reports a postgres/supabase database check.
 
 ## 5. n8n automation
 
@@ -102,5 +104,5 @@ Supabase project (`tmlwajtttnkhkmrsdnie`, `aws-1-us-west-2`):
    `listing.created`, `listing.sold`, `order.paid`, `stream.started`.
 4. Confirm `GET /api/meta` → `integrations.n8n: true`.
 
-For scale later without the opt-in flag, set `DATABASE_URL` directly to the pooled
-Supabase URI (`psycopg` is already in `requirements.txt`).
+You can also set `DATABASE_URL` directly to the pooled Supabase URI
+(`psycopg` is already in `requirements.txt`); `SUPABASE_DB_URL` is preferred when both are set.
