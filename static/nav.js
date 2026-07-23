@@ -32,21 +32,32 @@
       css.href = "/static/asgard-shell.css";
       document.head.appendChild(css);
     }
-    // "How it works" — home path only (shown once; see howto.js).
+    // "How it works" — home path ONLY. Never load or leave the band elsewhere
+    // (Feed / Marketplace / etc.). Cache-bust so older sitewide howto.js is not reused.
     if (path === "/") {
       if (!document.getElementById("howto-css")) {
         const css = document.createElement("link");
         css.id = "howto-css";
         css.rel = "stylesheet";
-        css.href = "/static/howto.css";
+        css.href = "/static/howto.css?v=home-only";
         document.head.appendChild(css);
       }
       if (!document.getElementById("howto-js")) {
         const s = document.createElement("script");
         s.id = "howto-js";
-        s.src = "/static/howto.js";
+        s.src = "/static/howto.js?v=home-only";
         s.defer = true;
         document.head.appendChild(s);
+      }
+    } else {
+      const stripHowto = () => {
+        const band = document.getElementById("ragnarHowto");
+        if (band) band.remove();
+        document.querySelectorAll("link#howto-css, script#howto-js").forEach((el) => el.remove());
+      };
+      stripHowto();
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", stripHowto);
       }
     }
   }
