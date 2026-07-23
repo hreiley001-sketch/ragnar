@@ -233,6 +233,28 @@ def _handle_checkout_completed(session: Session, obj: dict) -> None:
     ops_alert(f"Order paid: {listing.title} (${price_cents / 100:,.2f})")
     logger.info("Listing %s sold via Stripe; order %s created", listing_id, order.id)
 
+    try:
+        from ..automation import emit_bg
+        emit_bg("order.paid", {
+            "order_id": order.id,
+            "listing_id": listing.id,
+            "title": listing.title,
+            "price_cents": price_cents,
+            "seller_id": listing.seller_id,
+            "buyer_user_id": order.buyer_user_id,
+            "stripe_session_id": session_id,
+            "source": "stripe",
+        })
+        emit_bg("listing.sold", {
+            "listing_id": listing.id,
+            "order_id": order.id,
+            "title": listing.title,
+            "price_cents": price_cents,
+            "source": "stripe",
+        })
+    except Exception:  # noqa: BLE001
+        pass
+
 
 @router.post("/webhook")
 async def webhook(request: Request, session: Session = Depends(get_session)) -> dict:

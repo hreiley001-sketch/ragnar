@@ -157,11 +157,23 @@ def update_stream(
     seller = session.get(Seller, stream.seller_id)
     _authz(seller, user, x_store_token, x_admin_token)
     data = payload.model_dump(exclude_unset=True)
-    if data.get("status") == "live" and not stream.started_at:
+    went_live = data.get("status") == "live" and not stream.started_at
+    if went_live:
         stream.started_at = utcnow()
     for k, v in data.items():
         setattr(stream, k, v)
     session.add(stream)
     session.commit()
     session.refresh(stream)
+    if went_live:
+        try:
+            from ..automation import emit_bg
+            emit_bg("stream.started", {
+                "stream_id": stream.id,
+                "seller_id": stream.seller_id,
+                "seller_handle": seller.handle if seller else None,
+                "title": stream.title,
+            })
+        except Exception:  # noqa: BLE001
+            pass
     return _read(stream, seller)

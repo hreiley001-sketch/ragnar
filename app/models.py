@@ -75,6 +75,7 @@ class User(SQLModel, table=True):
     name: Optional[str] = Field(default=None, max_length=120)
     password_hash: Optional[str] = Field(default=None, max_length=255)  # null for Google-only
     google_sub: Optional[str] = Field(default=None, index=True, max_length=64)
+    supabase_sub: Optional[str] = Field(default=None, index=True, max_length=64)
     email_verified: bool = Field(default=False)
     verify_token: Optional[str] = Field(default=None, index=True, max_length=64)
     verify_sent_at: Optional[datetime] = Field(default=None)

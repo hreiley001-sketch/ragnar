@@ -71,6 +71,7 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "pending_email": "VARCHAR",
         "reset_token": "VARCHAR",
         "reset_sent_at": "DATETIME",
+        "supabase_sub": "VARCHAR",
     },
 }
 

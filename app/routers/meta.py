@@ -62,6 +62,19 @@ def _build_meta() -> dict:
             "image_enhance": replicate_configured(),
             "web_extract": firecrawl_configured(),
             "fonts": google_fonts_configured(),
+            "supabase_api": settings.supabase_enabled,
+            "supabase_db": settings.database_is_supabase,
+            "n8n": settings.automation_enabled,
+            "database": settings.database_dialect,
+        },
+        "platforms": {
+            "database": {
+                "dialect": settings.database_dialect,
+                "supabase": settings.database_is_supabase,
+                "use_supabase_db_flag": settings.use_supabase_db,
+            },
+            "supabase_api": settings.supabase_enabled,
+            "automation_n8n": settings.automation_enabled,
         },
     }
 

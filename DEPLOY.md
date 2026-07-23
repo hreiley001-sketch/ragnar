@@ -74,5 +74,33 @@ Optional but recommended for password-reset / verification emails:
 - **Azure App Service / Container Apps** — use the `Dockerfile`; set the same env vars.
 - **Your own VPS** — run behind Caddy/Nginx for TLS; `Dockerfile` works as-is.
 
-For scale later, swap SQLite for managed Postgres: add `psycopg[binary]` to
-`requirements.txt` and set `DATABASE_URL=postgresql+psycopg://…`.
+## 4. Supabase cutover (Postgres — recommended)
+
+Production still defaults to SQLite on the Render disk. To cut over to the shared
+Supabase project (`tmlwajtttnkhkmrsdnie`, `aws-1-us-west-2`):
+
+1. In Supabase → **Project Settings → Database**, copy the **Session pooler**
+   URI (port **6543** for app runtime). Percent-encode special characters in the password.
+2. In Render → Environment, set:
+   - `SUPABASE_DB_URL` = pooled URI (bare `postgresql://…` is fine — app normalizes)
+   - `SUPABASE_URL` = `https://tmlwajtttnkhkmrsdnie.supabase.co`
+   - `SUPABASE_PUBLISHABLE_KEY` / `SUPABASE_SECRET_KEY` from API settings
+   - `USE_SUPABASE_DB=true` **only after** schema + backfill are done
+3. From a shell with the migration URL (direct/session, not transaction pooler):
+   ```bash
+   SUPABASE_MIGRATION_DB_URL='postgresql+psycopg://…:5432/postgres' alembic upgrade head
+   ```
+4. Backfill prod SQLite → Postgres (run on Render where `/var/data/ragnar.db` lives).
+5. Flip `USE_SUPABASE_DB=true`, set `SCHEMA_BOOTSTRAP=alembic`, redeploy.
+6. Confirm `GET /health` shows `"database":"postgresql"` and `"supabase_db":true`.
+
+## 5. n8n automation
+
+1. Host n8n (Docker / cloud). Note the webhook base, e.g. `https://n8n.example/webhook`.
+2. Render → set `N8N_WEBHOOK_BASE` and optional `N8N_WEBHOOK_SECRET`.
+3. FastAPI emits (background, never blocks): `seller.applied`, `seller.founding_claimed`,
+   `listing.created`, `listing.sold`, `order.paid`, `stream.started`.
+4. Confirm `GET /api/meta` → `integrations.n8n: true`.
+
+For scale later without the opt-in flag, set `DATABASE_URL` directly to the pooled
+Supabase URI (`psycopg` is already in `requirements.txt`).

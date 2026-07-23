@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from app.config import settings  # noqa: E402
+from app.config import normalize_database_url, settings  # noqa: E402
 from app import models  # noqa: E402,F401  — register all tables on metadata
 
 config = context.config
@@ -32,11 +32,12 @@ def _migration_url() -> str:
     while the app keeps using DATABASE_URL / the transaction pooler at runtime.
     Falls back to settings.database_url so local + SQLite dev is unchanged.
     """
-    return (
+    raw = (
         os.getenv("SUPABASE_MIGRATION_DB_URL")
         or os.getenv("ALEMBIC_DB_URL")
         or settings.database_url
     ).strip()
+    return normalize_database_url(raw)
 
 
 # Escape % so ConfigParser interpolation doesn't choke on %-encoded

@@ -117,36 +117,46 @@ def place_bid(ride_id: int, payload: dict, session: Session = Depends(get_sessio
 async def sse_events(ride_id: int, request: Request) -> StreamingResponse:
     """Server-Sent Events: live phase/bid/event stream for a ride."""
 
-    async def gen():
-        last_id = 0
-        # prime with current state
+    def _poll(last_id: int) -> tuple[list[str], int, bool, bool]:
+        """Sync DB work off the event loop. Returns frames, new last_id, archived, missing."""
+        frames: list[str] = []
         with Session(db_engine) as s:
             ride = s.get(Ride, ride_id)
             if not ride:
-                yield f"data: {json.dumps({'kind': 'error', 'detail': 'not found'})}\n\n"
-                return
+                return frames, last_id, False, True
             engine.tick(s, ride)
-            yield f"data: {json.dumps({'kind': 'state', 'state': ride_state(s, ride)})}\n\n"
+            new_events = s.exec(
+                select(RideEvent).where(RideEvent.ride_id == ride_id, RideEvent.id > last_id).order_by(RideEvent.id)
+            ).all()
+            for ev in new_events:
+                last_id = ev.id
+                frames.append(
+                    f"data: {json.dumps({'kind': 'event', 'type': ev.type, 'data': ev.data, 'at': ev.created_at.isoformat()})}\n\n"
+                )
+            frames.append(f"data: {json.dumps({'kind': 'state', 'state': ride_state(s, ride)})}\n\n")
+            return frames, last_id, ride.status == RideStatus.archived.value, False
+
+    async def gen():
+        last_id = 0
+        frames, last_id, archived, missing = await asyncio.to_thread(_poll, last_id)
+        if missing:
+            yield f"data: {json.dumps({'kind': 'error', 'detail': 'not found'})}\n\n"
+            return
+        for frame in frames:
+            yield frame
+        if archived:
+            return
         while True:
             if await request.is_disconnected():
                 break
-            archived = False
-            with Session(db_engine) as s:
-                ride = s.get(Ride, ride_id)
-                if not ride:
-                    break
-                engine.tick(s, ride)
-                new_events = s.exec(
-                    select(RideEvent).where(RideEvent.ride_id == ride_id, RideEvent.id > last_id).order_by(RideEvent.id)
-                ).all()
-                for ev in new_events:
-                    last_id = ev.id
-                    yield f"data: {json.dumps({'kind': 'event', 'type': ev.type, 'data': ev.data, 'at': ev.created_at.isoformat()})}\n\n"
-                yield f"data: {json.dumps({'kind': 'state', 'state': ride_state(s, ride)})}\n\n"
-                archived = ride.status == RideStatus.archived.value
+            await asyncio.sleep(1.5)
+            frames, last_id, archived, missing = await asyncio.to_thread(_poll, last_id)
+            if missing:
+                break
+            for frame in frames:
+                yield frame
             if archived:
                 break
-            await asyncio.sleep(1.5)
 
     return StreamingResponse(gen(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 

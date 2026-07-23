@@ -56,6 +56,27 @@ def apply(payload: SellerApply, session: Session = Depends(get_session),
         session.add(user)
     session.commit()
     session.refresh(seller)
+
+    try:
+        from ..automation import emit_bg
+        emit_bg("seller.applied", {
+            "seller_id": seller.id,
+            "handle": seller.handle,
+            "display_name": seller.display_name,
+            "email": seller.email,
+            "is_founding": bool(seller.is_founding),
+            "founding_number": seller.founding_number,
+            "source": "seller_apply",
+        })
+        if seller.is_founding:
+            emit_bg("seller.founding_claimed", {
+                "seller_id": seller.id,
+                "handle": seller.handle,
+                "founding_number": seller.founding_number,
+            })
+    except Exception:  # noqa: BLE001
+        pass
+
     # store_edit_token is returned ONCE here so the seller can customize their store.
     return SellerApplyResult(**seller_state(seller), store_edit_token=seller.store_edit_token)
 
