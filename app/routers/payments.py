@@ -218,6 +218,11 @@ def _handle_checkout_completed(session: Session, obj: dict) -> None:
         shipping_cents=listing.shipping_cents or 0,
         status="paid",
         stripe_session_id=session_id,
+        stripe_payment_intent_id=(
+            obj.get("payment_intent")
+            if isinstance(obj.get("payment_intent"), str)
+            else None
+        ),
         source="stripe",
     )
     session.add(order)
@@ -306,6 +311,15 @@ async def webhook(request: Request, session: Session = Depends(get_session)) -> 
             obj = event["data"]["object"]
             inventory.release_hold(session, obj.get("id"))
             session.commit()
+        elif event_type in {
+            "charge.dispute.created",
+            "charge.dispute.updated",
+            "charge.dispute.closed",
+            "charge.dispute.funds_withdrawn",
+            "charge.dispute.funds_reinstated",
+        }:
+            from .. import chargebacks
+            chargebacks.apply_dispute_event(session, event["data"]["object"], event_type)
     except IntegrityError:
         # Unique stripe_session_id (or similar) — treat as already fulfilled.
         session.rollback()

@@ -259,6 +259,7 @@ class Order(SQLModel, table=True):
     tracking_number: Optional[str] = Field(default=None, max_length=80)
     carrier: Optional[str] = Field(default=None, max_length=40)
     stripe_session_id: Optional[str] = Field(default=None, index=True, unique=True, max_length=120)
+    stripe_payment_intent_id: Optional[str] = Field(default=None, index=True, max_length=120)
     stripe_refund_id: Optional[str] = Field(default=None, index=True, max_length=120)
     refunded_cents: int = Field(default=0)
     source: str = Field(default="manual")  # stripe | offer | manual | ride
@@ -370,6 +371,26 @@ class TrustEvent(SQLModel, table=True):
     score_before: Optional[int] = Field(default=None)
     score_after: Optional[int] = Field(default=None)
     created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class Chargeback(SQLModel, table=True):
+    """Stripe charge.dispute.* ledger — chargeback desk for Trust & Safety."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    stripe_dispute_id: str = Field(index=True, unique=True, max_length=120)
+    order_id: Optional[int] = Field(default=None, foreign_key="order.id", index=True)
+    seller_id: Optional[int] = Field(default=None, foreign_key="seller.id", index=True)
+    dispute_id: Optional[int] = Field(default=None, foreign_key="dispute.id", index=True)
+    stripe_charge_id: Optional[str] = Field(default=None, index=True, max_length=120)
+    stripe_payment_intent_id: Optional[str] = Field(default=None, index=True, max_length=120)
+    status: str = Field(default="needs_response", index=True, max_length=40)
+    reason: Optional[str] = Field(default=None, max_length=120)
+    amount_cents: int = Field(default=0)
+    currency: str = Field(default="usd", max_length=8)
+    evidence_due_by: Optional[datetime] = Field(default=None)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    updated_at: datetime = Field(default_factory=utcnow)
+    closed_at: Optional[datetime] = Field(default=None)
 
 
 # --------------------------------------------------------------------------- #

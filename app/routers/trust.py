@@ -126,3 +126,13 @@ def admin_rescore_seller(
     session.commit()
     session.refresh(seller)
     return trust_svc.admin_snapshot(session, seller)
+
+
+@admin_router.get("/chargebacks")
+def admin_chargebacks(
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+) -> dict:
+    from .. import chargebacks
+    items = chargebacks.list_chargebacks(session)
+    return {"items": items, "count": len(items)}

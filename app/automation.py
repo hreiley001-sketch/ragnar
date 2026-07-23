@@ -38,6 +38,8 @@ EVENTS = {
     "order.paid",
     "order.shipped",
     "dispute.opened",
+    "chargeback.opened",
+    "chargeback.updated",
     "stream.started",
 }
 

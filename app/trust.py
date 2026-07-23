@@ -11,6 +11,7 @@ from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
 from .models import (
+    Chargeback,
     Dispute,
     Feedback,
     Order,
@@ -132,6 +133,28 @@ def compute_fraud_score(session: Session, seller: Seller) -> int:
         )
     ).all()
     score += min(24, len(low_fb) * 8)
+
+    open_cbs = session.exec(
+        select(Chargeback).where(
+            Chargeback.seller_id == seller.id,
+            Chargeback.status.in_(  # type: ignore[attr-defined]
+                [
+                    "needs_response",
+                    "warning_needs_response",
+                    "under_review",
+                    "warning_under_review",
+                ]
+            ),
+        )
+    ).all()
+    score += min(40, len(open_cbs) * 20)
+    lost_cbs = session.exec(
+        select(Chargeback).where(
+            Chargeback.seller_id == seller.id,
+            Chargeback.status.in_(["lost", "warning_closed"]),  # type: ignore[attr-defined]
+        )
+    ).all()
+    score += min(30, len(lost_cbs) * 15)
 
     if seller.verification_status == SellerVerificationStatus.verified.value:
         score = max(0, score - 10)

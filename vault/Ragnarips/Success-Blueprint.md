@@ -47,7 +47,7 @@ flowchart TB
 | Trust | Fraud scoring | 🟡 heuristic scorer + events | P0 |
 | Trust | Suspension / ban | 🟡 trust_status enforced on list + checkout | P0 |
 | Trust | Buyer protection + disputes | 🟢 open/resolve dispute, Counsel | P0 polish |
-| Trust | Chargeback desk | 🔴 Stripe dispute webhooks + playbooks | P1 |
+| Trust | Chargeback desk | 🟢 Stripe `charge.dispute.*` → Chargeback + score | P0 done |
 | Payments | Stripe Connect split + fee | 🟢 destination charges | keep |
 | Payments | Escrow / delayed payout | 🔴 hold periods by risk tier | P1 |
 | Payments | 1099-K / tax | 🔴 Stripe Tax + reporting export | P2 |

@@ -69,6 +69,7 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
     "order": {
         "stripe_refund_id": "VARCHAR",
         "refunded_cents": "INTEGER DEFAULT 0",
+        "stripe_payment_intent_id": "VARCHAR",
     },
     "bid": {
         "bidder_user_id": "INTEGER",

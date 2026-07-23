@@ -210,6 +210,7 @@ def create_checkout_session(listing: Listing, seller: Seller | None,
         payment_intent_data={
             "application_fee_amount": split.platform_fee_cents,
             "transfer_data": {"destination": seller.stripe_account_id},
+            "metadata": metadata,
         },
         metadata=metadata,
         success_url=f"{base}/?checkout=success&listing={listing.id}",

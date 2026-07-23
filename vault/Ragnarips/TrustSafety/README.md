@@ -138,8 +138,8 @@ Must exist before scale (see Success Blueprint Wave 0/1):
 - [x] Admin verify / suspend / reinstate / rescore APIs
 - [x] Public trust badge endpoint
 - [x] KB: buyer protection + dispute escalation
+- [x] Stripe `charge.dispute.*` → Chargeback ledger + TrustEvent + score
 - [ ] Stripe Identity session create + webhook
-- [ ] Stripe `charge.dispute.*` → TrustEvent + score
 - [ ] Payout delay by risk tier
 - [ ] Image-hash duplicate listing detector
 - [ ] Shill-bid detector on rides
@@ -147,4 +147,5 @@ Must exist before scale (see Success Blueprint Wave 0/1):
 ---
 
 ## Change log
+- 2026-07-23 — chargeback desk (`app/chargebacks.py`) wired to Stripe webhooks.
 - 2026-07-23 — initial blueprint + Wave 0 code spine.

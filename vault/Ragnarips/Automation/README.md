@@ -49,7 +49,7 @@ await emit("order.paid", {"order_id": order.id, "total_cents": total, "buyer": u
 ```
 
 ## Event catalog (from `EVENTS` in automation.py)
-`seller.applied` · `seller.founding_claimed` · `seller.payouts_ready` · `seller.verification_requested` · `seller.onboarding_completed` · `listing.created` · `listing.sold` · `order.paid` · `order.shipped` · `dispute.opened` · `stream.started`
+`seller.applied` · `seller.founding_claimed` · `seller.payouts_ready` · `seller.verification_requested` · `seller.onboarding_completed` · `listing.created` · `listing.sold` · `order.paid` · `order.shipped` · `dispute.opened` · `chargeback.opened` · `chargeback.updated` · `stream.started`
 
 ## Emit points (wired — key-gated via `emit_bg`)
 | Event | Where |
