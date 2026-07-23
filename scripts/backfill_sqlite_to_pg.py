@@ -49,6 +49,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from sqlalchemy import create_engine, func, insert, select, text
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Engine
 from sqlmodel import SQLModel
 
@@ -89,14 +90,14 @@ def copy_table(src: Engine, dst: Engine, table, dry_run: bool) -> tuple[int, int
             if not chunk:
                 break
             rows = [dict(row._mapping) for row in chunk]
-            stmt = insert(table)
             if is_pg:
-                # ON CONFLICT (pk) DO NOTHING — idempotent re-runs.
-                stmt = stmt.on_conflict_do_nothing(
+                # ON CONFLICT (pk) DO NOTHING — idempotent re-runs. Uses the
+                # Postgres dialect insert; the generic insert() has no such method.
+                stmt = pg_insert(table).on_conflict_do_nothing(
                     index_elements=[c.name for c in pk_cols]
                 )
             else:  # sqlite target (used only in local tests)
-                stmt = stmt.prefix_with("OR IGNORE")
+                stmt = insert(table).prefix_with("OR IGNORE")
             with dst.begin() as dconn:
                 dconn.execute(stmt, rows)
             written += len(rows)
