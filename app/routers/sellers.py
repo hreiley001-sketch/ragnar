@@ -8,7 +8,7 @@ from sqlmodel import Session, select
 
 from ..auth import get_current_user, require_user
 from ..database import get_session
-from ..models import Seller
+from ..models import Seller, User
 from ..schemas import FoundingStatus, SellerApply, SellerApplyResult, SellerState
 from ..services import (
     founding_status,
@@ -63,7 +63,6 @@ def apply(payload: SellerApply, session: Session = Depends(get_session),
             "seller_id": seller.id,
             "handle": seller.handle,
             "display_name": seller.display_name,
-            "email": seller.email,
             "is_founding": bool(seller.is_founding),
             "founding_number": seller.founding_number,
             "source": "seller_apply",
@@ -85,18 +84,38 @@ def apply(payload: SellerApply, session: Session = Depends(get_session),
 def claim_store(payload: dict, session: Session = Depends(get_session),
                 user=Depends(get_current_user)) -> dict:
     """Link an existing store to the signed-in account using its store token."""
+    import hmac
+
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sign in first.")
     handle = (payload.get("handle") or "").strip().lower()
     token = (payload.get("store_token") or "").strip()
     seller = session.exec(select(Seller).where(Seller.handle == handle)).first()
-    if not seller or not seller.store_edit_token or token != seller.store_edit_token:
+    if (
+        not seller
+        or not seller.store_edit_token
+        or not token
+        or not hmac.compare_digest(token, seller.store_edit_token)
+    ):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Store not found or token doesn't match.")
+    # Single owner: clear any other accounts pointing at this handle.
+    others = session.exec(select(User).where(User.seller_handle == handle)).all()
+    for other in others:
+        if other.id != user.id:
+            other.seller_handle = None
+            session.add(other)
     user.seller_handle = handle
+    # Rotate claim token so the old secret cannot re-claim forever.
+    seller.store_edit_token = secrets.token_urlsafe(16)
     session.add(user)
+    session.add(seller)
     session.commit()
-    return {"status": "claimed", "seller_handle": handle}
+    return {
+        "status": "claimed",
+        "seller_handle": handle,
+        "store_edit_token": seller.store_edit_token,
+    }
 
 
 @router.get("/{handle}", response_model=SellerState)

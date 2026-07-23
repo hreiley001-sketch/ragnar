@@ -90,6 +90,15 @@ def is_staff(user: Optional[User]) -> bool:
     return bool(user and user.role == UserRole.admin.value)
 
 
+def admin_token_ok(provided: str | None) -> bool:
+    """Constant-time admin break-glass token check."""
+    expected = (settings.admin_token or "").strip()
+    got = (provided or "").strip()
+    if not expected or not got or len(got) != len(expected):
+        return False
+    return hmac.compare_digest(got, expected)
+
+
 def can_act_for_seller(user: Optional[User], seller, x_store_token: str = "") -> bool:
     """True if this request may act as the given Seller: the store token, the
     linked owner account (user.seller_handle), or staff."""
@@ -99,7 +108,9 @@ def can_act_for_seller(user: Optional[User], seller, x_store_token: str = "") ->
         return True
     if user and user.seller_handle and user.seller_handle == seller.handle:
         return True
-    return bool(seller.store_edit_token) and x_store_token == seller.store_edit_token
+    if not seller.store_edit_token or not x_store_token:
+        return False
+    return hmac.compare_digest(x_store_token, seller.store_edit_token)
 
 
 def require_can_act_for_seller(

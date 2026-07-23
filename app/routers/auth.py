@@ -67,8 +67,8 @@ def signup(payload: dict, request: Request, response: Response, session: Session
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Please enter your name.")
     if not _EMAIL_RE.match(email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Enter a valid email.")
-    if len(password) < 8:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must be at least 8 characters.")
+    if len(password) < 8 or len(password) > 128:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must be 8–128 characters.")
     if not payload.get("accept_terms"):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Please accept the Terms & buyer/seller conduct.")
     if session.exec(select(User).where(User.email == email)).first():
@@ -100,6 +100,11 @@ def verify_email(payload: dict, response: Response, session: Session = Depends(g
     if not user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="This verification link is invalid or already used.")
+    if user.verify_sent_at and utcnow() - user.verify_sent_at > timedelta(hours=24):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This verification link has expired. Request a new one from your account.",
+        )
     previous_role = user.role
     if user.pending_email:
         new_email = user.pending_email.strip().lower()
@@ -131,7 +136,22 @@ def verify_email(payload: dict, response: Response, session: Session = Depends(g
 
 
 @router.post("/resend-verification")
-def resend_verification(session: Session = Depends(get_session), user=Depends(auth.require_user)) -> dict:
+def resend_verification(
+    request: Request,
+    session: Session = Depends(get_session),
+    user=Depends(auth.require_user),
+) -> dict:
+    ip = ratelimit.client_ip(request)
+    ratelimit.limiter.hit(
+        f"resend:ip:{ip}",
+        limit=ratelimit.RESEND_IP_LIMIT,
+        window_seconds=ratelimit.RESEND_IP_WINDOW,
+    )
+    ratelimit.limiter.hit(
+        f"resend:user:{user.id}",
+        limit=ratelimit.RESEND_IP_LIMIT,
+        window_seconds=ratelimit.RESEND_IP_WINDOW,
+    )
     if user.email_verified and not user.pending_email:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Your email is already verified.")
     target_email = user.pending_email or user.email
@@ -195,8 +215,11 @@ def reset_password(payload: dict, response: Response, session: Session = Depends
     new_password = payload.get("password") or ""
     if not token:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing reset token.")
-    if len(new_password) < 8:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must be at least 8 characters.")
+    if len(new_password) < 8 or len(new_password) > 128:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be 8–128 characters.",
+        )
     user = session.exec(select(User).where(User.reset_token == token)).first()
     if not user or not user.reset_sent_at:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -248,7 +271,12 @@ def update_profile(payload: dict, session: Session = Depends(get_session), user=
 
 
 @router.post("/change-password")
-def change_password(payload: dict, session: Session = Depends(get_session), user=Depends(auth.require_user)) -> dict:
+def change_password(
+    request: Request,
+    payload: dict,
+    session: Session = Depends(get_session),
+    user=Depends(auth.require_user),
+) -> dict:
     current_password = payload.get("current_password") or ""
     new_password = payload.get("new_password") or ""
     if not user.password_hash:
@@ -256,13 +284,21 @@ def change_password(payload: dict, session: Session = Depends(get_session), user
                             detail="This account uses Google sign-in. Add a password later from support.")
     if not auth.verify_password(current_password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is incorrect.")
-    if len(new_password) < 8:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="New password must be at least 8 characters.")
+    if len(new_password) < 8 or len(new_password) > 128:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be 8–128 characters.",
+        )
     if auth.verify_password(new_password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Choose a new password that is different from your current password.")
     user.password_hash = auth.hash_password(new_password)
     session.add(user)
+    # Kill other sessions; keep the current device logged in.
+    current_token = request.cookies.get(settings.session_cookie)
+    for s in session.exec(select(UserSession).where(UserSession.user_id == user.id)).all():
+        if not current_token or s.token != current_token:
+            session.delete(s)
     session.commit()
     return {"status": "password_updated"}
 
@@ -324,8 +360,17 @@ def request_email_change(payload: dict, session: Session = Depends(get_session),
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="An account with that email already exists.")
 
     password = payload.get("password") or ""
-    if user.password_hash and not auth.verify_password(password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Password is incorrect.")
+    if user.password_hash:
+        if not auth.verify_password(password, user.password_hash):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Password is incorrect.")
+    else:
+        # Google-only accounts: require typing current email as step-up.
+        confirm_email = (payload.get("confirm_email") or "").strip().lower()
+        if confirm_email != (user.email or "").lower():
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Confirm your current email to change it on a Google account.",
+            )
 
     user.pending_email = new_email
     session.add(user)
@@ -337,25 +382,42 @@ def request_email_change(payload: dict, session: Session = Depends(get_session),
 @router.post("/deactivate")
 def deactivate_account(payload: dict, request: Request, response: Response,
                        session: Session = Depends(get_session), user=Depends(auth.require_user)) -> dict:
+    from ..models import Order
+
     confirm_text = (payload.get("confirm_text") or "").strip().upper()
     if confirm_text != "DEACTIVATE":
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail='Type "DEACTIVATE" to confirm account closure.')
 
     password = payload.get("password") or ""
-    if user.password_hash and not auth.verify_password(password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Password is incorrect.")
+    if user.password_hash:
+        if not auth.verify_password(password, user.password_hash):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Password is incorrect.")
+    else:
+        confirm_email = (payload.get("confirm_email") or "").strip().lower()
+        if confirm_email != (user.email or "").lower():
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Confirm your current email to deactivate a Google account.",
+            )
 
     token = request.cookies.get(settings.session_cookie)
     sessions = session.exec(select(UserSession).where(UserSession.user_id == user.id)).all()
     for s in sessions:
         session.delete(s)
 
+    # Scrub buyer PII on historical orders owned by this user.
+    for order in session.exec(select(Order).where(Order.buyer_user_id == user.id)).all():
+        order.buyer_email = None
+        order.buyer_name = "Deleted User"
+        session.add(order)
+
     # Keep row for historical FK references, but remove access and personal data.
     user.email = f"deleted+{user.id}+{int(time.time())}@example.invalid"
     user.name = "Deleted User"
     user.password_hash = None
     user.google_sub = None
+    user.supabase_sub = None
     user.email_verified = False
     user.verify_token = None
     user.verify_sent_at = None

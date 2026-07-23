@@ -1,6 +1,7 @@
 """Simple in-process sliding-window rate limiter for auth and checkout."""
 from __future__ import annotations
 
+import ipaddress
 import threading
 import time
 from collections import defaultdict, deque
@@ -47,12 +48,40 @@ CHECKOUT_LIMIT = 20
 CHECKOUT_WINDOW = 60 * 60
 FORGOT_IP_LIMIT = 10
 FORGOT_IP_WINDOW = 60 * 60
+SCAN_IP_LIMIT = 20
+SCAN_IP_WINDOW = 60 * 60
+SUPPORT_IP_LIMIT = 60
+SUPPORT_IP_WINDOW = 15 * 60
+APPLY_IP_LIMIT = 10
+APPLY_IP_WINDOW = 60 * 60
+RESEND_IP_LIMIT = 5
+RESEND_IP_WINDOW = 60 * 60
+
+
+def _valid_ip(value: str) -> bool:
+    try:
+        ipaddress.ip_address(value)
+        return True
+    except ValueError:
+        return False
 
 
 def client_ip(request: Request) -> str:
-    forwarded = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip()
-    if forwarded:
-        return forwarded
-    if request.client and request.client.host:
-        return request.client.host
-    return "unknown"
+    """Best-effort client IP.
+
+    Prefer the *right-most* untrusted-safe hop only when Render/Cloudflare
+    already set a direct peer; otherwise use ``request.client.host`` so
+    spoofed ``X-Forwarded-For`` prefixes cannot reset rate-limit buckets.
+    """
+    peer = request.client.host if request.client and request.client.host else ""
+    forwarded = request.headers.get("x-forwarded-for") or ""
+    # When behind a known proxy, the immediate peer is the proxy; take the
+    # left-most *valid* public-looking address but ignore obvious garbage.
+    if peer and peer not in {"127.0.0.1", "::1", "unknown"}:
+        # Direct connection (local / non-proxy) — ignore spoofable header.
+        return peer
+    for part in forwarded.split(","):
+        candidate = part.strip()
+        if candidate and _valid_ip(candidate):
+            return candidate
+    return peer or "unknown"

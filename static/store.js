@@ -5,6 +5,22 @@ const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&":
 const money = (n) => n == null ? "—" : "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const HANDLE = decodeURIComponent(location.pathname.split("/store/")[1] || "").replace(/\/$/, "");
 const TOKEN_KEY = `ragnar_store_token_${HANDLE}`;
+function safeMediaUrl(value) {
+  if (!value) return "";
+  try {
+    const url = new URL(value, location.origin);
+    if (!["http:", "https:"].includes(url.protocol)) return "";
+    // Block obvious CSS breakouts.
+    if (/['"\\]|\)/.test(url.href)) return "";
+    return url.href;
+  } catch (_) {
+    return "";
+  }
+}
+function safeAccent(value) {
+  const v = String(value || "").trim();
+  return /^#[0-9a-fA-F]{6}$/.test(v) ? v : "";
+}
 
 let toastTimer;
 function toast(m) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), 2600); }
@@ -53,17 +69,22 @@ function applyFont(family) {
 
 function applyStore(s) {
   STORE = s;
-  document.body.style.setProperty("--store-accent", s.accent_color || "var(--color-accent-fallback)");
+  const accent = safeAccent(s.accent_color) || "var(--color-accent-fallback)";
+  document.body.style.setProperty("--store-accent", accent);
   applyFont(s.font_family || "");
   document.title = `${s.display_name} — RAGNAR`;
   $("storeName").textContent = s.display_name;
   $("storeTag").textContent = s.tagline || "";
   $("storeBio").textContent = s.bio || "";
-  $("storeHero").style.background = s.banner_url ? `center/cover url('${s.banner_optimized || s.banner_url}')` : accentGrad(s.accent_color);
+  const banner = safeMediaUrl(s.banner_optimized || s.banner_url);
+  $("storeHero").style.background = banner
+    ? `center/cover url("${banner.replace(/"/g, "%22")}")`
+    : accentGrad(safeAccent(s.accent_color) || null);
   const av = $("storeAv");
-  if (s.avatar_url) { av.style.background = `center/cover url('${s.avatar_optimized || s.avatar_url}')`; av.textContent = ""; }
+  const avatar = safeMediaUrl(s.avatar_optimized || s.avatar_url);
+  if (avatar) { av.style.background = `center/cover url("${avatar.replace(/"/g, "%22")}")`; av.textContent = ""; }
   else {
-    av.style.background = `linear-gradient(rgba(3,8,12,.38),rgba(3,8,12,.38)), ${s.accent_color || "var(--color-accent-fallback)"}`;
+    av.style.background = `linear-gradient(rgba(3,8,12,.38),rgba(3,8,12,.38)), ${accent}`;
     av.textContent = (s.display_name || "?").trim()[0].toUpperCase();
   }
   // prefill customize

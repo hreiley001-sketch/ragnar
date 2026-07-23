@@ -478,7 +478,18 @@ def validate_launch_config() -> dict:
         _warn("SUPABASE_API", "unset — auth/storage/realtime client off")
 
     if settings.automation_enabled:
-        _ok("N8N_WEBHOOK_BASE", "set")
+        if settings.n8n_webhook_secret:
+            _ok("N8N_WEBHOOK_BASE", "set + secret")
+        elif settings.is_production:
+            _err(
+                "N8N_WEBHOOK_SECRET",
+                "required in production when N8N_WEBHOOK_BASE is set",
+            )
+        else:
+            _warn(
+                "N8N_WEBHOOK_SECRET",
+                "unset — set a shared secret so n8n can verify X-Ragnar-Signature",
+            )
     else:
         _warn("N8N_WEBHOOK_BASE", "unset — automation emit is a no-op")
 

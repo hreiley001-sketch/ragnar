@@ -259,6 +259,8 @@ def _handle_checkout_completed(session: Session, obj: dict) -> None:
 @router.post("/webhook")
 async def webhook(request: Request, session: Session = Depends(get_session)) -> dict:
     """Stripe webhook receiver. Idempotent on event.id and checkout session id."""
+    from sqlalchemy.exc import IntegrityError
+
     payload = await request.body()
     sig = request.headers.get("stripe-signature", "")
     try:
@@ -273,20 +275,29 @@ async def webhook(request: Request, session: Session = Depends(get_session)) -> 
     if event_id and _already_processed(session, event_id):
         return {"received": True, "duplicate": True}
 
-    if event_type == "checkout.session.completed":
-        _handle_checkout_completed(session, event["data"]["object"])
-    elif event_type == "checkout.session.expired":
-        obj = event["data"]["object"]
-        inventory.release_hold(session, obj.get("id"))
-
+    # Claim the event id BEFORE side effects so concurrent workers can't double-run.
     if event_id:
-        # Ignore IntegrityError races if two workers process the same event.
         try:
-            _mark_processed(session, event_id, event_type)
+            _mark_processed(session, event_id, event_type or "unknown")
+        except IntegrityError:
+            session.rollback()
+            return {"received": True, "duplicate": True}
         except Exception:  # noqa: BLE001
             session.rollback()
             if _already_processed(session, event_id):
                 return {"received": True, "duplicate": True}
             raise
+
+    try:
+        if event_type == "checkout.session.completed":
+            _handle_checkout_completed(session, event["data"]["object"])
+        elif event_type == "checkout.session.expired":
+            obj = event["data"]["object"]
+            inventory.release_hold(session, obj.get("id"))
+            session.commit()
+    except IntegrityError:
+        # Unique stripe_session_id (or similar) — treat as already fulfilled.
+        session.rollback()
+        return {"received": True, "duplicate": True}
 
     return {"received": True}

@@ -131,15 +131,30 @@ def test_api_start_and_chat_fees():
     data = start.json()
     assert data["id"].startswith("sup_")
     assert data["messages"]
+    assert data.get("access_token")
 
-    chat = client.post("/api/support/chat", json={
-        "conversation_id": data["id"],
-        "message": "What are your seller fees?",
-    })
+    chat = client.post(
+        "/api/support/chat",
+        json={
+            "conversation_id": data["id"],
+            "message": "What are your seller fees?",
+        },
+        headers={"X-Support-Token": data["access_token"]},
+    )
     assert chat.status_code == 200
     body = chat.json()
     assert body["reply"]
     assert "fee" in body["reply"].lower() or "5%" in body["reply"] or "Founding" in body["reply"]
+
+
+def test_api_support_chat_rejects_missing_token():
+    client = TestClient(app)
+    start = client.post("/api/support/conversations", json={"channel": "web"}).json()
+    denied = client.post("/api/support/chat", json={
+        "conversation_id": start["id"],
+        "message": "What are your seller fees?",
+    })
+    assert denied.status_code == 404
 
 
 def test_ensure_knowledge_recovers_missing_tables(tmp_path, monkeypatch):
@@ -165,10 +180,14 @@ def test_api_track_requires_auth_for_privacy():
     _user_id, order_id = _seed_buyer_order(status=OrderStatus.shipped.value)
     client = TestClient(app)
     start = client.post("/api/support/conversations").json()
-    track = client.post("/api/support/chat", json={
-        "conversation_id": start["id"],
-        "message": f"Track order #{order_id}",
-    }).json()
+    track = client.post(
+        "/api/support/chat",
+        json={
+            "conversation_id": start["id"],
+            "message": f"Track order #{order_id}",
+        },
+        headers={"X-Support-Token": start["access_token"]},
+    ).json()
     assert (
         "sign in" in track["reply"].lower()
         or "account" in track["reply"].lower()

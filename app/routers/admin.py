@@ -42,8 +42,8 @@ def require_admin(
     # 1) Signed-in staff (verified @ragnarips.com or allow-listed) — preferred.
     if auth.is_staff(user):
         return
-    # 2) Break-glass admin token.
-    if settings.admin_token and x_admin_token == settings.admin_token:
+    # 2) Break-glass admin token (constant-time compare).
+    if auth.admin_token_ok(x_admin_token):
         return
     if not settings.admin_token:
         raise HTTPException(

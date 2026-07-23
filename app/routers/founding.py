@@ -1,9 +1,10 @@
 """Founding 250 — public application funnel."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from sqlmodel import Session
 
+from .. import ratelimit
 from ..database import get_session
 from ..models import FoundingApplication
 from ..schemas import FoundingApplicationCreate, FoundingApplicationRead, FoundingStatus
@@ -18,7 +19,17 @@ def status_(session: Session = Depends(get_session)) -> FoundingStatus:
 
 
 @router.post("/apply", response_model=FoundingApplicationRead, status_code=status.HTTP_201_CREATED)
-def apply(payload: FoundingApplicationCreate, session: Session = Depends(get_session)) -> FoundingApplicationRead:
+def apply(
+    payload: FoundingApplicationCreate,
+    request: Request,
+    session: Session = Depends(get_session),
+) -> FoundingApplicationRead:
+    ip = ratelimit.client_ip(request)
+    ratelimit.limiter.hit(
+        f"founding:apply:{ip}",
+        limit=ratelimit.APPLY_IP_LIMIT,
+        window_seconds=ratelimit.APPLY_IP_WINDOW,
+    )
     application = FoundingApplication(
         name=payload.name.strip(),
         email=payload.email.strip().lower(),
@@ -53,8 +64,6 @@ def apply(payload: FoundingApplicationCreate, session: Session = Depends(get_ses
         from ..automation import emit_bg
         emit_bg("seller.applied", {
             "application_id": application.id,
-            "name": application.name,
-            "email": application.email,
             "handle_wanted": application.handle_wanted,
             "categories": application.categories,
             "source": "founding_apply",

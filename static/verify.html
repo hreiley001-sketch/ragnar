@@ -40,7 +40,16 @@
           state.innerHTML = '<div style="font-size:38px;">✅</div><h2>Email verified!</h2><p class="muted">Your account is ready.</p><a class="btn btn-primary" href="/account">Go to my account →</a>';
         }
       } catch (e) {
-        state.innerHTML = '<div style="font-size:38px;">⚠️</div><h2>Couldn\'t verify</h2><p class="muted">' + (e.message || "Link invalid or expired") + '</p><a class="btn btn-ghost" href="/account">Go to account &amp; resend</a>';
+        const msg = document.createElement("p");
+        msg.className = "muted";
+        msg.textContent = e.message || "Link invalid or expired";
+        state.innerHTML = '<div style="font-size:38px;">⚠️</div><h2>Couldn\'t verify</h2>';
+        state.appendChild(msg);
+        const a = document.createElement("a");
+        a.className = "btn btn-ghost";
+        a.href = "/account";
+        a.textContent = "Go to account & resend";
+        state.appendChild(a);
       }
     });
   </script>

@@ -229,7 +229,7 @@ class Order(SQLModel, table=True):
     status: str = Field(default=OrderStatus.paid.value, index=True)
     tracking_number: Optional[str] = Field(default=None, max_length=80)
     carrier: Optional[str] = Field(default=None, max_length=40)
-    stripe_session_id: Optional[str] = Field(default=None, index=True, max_length=120)
+    stripe_session_id: Optional[str] = Field(default=None, index=True, unique=True, max_length=120)
     stripe_refund_id: Optional[str] = Field(default=None, index=True, max_length=120)
     refunded_cents: int = Field(default=0)
     source: str = Field(default="manual")  # stripe | offer | manual | ride

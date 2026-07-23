@@ -320,9 +320,19 @@
       bar.style.cssText = "position:sticky;top:0;z-index:80;background:linear-gradient(90deg,var(--gold,#b8791a),var(--color-accent-gold-strong,#d8a13f));color:#2a1e08;border-bottom:1px solid rgba(58,44,20,0.22);font-size:13px;font-weight:700;letter-spacing:.01em;padding:8px 14px;text-align:center;";
       document.body.insertBefore(bar, document.body.firstChild);
     }
-    bar.innerHTML = c.announcement_link
-      ? `<a href="${c.announcement_link}" style="color:inherit;text-decoration:underline;">${msg}</a>`
-      : msg;
+    const safeMsg = String(msg);
+    const link = String(c.announcement_link || "").trim();
+    const safeLink = /^(https?:\/\/|\/)[^\s"'<>]+$/i.test(link) ? link : "";
+    bar.textContent = "";
+    if (safeLink) {
+      const a = document.createElement("a");
+      a.href = safeLink;
+      a.style.cssText = "color:inherit;text-decoration:underline;";
+      a.textContent = safeMsg;
+      bar.appendChild(a);
+    } else {
+      bar.textContent = safeMsg;
+    }
   }
   function applyContent(c) {
     // Landing-page copy, if present on this page (skip vault homepage — it owns its hero HTML).

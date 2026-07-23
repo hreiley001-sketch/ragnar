@@ -22,7 +22,8 @@ from . import actions, governance, intent, knowledge, policy, workflow
 
 
 def _public_id() -> str:
-    return "sup_" + secrets.token_hex(6)
+    # 16 bytes → 128-bit public id (harder to guess than prior 48-bit token).
+    return "sup_" + secrets.token_hex(16)
 
 
 def start_conversation(
@@ -32,11 +33,16 @@ def start_conversation(
     channel: str = SupportChannel.web.value,
 ) -> SupportConversation:
     knowledge.ensure_knowledge(session)
+    ctx: dict = {}
+    if user is None:
+        # Anonymous visitors get a high-entropy secret required for later access.
+        ctx["access_secret"] = secrets.token_urlsafe(32)
     conv = SupportConversation(
         public_id=_public_id(),
         user_id=user.id if user else None,
         channel=channel,
         status=SupportCaseStatus.open.value,
+        context=ctx,
     )
     session.add(conv)
     session.commit()
@@ -55,6 +61,7 @@ def get_conversation(
     *,
     user: Optional[User] = None,
     staff: bool = False,
+    access_token: str | None = None,
 ) -> Optional[SupportConversation]:
     conv = session.exec(
         select(SupportConversation).where(SupportConversation.public_id == public_id)
@@ -63,10 +70,22 @@ def get_conversation(
         return None
     if staff:
         return conv
-    if user and conv.user_id and conv.user_id != user.id:
+    # Owned threads require the owning signed-in user.
+    if conv.user_id is not None:
+        if not user or conv.user_id != user.id:
+            return None
+        return conv
+    # Anonymous threads require the high-entropy access secret issued at create.
+    secret = ((conv.context or {}).get("access_secret") or "").strip()
+    provided = (access_token or "").strip()
+    if not secret:
+        # Legacy anonymous threads without a secret: deny (no guess-and-claim).
+        return None
+    import hmac as _hmac
+    if not provided or len(provided) != len(secret) or not _hmac.compare_digest(secret, provided):
         return None
     if user and conv.user_id is None:
-        # Claim anonymous thread on first authenticated message.
+        # Claim anonymous thread on first authenticated message (secret already verified).
         conv.user_id = user.id
         session.add(conv)
         session.commit()
