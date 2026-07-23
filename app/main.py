@@ -343,3 +343,60 @@ def cart_page():
     if page.exists():
         return FileResponse(str(page))
     return {"error": "cart UI not found"}
+
+
+def _static_page(name: str, missing: str = "page"):
+    page = STATIC_DIR / f"{name}.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": f"{missing} not found"}
+
+
+@app.get("/legal", include_in_schema=False)
+def legal_hub():
+    return _static_page("legal", "legal hub")
+
+
+@app.get("/terms", include_in_schema=False)
+def terms_page():
+    return _static_page("terms", "terms")
+
+
+@app.get("/privacy", include_in_schema=False)
+def privacy_page():
+    return _static_page("privacy", "privacy policy")
+
+
+@app.get("/cookies", include_in_schema=False)
+def cookies_page():
+    return _static_page("cookies", "cookie policy")
+
+
+@app.get("/shipping", include_in_schema=False)
+def shipping_page():
+    return _static_page("shipping", "shipping policy")
+
+
+@app.get("/refunds", include_in_schema=False)
+def refunds_page():
+    return _static_page("refunds", "refund policy")
+
+
+@app.get("/returns", include_in_schema=False)
+def returns_page():
+    return _static_page("returns", "returns policy")
+
+
+@app.get("/buyer-protection", include_in_schema=False)
+def buyer_protection_page():
+    return _static_page("buyer-protection", "buyer protection")
+
+
+@app.get("/prohibited", include_in_schema=False)
+def prohibited_page():
+    return _static_page("prohibited", "prohibited items")
+
+
+@app.get("/fees", include_in_schema=False)
+def fees_page():
+    return _static_page("fees", "fees")

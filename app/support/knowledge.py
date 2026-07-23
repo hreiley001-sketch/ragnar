@@ -25,7 +25,8 @@ SEED_ARTICLES: list[dict] = [
             "Every paid order on RAGNAR is covered by Buyer Protection. If your item "
             "never arrives, arrives damaged, or is significantly not as described, "
             "you can request a refund within the eligibility window. We resolve most "
-            "cases automatically; complex disputes go to a human review queue."
+            "cases automatically; complex disputes go to a human review queue. "
+            "Full policy: https://ragnarips.com/buyer-protection"
         ),
         "rules": {"covers": ["not_received", "damaged", "not_as_described"]},
     },
@@ -39,7 +40,8 @@ SEED_ARTICLES: list[dict] = [
             "if never delivered). Full refunds cover item price + original shipping. "
             "Partial refunds may apply for minor condition issues. Digital goods and "
             "completed live-ride wins are generally non-refundable except for fraud. "
-            "Buyers are limited to 3 AI-approved refunds in a rolling 30-day window."
+            "Buyers are limited to 3 AI-approved refunds in a rolling 30-day window. "
+            "Full policy: https://ragnarips.com/refunds"
         ),
         "rules": {
             "window_days_delivered": 30,
@@ -58,7 +60,8 @@ SEED_ARTICLES: list[dict] = [
             "eligible cases (not as described / damaged in transit). For low-value "
             "items under $25, we may refund without a return (keep the item). "
             "Refunds typically trigger when the return is scanned or delivered. "
-            "Buyer's-remorse returns may include a restocking fee when the seller opts in."
+            "Buyer's-remorse returns may include a restocking fee when the seller opts in. "
+            "Full policy: https://ragnarips.com/returns"
         ),
         "rules": {
             "keep_item_under_cents": 2500,
@@ -75,9 +78,27 @@ SEED_ARTICLES: list[dict] = [
             "Once a seller marks an order shipped, tracking appears in your Account → "
             "Orders. Carriers can take 24–48 hours to show movement. If tracking has "
             "not updated for 10+ days after the ship date, open a not-received case "
-            "and we will investigate."
+            "and we will investigate. Full shipping policy: https://ragnarips.com/shipping"
         ),
         "rules": {"stale_tracking_days": 10},
+    },
+    {
+        "slug": "shipping-policy",
+        "title": "Shipping policy",
+        "category": "policy",
+        "tags": ["shipping", "ship", "tracking", "pack", "delivery", "label"],
+        "body": (
+            "Sellers should ship within 3 business days of payment (or sooner if the "
+            "listing promises a shorter window) and upload valid carrier tracking. "
+            "Pack cards and slabs to prevent bends and corner damage; use tracked and "
+            "insured service for higher-value items. Buyers find tracking under Account "
+            "→ Orders. If tracking has not updated for 10+ days after the ship date, "
+            "open a not-received case. Full policy: https://ragnarips.com/shipping"
+        ),
+        "rules": {
+            "ship_within_business_days": 3,
+            "stale_tracking_days": 10,
+        },
     },
     {
         "slug": "cancellation-policy",
@@ -114,7 +135,8 @@ SEED_ARTICLES: list[dict] = [
             "RAGNAR's standard platform fee is a flat 5%. Our founders program, "
             "the Founding 250, get a flat 4% forever — the first 250 sellers to "
             "sign up, no expiry. Payment processing is pass-through (roughly "
-            "2.9% + $0.30). There are no insertion fees."
+            "2.9% + $0.30). There are no insertion fees. "
+            "Full fee sheet: https://ragnarips.com/fees"
         ),
         "rules": {},
     },
@@ -139,7 +161,7 @@ SEED_ARTICLES: list[dict] = [
             "Counterfeits, altered grades presented as authentic, and stolen goods "
             "are banned. Sellers who repeatedly list prohibited items may be warned, "
             "suspended, or banned. Fraud rings and criminal activity are escalated "
-            "immediately."
+            "immediately. Full rules: https://ragnarips.com/prohibited"
         ),
         "rules": {"always_escalate": True},
     },

@@ -46,6 +46,13 @@
       s.defer = true;
       document.head.appendChild(s);
     }
+    if (!document.getElementById("legal-css")) {
+      const css = document.createElement("link");
+      css.id = "legal-css";
+      css.rel = "stylesheet";
+      css.href = "/static/legal.css";
+      document.head.appendChild(css);
+    }
   }
   function mountAsgardRealm() {
     // Homepage owns the full vault-env; other pages enter the shared hall.
@@ -263,11 +270,42 @@
   const acct = navLink({ icon: "👤", label: "Sign in", href: "/login" }); links.appendChild(acct);
   acctLinks.push(acct);
   links.appendChild(navLink({ icon: "💬", label: "Support", href: "/support" }));
+  links.appendChild(navLink({ icon: "📜", label: "Policies & legal", href: "/legal" }));
   // Command Hub is staff-only — hidden until we confirm the user is staff.
   const hub = navLink({ icon: "⚙️", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
 
   document.body.appendChild(scrim);
   document.body.appendChild(drawer);
+
+  // Sitewide legal footer — one place for Terms / Privacy / Shipping / etc.
+  function mountLegalFooter() {
+    if (document.getElementById("siteLegalFooter")) return;
+    if (path === "/admin" || document.body.classList.contains("premium-room")) return;
+    const foot = mk("footer", "site-legal-footer");
+    foot.id = "siteLegalFooter";
+    foot.innerHTML = `
+      <div class="site-legal-footer-inner">
+        <div class="site-legal-brand">
+          <strong>RAGNAR</strong>
+          Trust-first trading-card marketplace. Standard fee 5% · Founding 250 lock in 4% forever.
+        </div>
+        <nav class="site-legal-links" aria-label="Legal and policies">
+          <a href="/legal">Policy hub</a>
+          <a href="/terms">Terms</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/cookies">Cookies</a>
+          <a href="/buyer-protection">Buyer Protection</a>
+          <a href="/shipping">Shipping</a>
+          <a href="/refunds">Refunds</a>
+          <a href="/returns">Returns</a>
+          <a href="/fees">Fees</a>
+          <a href="/prohibited">Prohibited</a>
+          <a href="/support">Support</a>
+        </nav>
+      </div>`;
+    document.body.appendChild(foot);
+  }
+  mountLegalFooter();
 
   // Burger — mobile only (hidden at ≥960px via CSS once .site-nav is visible).
   const burger = mk("button", "nav-burger");

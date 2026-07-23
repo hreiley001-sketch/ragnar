@@ -41,7 +41,16 @@
       </div>`).join("");
 
     $("cartRoot").innerHTML = `
-      <div class="fee-breakdown" style="margin-bottom:16px">${esc(data.checkout_note || "")}</div>
+      <div class="fee-breakdown" style="margin-bottom:16px">
+        ${esc(data.checkout_note || "")}
+        <div style="margin-top:8px;font-size:13px">
+          <a href="/fees">Fees</a> ·
+          <a href="/buyer-protection">Buyer Protection</a> ·
+          <a href="/shipping">Shipping</a> ·
+          <a href="/refunds">Refunds</a> ·
+          <a href="/terms">Terms</a>
+        </div>
+      </div>
       ${blocks}
       <div class="dash-card"><strong>Subtotal ${money(data.subtotal)}</strong> · ${data.item_count} item(s)</div>`;
   }

@@ -147,6 +147,12 @@
           <label class="field"><span>Display name *</span><input name="seller_name" id="form-seller" minlength="2" maxlength="80" placeholder="Summit Cards" /></label>
           <button type="button" id="connectPayoutsBtn" class="btn btn-ghost btn-sm">💳 Set up payouts (Stripe)</button>
           <div id="sellerState" class="seller-state" hidden></div>
+          <p class="muted" style="font-size:12px;margin:8px 0 0;line-height:1.45">
+            By selling you agree to our <a href="/terms" target="_blank" rel="noopener">Terms</a>,
+            <a href="/shipping" target="_blank" rel="noopener">Shipping</a>,
+            <a href="/prohibited" target="_blank" rel="noopener">Prohibited items</a>, and
+            <a href="/fees" target="_blank" rel="noopener">Fees</a>.
+          </p>
         </div>
 
         <div id="feePreview" class="fee-preview"></div>
