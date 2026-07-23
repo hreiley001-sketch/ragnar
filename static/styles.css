@@ -63,7 +63,7 @@ code {
 
 /* ---------- Header (luxury tech chrome — built by nav.js) ---------- */
 .site-header {
-  position: sticky; top: 0; z-index: 40;
+  position: sticky; top: 0; z-index: 50;
   display: flex; align-items: center; gap: clamp(16px, 2.5vw, 36px);
   min-height: 68px;
   padding: 0 clamp(18px, 3.5vw, 40px);
@@ -145,6 +145,31 @@ code {
 }
 .header-extra { display: flex; align-items: center; gap: var(--space-2); }
 .header-extra:empty { display: none; }
+.header-icon {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 15px;
+  text-decoration: none;
+  line-height: 1;
+}
+.header-icon:hover {
+  background: var(--color-hover-surface);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+.header-icon .bump {
+  position: absolute; top: -6px; right: -6px;
+  min-width: 19px; height: 19px; padding: 0 5px;
+  border-radius: 999px;
+  background: var(--danger); color: var(--color-on-danger);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
 
 .site-header .btn {
   border-radius: var(--radius-xs);
@@ -181,6 +206,10 @@ code {
 
 @media (min-width: 900px) {
   .site-nav { display: flex; }
+}
+@media (min-width: 960px) {
+  /* Desktop already has .site-nav — drawer/burger is mobile-only. */
+  .nav-burger { display: none !important; }
 }
 
 /* Page-specific header atmosphere (shared chrome; no parallel nav) */
@@ -795,9 +824,9 @@ select option { background: var(--panel-solid); color: var(--text); }
 /* ---------- Hamburger nav (shared, injected by nav.js) ---------- */
 .nav-burger { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:var(--radius-sm); border:1px solid var(--color-border-subtle); background:transparent; color:var(--color-text-secondary); cursor:pointer; font-size:16px; line-height:1; }
 .nav-burger:hover { background:var(--color-hover-surface); color:var(--color-text-primary); transform:none; }
-.nav-scrim { position:fixed; inset:0; background:rgba(20,30,55,0.35); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:80; }
+.nav-scrim { position:fixed; inset:0; background:rgba(20,30,55,0.35); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:100; }
 .nav-scrim.open { opacity:1; pointer-events:auto; }
-.nav-drawer { position:fixed; top:0; right:0; bottom:0; width:min(330px,88%); background:var(--panel-solid); border-left:1px solid var(--border); z-index:81; transform:translateX(102%); transition:transform .24s ease; display:flex; flex-direction:column; padding:18px; overflow-y:auto; box-shadow:-16px 0 50px rgba(20,30,55,.18); }
+.nav-drawer { position:fixed; top:0; right:0; bottom:0; width:min(330px,88%); background:var(--panel-solid); border-left:1px solid var(--border); z-index:101; transform:translateX(102%); transition:transform .24s ease; display:flex; flex-direction:column; padding:18px; overflow-y:auto; box-shadow:-16px 0 50px rgba(20,30,55,.18); }
 .nav-drawer.open { transform:none; }
 .nav-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
 .nav-head img { height:42px; border-radius:9px; }
@@ -847,8 +876,8 @@ select option { background: var(--panel-solid); color: var(--text); }
   .logo-img { height: 32px; max-width: 118px; }
   .site-header .header-actions { width: auto; margin-left: auto; justify-content: flex-end; flex-wrap: nowrap; gap: 6px; }
   .site-header .founding-counter,
-  .site-header .status-badge,
-  .site-header .header-actions > a.btn-ghost { display: none; }
+  .site-header .status-badge { display: none; }
+  .site-header .header-acct { display: none; }
   .btn { min-height: 40px; }
   .btn-sm { min-height: 36px; }
   input, select, textarea { font-size: 16px; min-height: 40px; }

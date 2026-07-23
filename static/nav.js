@@ -130,17 +130,26 @@
   document.body.classList.remove("theme-utility");
   if (!onHome) document.body.classList.add("asgard-realm");
 
+  // Drawer destinations (mobile). Desktop primary links live in DESKTOP_NAV.
   const ITEMS = [
+    { icon: "🏠", label: "Home", href: "/" },
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
     { icon: "📡", label: "Live", href: "/live" },
     { icon: "📰", label: "Feed", href: "/feed" },
     { icon: "👥", label: "Groups", href: "/groups" },
     { icon: "🏪", label: "My Store", href: "/mystore" },
+    { icon: "🛍", label: "Cart", href: "/cart" },
     { icon: "🔔", label: "Notifications", href: "/notifications" },
-    { icon: "👤", label: "Profile", href: "/account" },
-    { icon: "🏠", label: "Home", href: "/" },
     { icon: "🤖", label: "AI Tools", href: "/ai-tools" },
     { icon: "⭐", label: "Become a Seller", href: "/#apply" },
+  ];
+
+  const DESKTOP_NAV = [
+    { label: "Marketplace", href: "/marketplace" },
+    { label: "Live", href: "/live" },
+    { label: "Feed", href: "/feed" },
+    { label: "Groups", href: "/groups" },
+    { label: "My Store", href: "/mystore" },
   ];
 
   const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
@@ -159,6 +168,7 @@
   // this script tag executes before that event fires. ----
   const acctLinks = [];   // kept in sync together: header link + drawer link
   let headerSellBtn = null;
+  let headerNotif = null;
   function headerExtrasHtml() {
     if (path === "/marketplace") {
       return `<span id="foundingCounter" class="founding-counter" title="Founding Seller slots">Founding —</span><span id="backendStatus" class="status-badge checking">connecting…</span>`;
@@ -174,67 +184,77 @@
   function buildHeader() {
     const header = document.getElementById("siteHeader");
     if (!header) return;
-    // Asgard chrome sitewide; arena/room tones keep home + live-room special cases.
+
+    // Admin owns its masthead + cmd-nav — do not replace with marketplace chrome.
+    if (path === "/admin" || header.classList.contains("site-header--admin")) {
+      header.classList.add("site-header");
+      return;
+    }
+
+    const light = path === "/login" || path === "/verify";
+    const modifiers = Array.from(header.classList).filter((c) => c.startsWith("site-header--"));
     const headerTone = onHome
       ? "site-header site-header--arena site-header--asgard"
       : onRoom
         ? "site-header site-header--room site-header--asgard"
         : "site-header site-header--asgard";
-    header.className = headerTone;
-    const light = path === "/login" || path === "/verify";
+    header.className = light ? "site-header site-header--light" : headerTone;
+    modifiers.forEach((c) => {
+      if (c !== "site-header--light" || light) header.classList.add(c);
+    });
+
     if (light) {
       header.innerHTML = `
         <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
         <div class="header-actions"></div>`;
       return;
     }
-    // Home: one nav channel only — utilities in the bar, full destinations in the drawer.
-    if (onHome) {
-      header.innerHTML = `
-        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
-        <div class="header-actions">
-          <div class="header-extra" id="headerExtra"></div>
-          <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
-          <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
-          <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
-        </div>`;
-      acctLinks.push(header.querySelector("#headerAcctLink"));
-      headerSellBtn = header.querySelector("[data-open-sell]");
-      return;
-    }
+
+    // One primary nav channel: .site-nav on desktop, hamburger drawer on mobile.
+    // Actions stay utilities only (cart / notif / sell / account) — no duplicate link pills.
+    const navHtml = DESKTOP_NAV.map((it) => {
+      const href = it.href.replace(/\/+$/, "") || "/";
+      const active = href === path ? " is-active" : "";
+      return `<a href="${it.href}" class="${active.trim()}">${it.label}</a>`;
+    }).join("");
+
     header.innerHTML = `
       <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
+      <nav class="site-nav" aria-label="Primary">${navHtml}</nav>
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
-        <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
-        <a class="btn btn-ghost btn-sm" href="/live">Live</a>
-        <a class="btn btn-ghost btn-sm" href="/feed">Feed</a>
-        <a class="btn btn-ghost btn-sm" href="/groups">Groups</a>
-        <a class="btn btn-ghost btn-sm" href="/mystore">My Store</a>
-        <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
-        <a class="btn btn-ghost btn-sm" href="/notifications" title="Notifications">🔔</a>
-        <button class="btn btn-primary btn-sm" type="button" data-open-sell>⚡ Sell</button>
-        <a id="headerAcctLink" class="btn btn-ghost btn-sm" href="/login"><span class="lbl">Sign in</span></a>
+        <a class="header-icon" href="/cart" title="Cart" aria-label="Cart">🛒</a>
+        <a class="header-icon" id="headerNotif" href="/notifications" title="Notifications" aria-label="Notifications">🔔</a>
+        <button class="btn btn-primary btn-sm" type="button" data-open-sell>Sell</button>
+        <a id="headerAcctLink" class="btn btn-ghost btn-sm header-acct" href="/login"><span class="lbl">Sign in</span></a>
       </div>`;
     acctLinks.push(header.querySelector("#headerAcctLink"));
     headerSellBtn = header.querySelector("[data-open-sell]");
+    headerNotif = header.querySelector("#headerNotif");
     if (path.startsWith("/ride/")) {
       const link = document.createElement("a");
-      link.className = "btn btn-ghost btn-sm"; link.href = "/rides"; link.textContent = "All rides";
-      header.querySelector(".header-actions").insertBefore(link, header.querySelector(".header-extra").nextSibling);
+      link.className = "btn btn-ghost btn-sm";
+      link.href = "/rides";
+      link.textContent = "All rides";
+      header.querySelector(".header-actions").insertBefore(
+        link,
+        header.querySelector(".header-extra").nextSibling
+      );
     }
   }
   buildHeader();
 
-  // Drawer
+  // Drawer (mobile) — same destinations as site-nav, plus account extras.
   const scrim = mk("div", "nav-scrim");
   const drawer = mk("div", "nav-drawer");
+  drawer.setAttribute("role", "dialog");
+  drawer.setAttribute("aria-label", "Site menu");
   drawer.innerHTML = `
     <div class="nav-head">
       <a href="/" style="display:inline-flex"><img src="/static/logo.svg" alt="RAGNAR" /></a>
-      <button class="nav-close" aria-label="Close menu">✕</button>
+      <button class="nav-close" type="button" aria-label="Close menu">✕</button>
     </div>
-    <nav class="nav-links" id="navLinks"></nav>
+    <nav class="nav-links" id="navLinks" aria-label="Menu"></nav>
     <div class="nav-foot">RAGNAR</div>`;
   const links = drawer.querySelector("#navLinks");
   ITEMS.forEach((it) => links.appendChild(navLink(it)));
@@ -242,28 +262,46 @@
   const userLine = mk("div", "nav-user"); userLine.id = "navUser"; userLine.hidden = true; links.appendChild(userLine);
   const acct = navLink({ icon: "👤", label: "Sign in", href: "/login" }); links.appendChild(acct);
   acctLinks.push(acct);
+  links.appendChild(navLink({ icon: "💬", label: "Support", href: "/support" }));
   // Command Hub is staff-only — hidden until we confirm the user is staff.
   const hub = navLink({ icon: "⚙️", label: "Command Hub", href: "/admin", cls: "nav-hub" }); hub.hidden = true; links.appendChild(hub);
 
   document.body.appendChild(scrim);
   document.body.appendChild(drawer);
 
-  // Burger button — into the header if present, else a floating button.
+  // Burger — mobile only (hidden at ≥960px via CSS once .site-nav is visible).
   const burger = mk("button", "nav-burger");
+  burger.type = "button";
   burger.innerHTML = "☰";
   burger.setAttribute("aria-label", "Open menu");
+  burger.setAttribute("aria-expanded", "false");
   const actions = document.querySelector(".header-actions");
   if (actions) actions.appendChild(burger);
-  else { Object.assign(burger.style, { position: "fixed", top: "14px", right: "14px", zIndex: "82" }); document.body.appendChild(burger); }
+  else {
+    Object.assign(burger.style, { position: "fixed", top: "14px", right: "14px", zIndex: "82" });
+    document.body.appendChild(burger);
+  }
 
-  const open = () => { scrim.classList.add("open"); drawer.classList.add("open"); };
-  const close = () => { scrim.classList.remove("open"); drawer.classList.remove("open"); };
+  const open = () => {
+    scrim.classList.add("open");
+    drawer.classList.add("open");
+    burger.setAttribute("aria-expanded", "true");
+  };
+  const close = () => {
+    scrim.classList.remove("open");
+    drawer.classList.remove("open");
+    burger.setAttribute("aria-expanded", "false");
+  };
   burger.addEventListener("click", open);
   scrim.addEventListener("click", close);
   drawer.querySelector(".nav-close").addEventListener("click", close);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  links.addEventListener("click", (e) => {
+    if (e.target.closest("a.nav-link")) close();
+  });
+  if (location.hash === "#menu") open();
 
-  // Highlight current page
+  // Highlight current page in the drawer
   links.querySelectorAll("a.nav-link").forEach((a) => {
     const href = (a.getAttribute("href").split("#")[0].replace(/\/+$/, "") || "/");
     if (href === path) a.classList.add("active");
@@ -376,21 +414,18 @@
         bar.querySelector("#navVdismiss").addEventListener("click", () => { sessionStorage.setItem("ragnar_hide_verify", "1"); bar.remove(); });
       }
 
-      const bell = document.createElement("a");
-      bell.className = "nav-bell";
-      bell.href = "/account#notifications";
-      bell.setAttribute("aria-label", "Notifications");
-      bell.innerHTML = "🔔";
-      if (actions) actions.insertBefore(bell, burger);
-      const refreshBell = () =>
-        fetch("/api/notifications/unread-count").then((r) => r.json()).then((c) => {
+      // Badge the single header notif icon (no second bell).
+      const refreshBell = () => {
+        if (!headerNotif) return;
+        return fetch("/api/notifications/unread-count").then((r) => r.json()).then((c) => {
           const n = (c && c.unread) || 0;
-          let b = bell.querySelector(".bump");
+          let b = headerNotif.querySelector(".bump");
           if (n > 0) {
-            if (!b) { b = document.createElement("span"); b.className = "bump"; bell.appendChild(b); }
+            if (!b) { b = document.createElement("span"); b.className = "bump"; headerNotif.appendChild(b); }
             b.textContent = n > 99 ? "99+" : String(n);
           } else if (b) b.remove();
         }).catch(() => {});
+      };
       refreshBell();
       setInterval(refreshBell, 30000);
     } else {
