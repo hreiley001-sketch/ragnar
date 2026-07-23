@@ -77,13 +77,33 @@ def get_current_user(
     us = session.exec(select(UserSession).where(UserSession.token == token)).first()
     if not us or us.expires_at < utcnow():
         return None
-    return session.get(User, us.user_id)
+    user = session.get(User, us.user_id)
+    if not user:
+        return None
+    # Banned accounts lose the session immediately.
+    if user.banned_at or user.identity_status == "banned":
+        return None
+    return user
 
 
 def require_user(user: Optional[User] = Depends(get_current_user)) -> User:
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sign in required")
     return user
+
+
+def require_identity_approved(user: User = Depends(require_user)) -> User:
+    """Selling and other high-trust actions require an approved AI ID check."""
+    from .models import IdentityStatus, UserRole
+
+    if user.role == UserRole.admin.value:
+        return user
+    if user.identity_status == IdentityStatus.approved.value:
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Complete identity verification before selling. Visit /identity.",
+    )
 
 
 def is_staff(user: Optional[User]) -> bool:
@@ -130,6 +150,10 @@ def role_for_verified_email(email: str) -> str:
 
 
 def public_user(user: User) -> dict:
+    from .identity import needs_identity, needs_legal_acceptance
+    from .models import IdentityStatus, LEGAL_DOCS_VERSION
+
+    banned = bool(user.banned_at or user.identity_status == IdentityStatus.banned.value)
     return {
         "id": user.id, "email": user.email, "name": user.name,
         "role": user.role, "is_staff": user.role == UserRole.admin.value,
@@ -137,6 +161,16 @@ def public_user(user: User) -> dict:
         "marketing_opt_in": bool(user.marketing_opt_in),
         "has_password": bool(user.password_hash),
         "pending_email": user.pending_email,
+        "terms_accepted": bool(user.terms_accepted_at),
+        "legal_docs_version": user.legal_docs_version,
+        "legal_docs_current": user.legal_docs_version == LEGAL_DOCS_VERSION,
+        "needs_legal": needs_legal_acceptance(user),
+        "identity_status": user.identity_status or IdentityStatus.none.value,
+        "identity_reject_reason": user.identity_reject_reason,
+        "needs_identity": needs_identity(user) and user.role != UserRole.admin.value,
+        "legal_name": user.legal_name,
+        "banned": banned,
+        "ban_reason": user.ban_reason if banned else None,
     }
 
 

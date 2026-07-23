@@ -37,7 +37,11 @@
         <label class="field"><span>Password</span><input name="password" id="pw" type="password" required minlength="8" placeholder="At least 8 characters" /></label>
         <div id="pwMeter" class="pw-meter" hidden><div id="pwBar" class="pw-bar"></div></div>
         <label class="field" id="confirmField" hidden><span>Confirm password</span><input name="confirm" type="password" placeholder="Re-enter password" /></label>
-        <label class="check-row" id="termsRow" hidden style="margin-bottom:10px;"><input type="checkbox" id="terms" /> <span style="font-size:13px;">I agree to RAGNAR's Terms &amp; buyer/seller conduct.</span></label>
+        <div id="legalChecks" hidden>
+          <label class="check-row" id="termsRow" style="margin-bottom:8px;"><input type="checkbox" id="terms" /> <span style="font-size:13px;">I agree to RAGNAR's <a href="/terms" target="_blank" rel="noopener">Terms of Service</a>.</span></label>
+          <label class="check-row" id="privacyRow" style="margin-bottom:8px;"><input type="checkbox" id="privacy" /> <span style="font-size:13px;">I agree to the <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/cookies" target="_blank" rel="noopener">Cookie Policy</a>.</span></label>
+          <label class="check-row" id="policiesRow" style="margin-bottom:10px;"><input type="checkbox" id="policies" /> <span style="font-size:13px;">I agree to marketplace policies (<a href="/buyer-protection" target="_blank" rel="noopener">Buyer Protection</a>, <a href="/shipping" target="_blank" rel="noopener">Shipping</a>, <a href="/refunds" target="_blank" rel="noopener">Refunds</a>, <a href="/fees" target="_blank" rel="noopener">Fees</a>, <a href="/prohibited" target="_blank" rel="noopener">Prohibited items</a>).</span></label>
+        </div>
         <label class="check-row" id="mktRow" hidden style="margin-bottom:12px;"><input type="checkbox" id="mkt" /> <span style="font-size:13px;color:var(--muted);">Email me drop alerts &amp; news (optional).</span></label>
         <button type="submit" class="btn btn-primary" style="width:100%;">Continue</button>
         <p id="forgotWrap" style="margin:10px 0 0;text-align:center;">
@@ -67,7 +71,7 @@
         <h3 style="margin:6px 0;">Check your email</h3>
         <p class="muted" id="verifyMsg" style="font-size:14px;"></p>
         <button id="resendBtn" class="btn btn-ghost btn-sm" type="button">Resend verification email</button>
-        <p style="margin-top:12px;"><a href="/account" class="btn btn-primary btn-sm">Continue to my account →</a></p>
+        <p style="margin-top:12px;"><a href="/identity" class="btn btn-primary btn-sm">Continue — verify identity →</a></p>
       </div>
 
       <p class="muted" style="font-size:12px;text-align:center;margin-top:10px;"><a href="/">← Back to RAGNAR</a></p>

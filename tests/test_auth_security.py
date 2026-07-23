@@ -124,6 +124,8 @@ def test_signup_rate_limit():
                 "password": "password12",
                 "name": "Signer",
                 "accept_terms": True,
+                "accept_privacy": True,
+                "accept_policies": True,
             })
             assert r.status_code == 200, r.text
         r = client.post("/api/auth/signup", json={
@@ -131,6 +133,8 @@ def test_signup_rate_limit():
             "password": "password12",
             "name": "Signer",
             "accept_terms": True,
+            "accept_privacy": True,
+            "accept_policies": True,
         })
         assert r.status_code == 429
     finally:

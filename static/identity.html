@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — Verify identity</title>
+  <link rel="icon" href="/static/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/asgard-shell.css" />
+  <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/legal.css" />
+  <style>
+    .id-wrap { max-width: 560px; margin: 28px auto 80px; padding: 0 18px; }
+    .id-wrap h1 { font-size: clamp(26px, 4vw, 34px); margin: 0 0 8px; }
+    .id-step { margin-top: 18px; padding: 18px; border: 1px solid var(--color-border-subtle, rgba(34,26,16,.12)); border-radius: 14px; background: var(--color-bg-lit, rgba(255,255,255,.4)); }
+    .id-step h2 { margin: 0 0 8px; font-size: 18px; }
+    .id-checks label { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 10px; font-size: 13px; line-height: 1.45; }
+    .id-status-pill { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: rgba(0,0,0,.06); }
+    .id-status-pill.ok { background: rgba(46,125,50,.15); color: #1b5e20; }
+    .id-status-pill.warn { background: rgba(183,140,31,.18); color: #6d5200; }
+    .id-status-pill.bad { background: rgba(160,40,40,.12); color: #8a1f1f; }
+    .id-preview { margin-top: 8px; max-width: 100%; max-height: 160px; border-radius: 8px; display: none; }
+  </style>
+</head>
+<body class="asgard-realm page-identity">
+  <header id="siteHeader"></header>
+  <main class="id-wrap">
+    <p class="legal-kicker">Trust &amp; safety</p>
+    <h1>Verify your identity</h1>
+    <p class="muted" style="margin:0 0 8px;font-size:15px;">RAGNAR uses an AI ID check so banned accounts can’t come back with a fake profile — and so selling stays safer for everyone.</p>
+    <p id="statusLine" class="muted" style="font-size:13px;"></p>
+
+    <section id="legalStep" class="id-step" hidden>
+      <h2>1. Agree to legal documents</h2>
+      <p class="muted" style="font-size:13px;margin:0 0 12px;">These are the same policies that protect buyers and sellers on RAGNAR.</p>
+      <div class="id-checks">
+        <label><input type="checkbox" id="legTerms" /> <span>I agree to the <a href="/terms" target="_blank" rel="noopener">Terms of Service</a>.</span></label>
+        <label><input type="checkbox" id="legPrivacy" /> <span>I agree to the <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/cookies" target="_blank" rel="noopener">Cookie Policy</a>.</span></label>
+        <label><input type="checkbox" id="legPolicies" /> <span>I agree to marketplace policies: <a href="/buyer-protection" target="_blank" rel="noopener">Buyer Protection</a>, <a href="/shipping" target="_blank" rel="noopener">Shipping</a>, <a href="/refunds" target="_blank" rel="noopener">Refunds</a>, <a href="/fees" target="_blank" rel="noopener">Fees</a>, and <a href="/prohibited" target="_blank" rel="noopener">Prohibited items</a>.</span></label>
+      </div>
+      <button type="button" id="acceptLegalBtn" class="btn btn-primary">Agree &amp; continue</button>
+      <p id="legalStatus" class="form-status"></p>
+    </section>
+
+    <section id="idStep" class="id-step" hidden>
+      <h2>2. AI ID check</h2>
+      <p class="muted" style="font-size:13px;margin:0 0 12px;">Upload a clear photo of a government ID (driver’s license, passport, or national ID). Optional selfie helps matching. We never store the raw ID number — only a secure hash.</p>
+      <form id="idForm">
+        <label class="field"><span>Government ID (front)</span><input type="file" id="idFront" accept="image/*" required /></label>
+        <img id="idFrontPreview" class="id-preview" alt="" />
+        <label class="field" style="margin-top:10px;"><span>Selfie holding ID (optional)</span><input type="file" id="idSelfie" accept="image/*" /></label>
+        <img id="idSelfiePreview" class="id-preview" alt="" />
+        <button type="submit" class="btn btn-primary" style="margin-top:14px;width:100%;">Run AI ID check</button>
+        <p id="idStatus" class="form-status"></p>
+      </form>
+    </section>
+
+    <section id="doneStep" class="id-step" hidden>
+      <h2>You’re set</h2>
+      <p id="doneMsg" class="muted" style="font-size:14px;"></p>
+      <p style="margin-top:14px;"><a class="btn btn-primary" href="/account">Go to my account</a>
+      <a class="btn btn-ghost" href="/" style="margin-left:8px;">Browse marketplace</a></p>
+    </section>
+  </main>
+  <script src="/static/identity.js"></script>
+  <script src="/static/nav.js"></script>
+</body>
+</html>

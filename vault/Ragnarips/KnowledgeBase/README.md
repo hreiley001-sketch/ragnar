@@ -18,12 +18,14 @@ Source-of-truth content that powers the **Support ("Counsel") agent** and RAG an
 ## Structure
 ```
 KnowledgeBase/
-  Policies/          fees, refunds, returns, prohibited items
+  Policies/          terms, privacy, shipping, refunds, returns, fees, prohibited (mirrors /legal pages)
   Selling/           onboarding, payouts, live-selling rules
   Buying/            offers, shipping, buyer protection
   Grading/           PSA/BGS/SGC basics, condition terms
   Disputes/          escalation ladder, evidence, timelines
 ```
+
+Live customer URLs are listed in [[Policies/README]].
 
 ## Doc template
 ```md

@@ -69,6 +69,18 @@ class UserRole(str, Enum):
     admin = "admin"  # staff / Command Hub access
 
 
+class IdentityStatus(str, Enum):
+    none = "none"
+    pending = "pending"
+    approved = "approved"
+    rejected = "rejected"
+    banned = "banned"
+
+
+# Bump when legal docs change in a material way — signup stores this version.
+LEGAL_DOCS_VERSION = "2026-07-23"
+
+
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     email: str = Field(index=True, unique=True, max_length=160)
@@ -85,6 +97,53 @@ class User(SQLModel, table=True):
     seller_handle: Optional[str] = Field(default=None, index=True, max_length=40)
     marketing_opt_in: bool = Field(default=False)
     created_at: datetime = Field(default_factory=utcnow, index=True)
+
+    # Legal acceptance (Terms + linked policies at signup / Google interstitial).
+    terms_accepted_at: Optional[datetime] = Field(default=None)
+    terms_version: Optional[str] = Field(default=None, max_length=32)
+    privacy_accepted_at: Optional[datetime] = Field(default=None)
+    legal_docs_version: Optional[str] = Field(default=None, max_length=32)
+
+    # AI ID check + account standing
+    identity_status: str = Field(default=IdentityStatus.none.value, index=True)
+    identity_checked_at: Optional[datetime] = Field(default=None)
+    identity_reject_reason: Optional[str] = Field(default=None, max_length=500)
+    legal_name: Optional[str] = Field(default=None, max_length=160)
+    id_doc_hash: Optional[str] = Field(default=None, index=True, max_length=64)
+    banned_at: Optional[datetime] = Field(default=None, index=True)
+    ban_reason: Optional[str] = Field(default=None, max_length=500)
+
+
+class BanRecord(SQLModel, table=True):
+    """Survives account delete/deactivate — blocks re-signup with same email or ID."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    email_normalized: Optional[str] = Field(default=None, index=True, max_length=160)
+    id_doc_hash: Optional[str] = Field(default=None, index=True, max_length=64)
+    legal_name_normalized: Optional[str] = Field(default=None, index=True, max_length=160)
+    reason: str = Field(default="policy_violation", max_length=500)
+    banned_by: Optional[str] = Field(default=None, max_length=160)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    user_id_at_ban: Optional[int] = Field(default=None, index=True)
+
+
+class IdentitySubmission(SQLModel, table=True):
+    """One AI ID-check attempt. Images stored as private upload paths only."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", index=True)
+    status: str = Field(default=IdentityStatus.pending.value, index=True)
+    id_image_path: Optional[str] = Field(default=None, max_length=500)
+    selfie_image_path: Optional[str] = Field(default=None, max_length=500)
+    provider: Optional[str] = Field(default=None, max_length=40)
+    confidence: Optional[float] = Field(default=None)
+    extracted_name: Optional[str] = Field(default=None, max_length=160)
+    extracted_doc_type: Optional[str] = Field(default=None, max_length=80)
+    id_doc_hash: Optional[str] = Field(default=None, index=True, max_length=64)
+    notes: Optional[str] = Field(default=None, max_length=1000)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    reviewed_at: Optional[datetime] = Field(default=None)
+    reviewed_by: Optional[str] = Field(default=None, max_length=160)
 
 
 class UserSession(SQLModel, table=True):

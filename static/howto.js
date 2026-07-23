@@ -7,7 +7,12 @@
   const path = (location.pathname.replace(/\/+$/, "") || "/");
 
   // Pages that should NOT show the band.
-  const SKIP = new Set(["/login", "/verify", "/admin", "/ai-tools"]);
+  const SKIP = new Set([
+    "/login", "/verify", "/identity", "/admin", "/ai-tools",
+    "/legal", "/terms", "/privacy", "/cookies",
+    "/shipping", "/refunds", "/returns",
+    "/buyer-protection", "/prohibited", "/fees",
+  ]);
   if (SKIP.has(path)) return;
   if (document.body.classList.contains("premium-room")) return;      // live room = focus mode
   if (localStorage.getItem("ragnar_howto_dismissed") === "1") return;
@@ -43,7 +48,7 @@
           <ol>
             <li><b>Search or ask.</b> Type a card, or tap <b>Ask RAGNAR</b> (bottom-right) to search in plain language.</li>
             <li><b>Buy Now or make an offer.</b> Every listing shows real sold-price history.</li>
-            <li><b>Secure checkout.</b> Per-seller checkout with buyer protection — all fees shown up front.</li>
+            <li><b>Secure checkout.</b> Per-seller checkout with <a href="/buyer-protection">buyer protection</a> — all <a href="/fees">fees</a> shown up front.</li>
           </ol>
         </div>
         <div class="howto-col" data-focus="${sellFocus ? 1 : 0}">

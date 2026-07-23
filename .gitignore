@@ -21,6 +21,8 @@ ENV/
 
 # Uploaded scan photos (runtime data, not source)
 uploads/
+# Private identity documents (never commit)
+private_uploads/
 
 # IDE / OS
 .vscode/
