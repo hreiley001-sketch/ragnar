@@ -41,6 +41,7 @@ from .routers import (
     scan,
     sellers,
     seo,
+    shipping,
     social,
     stores,
     streams,
@@ -102,6 +103,16 @@ async def lifespan(app: FastAPI):
             support_knowledge.ensure_knowledge(session)
     except Exception:  # noqa: BLE001
         logger.exception("Support knowledge seed skipped")
+    # Seed Dispatch (shipping agent) playbooks.
+    try:
+        from sqlmodel import Session
+        from .database import engine
+        from .shipping_agent import knowledge as shipping_knowledge
+
+        with Session(engine) as session:
+            shipping_knowledge.ensure_knowledge(session)
+    except Exception:  # noqa: BLE001
+        logger.exception("Shipping knowledge seed skipped")
     logger.info("%s v%s ready (%s).", settings.app_name, settings.version, settings.environment)
     yield
 
@@ -166,6 +177,8 @@ app.include_router(orders.router)
 app.include_router(orders.admin_router)
 app.include_router(support.router)
 app.include_router(support.admin_router)
+app.include_router(shipping.router)
+app.include_router(shipping.admin_router)
 app.include_router(watch.router)
 app.include_router(social.router)
 app.include_router(feed.router)
@@ -271,6 +284,14 @@ def support_page():
     if page.exists():
         return FileResponse(str(page))
     return {"error": "support UI not found"}
+
+
+@app.get("/shipping", include_in_schema=False)
+def shipping_page():
+    page = STATIC_DIR / "shipping.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "shipping UI not found"}
 
 
 @app.get("/rides", include_in_schema=False)

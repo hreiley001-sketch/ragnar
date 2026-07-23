@@ -385,6 +385,68 @@ async function resolveSupportCase() {
   } catch (err) { toast(err.message || "Failed"); }
 }
 
+/* ---------- Dispatch (shipping) queue ---------- */
+let _dispatchSelected = null;
+
+async function loadDispatchQueue() {
+  const q = $("dispatchQueueFilter")?.value || "";
+  const params = q ? `?queue=${encodeURIComponent(q)}` : "";
+  try {
+    const d = await api(`/api/admin/shipping/queue${params}`);
+    $("dispatchBody").innerHTML = (d.items || []).map((x) => `<tr>
+      <td><code>${esc(x.id)}</code></td>
+      <td>${esc((x.intent || "—").replace(/_/g, " "))}</td>
+      <td>${x.confidence != null ? Math.round(x.confidence * 100) + "%" : "—"}</td>
+      <td>${pill(x.queue || "—")}</td>
+      <td>${pill(x.status)}</td>
+      <td>${x.order_id != null ? "#" + esc(x.order_id) : "—"}</td>
+      <td><button class="btn btn-sm btn-primary" data-dispatch-view="${esc(x.id)}">Open</button></td>
+    </tr>`).join("") || `<tr><td colspan="7" class="muted" style="padding:20px;text-align:center;">Queue clear — Dispatch is handling it</td></tr>`;
+  } catch (err) {
+    $("dispatchBody").innerHTML = `<tr><td colspan="7" class="muted">${esc(err.message)}</td></tr>`;
+  }
+}
+
+async function dispatchAction(e) {
+  const t = e.target.closest("[data-dispatch-view]");
+  if (!t) return;
+  const id = t.getAttribute("data-dispatch-view");
+  try {
+    const d = await api(`/api/admin/shipping/conversations/${encodeURIComponent(id)}`);
+    _dispatchSelected = d.id;
+    $("dispatchDeskEmpty").hidden = true;
+    $("dispatchDeskActive").hidden = false;
+    $("dispatchDetailTitle").textContent = (d.intent || "Case").replace(/_/g, " ");
+    $("dispatchDetailMeta").textContent =
+      `${d.id} · ${d.status || ""} · conf ${d.confidence != null ? Math.round(d.confidence * 100) + "%" : "—"}`
+      + (d.order_id != null ? ` · order #${d.order_id}` : "")
+      + (d.queue ? ` · queue ${d.queue}` : "");
+    $("dispatchThread").innerHTML = (d.messages || []).map((m) =>
+      `<div class="chat-msg${m.role === "user" ? " me" : ""}"><b>${esc(m.role)}</b>: ${esc(m.body)}</div>`
+    ).join("") || "<div class='muted'>No messages</div>";
+    $("dispatchAudit").innerHTML = (d.audit || []).slice(0, 10).map((a) =>
+      `<div class="support-audit-line"><b>${esc(a.decision || a.actor)}</b> ${esc(a.reason || "")} <span class="muted">[${(a.policy_refs || []).map(esc).join(", ")}]</span></div>`
+    ).join("") || "<div class='muted'>No audit entries.</div>";
+    $("dispatchResolveNote").value = "";
+  } catch (err) { toast(err.message || "Failed to load case"); }
+}
+
+async function resolveDispatchCase() {
+  if (!_dispatchSelected) return;
+  const resolution = ($("dispatchResolveNote").value || "").trim();
+  if (!resolution) { toast("Add a resolution note"); return; }
+  try {
+    await api(`/api/admin/shipping/conversations/${encodeURIComponent(_dispatchSelected)}/resolve`, {
+      method: "POST", body: JSON.stringify({ resolution, status: "resolved" }),
+    });
+    toast("Shipping case resolved");
+    $("dispatchDeskEmpty").hidden = false;
+    $("dispatchDeskActive").hidden = true;
+    _dispatchSelected = null;
+    loadDispatchQueue();
+  } catch (err) { toast(err.message || "Failed"); }
+}
+
 /* ---------- rides ---------- */
 async function loadRides() {
   try {
@@ -745,6 +807,7 @@ function switchTab(name) {
   if (name === "orders") loadOrders();
   if (name === "disputes") loadDisputes();
   if (name === "support") loadSupportQueue();
+  if (name === "dispatch") loadDispatchQueue();
   if (name === "rides") loadRides();
   if (name === "team") loadTeam();
   if (name === "site") loadSite();
@@ -781,6 +844,10 @@ document.addEventListener("DOMContentLoaded", () => {
   $("supportQueueFilter")?.addEventListener("change", loadSupportQueue);
   $("supportBody")?.addEventListener("click", supportAction);
   $("supportResolveBtn")?.addEventListener("click", resolveSupportCase);
+  $("dispatchRefresh")?.addEventListener("click", loadDispatchQueue);
+  $("dispatchQueueFilter")?.addEventListener("change", loadDispatchQueue);
+  $("dispatchBody")?.addEventListener("click", dispatchAction);
+  $("dispatchResolveBtn")?.addEventListener("click", resolveDispatchCase);
   $("ridesBody").addEventListener("click", ridesAction);
   $("ridesRefresh").addEventListener("click", loadRides);
   $("siteSaveBtn").addEventListener("click", saveSite);

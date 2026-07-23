@@ -42,6 +42,10 @@ validating the recognition/comps adapters against live APIs.
 Full counsel chamber at `/support`; floating Counsel portal on every other page;
 Command Hub → Counsel for the human review desk. APIs: `/api/support/*`.
 
+**AI Shipping Agent (Dispatch)** — AI owns quote → pack → label → ship → track →
+exception. Seller chamber at `/shipping`; Shippo-backed when `SHIPPO_API_KEY` is set
+(demo rates + mock labels otherwise). APIs: `/api/shipping/*`.
+
 ### Turning on Stripe payments
 1. Create a Stripe account and grab **test** keys at
    https://dashboard.stripe.com/test/apikeys → put `STRIPE_SECRET_KEY=sk_test_…` in `.env`.
@@ -65,6 +69,7 @@ nothing breaks. `/api/meta.integrations` reports live status (also shown in the 
 | Live market price | **TCG API** / tcgapi.dev (`pricing.py`) | `TCG_API_KEY` | omitted (sold comps only) |
 | External sold comps | **SoldComps** shape (`comps.py`) | `COMPS_PROVIDER_URL` + `COMPS_PROVIDER_KEY` | RAGNAR's own + seeded comps |
 | Grading/pop data | **PSA** public API | `PSA_ACCESS_TOKEN` | (stub seam only) |
+| Shipping rates/labels | **Shippo** (`shipping.py` + Dispatch) | `SHIPPO_API_KEY` | Demo rates + mock labels |
 
 - Recognition precedence in `auto`: Ximilar → OpenAI vision → filename heuristic.
 - Live price + external comps are merged into `/api/scan` and `/api/sales/history`
@@ -132,6 +137,11 @@ The database (SQLite) is created and seeded with sample listings on first run.
 | `/api/support/knowledge` | GET | Search/list support knowledge base articles |
 | `/api/admin/support/queue` | GET | Human review queue (escalations + flagged cases) |
 | `/api/admin/support/audit` | GET | AI decision audit trail |
+| `/api/shipping/conversations` | POST | Start a Dispatch (AI shipping) conversation |
+| `/api/shipping/chat` | POST | Shipping message (quote → pack → label → track) |
+| `/api/shipping/to-ship` | GET | Paid orders waiting for postage |
+| `/api/shipping/status` | GET | Shippo + Dispatch capability status |
+| `/api/admin/shipping/queue` | GET | Dispatch human review queue |
 
 ## Configuration
 
