@@ -52,7 +52,7 @@ flowchart LR
 - **Storage:** move card photos from local `UPLOAD_DIR` → Supabase Storage bucket (or keep Cloudinary). Decide in Phase 1.
 
 ## Stability hooks
-Pooling params live in `db.py` (`pool_size`, `max_overflow`, `pool_pre_ping`). Replica lag + connection count → [[Stability/README|Grafana]]. Run the [[Stability-Checklist]] for the migration.
+Pooling params live in `app/database.py` (`pool_size=5`, `max_overflow=10`, `pool_pre_ping`, `pool_recycle=300`, `prepare_threshold=0` for transaction-mode PgBouncer). Perf indexes + `pg_trgm` live in Alembic `c3d4e5f6a7b8`. Replica lag + connection count → [[Stability/README|Grafana]]. Run the [[Stability-Checklist]] for the migration.
 
 ## What I need from you to proceed
 - A Supabase project (URL + service-role key), **or** a go-ahead to self-host via the clone's `docker/`.

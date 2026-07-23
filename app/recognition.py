@@ -18,9 +18,8 @@ import logging
 import re
 from pathlib import Path
 
-import httpx
-
 from .config import settings
+from .http_client import sync_client
 from .models import Category, Condition, GradingCompany
 
 logger = logging.getLogger("ragnar.scan")
@@ -198,12 +197,12 @@ def _openai_vision(image_bytes: bytes, content_type: str) -> dict | None:
     }
     headers = {"Authorization": f"Bearer {settings.openai_api_key}"}
     try:
-        with httpx.Client(timeout=45.0) as client:
-            resp = client.post(
-                "https://api.openai.com/v1/chat/completions",
-                json=payload,
-                headers=headers,
-            )
+        resp = sync_client(timeout=45.0).post(
+            "https://api.openai.com/v1/chat/completions",
+            json=payload,
+            headers=headers,
+            timeout=45.0,
+        )
         if resp.status_code >= 400:
             logger.warning("OpenAI vision failed %s: %s", resp.status_code, resp.text[:200])
             return None
@@ -263,8 +262,7 @@ def _ximilar(image_bytes: bytes, content_type: str) -> dict | None:
     headers = {"Authorization": f"Token {settings.ximilar_token}"}
     body = {"records": [{"_base64": b64}]}
     try:
-        with httpx.Client(timeout=45.0) as client:
-            resp = client.post(url, json=body, headers=headers)
+        resp = sync_client(timeout=45.0).post(url, json=body, headers=headers, timeout=45.0)
         if resp.status_code >= 400:
             logger.warning("Ximilar failed %s: %s", resp.status_code, resp.text[:200])
             return None

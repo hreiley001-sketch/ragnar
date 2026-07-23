@@ -108,12 +108,36 @@ def my_follows(
     session: Session = Depends(get_session),
     user: User = Depends(require_user),
 ) -> dict:
-    follows = session.exec(
+    follows = list(session.exec(
         select(Follow).where(Follow.user_id == user.id).order_by(Follow.created_at.desc())
-    ).all()
+    ).all())
+    seller_ids = [f.seller_id for f in follows]
+    sellers_by_id: dict[int, Seller] = {}
+    if seller_ids:
+        for seller in session.exec(select(Seller).where(Seller.id.in_(seller_ids))).all():
+            sellers_by_id[seller.id] = seller
+    live_ids: set[int] = set()
+    bidding_ids: set[int] = set()
+    if seller_ids:
+        live_ids = set(
+            session.exec(
+                select(LiveStream.seller_id).where(
+                    LiveStream.seller_id.in_(seller_ids),
+                    LiveStream.status == "live",
+                )
+            ).all()
+        )
+        bidding_ids = set(
+            session.exec(
+                select(Ride.seller_id).where(
+                    Ride.seller_id.in_(seller_ids),
+                    Ride.status == RideStatus.bidding.value,
+                )
+            ).all()
+        )
     items = []
     for f in follows:
-        seller = session.get(Seller, f.seller_id)
+        seller = sellers_by_id.get(f.seller_id)
         if not seller:
             continue
         items.append({
@@ -121,7 +145,7 @@ def my_follows(
             "display_name": seller.display_name,
             "avatar_url": seller.avatar_url,
             "accent_color": seller.accent_color,
-            "is_live": _is_live(session, seller.id),
+            "is_live": seller.id in live_ids or seller.id in bidding_ids,
         })
     return {"items": items}
 
@@ -223,29 +247,69 @@ def my_conversations(
                 (c, "seller") for c in seller_convs if c.user_id != user.id
             )
 
+    conv_ids = [c.id for c, _ in entries]
+    seller_ids = list({c.seller_id for c, side in entries if side == "buyer"})
+    buyer_ids = list({c.user_id for c, side in entries if side == "seller"})
+    sellers_by_id = {
+        s.id: s
+        for s in (
+            session.exec(select(Seller).where(Seller.id.in_(seller_ids))).all()
+            if seller_ids
+            else []
+        )
+    }
+    buyers_by_id = {
+        u.id: u
+        for u in (
+            session.exec(select(User).where(User.id.in_(buyer_ids))).all()
+            if buyer_ids
+            else []
+        )
+    }
+    last_by_conv: dict[int, ChatMessage] = {}
+    unread_by_conv: dict[tuple[int, str], int] = {}
+    if conv_ids:
+        max_rows = session.exec(
+            select(ChatMessage.conversation_id, func.max(ChatMessage.id))
+            .where(ChatMessage.conversation_id.in_(conv_ids))
+            .group_by(ChatMessage.conversation_id)
+        ).all()
+        last_ids = [mid for _, mid in max_rows if mid is not None]
+        if last_ids:
+            for msg in session.exec(
+                select(ChatMessage).where(ChatMessage.id.in_(last_ids))
+            ).all():
+                last_by_conv[msg.conversation_id] = msg
+        for conv_id, sender, n in session.exec(
+            select(
+                ChatMessage.conversation_id,
+                ChatMessage.sender,
+                func.count(),
+            )
+            .where(
+                ChatMessage.conversation_id.in_(conv_ids),
+                ChatMessage.read == False,  # noqa: E712
+            )
+            .group_by(ChatMessage.conversation_id, ChatMessage.sender)
+        ).all():
+            unread_by_conv[(conv_id, sender)] = int(n)
+
     items = []
     for conv, side in entries:
         if side == "buyer":
-            other_seller = session.get(Seller, conv.seller_id)
+            other_seller = sellers_by_id.get(conv.seller_id)
             with_name = other_seller.display_name if other_seller else "Unknown store"
             my_role = "user"
         else:
-            buyer = session.get(User, conv.user_id)
+            buyer = buyers_by_id.get(conv.user_id)
             with_name = _display(buyer)
             my_role = "seller"
-        last = session.exec(
-            select(ChatMessage)
-            .where(ChatMessage.conversation_id == conv.id)
-            .order_by(ChatMessage.id.desc())
-            .limit(1)
-        ).first()
-        unread = session.exec(
-            select(func.count()).select_from(ChatMessage).where(
-                ChatMessage.conversation_id == conv.id,
-                ChatMessage.read == False,  # noqa: E712
-                ChatMessage.sender != my_role,
-            )
-        ).one()
+        last = last_by_conv.get(conv.id)
+        unread = sum(
+            n
+            for (cid, sender), n in unread_by_conv.items()
+            if cid == conv.id and sender != my_role
+        )
         items.append({
             "id": conv.id,
             "side": side,

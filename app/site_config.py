@@ -11,7 +11,11 @@ import re
 
 from sqlmodel import Session, select
 
+from . import cache as app_cache
 from .models import SiteSetting, utcnow
+
+_SITE_CONFIG_CACHE_KEY = "site_config:public"
+_SITE_CONFIG_TTL = 45.0
 
 _HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
@@ -157,12 +161,19 @@ def retire_legacy_theme_values(session: Session) -> int:
     return removed
 
 
-def get_all(session: Session) -> dict[str, str]:
+def get_all(session: Session, *, use_cache: bool = True) -> dict[str, str]:
     """Every whitelisted key merged over its default (public-safe)."""
+    if use_cache:
+        hit = app_cache.get(_SITE_CONFIG_CACHE_KEY)
+        if isinstance(hit, dict):
+            return hit
+
     out = dict(DEFAULTS)
     for row in session.exec(select(SiteSetting)).all():
         if row.key in ALLOWED:
             out[row.key] = row.value
+    if use_cache:
+        app_cache.set(_SITE_CONFIG_CACHE_KEY, out, ttl_seconds=_SITE_CONFIG_TTL)
     return out
 
 
@@ -203,4 +214,5 @@ def set_many(session: Session, updates: dict, by: str | None) -> dict[str, str]:
             row = SiteSetting(key=key, value=value, updated_by=by, updated_at=now)
         session.add(row)
     session.commit()
-    return get_all(session)
+    app_cache.invalidate(_SITE_CONFIG_CACHE_KEY)
+    return get_all(session, use_cache=False)

@@ -7,18 +7,31 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from .config import settings
 
+_IS_SQLITE = settings.database_url.startswith("sqlite")
+
 # SQLite needs check_same_thread=False when used with FastAPI's threadpool.
-_connect_args = (
+# Postgres via Supabase transaction-mode PgBouncer: disable prepared statements
+# (prepare_threshold=0) so connections can be safely reused across clients.
+_connect_args: dict = (
     {"check_same_thread": False}
-    if settings.database_url.startswith("sqlite")
-    else {}
+    if _IS_SQLITE
+    else {"prepare_threshold": 0}
 )
 
-engine = create_engine(
-    settings.database_url,
-    echo=settings.debug,
-    connect_args=_connect_args,
-)
+_engine_kwargs: dict = {
+    "echo": settings.debug,
+    "connect_args": _connect_args,
+}
+if not _IS_SQLITE:
+    # Small pool sized for transaction-mode PgBouncer (port 6543).
+    _engine_kwargs.update(
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10,
+        pool_recycle=300,
+    )
+
+engine = create_engine(settings.database_url, **_engine_kwargs)
 
 
 # Columns added after each table originally shipped. On SQLite we add them in

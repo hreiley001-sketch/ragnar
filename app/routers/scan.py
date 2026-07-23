@@ -2,6 +2,7 @@
 history in one call so the seller can confirm and publish."""
 from __future__ import annotations
 
+import asyncio
 import logging
 import uuid
 from pathlib import Path
@@ -29,6 +30,8 @@ _EXT_BY_TYPE = {
     "image/webp": ".webp",
     "image/gif": ".gif",
 }
+# Below this, skip paid/external enrich — recognition didn't find a real card.
+_MIN_ENRICH_CONFIDENCE = 0.35
 
 
 @router.post("", response_model=ScanResponse)
@@ -61,8 +64,11 @@ async def scan(
     (UPLOAD_DIR / name).write_bytes(data)
     image_url = f"/uploads/{name}"
 
-    result = recognize(data, file.filename or name, file.content_type or "")
+    result = await asyncio.to_thread(
+        recognize, data, file.filename or name, file.content_type or ""
+    )
     fields = result["fields"]
+    confidence = float(result.get("confidence") or 0)
 
     sales = match_sales(
         session,
@@ -74,6 +80,7 @@ async def scan(
         grading_company=fields.get("grading_company"),
         grade=fields.get("grade"),
     )
+
     keyword = build_keyword(
         player_or_character=fields.get("player_or_character"),
         title=fields.get("title"),
@@ -82,13 +89,26 @@ async def scan(
         grading_company=fields.get("grading_company"),
         grade=fields.get("grade"),
     )
-    external = external_sold(keyword)
-    history = summarize_sales(sales, external)
-
     price_query = fields.get("player_or_character") or fields.get("title") or ""
     if fields.get("set_name"):
         price_query = f"{price_query} {fields['set_name']}".strip()
-    mp = market_price(price_query, category=fields.get("category"))
+
+    external: list = []
+    mp = None
+    if confidence >= _MIN_ENRICH_CONFIDENCE and (keyword or price_query):
+        # Parallelize outbound enrich after recognition (comps + TCG price).
+        external, mp = await asyncio.gather(
+            asyncio.to_thread(external_sold, keyword),
+            asyncio.to_thread(market_price, price_query, fields.get("category")),
+        )
+    else:
+        logger.info(
+            "Skipping external enrich (confidence=%.2f keyword=%r)",
+            confidence,
+            keyword,
+        )
+
+    history = summarize_sales(sales, external)
 
     return ScanResponse(
         image_url=image_url,

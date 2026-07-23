@@ -1,6 +1,7 @@
 """Alembic environment — uses RAGNAR Settings + SQLModel metadata."""
 from __future__ import annotations
 
+import os
 import sys
 from logging.config import fileConfig
 from pathlib import Path
@@ -21,7 +22,26 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", settings.database_url)
+
+def _migration_url() -> str:
+    """Where migrations run.
+
+    Alembic needs a real session (transaction pooler :6543 breaks prepared
+    statements), so the Supabase cutover points migrations at the session
+    pooler / direct connection via SUPABASE_MIGRATION_DB_URL (or ALEMBIC_DB_URL),
+    while the app keeps using DATABASE_URL / the transaction pooler at runtime.
+    Falls back to settings.database_url so local + SQLite dev is unchanged.
+    """
+    return (
+        os.getenv("SUPABASE_MIGRATION_DB_URL")
+        or os.getenv("ALEMBIC_DB_URL")
+        or settings.database_url
+    ).strip()
+
+
+# Escape % so ConfigParser interpolation doesn't choke on %-encoded
+# credentials (e.g. a URL-encoded password). get_main_option() restores it.
+config.set_main_option("sqlalchemy.url", _migration_url().replace("%", "%%"))
 
 target_metadata = SQLModel.metadata
 
@@ -44,7 +64,7 @@ def run_migrations_online() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        url=settings.database_url,
+        url=config.get_main_option("sqlalchemy.url"),
     )
     with connectable.connect() as connection:
         context.configure(
