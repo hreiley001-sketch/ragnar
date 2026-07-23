@@ -63,7 +63,7 @@ function setMode(m) {
   document.querySelectorAll(".auth-tab").forEach((t) => t.classList.toggle("active", t.dataset.mode === m));
   $("nameField").hidden = !signup;
   $("confirmField").hidden = !signup;
-  $("termsRow").hidden = !signup;
+  $("legalChecks").hidden = !signup;
   $("mktRow").hidden = !signup;
   $("pwMeter").hidden = !signup;
   $("forgotWrap").hidden = signup;
@@ -95,7 +95,7 @@ async function submit(e) {
     st.textContent = "Signing in…";
     try {
       const u = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ email: fd.get("email"), password: fd.get("password") }) });
-      location.href = u.is_staff ? "/admin" : "/account";
+      location.href = u.next || (u.is_staff ? "/admin" : "/account");
     } catch (err) { st.className = "form-status error"; st.textContent = err.message; }
     return;
   }
@@ -104,12 +104,15 @@ async function submit(e) {
   if (password !== ($("confirmField").querySelector("input").value || "")) {
     st.className = "form-status error"; st.textContent = "Passwords don't match."; return;
   }
-  if (!$("terms").checked) { st.className = "form-status error"; st.textContent = "Please accept the Terms."; return; }
+  if (!$("terms").checked || !$("privacy").checked || !$("policies").checked) {
+    st.className = "form-status error"; st.textContent = "Please agree to the Terms, Privacy Policy, and marketplace policies."; return;
+  }
   st.textContent = "Creating your account…";
   try {
     const u = await api("/api/auth/signup", { method: "POST", body: JSON.stringify({
       name: fd.get("name"), email: fd.get("email"), password,
-      accept_terms: true, marketing_opt_in: $("mkt").checked,
+      accept_terms: true, accept_privacy: true, accept_policies: true,
+      marketing_opt_in: $("mkt").checked,
     }) });
     // Show verify-email panel
     $("authForm").hidden = true;

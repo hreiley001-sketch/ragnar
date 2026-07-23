@@ -123,6 +123,9 @@
         u.is_staff ? `<span class="badge founding">★ Staff</span>` : `<span class="badge">Member</span>`,
         u.seller_handle ? `<span class="badge grade">Seller</span>` : "",
         u.email_verified ? `<span class="badge">✓ Verified email</span>` : "",
+        u.identity_status === "approved" ? `<span class="badge">✓ ID verified</span>`
+          : u.identity_status === "pending" ? `<span class="badge">ID pending</span>`
+          : `<span class="badge"><a href="/identity" style="color:inherit;">Verify ID →</a></span>`,
       ].filter(Boolean).join("");
       const storeBit = u.seller_handle
         ? `<div class="store-link-box">

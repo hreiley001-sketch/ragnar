@@ -74,6 +74,7 @@
             <button class="tab" data-tab="support" type="button" role="tab"><span class="tab-ico">CX</span> Counsel</button>
             <button class="tab" data-tab="disputes" type="button" role="tab"><span class="tab-ico">DP</span> Disputes</button>
             <button class="tab" data-tab="team" type="button" role="tab"><span class="tab-ico">TM</span> Team</button>
+            <button class="tab" data-tab="identity" type="button" role="tab"><span class="tab-ico">ID</span> ID checks</button>
           </div>
         </div>
         <div class="cmd-nav-group">
@@ -225,7 +226,26 @@
         <p id="staffStatus" class="form-status"></p>
       </div>
       <div class="results-bar"><input id="userSearch" class="max-280" type="search" placeholder="Search users…" /></div>
-      <div class="tbl-wrap"><table class="hub"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Verified</th><th>Store</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Verified</th><th>ID</th><th>Store</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+    </section>
+
+    <section id="tab-identity" class="tab-panel" hidden>
+      <div class="panel-bar">
+        <h3>AI identity queue</h3>
+        <button id="identityRefresh" class="btn btn-ghost btn-sm" type="button">↻ Refresh</button>
+      </div>
+      <div class="card card-pad-14 mb-14">
+        <p class="muted muted-sm no-top">Review ID submissions the AI couldn’t auto-approve. Approving unlocks selling; rejecting asks the user to resubmit.</p>
+        <div class="row-inline">
+          <select id="identityStatusFilter">
+            <option value="pending">Pending</option>
+            <option value="rejected">Rejected</option>
+            <option value="approved">Approved</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap"><table class="hub"><thead><tr><th>User</th><th>Extracted name</th><th>Doc</th><th>Confidence</th><th>Notes</th><th>Submitted</th><th>Actions</th></tr></thead><tbody id="identityBody"></tbody></table></div>
     </section>
 
     <section id="tab-site" class="tab-panel" hidden>

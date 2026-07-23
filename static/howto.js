@@ -8,7 +8,7 @@
 
   // Pages that should NOT show the band.
   const SKIP = new Set([
-    "/login", "/verify", "/admin", "/ai-tools",
+    "/login", "/verify", "/identity", "/admin", "/ai-tools",
     "/legal", "/terms", "/privacy", "/cookies",
     "/shipping", "/refunds", "/returns",
     "/buyer-protection", "/prohibited", "/fees",

@@ -442,7 +442,7 @@
       if (d.user.email_verified === false && !sessionStorage.getItem("ragnar_hide_verify")) {
         const bar = document.createElement("div");
         bar.style.cssText = "position:sticky;top:0;z-index:79;background:linear-gradient(90deg,#8a6d1f,#b8901f);color:#0a0d12;font-size:13px;font-weight:600;padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;";
-        bar.innerHTML = '📬 Verify your email to unlock full access. <a href="#" id="navResend" style="color:#0a0d12;text-decoration:underline;">Resend link</a> <span id="navVdismiss" style="cursor:pointer;opacity:.7;">✕</span>';
+        bar.innerHTML = 'Verify your email to unlock full access. <a href="#" id="navResend" style="color:#0a0d12;text-decoration:underline;">Resend link</a> <span id="navVdismiss" style="cursor:pointer;opacity:.7;">✕</span>';
         document.body.insertBefore(bar, document.body.firstChild);
         bar.querySelector("#navResend").addEventListener("click", async (e) => {
           e.preventDefault();
@@ -450,6 +450,26 @@
           catch (_) { e.target.textContent = "Try again later"; }
         });
         bar.querySelector("#navVdismiss").addEventListener("click", () => { sessionStorage.setItem("ragnar_hide_verify", "1"); bar.remove(); });
+      }
+
+      // Identity / legal reminder (skip on the verify page itself).
+      const onIdentityPage = (location.pathname.replace(/\/+$/, "") || "/") === "/identity";
+      if (!onIdentityPage && !d.user.is_staff && !sessionStorage.getItem("ragnar_hide_identity")) {
+        if (d.user.needs_legal || d.user.needs_identity || d.user.identity_status === "rejected") {
+          const ibar = document.createElement("div");
+          ibar.style.cssText = "position:sticky;top:0;z-index:78;background:linear-gradient(90deg,#3d4f3a,#5a6f52);color:#f4f1e8;font-size:13px;font-weight:600;padding:8px 14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;";
+          const msg = d.user.needs_legal
+            ? "Agree to RAGNAR’s legal documents to continue."
+            : d.user.identity_status === "pending"
+              ? "ID check pending review — selling unlocks when approved."
+              : "Complete the AI ID check to sell on RAGNAR.";
+          ibar.innerHTML = `${msg} <a href="/identity" style="color:#f4f1e8;text-decoration:underline;">Open verification</a> <span id="navIdismiss" style="cursor:pointer;opacity:.7;">✕</span>`;
+          document.body.insertBefore(ibar, document.body.firstChild);
+          ibar.querySelector("#navIdismiss").addEventListener("click", () => {
+            sessionStorage.setItem("ragnar_hide_identity", "1");
+            ibar.remove();
+          });
+        }
       }
 
       // Badge the single header notif icon (no second bell).

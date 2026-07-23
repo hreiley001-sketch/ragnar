@@ -202,6 +202,10 @@ class Settings:
     # user. If neither is set/available, admin is disabled.
     admin_token: str = os.getenv("ADMIN_TOKEN", "").strip()
 
+    # Pepper for hashing government ID numbers (never store raw numbers).
+    # Falls back to ADMIN_TOKEN when empty so local/dev still works.
+    identity_hash_pepper: str = os.getenv("IDENTITY_HASH_PEPPER", "").strip()
+
     # --- Media pipeline: Cloudinary (transform-CDN + AI background removal) ---
     # Key-gated. Without keys, media helpers return the original image untouched.
     cloudinary_cloud_name: str = os.getenv("CLOUDINARY_CLOUD_NAME", "").strip()

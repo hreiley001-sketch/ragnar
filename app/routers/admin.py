@@ -18,6 +18,8 @@ from ..config import settings
 from ..database import get_session
 from ..models import (
     FoundingApplication,
+    IdentityStatus,
+    IdentitySubmission,
     Listing,
     ListingStatus,
     LiveStream,
@@ -142,7 +144,115 @@ def admin_users(
         "id": u.id, "email": u.email, "name": u.name, "role": u.role,
         "is_staff": u.role == UserRole.admin.value, "email_verified": u.email_verified,
         "seller_handle": u.seller_handle, "created_at": u.created_at.isoformat(),
+        "identity_status": u.identity_status or IdentityStatus.none.value,
+        "banned": bool(u.banned_at or u.identity_status == IdentityStatus.banned.value),
+        "ban_reason": u.ban_reason,
+        "legal_name": u.legal_name,
     } for u in rows], "count": len(rows)}
+
+
+@router.post("/users/{user_id}/ban")
+def admin_ban_user(
+    user_id: int,
+    payload: dict,
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+    admin_user=Depends(auth.get_current_user),
+) -> dict:
+    """Ban a user permanently — email + ID fingerprint cannot re-register."""
+    from ..identity import record_ban
+
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No such user.")
+    reason = (payload.get("reason") or "policy_violation").strip()[:500]
+    banned_by = (admin_user.email if admin_user else None) or "admin"
+    for s in session.exec(select(UserSession).where(UserSession.user_id == user_id)).all():
+        session.delete(s)
+    rec = record_ban(session, user, reason=reason, banned_by=str(banned_by))
+    return {
+        "banned": True,
+        "user_id": user_id,
+        "email": user.email,
+        "reason": rec.reason,
+        "ban_record_id": rec.id,
+    }
+
+
+@router.get("/identity-queue")
+def admin_identity_queue(
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+    status_filter: str = Query("pending", alias="status"),
+) -> dict:
+    stmt = select(IdentitySubmission).order_by(IdentitySubmission.created_at.desc())
+    if status_filter and status_filter != "all":
+        stmt = stmt.where(IdentitySubmission.status == status_filter)
+    rows = session.exec(stmt.limit(200)).all()
+    items = []
+    for sub in rows:
+        u = session.get(User, sub.user_id)
+        items.append({
+            "id": sub.id,
+            "user_id": sub.user_id,
+            "email": u.email if u else None,
+            "name": u.name if u else None,
+            "status": sub.status,
+            "confidence": sub.confidence,
+            "extracted_name": sub.extracted_name,
+            "extracted_doc_type": sub.extracted_doc_type,
+            "notes": sub.notes,
+            "provider": sub.provider,
+            "created_at": sub.created_at.isoformat() if sub.created_at else None,
+            "reviewed_at": sub.reviewed_at.isoformat() if sub.reviewed_at else None,
+            "reviewed_by": sub.reviewed_by,
+            "user_identity_status": u.identity_status if u else None,
+        })
+    return {"items": items, "count": len(items)}
+
+
+@router.post("/identity/{submission_id}/review")
+def admin_review_identity(
+    submission_id: int,
+    payload: dict,
+    session: Session = Depends(get_session),
+    _: None = Depends(require_admin),
+    admin_user=Depends(auth.get_current_user),
+) -> dict:
+    """Approve or reject a pending AI ID submission."""
+    from ..models import utcnow
+
+    sub = session.get(IdentitySubmission, submission_id)
+    if not sub:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Submission not found.")
+    decision = (payload.get("decision") or "").strip().lower()
+    if decision not in {"approve", "reject"}:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="decision must be approve or reject")
+    user = session.get(User, sub.user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User missing.")
+    reviewer = (admin_user.email if admin_user else None) or "admin"
+    if decision == "approve":
+        sub.status = IdentityStatus.approved.value
+        user.identity_status = IdentityStatus.approved.value
+        user.identity_reject_reason = None
+        if sub.extracted_name:
+            user.legal_name = sub.extracted_name[:160]
+        if sub.id_doc_hash:
+            user.id_doc_hash = sub.id_doc_hash
+    else:
+        reason = (payload.get("reason") or sub.notes or "Rejected by staff").strip()[:500]
+        sub.status = IdentityStatus.rejected.value
+        sub.notes = reason
+        user.identity_status = IdentityStatus.rejected.value
+        user.identity_reject_reason = reason
+    sub.reviewed_at = utcnow()
+    sub.reviewed_by = str(reviewer)
+    user.identity_checked_at = utcnow()
+    session.add(sub)
+    session.add(user)
+    session.commit()
+    return {"id": sub.id, "status": sub.status, "user_identity_status": user.identity_status}
 
 
 @router.post("/staff")
@@ -187,6 +297,13 @@ def admin_delete_user(
             detail=f"This user operates store '{user.seller_handle}'. Pass force=true to delete anyway.",
         )
     email = user.email
+    # If already banned, ensure BanRecord exists before hard-delete.
+    if user.banned_at or user.identity_status == IdentityStatus.banned.value:
+        from ..identity import record_ban
+        try:
+            record_ban(session, user, reason=user.ban_reason or "admin_delete", banned_by="admin")
+        except Exception:  # noqa: BLE001
+            pass
     for s in session.exec(select(UserSession).where(UserSession.user_id == user_id)).all():
         session.delete(s)
     session.delete(user)

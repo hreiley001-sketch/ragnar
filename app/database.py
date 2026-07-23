@@ -71,6 +71,17 @@ _ADDED_COLUMNS: dict[str, dict[str, str]] = {
         "pending_email": "VARCHAR",
         "reset_token": "VARCHAR",
         "reset_sent_at": "DATETIME",
+        "terms_accepted_at": "DATETIME",
+        "terms_version": "VARCHAR",
+        "privacy_accepted_at": "DATETIME",
+        "legal_docs_version": "VARCHAR",
+        "identity_status": "VARCHAR DEFAULT 'none'",
+        "identity_checked_at": "DATETIME",
+        "identity_reject_reason": "VARCHAR",
+        "legal_name": "VARCHAR",
+        "id_doc_hash": "VARCHAR",
+        "banned_at": "DATETIME",
+        "ban_reason": "VARCHAR",
     },
 }
 

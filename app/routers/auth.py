@@ -4,18 +4,44 @@ from __future__ import annotations
 import re
 import secrets
 import time
+import uuid
+from datetime import timedelta
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, Response, UploadFile, status
 from fastapi.responses import RedirectResponse
 from sqlmodel import Session, select
 
 from .. import auth
+from .. import ratelimit
 from ..config import settings
 from ..database import get_session
 from ..emailer import send_password_reset_email, send_verification_email
-from ..models import User, UserRole, UserSession, utcnow
-from .. import ratelimit
-from datetime import timedelta
+from ..identity import (
+    accept_legal,
+    assert_not_banned,
+    needs_identity,
+    needs_legal_acceptance,
+    run_id_check,
+)
+from ..models import (
+    LEGAL_DOCS_VERSION,
+    IdentityStatus,
+    IdentitySubmission,
+    User,
+    UserRole,
+    UserSession,
+    utcnow,
+)
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+IDENTITY_UPLOAD_DIR = PROJECT_ROOT / "private_uploads" / "identity"
+_ALLOWED_ID_EXT = {".png", ".jpg", ".jpeg", ".webp"}
+_EXT_BY_TYPE = {
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/webp": ".webp",
+}
 
 def _base_url() -> str:
     return (settings.site_url or settings.public_base_url).rstrip("/")
@@ -69,15 +95,27 @@ def signup(payload: dict, request: Request, response: Response, session: Session
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Enter a valid email.")
     if len(password) < 8:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password must be at least 8 characters.")
-    if not payload.get("accept_terms"):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Please accept the Terms & buyer/seller conduct.")
+    accept_terms = bool(payload.get("accept_terms"))
+    accept_privacy = bool(payload.get("accept_privacy"))
+    accept_policies = bool(payload.get("accept_policies"))
+    # Back-compat: a single accept_terms checkbox still requires all docs.
+    if payload.get("accept_legal"):
+        accept_terms = accept_privacy = accept_policies = True
+    if not (accept_terms and accept_privacy and accept_policies):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please agree to the Terms, Privacy Policy, and marketplace policies.",
+        )
+    assert_not_banned(session, email=email)
     if session.exec(select(User).where(User.email == email)).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="An account with that email already exists.")
     # Password signup is always a regular user until the email is VERIFIED.
     # Verifying an @ragnarips.com address (proving inbox control) promotes to staff.
     user = User(email=email, name=name, password_hash=auth.hash_password(password),
                 email_verified=False, role=UserRole.user.value,
-                marketing_opt_in=bool(payload.get("marketing_opt_in")))
+                marketing_opt_in=bool(payload.get("marketing_opt_in")),
+                identity_status=IdentityStatus.none.value)
+    accept_legal(user)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -88,7 +126,118 @@ def signup(payload: dict, request: Request, response: Response, session: Session
     out["verification_required"] = True
     out["verification_email_sent"] = sent
     out["staff_domain"] = _is_staff_domain(email)
+    out["identity_required"] = True
+    out["next"] = "/identity"
     return out
+
+
+@router.post("/accept-legal")
+def accept_legal_docs(payload: dict, session: Session = Depends(get_session),
+                      user=Depends(auth.require_user)) -> dict:
+    """Google / returning users accept current Terms + policies before using the account."""
+    if not (
+        payload.get("accept_terms")
+        and payload.get("accept_privacy")
+        and payload.get("accept_policies")
+    ) and not payload.get("accept_legal"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please agree to the Terms, Privacy Policy, and marketplace policies.",
+        )
+    accept_legal(user)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    out = auth.public_user(user)
+    out["legal_docs_version"] = LEGAL_DOCS_VERSION
+    out["next"] = "/identity" if needs_identity(user) else "/account"
+    return out
+
+
+@router.get("/identity")
+def identity_status(session: Session = Depends(get_session), user=Depends(auth.require_user)) -> dict:
+    latest = session.exec(
+        select(IdentitySubmission)
+        .where(IdentitySubmission.user_id == user.id)
+        .order_by(IdentitySubmission.created_at.desc())
+    ).first()
+    return {
+        "user": auth.public_user(user),
+        "legal_docs_version": LEGAL_DOCS_VERSION,
+        "latest_submission": None if not latest else {
+            "id": latest.id,
+            "status": latest.status,
+            "confidence": latest.confidence,
+            "extracted_name": latest.extracted_name,
+            "extracted_doc_type": latest.extracted_doc_type,
+            "notes": latest.notes,
+            "created_at": latest.created_at.isoformat() if latest.created_at else None,
+        },
+    }
+
+
+async def _save_identity_image(file: UploadFile, *, kind: str, user_id: int) -> tuple[bytes, str, str]:
+    if not (file.content_type or "").startswith("image/"):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{kind} must be an image.")
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{kind} file is empty.")
+    if len(data) > settings.max_upload_mb * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"Image exceeds {settings.max_upload_mb} MB limit.",
+        )
+    ext = Path(file.filename or "").suffix.lower()
+    if ext not in _ALLOWED_ID_EXT:
+        ext = _EXT_BY_TYPE.get(file.content_type or "", ".jpg")
+    IDENTITY_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    name = f"u{user_id}-{kind}-{uuid.uuid4().hex[:12]}{ext}"
+    path = IDENTITY_UPLOAD_DIR / name
+    path.write_bytes(data)
+    # Private relative path — not under the public /uploads mount.
+    return data, file.content_type or "image/jpeg", f"private_uploads/identity/{name}"
+
+
+@router.post("/identity/submit")
+async def identity_submit(
+    id_front: UploadFile = File(...),
+    selfie: UploadFile | None = File(None),
+    session: Session = Depends(get_session),
+    user=Depends(auth.require_user),
+) -> dict:
+    """AI ID check: upload a government ID photo (+ optional selfie)."""
+    if needs_legal_acceptance(user):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Accept the current legal documents before identity verification.",
+        )
+    if user.identity_status == IdentityStatus.banned.value or user.banned_at:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This account is banned.")
+    if user.identity_status == IdentityStatus.approved.value:
+        return {"status": "approved", "user": auth.public_user(user), "message": "Already verified."}
+
+    id_bytes, id_ctype, id_path = await _save_identity_image(id_front, kind="id", user_id=user.id)
+    selfie_bytes = selfie_path = None
+    if selfie is not None and selfie.filename:
+        selfie_bytes, _, selfie_path = await _save_identity_image(selfie, kind="selfie", user_id=user.id)
+
+    sub = run_id_check(
+        session,
+        user,
+        id_bytes=id_bytes,
+        id_content_type=id_ctype,
+        id_path=id_path,
+        selfie_bytes=selfie_bytes,
+        selfie_path=selfie_path,
+    )
+    return {
+        "status": sub.status,
+        "confidence": sub.confidence,
+        "extracted_name": sub.extracted_name,
+        "notes": sub.notes,
+        "user": auth.public_user(user),
+        "next": "/account" if sub.status == IdentityStatus.approved.value else "/identity",
+    }
 
 
 @router.post("/verify")
@@ -158,8 +307,21 @@ def login(payload: dict, request: Request, response: Response, session: Session 
     user = session.exec(select(User).where(User.email == email)).first()
     if not user or not auth.verify_password(password, user.password_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password.")
+    if user.banned_at or user.identity_status == IdentityStatus.banned.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This account is banned and cannot sign in.",
+        )
+    assert_not_banned(session, email=email, doc_hash=user.id_doc_hash)
     _set_session_cookie(response, auth.create_session(session, user))
-    return auth.public_user(user)
+    out = auth.public_user(user)
+    if needs_legal_acceptance(user):
+        out["next"] = "/identity"
+    elif needs_identity(user) and user.role != UserRole.admin.value:
+        out["next"] = "/identity"
+    else:
+        out["next"] = "/admin" if user.role == UserRole.admin.value else "/account"
+    return out
 
 
 @router.post("/forgot-password")
@@ -352,6 +514,15 @@ def deactivate_account(payload: dict, request: Request, response: Response,
         session.delete(s)
 
     # Keep row for historical FK references, but remove access and personal data.
+    # Preserve ban fingerprint first so re-signup with same email/ID stays blocked.
+    from ..identity import record_ban
+    if user.banned_at or user.identity_status == IdentityStatus.banned.value:
+        try:
+            record_ban(session, user, reason=user.ban_reason or "account_closed_while_banned",
+                       banned_by="self-deactivate")
+        except Exception:  # noqa: BLE001
+            pass
+
     user.email = f"deleted+{user.id}+{int(time.time())}@example.invalid"
     user.name = "Deleted User"
     user.password_hash = None
@@ -363,6 +534,8 @@ def deactivate_account(payload: dict, request: Request, response: Response,
     user.role = UserRole.user.value
     user.seller_handle = None
     user.marketing_opt_in = False
+    # Keep id_doc_hash + ban fields for enforcement; scrub display name only.
+    user.legal_name = None
     session.add(user)
     session.commit()
 
@@ -405,11 +578,18 @@ def google_callback(request: Request, code: str = "", state: str = "",
     if not email or not verified:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Google account email not verified.")
 
+    assert_not_banned(session, email=email)
+
     user = session.exec(select(User).where(User.email == email)).first()
+    if user and (user.banned_at or user.identity_status == IdentityStatus.banned.value):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="This account is banned and cannot sign in.")
+
     role = auth.role_for_verified_email(email)
     if not user:
         user = User(email=email, name=info.get("name"), google_sub=info.get("sub"),
-                    email_verified=True, role=role)
+                    email_verified=True, role=role,
+                    identity_status=IdentityStatus.none.value)
         session.add(user)
     else:
         user.google_sub = info.get("sub") or user.google_sub
@@ -423,7 +603,12 @@ def google_callback(request: Request, code: str = "", state: str = "",
     session.refresh(user)
 
     token = auth.create_session(session, user)
-    dest = "/admin" if user.role == UserRole.admin.value else "/account"
+    if user.role == UserRole.admin.value:
+        dest = "/admin"
+    elif needs_legal_acceptance(user) or needs_identity(user):
+        dest = "/identity"
+    else:
+        dest = "/account"
     resp = RedirectResponse(dest, status_code=status.HTTP_303_SEE_OTHER)
     _set_session_cookie(resp, token)
     resp.delete_cookie("g_state", path="/")

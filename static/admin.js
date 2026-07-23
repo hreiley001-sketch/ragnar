@@ -522,14 +522,16 @@ async function loadTeam() {
       <td>${esc(u.email)}</td><td>${esc(u.name || "—")}</td>
       <td>${u.is_staff ? '<span class="pill gold">★ staff</span>' : "member"}</td>
       <td>${u.email_verified ? '<span class="pill ok">verified</span>' : '<span class="pill warn">unverified</span>'}</td>
+      <td>${u.banned ? '<span class="pill warn">banned</span>' : esc(u.identity_status || "none")}</td>
       <td>${u.seller_handle ? esc(u.seller_handle) : "—"}</td>
       <td>${fmtDate(u.created_at)}</td>
       <td class="row-actions">
         ${u.is_staff
           ? `<button class="btn btn-sm" data-revoke="${esc(u.email)}">Revoke staff</button>`
           : `<button class="btn btn-sm" data-grant="${esc(u.email)}">Make staff</button>`}
+        ${u.banned ? "" : `<button class="btn btn-sm btn-danger" data-ban="${u.id}" data-ban-email="${esc(u.email)}">Ban</button>`}
         <button class="btn btn-sm btn-danger" data-del="${u.id}" data-del-email="${esc(u.email)}" data-del-store="${esc(u.seller_handle || "")}">Remove</button>
-      </td></tr>`).join("") || `<tr><td colspan="7" class="muted" style="padding:20px;text-align:center;">No users yet</td></tr>`;
+      </td></tr>`).join("") || `<tr><td colspan="8" class="muted" style="padding:20px;text-align:center;">No users yet</td></tr>`;
   } catch (e) { toast(e.message); }
 }
 
@@ -565,14 +567,67 @@ async function deleteUser(id, email, store) {
   } catch (e) { toast(e.message); }
 }
 
+async function banUser(id, email) {
+  const reason = prompt(`Ban ${email}? They cannot re-register with this email or verified ID.\nReason:`, "policy_violation");
+  if (reason === null) return;
+  try {
+    await api(`/api/admin/users/${id}/ban`, { method: "POST", body: JSON.stringify({ reason: reason || "policy_violation" }) });
+    toast(`Banned ${email}`);
+    loadTeam();
+  } catch (e) { toast(e.message); }
+}
+
 function teamAction(e) {
   const t = e.target.closest("button"); if (!t) return;
   const grant = t.getAttribute("data-grant");
   const revoke = t.getAttribute("data-revoke");
   const del = t.getAttribute("data-del");
+  const ban = t.getAttribute("data-ban");
   if (grant) setStaff(grant, true);
   else if (revoke) { if (confirm(`Revoke staff access from ${revoke}?`)) setStaff(revoke, false); }
+  else if (ban) banUser(ban, t.getAttribute("data-ban-email"));
   else if (del) deleteUser(del, t.getAttribute("data-del-email"), t.getAttribute("data-del-store"));
+}
+
+async function loadIdentityQueue() {
+  try {
+    const st = ($("identityStatusFilter") && $("identityStatusFilter").value) || "pending";
+    const d = await api(`/api/admin/identity-queue?status=${encodeURIComponent(st)}`);
+    $("identityBody").innerHTML = d.items.map((row) => `<tr>
+      <td>${esc(row.email || "—")}<div class="muted" style="font-size:11px;">${esc(row.name || "")}</div></td>
+      <td>${esc(row.extracted_name || "—")}</td>
+      <td>${esc(row.extracted_doc_type || "—")}</td>
+      <td>${row.confidence != null ? Number(row.confidence).toFixed(2) : "—"}</td>
+      <td style="max-width:220px;font-size:12px;">${esc(row.notes || "—")}</td>
+      <td>${fmtDate(row.created_at)}</td>
+      <td class="row-actions">
+        ${row.status === "pending" ? `
+          <button class="btn btn-sm" data-id-approve="${row.id}">Approve</button>
+          <button class="btn btn-sm btn-danger" data-id-reject="${row.id}">Reject</button>
+        ` : `<span class="pill">${esc(row.status)}</span>`}
+      </td></tr>`).join("") || `<tr><td colspan="7" class="muted" style="padding:20px;text-align:center;">No submissions</td></tr>`;
+  } catch (e) { toast(e.message); }
+}
+
+async function identityAction(e) {
+  const t = e.target.closest("button"); if (!t) return;
+  const approve = t.getAttribute("data-id-approve");
+  const reject = t.getAttribute("data-id-reject");
+  if (approve) {
+    try {
+      await api(`/api/admin/identity/${approve}/review`, { method: "POST", body: JSON.stringify({ decision: "approve" }) });
+      toast("Approved");
+      loadIdentityQueue();
+    } catch (err) { toast(err.message); }
+  } else if (reject) {
+    const reason = prompt("Reject reason:", "Could not verify ID");
+    if (reason === null) return;
+    try {
+      await api(`/api/admin/identity/${reject}/review`, { method: "POST", body: JSON.stringify({ decision: "reject", reason }) });
+      toast("Rejected");
+      loadIdentityQueue();
+    } catch (err) { toast(err.message); }
+  }
 }
 
 /* ---------- site editor ---------- */
@@ -747,6 +802,7 @@ function switchTab(name) {
   if (name === "support") loadSupportQueue();
   if (name === "rides") loadRides();
   if (name === "team") loadTeam();
+  if (name === "identity") loadIdentityQueue();
   if (name === "site") loadSite();
 }
 
@@ -796,6 +852,9 @@ document.addEventListener("DOMContentLoaded", () => {
   $("teamRefresh").addEventListener("click", loadTeam);
   $("usersBody").addEventListener("click", teamAction);
   $("userSearch").addEventListener("input", () => { clearTimeout(window._us); window._us = setTimeout(loadTeam, 300); });
+  $("identityRefresh")?.addEventListener("click", loadIdentityQueue);
+  $("identityStatusFilter")?.addEventListener("change", loadIdentityQueue);
+  $("identityBody")?.addEventListener("click", identityAction);
   document.querySelectorAll("[data-jump]").forEach((btn) => {
     btn.addEventListener("click", () => switchTab(btn.getAttribute("data-jump")));
   });

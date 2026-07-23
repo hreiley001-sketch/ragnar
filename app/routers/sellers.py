@@ -27,6 +27,14 @@ def get_founding_status(session: Session = Depends(get_session)) -> FoundingStat
 @router.post("/apply", response_model=SellerApplyResult, status_code=status.HTTP_201_CREATED)
 def apply(payload: SellerApply, session: Session = Depends(get_session),
           user=Depends(require_user)) -> SellerApplyResult:
+    from ..auth import is_staff
+    from ..models import IdentityStatus
+
+    if not is_staff(user) and user.identity_status != IdentityStatus.approved.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Complete identity verification at /identity before applying to sell.",
+        )
     handle = payload.handle.strip().lower()
     existing = session.exec(select(Seller).where(Seller.handle == handle)).first()
     if existing:

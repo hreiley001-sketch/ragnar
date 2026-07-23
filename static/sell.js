@@ -436,6 +436,12 @@
     const name = $("form-seller").value.trim();
     if (!handle || !name) { toast("Enter a seller handle and display name first."); return; }
     try {
+      const me = await api("/api/auth/me");
+      if (me.user && !me.user.is_staff && me.user.identity_status !== "approved") {
+        toast("Complete the AI ID check before selling.");
+        location.href = "/identity";
+        return;
+      }
       const s = await api("/api/sellers/apply", {
         method: "POST",
         body: JSON.stringify({ handle, display_name: name, apply_for_founding: true }),
@@ -444,6 +450,11 @@
       updateFeePreview();
       toast(s.is_founding ? `You're Founding Seller #${s.founding_number}! You locked in a flat 4% fee, forever.` : "Seller created (Founding slots full — standard flat 5%).");
     } catch (err) {
+      if (String(err.message).includes("identity") || String(err.message).includes("/identity")) {
+        toast(err.message);
+        location.href = "/identity";
+        return;
+      }
       if (String(err.message).includes("already taken")) {
         try { const s = await api(`/api/sellers/${encodeURIComponent(handle)}`); showSellerState(s); updateFeePreview(); toast("Welcome back — seller loaded."); return; } catch (_) {}
       }
