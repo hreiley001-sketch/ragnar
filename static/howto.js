@@ -1,19 +1,17 @@
-// RAGNAR — sitewide "How it works" onboarding band.
-// Injected by nav.js. Makes listing + using the site obvious on every content
-// page. Dismissible (remembered in localStorage). Ensures sell.js is loaded so
-// the "List a card" CTA always opens the sell drawer.
+// RAGNAR — home-only "How it works" onboarding band.
+// Injected by nav.js on the home page. Dismissible (remembered in localStorage).
+// Ensures sell.js is loaded so the "List a card" CTA always opens the sell drawer.
 "use strict";
 (function () {
   const path = (location.pathname.replace(/\/+$/, "") || "/");
 
-  // Pages that should NOT show the band.
-  const SKIP = new Set(["/login", "/verify", "/admin", "/ai-tools"]);
-  if (SKIP.has(path)) return;
-  if (document.body.classList.contains("premium-room")) return;      // live room = focus mode
+  // Only show once — on the home page.
+  const onHome = path === "/" || document.body.classList.contains("arena-home");
+  if (!onHome) return;
   if (localStorage.getItem("ragnar_howto_dismissed") === "1") return;
 
-  // Which flow to emphasise on this page.
-  const sellFocus = ["/", "/mystore", "/account"].includes(path);
+  // Home emphasises listing (sell-first onboarding).
+  const sellFocus = true;
 
   function ensureSell() {
     const has = Array.prototype.some.call(document.scripts, (s) => /\/static\/sell\.js/.test(s.src || ""));

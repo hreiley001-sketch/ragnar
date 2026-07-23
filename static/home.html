@@ -83,6 +83,30 @@
     }
     .home-stat b { display: block; font-size: var(--text-2xl); color: var(--color-text-primary); margin-bottom: 4px; }
     .home-stat span { color: var(--color-text-muted); font-size: var(--text-sm); }
+
+    /* AI feature cards — equal structure so icons/titles/copy align across the row */
+    .home-ai-tools .home-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100%;
+    }
+    .home-ai-ico {
+      display: block;
+      font-size: 1.5rem;
+      line-height: 1;
+      height: 1.5rem;
+    }
+    .home-ai-tools .home-stat b {
+      font-size: var(--text-lg);
+      line-height: 1.25;
+      min-height: 2.5em; /* reserve two lines so wrapped titles stay even */
+      margin-bottom: 0;
+    }
+    .home-ai-tools .home-stat > span:last-child {
+      line-height: 1.45;
+      flex: 1;
+    }
   </style>
 </head>
 <body class="arena-home" data-vault-stage="1">
@@ -115,11 +139,27 @@
       <div class="home-stat"><b>Reviewed</b><span>Every seller application is reviewed by our team.</span></div>
     </section>
 
-    <section class="home-stats" aria-label="AI tools" style="padding-top:0;">
-      <div class="home-stat"><b>🔎 Smart search</b><span>Ask RAGNAR in plain language — it finds the cards you mean.</span></div>
-      <div class="home-stat"><b>📷 Scan-to-list</b><span>Snap a photo; AI fills in set, grade, and details for you.</span></div>
-      <div class="home-stat"><b>💲 AI pricing</b><span>Fair prices from real sold comps, with the history to back it.</span></div>
-      <div class="home-stat"><b>🎨 Store designer</b><span>Describe a vibe; get an instant storefront look.</span></div>
+    <section class="home-stats home-ai-tools" aria-label="AI tools" style="padding-top:0;">
+      <div class="home-stat">
+        <span class="home-ai-ico" aria-hidden="true">🔎</span>
+        <b>Smart search</b>
+        <span>Ask RAGNAR what you're after — it finds the cards you mean.</span>
+      </div>
+      <div class="home-stat">
+        <span class="home-ai-ico" aria-hidden="true">📷</span>
+        <b>Scan-to-list</b>
+        <span>Snap a photo; AI fills in set, grade, and details for you.</span>
+      </div>
+      <div class="home-stat">
+        <span class="home-ai-ico" aria-hidden="true">💰</span>
+        <b>AI pricing</b>
+        <span>Instantly see comps from real sold prices, with the history to back it.</span>
+      </div>
+      <div class="home-stat">
+        <span class="home-ai-ico" aria-hidden="true">🎨</span>
+        <b>Store designer</b>
+        <span>Describe a vibe; get an instant storefront look.</span>
+      </div>
     </section>
     <div style="text-align:center; margin: 4px auto 8px;">
       <a class="arena-btn primary" href="/ai-tools">See all AI tools &amp; how to use them <span class="arrow">→</span></a>

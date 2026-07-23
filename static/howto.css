@@ -1,5 +1,5 @@
-/* RAGNAR — sitewide "How it works" onboarding band.
-   Injected by nav.js on content pages so listing + using the site is obvious everywhere. */
+/* RAGNAR — home-only "How it works" onboarding band.
+   Injected by nav.js on the home page. */
 
 .howto {
   position: relative;
