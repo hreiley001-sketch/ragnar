@@ -9,10 +9,11 @@ import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from .config import settings
 from .database import init_db
@@ -119,6 +120,24 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+class StaticCacheMiddleware(BaseHTTPMiddleware):
+    """Long-lived Cache-Control for /static; shorter for /uploads."""
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        path = request.url.path
+        if path.startswith("/static/"):
+            response.headers.setdefault(
+                "Cache-Control", "public, max-age=604800, immutable"
+            )
+        elif path.startswith("/uploads/"):
+            response.headers.setdefault(
+                "Cache-Control", "public, max-age=3600"
+            )
+        return response
+
+
+app.add_middleware(StaticCacheMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_allow_origins,
@@ -178,6 +197,14 @@ def home():
     if page.exists():
         return FileResponse(str(page))
     return {"name": settings.app_name, "tagline": settings.tagline}
+
+
+@app.get("/ai-tools", include_in_schema=False)
+def ai_tools_page():
+    page = STATIC_DIR / "ai-tools.html"
+    if page.exists():
+        return FileResponse(str(page))
+    return {"error": "AI tools UI not found"}
 
 
 @app.get("/marketplace", include_in_schema=False)

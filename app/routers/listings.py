@@ -13,7 +13,18 @@ import csv
 import io
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Header, HTTPException, Query, UploadFile, status
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Header,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
+from sqlalchemy import text
 from sqlmodel import Session, select
 
 from ..auth import (
@@ -23,7 +34,7 @@ from ..auth import (
     require_user,
 )
 from ..config import settings
-from ..database import get_session
+from ..database import engine, get_session
 from ..fees import quote
 from ..models import (
     Category,
@@ -488,25 +499,40 @@ def get_listing(
     return ListingRead.from_listing(listing)
 
 
+def _bump_view_count(listing_id: int) -> None:
+    """Best-effort counter — never on the critical path of the item page."""
+    try:
+        with Session(engine) as session:
+            session.execute(
+                text(
+                    'UPDATE listing SET view_count = COALESCE(view_count, 0) + 1 '
+                    "WHERE id = :id"
+                ),
+                {"id": listing_id},
+            )
+            session.commit()
+    except Exception:  # noqa: BLE001
+        pass
+
+
 @router.get("/{listing_id}/full")
 def get_listing_full(
     listing_id: int,
+    background: BackgroundTasks,
     session: Session = Depends(get_session),
 ) -> dict:
     """Everything the item page needs in one call: listing + seller + stats."""
     listing = session.get(Listing, listing_id)
     if not listing:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found")
-    # Lightweight view analytics (eBay-style "N views") on the item page only.
-    listing.view_count = (listing.view_count or 0) + 1
-    session.add(listing)
-    session.commit()
-    session.refresh(listing)
+    # Defer write so page views don't amplify DB commits under load.
+    shown_views = (listing.view_count or 0) + 1
+    background.add_task(_bump_view_count, listing_id)
     seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
     data = ListingRead.from_listing(listing).model_dump()
     data["shipping"] = round((listing.shipping_cents or 0) / 100, 2)
     data["is_featured"] = bool(listing.is_featured)
-    data["view_count"] = listing.view_count or 0
+    data["view_count"] = shown_views
     data["seller"] = None if not seller else {
         "handle": seller.handle,
         "display_name": seller.display_name,

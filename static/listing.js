@@ -18,7 +18,7 @@ async function api(p, o = {}) {
   return d;
 }
 
-const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="var(--crest-primary)"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="var(--crest-accent)"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
+const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" fill="none"><rect x="34" y="16" width="52" height="48" rx="6" stroke="var(--crest-primary)" stroke-width="2.5"/><circle cx="49" cy="31" r="5" fill="var(--crest-accent)"/><path d="M39 58 L55 40 L65 51 L73 43 L81 58 Z" fill="var(--crest-primary)"/></svg>`;
 
 let LISTING = null;
 let myOffer = null;
@@ -94,7 +94,7 @@ function renderMain(l) {
   const sub = [l.set_name, l.card_number, l.year].filter((v) => v != null && v !== "").map(esc).join(" · ");
   const ship = l.shipping > 0 ? `+ ${money(l.shipping)} shipping` : "Free shipping";
   $("itemMain").innerHTML = `
-    ${sold ? `<div class="sold-banner">⚔ SOLD — this item has found a new hall</div>` : ""}
+    ${sold ? `<div class="sold-banner">SOLD — this item is no longer available</div>` : ""}
     <h1>${esc(l.title)}</h1>
     ${sub ? `<div class="item-sub">${sub}</div>` : ""}
     <div class="price-line"><span class="item-price">${money(l.price)}</span><span class="ship-note">${ship}</span></div>

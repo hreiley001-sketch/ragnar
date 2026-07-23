@@ -23,7 +23,7 @@ const accentGrad = (c) => {
   const accent = c || "var(--color-accent-fallback)";
   return `linear-gradient(135deg, color-mix(in srgb, ${accent} 28%, transparent), var(--color-bg-base)), radial-gradient(circle at 30% 20%, color-mix(in srgb, ${accent} 42%, transparent), transparent 60%)`;
 };
-const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg"><g fill="var(--crest-primary)"><path d="M60 30 L18 20 L30 27 L14 26 L28 33 L16 34 L30 40 L60 40 Z"/><path d="M60 30 L102 20 L90 27 L106 26 L92 33 L104 34 L90 40 L60 40 Z"/><path d="M60 24 L48 30 L44 44 L52 42 L48 54 L60 66 L72 54 L68 42 L76 44 L72 30 Z"/></g><g fill="var(--crest-accent)"><circle cx="55" cy="42" r="1.8"/><circle cx="65" cy="42" r="1.8"/></g></svg>`;
+const CREST = `<svg class="placeholder-crest" viewBox="0 0 120 80" xmlns="http://www.w3.org/2000/svg" fill="none"><rect x="34" y="16" width="52" height="48" rx="6" stroke="var(--crest-primary)" stroke-width="2.5"/><circle cx="49" cy="31" r="5" fill="var(--crest-accent)"/><path d="M39 58 L55 40 L65 51 L73 43 L81 58 Z" fill="var(--crest-primary)"/></svg>`;
 
 let STORE = null;
 let DESIGN_PRESET = "";
@@ -149,7 +149,7 @@ async function loadListings() {
   try {
     const items = await api(`/api/stores/${encodeURIComponent(HANDLE)}/listings?include_sold=true`);
     $("listCount").textContent = `${items.filter((i) => i.status === "active").length} listings`;
-    $("grid").innerHTML = items.length ? items.map(listingCard).join("") : `<div class="empty">This hall stands empty — no cards have been laid out yet.</div>`;
+    $("grid").innerHTML = items.length ? items.map(listingCard).join("") : `<div class="empty">This store is empty — no cards listed yet.</div>`;
     $("grid").querySelectorAll("[data-buy]").forEach((b) => b.addEventListener("click", () => buyListing(b.getAttribute("data-buy"))));
   } catch (err) {
     $("grid").innerHTML = `<div class="empty">Could not load listings: ${esc(err.message || "Unknown error")}.</div>`;

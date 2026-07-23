@@ -147,10 +147,10 @@
         </div>
         <div id="sellerSetup">
           <div class="field-row">
-            <label class="field"><span>Seller handle</span><input name="seller_handle" id="form-handle" maxlength="40" placeholder="yggdrasil" /></label>
+            <label class="field"><span>Seller handle</span><input name="seller_handle" id="form-handle" maxlength="40" placeholder="summitcards" /></label>
             <button type="button" id="applyFoundingBtn" class="btn btn-ghost btn-sm apply-btn">Apply as Founding Seller</button>
           </div>
-          <label class="field"><span>Display name *</span><input name="seller_name" id="form-seller" minlength="2" maxlength="80" placeholder="Yggdrasil Cards" /></label>
+          <label class="field"><span>Display name *</span><input name="seller_name" id="form-seller" minlength="2" maxlength="80" placeholder="Summit Cards" /></label>
           <button type="button" id="connectPayoutsBtn" class="btn btn-ghost btn-sm">💳 Set up payouts (Stripe)</button>
           <div id="sellerState" class="seller-state" hidden></div>
         </div>
@@ -485,7 +485,7 @@
     try {
       const created = await api("/api/listings", { method: "POST", body: JSON.stringify(payload) });
       status.className = "form-status ok"; status.textContent = "Published!";
-      toast(`"${created.title}" is live in the vault.`);
+      toast(`"${created.title}" is now listed.`);
       e.target.reset();
       $("scanPreview").hidden = true; $("scanResult").hidden = true; $("historyPanel").hidden = true;
       syncGradedFields(); updateFeePreview();

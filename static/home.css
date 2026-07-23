@@ -44,7 +44,7 @@ body.arena-home {
 .arena-home h2,
 .arena-home h3 {
   font-family: var(--arena-display);
-  font-weight: 400; /* Germania One — single weight */
+  font-weight: 700;
   letter-spacing: var(--tracking-display);
 }
 .arena-home ::selection { color: var(--color-on-accent); background: var(--arena-ice); }

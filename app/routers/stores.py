@@ -25,24 +25,40 @@ def _seller_or_404(handle: str, session: Session) -> Seller:
     return seller
 
 
-def _active_count(session: Session, seller_id: int) -> int:
-    return session.exec(
-        select(func.count()).select_from(Listing).where(
-            Listing.seller_id == seller_id,
-            Listing.status == ListingStatus.active.value,
-        )
-    ).one()
+def _batch_store_stats(
+    session: Session, seller_ids: list[int]
+) -> tuple[dict[int, int], set[int]]:
+    """One grouped count query + one live-id query instead of 2N lookups."""
+    if not seller_ids:
+        return {}, set()
+    counts = {
+        sid: int(n)
+        for sid, n in session.exec(
+            select(Listing.seller_id, func.count())
+            .where(
+                Listing.seller_id.in_(seller_ids),
+                Listing.status == ListingStatus.active.value,
+            )
+            .group_by(Listing.seller_id)
+        ).all()
+    }
+    live_ids = set(
+        session.exec(
+            select(LiveStream.seller_id).where(
+                LiveStream.seller_id.in_(seller_ids),
+                LiveStream.status == "live",
+            )
+        ).all()
+    )
+    return counts, live_ids
 
 
-def _is_live(session: Session, seller_id: int) -> bool:
-    return session.exec(
-        select(LiveStream.id).where(
-            LiveStream.seller_id == seller_id, LiveStream.status == "live"
-        ).limit(1)
-    ).first() is not None
-
-
-def _summary(session: Session, s: Seller) -> dict:
+def _summary(
+    s: Seller,
+    *,
+    listing_count: int = 0,
+    is_live: bool = False,
+) -> dict:
     from ..media import cdn_url
     return {
         "handle": s.handle,
@@ -57,8 +73,8 @@ def _summary(session: Session, s: Seller) -> dict:
         "font_family": s.font_family,
         "is_founding": s.is_founding,
         "founding_number": s.founding_number,
-        "listing_count": _active_count(session, s.id),
-        "is_live": _is_live(session, s.id),
+        "listing_count": listing_count,
+        "is_live": is_live,
     }
 
 
@@ -71,9 +87,17 @@ def list_stores(
     if q:
         like = f"%{q.strip()}%"
         stmt = stmt.where((Seller.display_name.ilike(like)) | (Seller.handle.ilike(like)))
-    sellers = session.exec(stmt).all()
+    sellers = list(session.exec(stmt).all())
+    counts, live_ids = _batch_store_stats(session, [s.id for s in sellers if s.id is not None])
     # Live stores first, then Founding, then by inventory.
-    summaries = [_summary(session, s) for s in sellers]
+    summaries = [
+        _summary(
+            s,
+            listing_count=counts.get(s.id, 0),
+            is_live=s.id in live_ids,
+        )
+        for s in sellers
+    ]
     summaries.sort(key=lambda d: (not d["is_live"], not d["is_founding"], -d["listing_count"]))
     return [StoreSummary(**d) for d in summaries]
 
@@ -81,7 +105,12 @@ def list_stores(
 @router.get("/{handle}", response_model=StoreProfile)
 def get_store(handle: str, session: Session = Depends(get_session)) -> StoreProfile:
     s = _seller_or_404(handle, session)
-    data = _summary(session, s)
+    counts, live_ids = _batch_store_stats(session, [s.id])
+    data = _summary(
+        s,
+        listing_count=counts.get(s.id, 0),
+        is_live=s.id in live_ids,
+    )
     data["bio"] = s.bio
     return StoreProfile(**data)
 
@@ -121,6 +150,11 @@ def update_store(
     session.add(s)
     session.commit()
     session.refresh(s)
-    data = _summary(session, s)
+    counts, live_ids = _batch_store_stats(session, [s.id])
+    data = _summary(
+        s,
+        listing_count=counts.get(s.id, 0),
+        is_live=s.id in live_ids,
+    )
     data["bio"] = s.bio
     return StoreProfile(**data)

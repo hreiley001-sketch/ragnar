@@ -12,9 +12,8 @@ from __future__ import annotations
 
 import logging
 
-import httpx
-
 from .config import settings
+from .http_client import sync_client
 from .models import Category
 
 logger = logging.getLogger("ragnar.pricing")
@@ -53,12 +52,12 @@ def market_price(query: str, category: str | None = None, game: str | None = Non
     if not game:
         return None
     try:
-        with httpx.Client(timeout=20.0) as client:
-            resp = client.get(
-                f"{settings.tcg_api_base}/v1/search",
-                params={"q": query, "game": game},
-                headers={"X-API-Key": settings.tcg_api_key},
-            )
+        resp = sync_client(timeout=20.0).get(
+            f"{settings.tcg_api_base}/v1/search",
+            params={"q": query, "game": game},
+            headers={"X-API-Key": settings.tcg_api_key},
+            timeout=20.0,
+        )
         if resp.status_code >= 400:
             logger.warning("TCG API failed %s: %s", resp.status_code, resp.text[:200])
             return None

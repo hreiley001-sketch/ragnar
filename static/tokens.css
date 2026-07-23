@@ -67,8 +67,8 @@
   --color-active-surface: rgba(169, 123, 22, 0.16);
   --color-disabled-surface: rgba(58, 44, 20, 0.05);
 
-  /* Germania One: carved Nordic display · Outfit: clean body · Plex Mono: rune labels */
-  --font-display: "Germania One", "Cinzel", "Times New Roman", serif;
+  /* Clean corporate sans throughout — display and body share one family */
+  --font-display: "Outfit", "Helvetica Neue", system-ui, -apple-system, sans-serif;
   --font-body: "Outfit", "Helvetica Neue", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
 
@@ -103,18 +103,12 @@
   --shadow-md: 0 10px 28px rgba(58, 44, 20, 0.10);
   --shadow-lg: 0 20px 48px rgba(58, 44, 20, 0.14);
   --shadow-focus: 0 0 0 3px rgba(169, 123, 22, 0.28);
-  --glow-ice: 0 6px 24px rgba(79, 150, 179, 0.14);
-  --glow-crystal: 0 8px 30px rgba(184, 121, 26, 0.10);
-  --glow-gold: 0 6px 24px rgba(184, 121, 26, 0.22);
+  /* Glows muted to near-flat — corporate, no shimmer/halo */
+  --glow-ice: 0 1px 3px rgba(58, 44, 20, 0.06);
+  --glow-crystal: 0 1px 3px rgba(58, 44, 20, 0.06);
+  --glow-gold: 0 1px 3px rgba(58, 44, 20, 0.07);
 
-  --card-foil: linear-gradient(
-    125deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(184, 121, 26, 0.12) 24%,
-    rgba(79, 150, 179, 0.10) 48%,
-    rgba(255, 255, 255, 0.55) 72%,
-    rgba(184, 121, 26, 0.10) 100%
-  );
+  --card-foil: none;
   --card-surface: linear-gradient(155deg, var(--color-bg-panel), var(--color-bg-panel-strong) 70%);
   --card-surface-live: linear-gradient(155deg, #fff6e6 0%, var(--color-bg-panel-strong) 55%, var(--color-bg-mid) 100%);
   --card-surface-archive: linear-gradient(165deg, #f2ece0 0%, #ece4d2 50%, var(--color-bg-base) 100%);

@@ -46,14 +46,29 @@ def get_cart(
     user: User = Depends(require_user),
 ) -> dict:
     items = list(session.exec(select(CartItem).where(CartItem.user_id == user.id)).all())
+    listing_ids = [i.listing_id for i in items]
+    listings_by_id: dict[int, Listing] = {}
+    if listing_ids:
+        for listing in session.exec(select(Listing).where(Listing.id.in_(listing_ids))).all():
+            listings_by_id[listing.id] = listing
+    seller_ids = [
+        listing.seller_id
+        for listing in listings_by_id.values()
+        if listing.seller_id is not None
+    ]
+    sellers_by_id: dict[int, Seller] = {}
+    if seller_ids:
+        for seller in session.exec(select(Seller).where(Seller.id.in_(seller_ids))).all():
+            sellers_by_id[seller.id] = seller
+
     lines = []
     by_seller: dict[str, list] = {}
     subtotal = 0.0
     for item in items:
-        listing = session.get(Listing, item.listing_id)
+        listing = listings_by_id.get(item.listing_id)
         if not listing or listing.status != ListingStatus.active.value:
             continue
-        seller = session.get(Seller, listing.seller_id) if listing.seller_id else None
+        seller = sellers_by_id.get(listing.seller_id) if listing.seller_id else None
         line = _listing_line(listing, seller, item.quantity)
         line["cart_item_id"] = item.id
         lines.append(line)

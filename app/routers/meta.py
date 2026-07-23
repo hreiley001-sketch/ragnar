@@ -4,6 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session
 
+from .. import cache as app_cache
 from .. import site_config
 from ..database import get_session
 
@@ -28,10 +29,11 @@ from ..schemas import SortOption
 
 router = APIRouter(prefix="/api", tags=["meta"])
 
+_META_CACHE_KEY = "api:meta"
+_META_TTL = 60.0
 
-@router.get("/meta")
-def meta() -> dict:
-    """Everything the UI needs to render structured listing controls."""
+
+def _build_meta() -> dict:
     return {
         "app": {
             "name": settings.app_name,
@@ -65,6 +67,12 @@ def meta() -> dict:
             "supabase": bool(settings.supabase_url),
         },
     }
+
+
+@router.get("/meta")
+def meta() -> dict:
+    """Everything the UI needs to render structured listing controls."""
+    return app_cache.get_or_set(_META_CACHE_KEY, _build_meta, ttl_seconds=_META_TTL)
 
 
 @router.get("/meta/fonts")

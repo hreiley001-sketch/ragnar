@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RAGNAR — AI Tools</title>
+  <meta name="description" content="The AI tools built into RAGNAR: smart search, scan-to-list, AI pricing, store designer, and support — and how to use each one." />
+  <link rel="icon" href="/static/logo.svg" />
+  <link rel="stylesheet" href="/static/tokens.css" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/asgard-shell.css" />
+  <link rel="stylesheet" href="/static/pages.css" />
+  <link rel="stylesheet" href="/static/platform.css" />
+  <style>
+    .ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin-top: 8px; }
+    .ai-card {
+      background: var(--color-bg-panel); border: 1px solid var(--color-border-subtle);
+      border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .ai-card h3 { margin: 0; font-size: var(--text-xl); display: flex; align-items: center; gap: 10px; }
+    .ai-card .ai-ico { font-size: 22px; }
+    .ai-card .ai-where { font-size: var(--text-sm); color: var(--color-crystal); font-weight: 600; letter-spacing: .02em; }
+    .ai-card p { margin: 0; color: var(--color-text-secondary); line-height: var(--leading-body); max-width: none; }
+    .ai-card ol { margin: 4px 0 0; padding-left: 20px; color: var(--color-text-secondary); line-height: 1.6; }
+    .ai-card .ai-eg { font-size: var(--text-sm); color: var(--color-text-muted); font-style: italic; }
+    .ai-card .ai-actions { margin-top: auto; padding-top: 8px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .ai-status-note { margin-top: 22px; padding: 14px 18px; border: 1px dashed var(--color-border-default);
+      border-radius: var(--radius-md); color: var(--color-text-muted); font-size: var(--text-sm); background: var(--color-bg-lit); }
+    .ai-staff { opacity: .9; }
+    .ai-staff .ai-where { color: var(--color-text-muted); }
+  </style>
+</head>
+<body class="asgard-realm page-ai-tools">
+  <header id="siteHeader"></header>
+
+  <main class="platform-main">
+    <section class="platform-hero">
+      <p class="asgard-kicker">AI Tools</p>
+      <h1>AI built into every step</h1>
+      <p>RAGNAR uses AI to help you find cards, list them fast, price them fairly, design your store, and get support — without the busywork. Here's every tool and how to use it.</p>
+      <div class="arena-hero-actions" style="margin-top:16px;">
+        <a class="arena-btn primary" href="/marketplace">Open the marketplace <span class="arrow">→</span></a>
+        <button type="button" class="arena-btn" id="tryConcierge">Try Ask RAGNAR <span class="arrow">→</span></button>
+      </div>
+    </section>
+
+    <section class="section section-tight">
+      <div class="ai-grid">
+
+        <div class="ai-card">
+          <h3><span class="ai-ico">💬</span> Ask RAGNAR</h3>
+          <span class="ai-where">Where: the “Ask RAGNAR” button, bottom-right of every page</span>
+          <p>Your shopping concierge. Describe what you want in plain language — a player, a set, a budget, a vibe — and it turns that into a filtered marketplace search. It can also restyle your own view (colors, dark mode) just for you.</p>
+          <ol>
+            <li>Click <b>Ask RAGNAR</b> (bottom-right).</li>
+            <li>Type what you're after, e.g. a player + budget.</li>
+            <li>It takes you to matching results in the marketplace.</li>
+          </ol>
+          <p class="ai-eg">“Cheap PSA 10 rookies under $50” · “A gift for a Lakers fan” · “Make my view dark”</p>
+          <div class="ai-actions"><button type="button" class="arena-btn small" id="tryConcierge2">Open Ask RAGNAR</button></div>
+        </div>
+
+        <div class="ai-card">
+          <h3><span class="ai-ico">📷</span> Scan-to-List</h3>
+          <span class="ai-where">Where: the “⚡ Sell” button → snap or upload a photo</span>
+          <p>Turn a photo of a card into a ready-to-post listing. The scanner reads the card and auto-fills set, player/character, year, grade, and category — so you're not typing every field.</p>
+          <ol>
+            <li>Click <b>⚡ Sell</b> in the header.</li>
+            <li>Add a photo of the card (or its slab).</li>
+            <li>Review the auto-filled details and post.</li>
+          </ol>
+          <p class="ai-eg">Works best with a clear, straight-on photo and readable card text.</p>
+          <div class="ai-actions"><button type="button" class="arena-btn small" data-open-sell>Start a listing</button></div>
+        </div>
+
+        <div class="ai-card">
+          <h3><span class="ai-ico">💲</span> AI Pricing &amp; Comps</h3>
+          <span class="ai-where">Where: inside the listing flow, after the card is identified</span>
+          <p>Price with confidence. RAGNAR suggests a price from recent sold comps for the same card, set, and grade — and shows the sold history behind it so you can adjust.</p>
+          <ol>
+            <li>Identify the card (via Scan-to-List or manually).</li>
+            <li>See the <b>suggested price</b> and recent sold comps.</li>
+            <li>Accept it or set your own.</li>
+          </ol>
+          <p class="ai-eg">“Suggested: $412 — based on 6 recent PSA 9 sales.”</p>
+          <div class="ai-actions"><a class="arena-btn small" href="/marketplace">Browse priced cards</a></div>
+        </div>
+
+        <div class="ai-card">
+          <h3><span class="ai-ico">🎨</span> Store Designer</h3>
+          <span class="ai-where">Where: My Store → Store Designer chat</span>
+          <p>Design your storefront by describing a vibe. The designer suggests an accent color, tagline, and bio to match — you preview it and apply in one click. No design skills needed.</p>
+          <ol>
+            <li>Go to <b>My Store</b>.</li>
+            <li>Tell the designer your vibe.</li>
+            <li>Preview the look and apply it.</li>
+          </ol>
+          <p class="ai-eg">“Clean and premium for high-end vintage” · “Bright and fun for Pokémon”</p>
+          <div class="ai-actions"><a class="arena-btn small" href="/mystore">Open My Store</a></div>
+        </div>
+
+        <div class="ai-card">
+          <h3><span class="ai-ico">🛟</span> Counsel — AI Support</h3>
+          <span class="ai-where">Where: the Support page</span>
+          <p>Resolution without the ticket queue. Counsel tracks orders, starts refunds and returns, and answers policy questions — acting when the answer is clear and escalating only the edge cases to a human.</p>
+          <ol>
+            <li>Open <b>Support</b>.</li>
+            <li>Describe the issue (include an order # if you have one).</li>
+            <li>Counsel resolves it or routes it to the team.</li>
+          </ol>
+          <p class="ai-eg">“Where's order #10423?” · “Start a return for a damaged card.”</p>
+          <div class="ai-actions"><a class="arena-btn small" href="/support">Open Support</a></div>
+        </div>
+
+        <div class="ai-card ai-staff">
+          <h3><span class="ai-ico">✨</span> RAGNAR Studio <span style="font-size:12px;color:var(--color-text-muted);">· staff</span></h3>
+          <span class="ai-where">Where: the “Studio” button (staff accounts only)</span>
+          <p>For the RAGNAR team: reshape the whole site — colors, fonts, announcements, and landing copy — in plain English, preview it live, and publish in one tap.</p>
+          <p class="ai-eg">“Announce the Friday live drop” · “Bolder headline about lower fees”</p>
+        </div>
+
+      </div>
+
+      <div class="ai-status-note">
+        Every AI tool degrades gracefully: if the AI service is briefly unavailable, RAGNAR falls back to a fast rules-based version so the feature still works. AI suggestions are assistive — you're always in control of the final listing, price, and store.
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/static/nav.js"></script>
+  <script src="/static/sell.js"></script>
+  <script>
+    // "Try Ask RAGNAR" buttons open the concierge widget injected by nav.js.
+    (function () {
+      function openConcierge() {
+        var fab = document.getElementById("fab-concierge");
+        if (fab) { fab.click(); }
+        else { var t = document.getElementById("toast"); if (t) { t.textContent = "Ask RAGNAR is loading — try again in a second."; t.classList.add("show"); setTimeout(function(){ t.classList.remove("show"); }, 2500); } }
+      }
+      ["tryConcierge", "tryConcierge2"].forEach(function (id) {
+        var b = document.getElementById(id);
+        if (b) b.addEventListener("click", openConcierge);
+      });
+    })();
+  </script>
+</body>
+</html>

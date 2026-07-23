@@ -20,22 +20,28 @@ if settings.use_supabase_db:
     except Exception:  # noqa: BLE001
         pass
 
+_IS_SQLITE = _db_url.startswith("sqlite")
+
 # SQLite needs check_same_thread=False when used with FastAPI's threadpool.
-_connect_args = (
+# Postgres via Supabase transaction-mode PgBouncer: disable prepared statements
+# (prepare_threshold=0) so connections can be safely reused across clients.
+_connect_args: dict = (
     {"check_same_thread": False}
-    if _db_url.startswith("sqlite")
-    else {}
+    if _IS_SQLITE
+    else {"prepare_threshold": 0}
 )
 
-# Postgres pool — small, explicit; LB fan-out expects many short connections.
-_engine_kwargs: dict = {"echo": settings.debug, "connect_args": _connect_args}
-if not _db_url.startswith("sqlite"):
+_engine_kwargs: dict = {
+    "echo": settings.debug,
+    "connect_args": _connect_args,
+}
+if not _IS_SQLITE:
+    # Small pool sized for transaction-mode PgBouncer (port 6543).
     _engine_kwargs.update(
-        {
-            "pool_size": int(os.getenv("DB_POOL_SIZE", "5")),
-            "max_overflow": int(os.getenv("DB_MAX_OVERFLOW", "10")),
-            "pool_pre_ping": True,
-        }
+        pool_pre_ping=True,
+        pool_size=int(os.getenv("DB_POOL_SIZE", "5")),
+        max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "10")),
+        pool_recycle=300,
     )
 
 engine = create_engine(_db_url, **_engine_kwargs)
@@ -89,7 +95,7 @@ def _quote_ident(name: str) -> str:
 
 
 def _sqlite_add_missing_columns() -> None:
-    if not _db_url.startswith("sqlite"):
+    if not _IS_SQLITE:
         return
     from sqlalchemy import inspect, text
 

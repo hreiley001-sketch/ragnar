@@ -29,7 +29,7 @@
       const fonts = document.createElement("link");
       fonts.id = "ragnar-fonts";
       fonts.rel = "stylesheet";
-      fonts.href = "https://fonts.googleapis.com/css2?family=Germania+One&family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap";
+      fonts.href = "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap";
       document.head.appendChild(pre1);
       document.head.appendChild(pre2);
       document.head.appendChild(fonts);
@@ -48,17 +48,17 @@
       css.href = "/static/birdman-chrome.css";
       document.head.appendChild(css);
     }
-    if (!document.getElementById("gods-css")) {
+    if (!document.getElementById("howto-css")) {
       const css = document.createElement("link");
-      css.id = "gods-css";
+      css.id = "howto-css";
       css.rel = "stylesheet";
-      css.href = "/static/gods.css";
+      css.href = "/static/howto.css";
       document.head.appendChild(css);
     }
-    if (!document.getElementById("gods-js")) {
+    if (!document.getElementById("howto-js")) {
       const s = document.createElement("script");
-      s.id = "gods-js";
-      s.src = "/static/gods.js";
+      s.id = "howto-js";
+      s.src = "/static/howto.js";
       s.defer = true;
       document.head.appendChild(s);
     }
@@ -99,7 +99,7 @@
         <div class="asgard-rail asgard-rail-l"><span>\u16b1</span><span>\u16a8</span><span>\u16b7</span><span>\u16be</span><span>\u16a8</span><span>\u16b1</span></div>
         <div class="asgard-rail asgard-rail-r"><span>\u16a6</span><span>\u16b1</span><span>\u16a8</span><span>\u16df</span><span>\u16b9</span><span>\u16a2</span></div>
         <div class="asgard-crest-seal">
-          <img src="/static/logo.png" alt="" width="120" height="120" decoding="async" />
+          <img src="/static/logo.svg" alt="" width="120" height="120" decoding="async" />
         </div>
         <div class="asgard-spark asgard-spark-a"></div>
         <div class="asgard-spark asgard-spark-b"></div>
@@ -142,13 +142,9 @@
   }
 
   ensureAsgardAssets();
-  mountAsgardRealm();
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", embellishAsgardPage);
-  } else {
-    embellishAsgardPage();
-  }
-  window.addEventListener("load", () => setTimeout(embellishAsgardPage, 400));
+  // Clean shell: plain page background, no atmosphere/ornaments/patron statues.
+  document.body.classList.remove("theme-utility");
+  if (!onHome) document.body.classList.add("asgard-realm");
 
   const ITEMS = [
     { icon: "🛒", label: "Marketplace", href: "/marketplace" },
@@ -159,6 +155,7 @@
     { icon: "🔔", label: "Notifications", href: "/notifications" },
     { icon: "👤", label: "Profile", href: "/account" },
     { icon: "🏠", label: "Home", href: "/" },
+    { icon: "🤖", label: "AI Tools", href: "/ai-tools" },
     { icon: "⭐", label: "Become a Seller", href: "/#apply" },
   ];
 
@@ -203,14 +200,14 @@
     const light = path === "/login" || path === "/verify";
     if (light) {
       header.innerHTML = `
-        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
         <div class="header-actions"></div>`;
       return;
     }
     // Home: one nav channel only — utilities in the bar, full destinations in the drawer.
     if (onHome) {
       header.innerHTML = `
-        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+        <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
         <div class="header-actions">
           <div class="header-extra" id="headerExtra"></div>
           <a class="btn btn-ghost btn-sm" href="/cart" title="Cart">🛒</a>
@@ -222,7 +219,7 @@
       return;
     }
     header.innerHTML = `
-      <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.png" alt="RAGNAR" class="logo-img" /></a></div>
+      <div class="brand"><a href="/" class="logo-link"><img src="/static/logo.svg" alt="RAGNAR" class="logo-img" /></a></div>
       <div class="header-actions">
         <div class="header-extra" id="headerExtra">${headerExtrasHtml()}</div>
         <a class="btn btn-ghost btn-sm" href="/marketplace">Marketplace</a>
@@ -250,11 +247,11 @@
   const drawer = mk("div", "nav-drawer");
   drawer.innerHTML = `
     <div class="nav-head">
-      <a href="/" style="display:inline-flex"><img src="/static/logo.png" alt="RAGNAR" /></a>
+      <a href="/" style="display:inline-flex"><img src="/static/logo.svg" alt="RAGNAR" /></a>
       <button class="nav-close" aria-label="Close menu">✕</button>
     </div>
     <nav class="nav-links" id="navLinks"></nav>
-    <div class="nav-foot">RAGNAR · ᚱᚨᚷᚾᚨᚱ</div>`;
+    <div class="nav-foot">RAGNAR</div>`;
   const links = drawer.querySelector("#navLinks");
   ITEMS.forEach((it) => links.appendChild(navLink(it)));
   links.appendChild(mk("div", "nav-div"));
@@ -512,7 +509,7 @@
     if (conciergeBuilt) return;
     conciergeBuilt = true;
     const w = createChatWidget({ key: "concierge", icon: "💬", label: "Ask RAGNAR", footNote: "What are you hunting for?" });
-    w.msg("The hall is open, traveler. Tell me what you're hunting — a player, a set, a grail — and I'll point the way. 🐺");
+    w.msg("Hi — I'm the RAGNAR assistant. Tell me what you're looking for — a player, a set, a specific card — and I'll help you find it.");
 
     function personalize(text) {
       const low = text.toLowerCase();
@@ -557,8 +554,8 @@
     });
 
     w.onFirstOpen(() => {
-      w.msg("Hey! Tell me what you're after — a card, a player, a vibe — and I'll find it. I can also restyle your view just for you. 🐺");
-      w.chips(["Vintage Charizard grails", "Cheap graded rookies under $50", "A gift for a Lakers fan", "Make my view dark & cozy"]);
+      w.msg("Tell me what you're after — a card, a player, or a category — and I'll find it. I can also adjust the look of your view.");
+      w.chips(["Vintage Charizard", "Graded rookies under $50", "A gift for a Lakers fan", "Switch my view to dark mode"]);
     });
   }
 
@@ -617,8 +614,8 @@
     });
 
     w.onFirstOpen(() => {
-      w.msg("Hey — I'm your Studio assistant. Tell me the vibe and I'll sculpt the whole site: colors, font, announcement, landing copy. Big swings welcome. 🐺");
-      w.chips(["Midnight forge: black + ember gold", "Icy, premium, minimal", "Announce our Friday live drop", "Bolder headline about beating eBay fees"]);
+      w.msg("I'm your Studio assistant. Tell me the direction and I'll update the whole site: colors, font, announcement, and landing copy.");
+      w.chips(["Clean, minimal, professional", "Announce our Friday live drop", "Bolder headline about lower fees", "Switch accent to blue"]);
     });
   }
 

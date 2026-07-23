@@ -12,9 +12,8 @@ import json
 import logging
 import re
 
-import httpx
-
 from .config import settings
+from .http_client import sync_client
 from .models import Category, GradingCompany
 
 logger = logging.getLogger("ragnar.ai")
@@ -31,17 +30,17 @@ def _chat(messages: list[dict], *, max_tokens: int = 400, temperature: float = 0
     if not settings.openai_api_key:
         return None
     try:
-        with httpx.Client(timeout=40.0) as client:
-            resp = client.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {settings.openai_api_key}"},
-                json={
-                    "model": settings.openai_vision_model,
-                    "messages": messages,
-                    "max_tokens": max_tokens,
-                    "temperature": temperature,
-                },
-            )
+        resp = sync_client(timeout=40.0).post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {settings.openai_api_key}"},
+            json={
+                "model": settings.openai_vision_model,
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+            },
+            timeout=40.0,
+        )
         if resp.status_code >= 400:
             logger.warning("OpenAI chat failed %s: %s", resp.status_code, resp.text[:200])
             return None
@@ -184,7 +183,7 @@ def _rules_design(prompt: str, current: dict) -> dict:
             break
     pretty = cname.replace("-", " ")
     tagline = (f"{pretty.title()} vibes for {focus} collectors." if focus
-               else f"A {pretty} store, forged on RAGNAR.")
+               else f"A {pretty} store on RAGNAR.")
     bio = ((f"Curated {focus} cards" if focus else "Curated cards")
            + f" with a {pretty} look — grading-aware listings, real sold-price history, "
              "and buyer protection on every sale.")

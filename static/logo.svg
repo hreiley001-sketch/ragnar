@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="RAGNAR">
+  <title>RAGNAR</title>
+  <circle cx="32" cy="32" r="30" fill="#fdfbf6" stroke="#b8791a" stroke-width="2.5"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6">
+    <!-- Left R (ink), mirror of the right — drawn first; shared stem reads gold on top -->
+    <g stroke="#221a10">
+      <path d="M32 17 V47"/>
+      <path d="M32 17 C19 17 19 32 32 32"/>
+      <path d="M32 32 L19 47"/>
+    </g>
+    <!-- Right R (gold) -->
+    <g stroke="#b8791a">
+      <path d="M32 17 V47"/>
+      <path d="M32 17 C45 17 45 32 32 32"/>
+      <path d="M32 32 L45 47"/>
+    </g>
+  </g>
+</svg>

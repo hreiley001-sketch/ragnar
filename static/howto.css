@@ -1,0 +1,53 @@
+/* RAGNAR — sitewide "How it works" onboarding band.
+   Injected by nav.js on content pages so listing + using the site is obvious everywhere. */
+
+.howto {
+  position: relative;
+  max-width: var(--content-max, 1200px);
+  margin: 18px auto;
+  padding: 22px clamp(18px, 3vw, 28px);
+  background: var(--color-bg-panel, #fffdf9);
+  border: 1px solid var(--color-border-subtle, rgba(58,44,20,.12));
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-sm);
+}
+.howto-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.howto-kicker { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--color-crystal, #7a5a14); }
+.howto-head h2 { margin: 0; font-size: var(--text-xl, 22px); }
+.howto-sub { margin: 0; color: var(--color-text-muted); font-size: var(--text-sm); }
+
+.howto-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 720px) { .howto-cols { grid-template-columns: 1fr; } }
+
+.howto-col {
+  border: 1px solid var(--color-border-subtle, rgba(58,44,20,.12));
+  border-radius: var(--radius-md, 14px);
+  padding: 16px 18px;
+  background: var(--color-bg-lit, #fdfbf6);
+}
+.howto-col[data-focus="1"] {
+  border-color: var(--color-border-gold, rgba(184,121,26,.5));
+  box-shadow: 0 0 0 1px var(--color-border-gold, rgba(184,121,26,.5)) inset;
+}
+.howto-col h3 { margin: 0 0 10px; font-size: var(--text-md, 16px); display: flex; align-items: center; gap: 8px; }
+.howto-col ol { margin: 0; padding-left: 0; list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 10px; }
+.howto-col li { position: relative; padding-left: 34px; color: var(--color-text-secondary); line-height: 1.5; font-size: var(--text-sm, 13px); }
+.howto-col li::before {
+  counter-increment: step; content: counter(step);
+  position: absolute; left: 0; top: -1px;
+  width: 24px; height: 24px; border-radius: 999px;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 12px;
+  color: var(--color-on-accent, #fdf3e2);
+  background: var(--color-accent-primary, #8a6510);
+}
+.howto-col li b { color: var(--color-text-primary); }
+
+.howto-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.howto-x {
+  position: absolute; top: 10px; right: 12px;
+  background: none; border: none; cursor: pointer;
+  font-size: 18px; line-height: 1; color: var(--color-text-muted);
+  padding: 4px 6px; border-radius: 8px;
+}
+.howto-x:hover { background: var(--color-hover-surface, rgba(169,123,22,.1)); color: var(--color-text-primary); }

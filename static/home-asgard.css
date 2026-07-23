@@ -119,21 +119,21 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
 .asgard-bifrost {
   position: absolute;
   inset: -25% -35%;
-  opacity: 0.32;
+  opacity: 0.22;
   pointer-events: none;
   background: linear-gradient(
     118deg,
     transparent 22%,
-    rgba(232, 122, 58, 0.14) 30%,
-    rgba(200, 144, 31, 0.28) 36%,
-    rgba(47, 143, 107, 0.22) 42%,
-    rgba(47, 147, 196, 0.26) 48%,
-    rgba(122, 92, 196, 0.24) 54%,
-    rgba(31, 143, 154, 0.2) 60%,
-    rgba(166, 124, 26, 0.18) 66%,
+    rgba(232, 122, 58, 0.1) 30%,
+    rgba(200, 144, 31, 0.18) 36%,
+    rgba(47, 143, 107, 0.14) 42%,
+    rgba(47, 147, 196, 0.16) 48%,
+    rgba(122, 92, 196, 0.14) 54%,
+    rgba(31, 143, 154, 0.12) 60%,
+    rgba(166, 124, 26, 0.12) 66%,
     transparent 76%
   );
-  filter: blur(10px) saturate(1.55);
+  filter: blur(12px) saturate(1.35);
   mix-blend-mode: multiply;
   animation: bifrostDrift 18s ease-in-out infinite alternate;
 }
@@ -250,6 +250,46 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
       transparent 72%);
 }
 
+/* Gem constellation around the crest — pantheon color pops */
+.asgard-crest::before,
+.asgard-crest::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+}
+.asgard-crest::before {
+  width: 11px; height: 11px;
+  top: 8%; left: 18%;
+  background: radial-gradient(circle at 30% 28%, #fff 0 18%, #f0d878 42%, #c8901f 100%);
+  box-shadow:
+    0 0 16px rgba(200, 144, 31, 0.85),
+    72px 18px 0 -2px #5eb8e0,
+    72px 18px 14px -2px rgba(47, 147, 196, 0.7),
+    18px 78px 0 -3px #4db88a,
+    18px 78px 12px -3px rgba(47, 143, 107, 0.65),
+    78px 70px 0 -2px #c070e0,
+    78px 70px 14px -2px rgba(122, 92, 196, 0.65);
+  animation: crestGemPulse 5.5s ease-in-out infinite;
+}
+.asgard-crest::after {
+  width: 9px; height: 9px;
+  top: 14%; right: 12%;
+  background: radial-gradient(circle at 30% 28%, #fff 0 16%, #40d0c8 45%, #1f8f9a 100%);
+  box-shadow:
+    0 0 14px rgba(31, 143, 154, 0.8),
+    -64px 28px 0 -2px #e8c050,
+    -64px 28px 12px -2px rgba(166, 124, 26, 0.7),
+    -12px 76px 0 -3px #e87850,
+    -12px 76px 12px -3px rgba(232, 120, 80, 0.55);
+  animation: crestGemPulse 5.5s ease-in-out infinite reverse;
+}
+@keyframes crestGemPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
 .asgard-crest-halo {
   position: absolute;
   inset: -8%;
@@ -328,6 +368,30 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
   width: 100%;
   max-width: 680px;
   margin-inline: auto;
+}
+
+/* Brand-first hero — RAGNAR is the signal; tagline supports */
+.vault-arrival-copy.asgard-throne h1#vaultHeroHeadline,
+body.arena-home--concise .vault-arrival-copy h1 {
+  font-family: var(--font-display) !important;
+  font-size: clamp(52px, 9vw, 104px) !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+  line-height: 0.95 !important;
+  margin: 0 0 12px;
+}
+.vault-hero-tagline {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3.2vw, 34px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary);
+  line-height: 1.25;
+}
+.vault-hero-tagline em {
+  font-style: italic;
+  color: var(--color-accent-primary-strong);
 }
 
 .vault-arrival-copy.asgard-throne .arena-hero-actions,
@@ -442,6 +506,8 @@ body.arena-home[data-vault-stage="4"] .vault-env-fjord {
   .asgard-crest-shimmer,
   .asgard-crest-logo,
   .asgard-crest-halo,
+  .asgard-crest::before,
+  .asgard-crest::after,
   .vault-env-frost,
   .vault-env-aurora-c { animation: none !important; }
 }
